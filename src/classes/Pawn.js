@@ -5,7 +5,7 @@ class Pawn extends GamePiece {
   constructor(name, color, point, movement) {
     super(name, color, point, movement);
     this.moved = false;
-    this.direction = color === "white" ? 1 : -1;
+    this.direction = this.color === "white" ? 1 : -1;
   }
   //Add EnPasse rule
   calculateAvailableMoves(currentPoint, grid) {
@@ -16,7 +16,7 @@ class Pawn extends GamePiece {
       finalMoves: [],
     };
 
-    calcPawnMovement(grid, currentPoint, this.direction, this.moved, pawnMovements);
+    calcPawnMovement(grid, currentPoint, this.direction, this.moved, this.color, pawnMovements);
 
     return pawnMovements.finalMoves;
   }

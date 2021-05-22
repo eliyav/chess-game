@@ -1,7 +1,7 @@
 import { setPieces, createGrid, validateMove } from "./helper/boardFunctions";
 
 class Board {
-  constructor({ boardSize, pieceInitialPoints, movement, columnNames }, gameState) {
+  constructor({ boardSize, pieceInitialPoints, movement, columnNames }) {
     this.data = {
       movement: movement,
       pieceInitialPoints: pieceInitialPoints,
@@ -9,7 +9,6 @@ class Board {
       columnNames: columnNames,
     };
     this.grid = createGrid(this.data.boardSize, this.data.columnNames);
-    this.gameState = gameState;
   }
 
   setBoard = () => {
@@ -19,10 +18,6 @@ class Board {
   resetBoard = () => {
     this.grid = createGrid(this.data.boardSize, this.data.columnNames);
     this.setBoard();
-  };
-
-  movePoints = (sourcePoint, targetPoint) => {
-    validateMove(sourcePoint, targetPoint, this.gameState, this.grid);
   };
 }
 
