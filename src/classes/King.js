@@ -11,10 +11,6 @@ class King extends GamePiece {
     //Calculate castling available with rooks
   }
 
-  isChecked() {
-    //Calculate if king is checked by enemy pieces
-  }
-
   calculateAvailableMoves(currentPoint, grid) {
     const kingMoves = [
       [0, 1],

@@ -19,6 +19,11 @@ class Board {
     this.grid = createGrid(this.data.boardSize, this.data.columnNames);
     this.setBoard();
   };
+
+  createBoardSnapshot = () => {
+    const grid = this.grid;
+    return [([...grid[0]], [...grid[1]], [...grid[2]], [...grid[3]], [...grid[4]], [...grid[5]], [...grid[6]], [...grid[7]])];
+  };
 }
 
 export default Board;

@@ -1,5 +1,5 @@
 import Board from "./Board";
-import { resolveMove } from "./helper/gameStateFunctions/";
+import { resolveMove, simulateCheckmate } from "./helper/gameFunctions/";
 
 class Game {
   constructor(gameData) {
@@ -12,9 +12,17 @@ class Game {
     this.gameState.currentPlayer = this.gameState.currentPlayer === this.teams[0] ? this.teams[1] : this.teams[0];
   };
 
-  movePiece = (sourcePoint, targetPoint) => {
-    if (resolveMove(sourcePoint, targetPoint, this.gameState, this.board.grid)) this.changePlayer();
+  switchTurn = () => {
+    this.changePlayer();
+    simulateCheckmate(this.gameState, this.board.grid) ? this.endGame() : null;
   };
+
+  endGame = () => {
+    console.log(`Game is over, ${this.gameState.currentPlayer} team wins!`);
+  };
+
+  movePiece = (sourcePoint, targetPoint) =>
+    resolveMove(sourcePoint, targetPoint, this.gameState, this.board.grid, this.endGame) ? this.switchTurn() : null;
 }
 
 export default Game;
