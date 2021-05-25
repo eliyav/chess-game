@@ -1,6 +1,8 @@
 const resolveMove = (originPoint, targetPoint, gameState, grid, endGame) => {
   const originSquare = grid[getX(originPoint)][getY(originPoint)];
   const targetSquare = grid[getX(targetPoint)][getY(targetPoint)];
+  const originPiece = originSquare.on;
+  const targetPiece = targetSquare.on;
   //Check if square has game piece on it
   if (originSquare.on === undefined) {
     console.log("No Piece Exists at source point!");
@@ -13,13 +15,14 @@ const resolveMove = (originPoint, targetPoint, gameState, grid, endGame) => {
     const validMove = possibleMoves.find((movePoint) => doPointsMatch(movePoint, targetPoint));
     if (validMove) {
       //Will resolving move be valid
-      if (canValidMoveResolve(originSquare, targetSquare, targetPoint, gameState, grid, endGame)) {
+      if (canValidMoveResolve(originSquare, targetSquare, originPiece, targetPiece, targetPoint, gameState, grid, endGame)) {
         //***Check for pawn promotion here********************
+        originPiece.moved = true;
         console.log("Move is Valid! Board is updated.");
         return true;
       } else {
         //Switch squares back after valid move resolve check --------Try and find a fix for this..
-        switchSquares(targetSquare, originSquare, originPoint);
+        switchSquaresBack(originSquare, targetSquare, originPiece, targetPiece, originPoint);
         console.log(`${gameState.currentPlayer} King will be in check if move is resolved`);
         return false;
       }
@@ -33,11 +36,11 @@ const resolveMove = (originPoint, targetPoint, gameState, grid, endGame) => {
   }
 };
 
-const canValidMoveResolve = (originSquare, targetSquare, targetPoint, gameState, grid, endGame) => {
+const canValidMoveResolve = (originSquare, targetSquare, originPiece, targetPiece, targetPoint, gameState, grid, endGame) => {
   //If target square is King, end game
   targetSquare.on !== undefined ? (targetSquare.on.name === "King" ? endGame() : null) : null;
   //Resolve Switch squares
-  switchSquares(originSquare, targetSquare, targetPoint);
+  switchSquares(originSquare, targetSquare, originPiece, targetPiece, targetPoint);
   //Check if resolve causes current players king to be check
   const kingSquare = findKing(gameState, grid);
   return isChecked(gameState, grid, kingSquare) ? false : true;
@@ -79,8 +82,10 @@ const simulateCheckmate = (gameState, grid, endGame) => {
     const isItCheckmate = availableMoves.map((move) => {
       const originSquare = grid[getX(originPoint)][getY(originPoint)];
       const targetSquare = grid[getX(move)][getY(move)];
-      return resolveMove(piece.point, move, gameState, grid, endGame)
-        ? switchSquares(targetSquare, originSquare, originPoint)
+      const originPiece = originSquare.on;
+      const targetPiece = targetSquare.on;
+      return simulateResolveMove(originPoint, move, gameState, grid, endGame)
+        ? switchSquaresBack(originSquare, targetSquare, originPiece, targetPiece, originPoint)
           ? false
           : true
         : true;
@@ -88,9 +93,9 @@ const simulateCheckmate = (gameState, grid, endGame) => {
     finalResults.push.apply(finalResults, isItCheckmate);
   });
 
-  const isCheckmate = finalResults.filter((result) => result === true);
+  const isCheckmate = finalResults.filter((result) => result === false);
   //If any return true, you are not in checkmate
-  return isCheckmate.length > 0 ? true : false;
+  return isCheckmate.length ? false : true;
 };
 
 const doPointsMatch = (movement, targetPoint) => getX(movement) == getX(targetPoint) && getY(movement) == getY(targetPoint);
@@ -136,11 +141,55 @@ const findKing = (gameState, grid) => {
   return findKing;
 };
 
-const switchSquares = (square1, square2, point) => {
-  square2.on = square1.on;
-  square2.on.point = [getX(point), getY(point)];
-  square1.on = undefined;
+const switchSquares = (originSquare, targetSquare, originPiece, targetPiece, point) => {
+  targetSquare.on = originPiece;
+  targetSquare.on.point = [getX(point), getY(point)];
+  originSquare.on = undefined;
   return true;
+};
+
+const switchSquaresBack = (originSquare, targetSquare, originPiece, targetPiece, point) => {
+  originSquare.on = originPiece;
+  originSquare.on.point = [getX(point), getY(point)];
+  targetSquare.on = targetPiece;
+  return true;
+};
+
+const simulateResolveMove = (originPoint, targetPoint, gameState, grid, endGame) => {
+  const originSquare = grid[getX(originPoint)][getY(originPoint)];
+  const targetSquare = grid[getX(targetPoint)][getY(targetPoint)];
+  const originPiece = originSquare.on;
+  const targetPiece = targetSquare.on;
+  //Check if square has game piece on it
+  if (originSquare.on === undefined) {
+    console.log("No Piece Exists at source point!");
+    return false;
+  }
+  //Check if game piece using square belongs to current player
+  else if (originSquare.on.color === gameState.currentPlayer) {
+    const possibleMoves = originSquare.on.calculateAvailableMoves(originPoint, grid);
+    //Check if the entered targetPoint is a valid move for current game piece
+    const validMove = possibleMoves.find((movePoint) => doPointsMatch(movePoint, targetPoint));
+    if (validMove) {
+      //Will resolving move be valid
+      if (canValidMoveResolve(originSquare, targetSquare, originPiece, targetPiece, targetPoint, gameState, grid, endGame)) {
+        //***Check for pawn promotion here********************
+        console.log("Move is Valid! Board is updated.");
+        return true;
+      } else {
+        //Switch squares back after valid move resolve check --------Try and find a fix for this..
+        switchSquaresBack(originSquare, targetSquare, originPiece, targetPiece, originPoint);
+        console.log(`${gameState.currentPlayer} King will be in check if move is resolved`);
+        return false;
+      }
+    } else {
+      console.log(`Target point ${targetPoint} is not a valid move for game piece!`);
+      return false;
+    }
+  } else {
+    console.log(`Piece doesn't belong to the ${gameState.currentPlayer} team!`);
+    return false;
+  }
 };
 
 export { resolveMove, isCheckmate, simulateCheckmate };

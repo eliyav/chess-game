@@ -4,6 +4,7 @@ import { filterToFinalMoves, calcHorizontalMovements } from "../helper/movementF
 class Bishop extends GamePiece {
   constructor(name, color, point, movement) {
     super(name, color, point, movement);
+    this.moved = false;
   }
   calculateAvailableMoves(currentPoint, grid) {
     const availableMoves = [];

@@ -4,6 +4,7 @@ import { calcKnightMovement } from "../helper/movementFunctions";
 class Knight extends GamePiece {
   constructor(name, color, point, movement) {
     super(name, color, point, movement);
+    this.moved = false;
   }
   calculateAvailableMoves(currentPoint, grid) {
     const knightMoves = [

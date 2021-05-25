@@ -62,16 +62,17 @@ const calcVerticalMovements = (grid, currentPoint, move, finalObj) => {
 
 const calcPawnMovement = (grid, currentPoint, direction, moved, color, finalObj) => {
   let [x, y] = currentPoint;
+
   //Calculate Movements
   if (moved) {
-    const movement = [x, y + direction];
+    const movement = [x, y + 1 * direction];
     const [moveX, moveY] = movement;
-    if (bounds(moveX, grid && bounds(moveY, grid))) {
+    if (bounds(moveX, grid) && bounds(moveY, grid)) {
       finalObj.finalMoves.push(movement);
     }
   } else {
-    const movement1 = [x, y + direction];
-    const movement2 = [x, y + direction * 2];
+    const movement1 = [x, y + 1 * direction];
+    const movement2 = [x, y + 2 * direction];
     const [move1X, move1Y] = movement1;
     const [move2X, move2Y] = movement2;
     if (bounds(move1X, grid) && bounds(move1Y, grid)) {
