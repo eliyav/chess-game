@@ -1,9 +1,9 @@
-import Pawn from "../classes/Pawn";
-import Rook from "../classes/Rook";
-import Bishop from "../classes/Bishop";
-import Knight from "../classes/Knight";
-import King from "../classes/King";
-import Queen from "../classes/Queen";
+import Pawn from "../component/Pawn";
+import Rook from "../component/Rook";
+import Bishop from "../component/Bishop";
+import Knight from "../component/Knight";
+import King from "../component/King";
+import Queen from "../component/Queen";
 
 const classes = { Pawn, Rook, Bishop, Knight, King, Queen };
 

@@ -192,4 +192,4 @@ const simulateResolveMove = (originPoint, targetPoint, gameState, grid, endGame)
   }
 };
 
-export { resolveMove, isCheckmate, simulateCheckmate };
+export { resolveMove, isCheckmate };

@@ -1,5 +1,5 @@
 import Board from "./Board";
-import { resolveMove, simulateCheckmate } from "./helper/gameFunctions/";
+import { resolveMove, isCheckmate } from "./helper/gameFunctions/";
 
 class Game {
   constructor(gameData) {
@@ -14,7 +14,7 @@ class Game {
 
   switchTurn = () => {
     this.changePlayer();
-    simulateCheckmate(this.gameState, this.board.grid) ? this.endGame() : null;
+    isCheckmate() ? this.endGame() : null;
   };
 
   endGame = () => {
