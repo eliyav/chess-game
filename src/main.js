@@ -1,6 +1,7 @@
 import Game from "./Game";
 import chessData from "./data/chessDataImport";
 import * as BABYLON from "babylonjs";
+import * as GUI from "babylonjs-gui";
 import "babylonjs-loaders";
 import createCanvas from "../view/Canvas";
 
@@ -13,7 +14,7 @@ function Main() {
   const engine = new BABYLON.Engine(canvas, true);
 
   (async () => {
-    const scene = await createCanvas(engine, canvas, BABYLON);
+    const scene = await createCanvas(engine, canvas, BABYLON, GUI, game.movePiece);
 
     engine.runRenderLoop(function () {
       scene.render();

@@ -8,17 +8,12 @@ class Pawn extends GamePiece {
     this.direction = this.color === "white" ? 1 : -1;
   }
   //Add EnPasse rule
-  calculateAvailableMoves(currentPoint, grid) {
-    let availableMoves = [];
-    let pawnMovements = {
-      movements: [],
-      captures: [],
-      finalMoves: [],
-    };
+  calculateAvailableMoves(grid, currentPoint = this.point) {
+    const availableMoves = [];
 
-    calcPawnMovement(grid, currentPoint, this.direction, this.moved, this.color, pawnMovements);
+    calcPawnMovement(grid, currentPoint, this.direction, this.moved, this.color, availableMoves);
 
-    return pawnMovements.finalMoves;
+    return availableMoves;
   }
 }
 

@@ -1,4 +1,4 @@
-import { setPieces, createGrid, validateMove } from "./helper/boardFunctions";
+import { setPieces, createGrid } from "./helper/boardHelpers";
 
 class Board {
   constructor({ boardSize, pieceInitialPoints, movement, columnNames }) {

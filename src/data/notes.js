@@ -22,3 +22,12 @@
 //Check kings moves against opponents moves
 //const filteredKingMoves = kingsMoves.filter((move) => !opponentsAvailableMoves.find((oppMove) => doPointsMatch(move, oppMove)));
 //const kingsMoves = kingSquare.on.calculateAvailableMoves(kingSquare.on.point, grid);
+
+// if (kingSquare) {
+//   if (isChecked(gameState, grid, kingSquare) ? true : false) {
+//     console.log("King is checked!");
+//     return simulateCheckmate(gameState, grid) ? true : false;
+//   }
+// } else {
+//   return false;
+// }

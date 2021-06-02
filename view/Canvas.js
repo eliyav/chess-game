@@ -1,6 +1,7 @@
+import Game from "../src/Game";
 import assetsLoader from "./assetLoader";
 
-async function createCanvas(engine, canvas, BABYLON) {
+async function createCanvas(engine, canvas, BABYLON, GUI, movePiece) {
   const scene = new BABYLON.Scene(engine);
 
   await assetsLoader(BABYLON);
@@ -20,6 +21,10 @@ async function createCanvas(engine, canvas, BABYLON) {
 
   //#region light
   const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0), scene);
+  //#endregion
+
+  //#region 3D UI manager
+
   //#endregion
 
   //#region ticker

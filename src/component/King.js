@@ -11,7 +11,7 @@ class King extends GamePiece {
     //Calculate castling available with rooks
   }
 
-  calculateAvailableMoves(currentPoint, grid) {
+  calculateAvailableMoves(grid, currentPoint = this.point) {
     const kingMoves = [
       [0, 1],
       [1, 1],

@@ -68,7 +68,7 @@ const calcPawnMovement = (grid, currentPoint, direction, moved, color, finalObj)
     const movement = [x, y + 1 * direction];
     const [moveX, moveY] = movement;
     if (bounds(moveX, grid) && bounds(moveY, grid)) {
-      finalObj.finalMoves.push(movement);
+      finalObj.push(movement);
     }
   } else {
     const movement1 = [x, y + 1 * direction];
@@ -76,10 +76,10 @@ const calcPawnMovement = (grid, currentPoint, direction, moved, color, finalObj)
     const [move1X, move1Y] = movement1;
     const [move2X, move2Y] = movement2;
     if (bounds(move1X, grid) && bounds(move1Y, grid)) {
-      finalObj.finalMoves.push(movement1);
+      finalObj.push(movement1);
     }
     if (bounds(move2X, grid) && bounds(move2Y, grid)) {
-      finalObj.finalMoves.push(movement2);
+      finalObj.push(movement2);
     }
   }
 
@@ -93,14 +93,14 @@ const calcPawnMovement = (grid, currentPoint, direction, moved, color, finalObj)
     const captureSquare1 = grid[capture1X][capture1Y];
     if (captureSquare1.on === undefined) {
     } else if (captureSquare1.on.color !== color) {
-      finalObj.finalMoves.push(capture1);
+      finalObj.push(capture1);
     }
   }
   if (bounds(capture2X, grid) && bounds(capture2Y, grid)) {
     const captureSquare2 = grid[capture2X][capture2Y];
     if (captureSquare2.on === undefined) {
     } else if (captureSquare2.on.color !== color) {
-      finalObj.finalMoves.push(capture2);
+      finalObj.push(capture2);
     }
   }
 };

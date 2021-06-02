@@ -5,7 +5,7 @@ import Knight from "../component/Knight";
 import King from "../component/King";
 import Queen from "../component/Queen";
 
-const classes = { Pawn, Rook, Bishop, Knight, King, Queen };
+const pieceClasses = { Pawn, Rook, Bishop, Knight, King, Queen };
 
 const createGrid = (boardSize, columnNames) => {
   return Array.from({ length: boardSize }, (array, idx) =>
@@ -19,10 +19,10 @@ const createGrid = (boardSize, columnNames) => {
 const setPieces = (grid, pieceInitialPoints, movement) => {
   pieceInitialPoints.forEach((array) =>
     array.forEach((ele) => {
-      let { name, color, points } = ele;
+      const { name, color, points } = ele;
       points.forEach((point) => {
-        let squareIndex = grid[point[0]][point[1]];
-        squareIndex.on = new classes[name](name, color, point, movement);
+        const squareIndex = grid[point[0]][point[1]];
+        squareIndex.on = new pieceClasses[name](name, color, point, movement);
       });
     })
   );
