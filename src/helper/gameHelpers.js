@@ -1,7 +1,8 @@
+import { pieceClasses } from "./boardHelpers";
+
 const resolveMove = (originPoint, targetPoint, gameState, grid, endGame) => {
   const squaresandPieces = getSquaresandPieces(originPoint, targetPoint, grid);
   const { originSquare, originPiece } = squaresandPieces;
-
   //Check if square has game piece on it
   if (originSquare.on === undefined) {
     console.log("No Piece Exists at source point!");
@@ -10,13 +11,13 @@ const resolveMove = (originPoint, targetPoint, gameState, grid, endGame) => {
   //Check if game piece using square belongs to current player
   else if (originSquare.on.color === gameState.currentPlayer) {
     const availableMoves = originSquare.on.calculateAvailableMoves(grid);
-    console.log(grid); //---------------------------------------------------------------------------------------delete console.log
     //Check if the entered targetPoint is a valid move for current game piece
     const validMove = availableMoves.find((possibleMove) => doMovesMatch(possibleMove, targetPoint));
     if (validMove) {
       //Will resolving move be valid
       if (canValidMoveResolve(squaresandPieces, targetPoint, gameState, grid, endGame)) {
-        //***Check for pawn promotion here********************
+        //Checks for Pawn Promotion
+        originPiece.name === "Pawn" ? checkForPawnPromotion(squaresandPieces) : null;
         originPiece.moved = true;
         console.log("Move is Valid! Board is updated.");
         return true;
@@ -53,6 +54,121 @@ const isChecked = (gameState, grid, kingSquare) => {
   const kingIsChecked = opponentsAvailableMoves.find((move) => doMovesMatch(move, kingSquare.on.point));
   //Returns an array with the kings location if checked
   return kingIsChecked;
+};
+
+//Checks if castling is valid
+const checkForCastling = (originPoint, targetPoint, gameState, grid) => {
+  const squaresandPieces = getSquaresandPieces(originPoint, targetPoint, grid);
+  const { originPiece, targetPiece } = squaresandPieces;
+  //Check for valid castling pieces
+  if (originPiece.moved === false && targetPiece.moved === false) {
+    if (originPiece.name === "King" && targetPiece.name === "Rook") {
+      //Check for valid team
+      if (originPiece.color === gameState.currentPlayer && targetPiece.color === gameState.currentPlayer) {
+        //Check if king is currently in check
+        const kingSquare = findKing(gameState, grid);
+        const isKingChecked = isChecked(gameState, grid, kingSquare);
+        if (isKingChecked) {
+          console.log("King is checked!");
+          return false;
+        } else {
+          //Check squares between king and rook are unoccupied.
+          const a = getX(originPoint);
+          const b = getX(targetPoint);
+          const y = getY(originPoint);
+          let c = a - b;
+          let d;
+          c < 0 ? (d = c * -1 - 1) : (d = c - 1);
+
+          const squaresInBetween = [];
+          for (let i = 1; i <= d; i++) {
+            if (a - b > 0) {
+              const point = [a - i, y];
+              squaresInBetween.push(point);
+            } else {
+              const point = [a + i, y];
+              squaresInBetween.push(point);
+            }
+          }
+          const squaresInUse = squaresInBetween
+            .map((point) => {
+              const square = grid[getX(point)][getY(point)];
+              return square.on === undefined ? false : true;
+            })
+            .filter((result) => result === true);
+
+          if (squaresInUse.length) {
+            console.log("Squares in between are in use by other game pieces, Castling not available!");
+            return false;
+          } else {
+            //Check if opponents pieces, threathen any of the spaces in between
+            const opponentsPieces = getOpponentsPieces(gameState, grid);
+            const opponentsAvailableMoves = getMoves(grid, opponentsPieces);
+            const isThereOverlap = [];
+            for (let i = 0; i < squaresInBetween.length; i++) {
+              const square = squaresInBetween[i];
+              for (let k = 0; k < opponentsAvailableMoves.length; k++) {
+                const availableMove = opponentsAvailableMoves[k];
+                const doesMoveMatchSquare = doMovesMatch(availableMove, square);
+                doesMoveMatchSquare ? isThereOverlap.push(doesMoveMatchSquare) : null;
+              }
+            }
+            if (isThereOverlap.length === 0) {
+              console.log("Castling Successful, Switching Squares!");
+              c < 0 ? (c = 1) : (c = -1);
+              castlingMove(c, squaresandPieces, grid);
+              return true;
+            } else {
+              console.log("Castling Not Available!, One of Squares is under Enemy Threat!");
+              return false;
+            }
+          }
+        }
+      } else {
+        console.log("Both pieces must belong to currentPlayer!");
+        return false;
+      }
+    } else {
+      console.log("Moving piece must be King, target piece needs to be Rook!");
+      return false;
+    }
+  } else {
+    console.log("Both King and Rook need to have not moved!");
+    return false;
+  }
+};
+
+const castlingMove = (direction, squaresandPieces, grid) => {
+  const { originSquare, originPiece, targetSquare, targetPiece } = squaresandPieces;
+  const { name, color, point, movement } = originPiece;
+  const { name: name2, color: color2, movement: movement2 } = targetPiece;
+  originSquare.on = undefined;
+  targetSquare.on = undefined;
+  //Move King 2 Spaces from current location in the direction of rook
+  //Move the Rook 1 space in that same direction from the kings original location
+  const newKingX = getX(point) + direction * 2;
+  const newRookX = getX(point) + direction;
+  const y = getY(point);
+  const newKingPoint = [newKingX, y];
+  const newRookPoint = [newRookX, y];
+  const newKingSquare = grid[newKingX][y];
+  const newRookSquare = grid[newRookX][y];
+  newKingSquare.on = new pieceClasses[name](name, color, newKingPoint, movement);
+  newRookSquare.on = new pieceClasses[name2](name2, color2, newRookPoint, movement2);
+};
+
+//Checks for pawn promotion
+const checkForPawnPromotion = async (squaresandPieces) => {
+  const { targetSquare, originPiece } = squaresandPieces;
+  const y = getY(originPiece.point);
+  if (y === 7 || y === 0) {
+    const newClass = await prompt(
+      "Piece Promoted! Please type your new piece. Your Choices are: King, Queen, Knight, Bishop, Rook, Pawn",
+      "Enter class name here"
+    ); //Change with UI prompt
+    const { color, point, movement } = originPiece;
+    targetSquare.on = new pieceClasses[newClass](newClass, color, point, movement);
+  }
 };
 
 //Functions to switch game pieces back and forth between squares once move is entered
@@ -199,4 +315,4 @@ const simulateResolveMove = (originPoint, targetPoint, gameState, grid, endGame)
   }
 };
 
-export { resolveMove, isCheckmate };
+export { resolveMove, isCheckmate, checkForCastling };

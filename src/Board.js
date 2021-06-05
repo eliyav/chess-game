@@ -18,6 +18,7 @@ class Board {
   resetBoard = () => {
     this.grid = createGrid(this.data.boardSize, this.data.columnNames);
     this.setBoard();
+    return console.log("Board Has Been Reset!");
   };
 
   createBoardSnapshot = () => {

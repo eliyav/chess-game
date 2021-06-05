@@ -28,4 +28,4 @@ const setPieces = (grid, pieceInitialPoints, movement) => {
   );
 };
 
-export { setPieces, createGrid };
+export { setPieces, createGrid, pieceClasses };
