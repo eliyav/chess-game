@@ -1,17 +1,12 @@
 import Game from "../src/Game";
 import assetsLoader from "./assetLoader";
+import assetTransforms from "./assetTransforms";
 
-async function createCanvas(engine, canvas, BABYLON, GUI, movePiece) {
+async function createCanvas(engine, canvas, BABYLON, chessData) {
   const scene = new BABYLON.Scene(engine);
 
-  await assetsLoader(BABYLON);
-
-  //#region temp scaling
-  scene.meshes[0].scalingDeterminant = 50;
-  scene.meshes[1].scalingDeterminant = 50;
-  scene.meshes[2].scalingDeterminant = 50;
-  scene.meshes[3].scalingDeterminant = 50;
-  //#endregion
+  scene.finalMeshList = await assetsLoader(BABYLON);
+  await assetTransforms(scene.finalMeshList, chessData);
 
   //#region camera
   const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 1, Math.PI / 3, 40, new BABYLON.Vector3(0, 0, 0), scene);
@@ -26,7 +21,7 @@ async function createCanvas(engine, canvas, BABYLON, GUI, movePiece) {
   //#region 3D UI manager
 
   //#endregion
-
+  console.log(scene);
   //#region ticker
   const animateDistance = () => {
     requestAnimationFrame(() => {

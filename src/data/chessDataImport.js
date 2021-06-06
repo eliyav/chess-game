@@ -1,17 +1,17 @@
 const chessData = {
   boardSize: 8,
   columnNames: [["A"], ["B"], ["C"], ["D"], ["E"], ["F"], ["G"], ["H"]],
-  teams: ["white", "black"],
+  teams: ["White", "Black"],
   pieces: ["Pawn", "Rook", "Bishop", "Knight", "King", "Queen"],
   movement: [1, 2, 3, 4, 5, 6, 7],
   initialState: {
-    currentPlayer: "white",
+    currentPlayer: "White",
   },
   pieceInitialPoints: [
     [
       {
         name: "Pawn",
-        color: "white",
+        color: "White",
         points: [
           [0, 1],
           [1, 1],
@@ -25,7 +25,7 @@ const chessData = {
       },
       {
         name: "Rook",
-        color: "white",
+        color: "White",
         points: [
           [0, 0],
           [7, 0],
@@ -33,7 +33,7 @@ const chessData = {
       },
       {
         name: "Bishop",
-        color: "white",
+        color: "White",
         points: [
           [2, 0],
           [5, 0],
@@ -41,7 +41,7 @@ const chessData = {
       },
       {
         name: "Knight",
-        color: "white",
+        color: "White",
         points: [
           [1, 0],
           [6, 0],
@@ -49,19 +49,19 @@ const chessData = {
       },
       {
         name: "King",
-        color: "white",
+        color: "White",
         points: [[4, 0]],
       },
       {
         name: "Queen",
-        color: "white",
+        color: "White",
         points: [[3, 0]],
       },
     ],
     [
       {
         name: "Pawn",
-        color: "black",
+        color: "Black",
         points: [
           [0, 6],
           [1, 6],
@@ -75,7 +75,7 @@ const chessData = {
       },
       {
         name: "Rook",
-        color: "black",
+        color: "Black",
         points: [
           [0, 7],
           [7, 7],
@@ -83,7 +83,7 @@ const chessData = {
       },
       {
         name: "Bishop",
-        color: "black",
+        color: "Black",
         points: [
           [2, 7],
           [5, 7],
@@ -91,7 +91,7 @@ const chessData = {
       },
       {
         name: "Knight",
-        color: "black",
+        color: "Black",
         points: [
           [1, 7],
           [6, 7],
@@ -99,13 +99,115 @@ const chessData = {
       },
       {
         name: "King",
-        color: "black",
+        color: "Black",
         points: [[4, 7]],
       },
       {
         name: "Queen",
-        color: "black",
+        color: "Black",
         points: [[3, 7]],
+      },
+    ],
+  ],
+  gridInitialPoints: [
+    [
+      {
+        name: "Pawn",
+        color: "White",
+        points: [
+          [7.5, 10.5],
+          [7.5, 7.5],
+          [7.5, 4.5],
+          [7.5, 1.5],
+          [7.5, -1.5],
+          [7.5, -4.5],
+          [7.5, -7.5],
+          [7.5, -10.5],
+        ],
+      },
+      {
+        name: "Rook",
+        color: "White",
+        points: [
+          [10.5, 10.5],
+          [10.5, -10.5],
+        ],
+      },
+      {
+        name: "Bishop",
+        color: "White",
+        points: [
+          [10.5, 4.5],
+          [10.5, -4.5],
+        ],
+      },
+      {
+        name: "Knight",
+        color: "White",
+        points: [
+          [10.5, 7.5],
+          [10.5, -7.5],
+        ],
+      },
+      {
+        name: "King",
+        color: "White",
+        points: [[10.5, -1.5]],
+      },
+      {
+        name: "Queen",
+        color: "White",
+        points: [[10.5, 1.5]],
+      },
+    ],
+    [
+      {
+        name: "Pawn",
+        color: "Black",
+        points: [
+          [-7.5, 10.5],
+          [-7.5, 7.5],
+          [-7.5, 4.5],
+          [-7.5, 1.5],
+          [-7.5, -1.5],
+          [-7.5, -4.5],
+          [-7.5, -7.5],
+          [-7.5, -10.5],
+        ],
+      },
+      {
+        name: "Rook",
+        color: "Black",
+        points: [
+          [-10.5, 10.5],
+          [-10.5, -10.5],
+        ],
+      },
+      {
+        name: "Bishop",
+        color: "Black",
+        points: [
+          [-10.5, 4.5],
+          [-10.5, -4.5],
+        ],
+      },
+      {
+        name: "Knight",
+        color: "Black",
+        points: [
+          [-10.5, 7.5],
+          [-10.5, -7.5],
+        ],
+      },
+      {
+        name: "King",
+        color: "Black",
+        points: [[-10.5, -1.5]],
+      },
+      {
+        name: "Queen",
+        color: "Black",
+        points: [[-10.5, 1.5]],
       },
     ],
   ],

@@ -26,6 +26,7 @@ class Game {
       checkNewGame = await prompt("Game is over, would you like to play another game? Please type 'Yes' or 'No'");
     }
     checkNewGame === "Yes" ? this.board.resetBoard() : null;
+    //set player to white team
   };
 
   movePiece = (originPoint, targetPoint) =>

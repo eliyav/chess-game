@@ -14,7 +14,7 @@ function Main() {
   const engine = new BABYLON.Engine(canvas, true);
 
   (async () => {
-    const scene = await createCanvas(engine, canvas, BABYLON, GUI, game.movePiece);
+    const scene = await createCanvas(engine, canvas, BABYLON, chessData);
 
     engine.runRenderLoop(function () {
       scene.render();
