@@ -1,8 +1,7 @@
-import Game from "../src/Game";
 import assetsLoader from "./assetLoader";
 import assetTransforms from "./assetTransforms";
 
-async function createCanvas(engine, canvas, BABYLON, chessData) {
+async function Canvas(engine, canvas, BABYLON, chessData) {
   const scene = new BABYLON.Scene(engine);
 
   scene.finalMeshList = await assetsLoader(BABYLON);
@@ -21,7 +20,7 @@ async function createCanvas(engine, canvas, BABYLON, chessData) {
   //#region 3D UI manager
 
   //#endregion
-  console.log(scene);
+
   //#region ticker
   const animateDistance = () => {
     requestAnimationFrame(() => {
@@ -35,4 +34,4 @@ async function createCanvas(engine, canvas, BABYLON, chessData) {
   return scene;
 }
 
-export default createCanvas;
+export default Canvas;

@@ -1,4 +1,4 @@
-import { setPieces, createGrid } from "./helper/boardHelpers";
+import { createGrid } from "./helper/boardHelpers";
 
 class Board {
   constructor({ boardSize, pieceInitialPoints, movement, columnNames }) {
@@ -10,16 +10,6 @@ class Board {
     };
     this.grid = createGrid(this.data.boardSize, this.data.columnNames);
   }
-
-  setBoard = () => {
-    setPieces(this.grid, this.data.pieceInitialPoints, this.data.movement);
-  };
-
-  resetBoard = () => {
-    this.grid = createGrid(this.data.boardSize, this.data.columnNames);
-    this.setBoard();
-    return console.log("Board Has Been Reset!");
-  };
 
   createBoardSnapshot = () => {
     const grid = this.grid;

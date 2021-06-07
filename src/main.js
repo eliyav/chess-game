@@ -3,19 +3,17 @@ import chessData from "./data/chessDataImport";
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
 import "babylonjs-loaders";
-import createCanvas from "../view/Canvas";
+import Canvas from "../view/Canvas";
 
-function Main() {
-  const game = new Game(chessData);
-  game.board.setBoard();
-  window.game = game;
-
+async function Main() {
   const canvas = document.getElementById("renderCanvas");
   const engine = new BABYLON.Engine(canvas, true);
+  const scene = await Canvas(engine, canvas, BABYLON, chessData);
+  const game = new Game(chessData, scene);
+  game.setBoard();
+  window.game = game;
 
   (async () => {
-    const scene = await createCanvas(engine, canvas, BABYLON, chessData);
-
     engine.runRenderLoop(function () {
       scene.render();
     });
