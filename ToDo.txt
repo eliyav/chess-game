@@ -8,6 +8,7 @@ Turn Timers
 Add draw/resign, previous turn, next turn, 
 
 UI:
+rotate camera on turn switch until WebRTC
 Interactable UI, click on squares
 Display the available moves calculated by a piece on the board
 Build UI layout for canvas to center

@@ -8,9 +8,9 @@ async function Canvas(engine, canvas, BABYLON, GUI, chessData) {
   await assetTransforms(scene.finalMeshList, chessData);
 
   //#region camera
-  const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 1, Math.PI / 3, 40, new BABYLON.Vector3(0, 0, 0), scene);
-  camera.attachControl(canvas, true);
-  camera.useFramingBehavior = true;
+  const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 1, Math.PI / 4, 30, new BABYLON.Vector3(-1, 0, 0), scene);
+  //camera.attachControl(canvas, true);
+  camera.useFramingBehavior = false;
   //#endregion
 
   //#region light
