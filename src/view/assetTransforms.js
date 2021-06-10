@@ -16,6 +16,7 @@ const assetTransforms = async (meshList, chessData) => {
         filteredPieces[idx].point = [point[0], point[1]];
         filteredPieces[idx].position.x = gridPoint[0];
         filteredPieces[idx].position.z = gridPoint[1];
+        filteredPieces[idx].isVisible = true;
       });
     })
   );

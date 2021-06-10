@@ -18,9 +18,56 @@ const updateScene = (originPoint, targetPoint, gameState, scene) => {
   movingMesh.point = targetPoint;
   //Get rid of eaten piece
   if (targetMesh) {
-    targetMesh.point = null;
+    targetMesh.point = [8, 8];
     targetMesh.isVisible = false;
   }
 };
 
-export { updateScene };
+const calculatePoint = (x, y) => {
+  //Calculate X
+  if (x > 9 && x < 12) {
+    x = 0;
+  } else if (x > 6 && x < 9) {
+    x = 1;
+  } else if (x > 3 && x < 6) {
+    x = 2;
+  } else if (x > 0 && x < 3) {
+    x = 3;
+  } else if (x < 0 && x > -3) {
+    x = 4;
+  } else if (x < -3 && x > -6) {
+    x = 5;
+  } else if (x < -6 && x > -9) {
+    x = 6;
+  } else if (x < -9 && x > -12) {
+    x = 7;
+  } else {
+    return console.log("You have not clicked a valid X coordinate", x);
+  }
+  //Calculate Y
+  if (y < -9 && y > -12) {
+    y = 0;
+  } else if (y < -6 && y > -9) {
+    y = 1;
+  } else if (y < -3 && y > -6) {
+    y = 2;
+  } else if (y < 0 && y > -3) {
+    y = 3;
+  } else if (y > 0 && y < 3) {
+    y = 4;
+  } else if (y > 3 && y < 6) {
+    y = 5;
+  } else if (y > 6 && y < 9) {
+    y = 6;
+  } else if (y > 9 && y < 12) {
+    y = 7;
+  } else {
+    return console.log("You have not clicked a valid Y coordinate", y);
+  }
+
+  const canvasX = x;
+  const canvasY = y;
+  return [canvasX, canvasY];
+};
+
+export { updateScene, calculatePoint };

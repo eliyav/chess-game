@@ -1,16 +1,16 @@
-import board from "../assets/board.gltf";
-import pawnWhite from "../assets/white pieces/pawn-white.gltf";
-import rookWhite from "../assets/white pieces/rook-white.gltf";
-import bishopWhite from "../assets/white pieces/bishop-white.gltf";
-import knightWhite from "../assets/white pieces/knight-white.gltf";
-import kingWhite from "../assets/white pieces/king-white.gltf";
-import queenWhite from "../assets/white pieces/queen-white.gltf";
-import pawnBlack from "../assets/black pieces/pawn-black.gltf";
-import rookBlack from "../assets/black pieces/rook-black.gltf";
-import bishopBlack from "../assets/black pieces/bishop-black.gltf";
-import knightBlack from "../assets/black pieces/knight-black.gltf";
-import kingBlack from "../assets/black pieces/king-black.gltf";
-import queenBlack from "../assets/black pieces/queen-black.gltf";
+import board from "../../assets/board.gltf";
+import pawnWhite from "../../assets/white pieces/pawn-white.gltf";
+import rookWhite from "../../assets/white pieces/rook-white.gltf";
+import bishopWhite from "../../assets/white pieces/bishop-white.gltf";
+import knightWhite from "../../assets/white pieces/knight-white.gltf";
+import kingWhite from "../../assets/white pieces/king-white.gltf";
+import queenWhite from "../../assets/white pieces/queen-white.gltf";
+import pawnBlack from "../../assets/black pieces/pawn-black.gltf";
+import rookBlack from "../../assets/black pieces/rook-black.gltf";
+import bishopBlack from "../../assets/black pieces/bishop-black.gltf";
+import knightBlack from "../../assets/black pieces/knight-black.gltf";
+import kingBlack from "../../assets/black pieces/king-black.gltf";
+import queenBlack from "../../assets/black pieces/queen-black.gltf";
 
 const assetsLoader = async (BABYLON) => {
   let meshesToLoad = [
@@ -45,7 +45,7 @@ const assetsLoader = async (BABYLON) => {
         ? finalMeshList[1].push(finalMesh)
         : finalMeshList[2].push(mesh.meshes);
     }
-    mesh.meshes.forEach((mesh) => (mesh.isPickable = false));
+    mesh.meshes.forEach((mesh) => (mesh.isPickable = true));
     finalMeshList[2].push(mesh.meshes);
   });
 

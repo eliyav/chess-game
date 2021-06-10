@@ -1,5 +1,5 @@
 import GamePiece from "./GamePiece";
-import { filterToFinalMoves, calcVerticalMovements } from "../helper/movementFunctions";
+import { filterToFinalMoves, calcVerticalMovements } from "../../helper/movementFunctions";
 
 class Rook extends GamePiece {
   constructor(name, color, point, movement) {

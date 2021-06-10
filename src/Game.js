@@ -1,7 +1,7 @@
 import Board from "./Board";
 import { resolveMove, isCheckmate, checkForCastling } from "./helper/gameHelpers";
 import { setPieces, createGrid } from "./helper/boardHelpers";
-import assetTransforms from "../view/assetTransforms";
+import assetTransforms from "./view/assetTransforms";
 import { updateScene } from "./helper/canvasHelpers";
 
 class Game {
@@ -24,6 +24,7 @@ class Game {
     assetTransforms(this.scene.finalMeshList, this.chessData);
     return console.log("Board Has Been Reset!");
   };
+
   changePlayer = () => {
     this.gameState.currentPlayer = this.gameState.currentPlayer === this.teams[0] ? this.teams[1] : this.teams[0];
   };
@@ -39,15 +40,13 @@ class Game {
     while (checkNewGame !== "Yes" && checkNewGame !== "No") {
       checkNewGame = await prompt("Game is over, would you like to play another game? Please type 'Yes' or 'No'");
     }
-    checkNewGame === "Yes" ? this.board.resetBoard() : null;
+    checkNewGame === "Yes" ? this.resetBoard() : null;
     //set player to white team
   };
 
-  movePiece = (originPoint, targetPoint) => {
-    const resolved = resolveMove(originPoint, targetPoint, this.gameState, this.board.grid, this.scene, this.endGame);
-    resolved ? updateScene(originPoint, targetPoint, this.gameState, this.scene) : null;
-    resolved ? this.switchTurn() : null;
-  };
+  movePiece = (originPoint, targetPoint) =>
+    resolveMove(originPoint, targetPoint, this.gameState, this.board.grid, this.scene, this.endGame);
+
   castling = (originPoint, targetPoint) => {
     checkForCastling(originPoint, targetPoint, this.gameState, this.board.grid) ? this.switchTurn() : null;
   };

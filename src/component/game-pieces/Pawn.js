@@ -1,5 +1,5 @@
 import GamePiece from "./GamePiece";
-import { calcPawnMovement } from "../helper/movementFunctions";
+import { calcPawnMovement } from "../../helper/movementFunctions";
 
 class Pawn extends GamePiece {
   constructor(name, color, point, movement) {
