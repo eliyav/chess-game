@@ -1,17 +1,19 @@
 import "babylonjs-loaders";
 import * as BABYLON from "babylonjs";
-import * as GUI from "babylonjs-gui";
+import * as GUI from "babylonjs-gui"; //Unused for now, leave
 import Game from "./Game";
 import Canvas from "./view/Canvas";
 import EventEmitter from "./component/EventEmitter";
 import chessData from "./data/chessDataImport";
 import { updateScene, calculatePoint } from "./helper/canvasHelpers";
+import assetTransforms from "./view/assetTransforms";
 
 async function Main() {
   const canvas = document.getElementById("renderCanvas");
+  const resetBoardButton = document.getElementById("reset-board");
   const engine = new BABYLON.Engine(canvas, true);
   const scene = await Canvas(engine, canvas, BABYLON, GUI, chessData);
-  const game = new Game(chessData, scene);
+  const game = new Game(chessData);
   const emitter = new EventEmitter();
 
   game.setBoard();
@@ -21,6 +23,16 @@ async function Main() {
     resolved ? updateScene(originPoint, targetPoint, mygame.gameState, myscene) : null;
     resolved ? mygame.switchTurn() : null;
   });
+
+  emitter.on("reset-board", () => {
+    const answer = prompt("Are you sure you want to reset the board?, Enter Yes or No");
+    if (answer === "Yes" || answer === "yes" || answer === "YES") {
+      game.resetBoard();
+      assetTransforms(scene.finalMeshList, chessData);
+    }
+  });
+
+  resetBoardButton.addEventListener("click", () => emitter.emit("reset-board"));
 
   //Refactor for the event to await another click event
   let tempMoves = [];
@@ -52,7 +64,6 @@ async function Main() {
     }
   };
 
-  let removeLater;
   //Scene Renderer
   (async () => {
     engine.runRenderLoop(function () {

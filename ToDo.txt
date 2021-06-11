@@ -1,7 +1,6 @@
 Game Logic:
 Clone grid - get to work in simulation function
-Refactor movement functions
-movement type to movement functions. Capture/Movement
+add movement type identifier to movement functions. Capture/Movement
 Turn History
 EN Pasant
 Turn Timers
@@ -20,7 +19,7 @@ Eaten pieces to go to side of board
 
 Misc:
 WebRTC/GameRooms
-Chat to room
+Chat room
 Save game state, come back to at any time
 
 

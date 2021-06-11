@@ -1,4 +1,9 @@
 #renderCanvas {
-  height: 100%;
-  width: 100%;
+  height: 80%;
+  width: 80%;
+}
+
+.reset-board {
+  width: 100px;
+  height: 50px;
 }

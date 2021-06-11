@@ -1,6 +1,6 @@
 import { pieceClasses } from "./boardHelpers";
 
-const resolveMove = (originPoint, targetPoint, gameState, grid, scene, endGame) => {
+const resolveMove = (originPoint, targetPoint, gameState, grid, endGame) => {
   const squaresandPieces = getSquaresandPieces(originPoint, targetPoint, grid);
   const { originSquare, originPiece } = squaresandPieces;
   //Check if square has game piece on it

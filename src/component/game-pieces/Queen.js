@@ -1,5 +1,5 @@
 import GamePiece from "./GamePiece";
-import { filterToFinalMoves, calcVerticalMovements, calcHorizontalMovements } from "../../helper/movementFunctions";
+import { filterToFinalMoves, calcVerticalMovements, calcHorizontalMovements } from "../../helper/movementHelpers.js";
 
 class Queen extends GamePiece {
   constructor(name, color, point, movement) {
@@ -26,8 +26,8 @@ class Queen extends GamePiece {
       calcHorizontalMovements(grid, currentPoint, move, horizantalMovements);
     });
 
-    filterToFinalMoves(grid, this.color, availableMoves, verticalMovements);
-    filterToFinalMoves(grid, this.color, availableMoves, horizantalMovements);
+    filterToFinalMoves(grid, this.color, verticalMovements, availableMoves);
+    filterToFinalMoves(grid, this.color, horizantalMovements, availableMoves);
 
     return availableMoves;
   }

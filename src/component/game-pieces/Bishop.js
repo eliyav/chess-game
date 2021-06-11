@@ -1,5 +1,5 @@
 import GamePiece from "./GamePiece";
-import { filterToFinalMoves, calcHorizontalMovements } from "../../helper/movementFunctions";
+import { filterToFinalMoves, calcHorizontalMovements } from "../../helper/movementHelpers.js";
 
 class Bishop extends GamePiece {
   constructor(name, color, point, movement) {
@@ -19,7 +19,7 @@ class Bishop extends GamePiece {
       calcHorizontalMovements(grid, currentPoint, move, horizantalMovements);
     });
 
-    filterToFinalMoves(grid, this.color, availableMoves, horizantalMovements);
+    filterToFinalMoves(grid, this.color, horizantalMovements, availableMoves);
 
     return availableMoves;
   }

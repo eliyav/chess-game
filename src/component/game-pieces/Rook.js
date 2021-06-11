@@ -1,5 +1,5 @@
 import GamePiece from "./GamePiece";
-import { filterToFinalMoves, calcVerticalMovements } from "../../helper/movementFunctions";
+import { filterToFinalMoves, calcVerticalMovements } from "../../helper/movementHelpers.js";
 
 class Rook extends GamePiece {
   constructor(name, color, point, movement) {
@@ -20,7 +20,7 @@ class Rook extends GamePiece {
       calcVerticalMovements(grid, currentPoint, move, verticalMovements);
     });
 
-    filterToFinalMoves(grid, this.color, availableMoves, verticalMovements);
+    filterToFinalMoves(grid, this.color, verticalMovements, availableMoves);
 
     return availableMoves;
   }
