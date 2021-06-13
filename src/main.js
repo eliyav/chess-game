@@ -17,6 +17,7 @@ async function Main() {
   const emitter = new EventEmitter();
 
   game.setBoard();
+  window.game = game;
 
   emitter.on("move", (originPoint, targetPoint, mygame = game, myscene = scene) => {
     const resolved = mygame.movePiece(originPoint, targetPoint);

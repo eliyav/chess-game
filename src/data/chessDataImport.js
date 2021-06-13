@@ -1,6 +1,6 @@
 const chessData = {
   boardSize: 8,
-  columnNames: [["A"], ["B"], ["C"], ["D"], ["E"], ["F"], ["G"], ["H"]],
+  columnNames: [["a"], ["b"], ["c"], ["d"], ["e"], ["f"], ["g"], ["h"]],
   teams: ["White", "Black"],
   pieces: ["Pawn", "Rook", "Bishop", "Knight", "King", "Queen"],
   movement: [1, 2, 3, 4, 5, 6, 7],

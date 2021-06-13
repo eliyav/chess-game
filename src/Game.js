@@ -1,5 +1,5 @@
 import Board from "./Board";
-import { resolveMove, isCheckmate, checkForCastling } from "./helper/gameHelpers";
+import { resolveMove, isCheckmate, checkForCastling, annotate, annotateCastling } from "./helper/gameHelpers";
 import { setPieces, createGrid } from "./helper/boardHelpers";
 
 class Game {
@@ -8,6 +8,8 @@ class Game {
     this.gameState = { ...gameData.initialState };
     this.teams = gameData.teams;
     this.board = new Board(gameData);
+    this.history = [];
+    this.turnCounter = 1;
   }
 
   setBoard = () => {
@@ -18,6 +20,8 @@ class Game {
     this.board.grid = createGrid(this.board.data.boardSize, this.board.data.columnNames);
     this.setBoard();
     this.gameState.currentPlayer = "White";
+    this.history = [];
+    this.turnCounter = 1;
     return console.log("Board Has Been Reset!");
   };
 
@@ -38,13 +42,35 @@ class Game {
       checkNewGame = prompt("Game is over, would you like to play another game? Please type 'Yes' or 'No'");
     }
     checkNewGame === "Yes" || checkNewGame === "yes" || checkNewGame === "YES" ? this.resetBoard() : null;
-    //set player to white team
+    checkNewGame === "Yes" || checkNewGame === "yes" || checkNewGame === "YES" ? (this.gameState.currentPlayer = "White") : null;
   };
 
-  movePiece = (originPoint, targetPoint) => resolveMove(originPoint, targetPoint, this.gameState, this.board.grid, this.endGame);
+  movePiece = (originPoint, targetPoint) => {
+    const resolve = resolveMove(originPoint, targetPoint, this.gameState, this.board.grid, this.endGame);
+    resolve.result
+      ? (async () => {
+          resolve.turn = this.turnCounter;
+          this.turnCounter++;
+          let turnHistory = await annotate(resolve, this.gameState, this.board.grid);
+          this.history.push(turnHistory);
+          console.log(this.history);
+        })()
+      : null;
+    return resolve.result;
+  };
 
   castling = (originPoint, targetPoint) => {
-    checkForCastling(originPoint, targetPoint, this.gameState, this.board.grid) ? this.switchTurn() : null;
+    const resolve = checkForCastling(originPoint, targetPoint, this.gameState, this.board.grid);
+    resolve.result
+      ? (() => {
+          resolve.turn = this.turnCounter;
+          this.turnCounter++;
+          let turnHistory = annotateCastling(resolve);
+          this.history.push(turnHistory);
+          console.log(this.history);
+        })()
+      : null;
+    resolve.result ? this.switchTurn() : null;
   };
 }
 

@@ -2,7 +2,7 @@ import { pieceClasses } from "./boardHelpers";
 
 const resolveMove = (originPoint, targetPoint, gameState, grid, endGame) => {
   const squaresandPieces = getSquaresandPieces(originPoint, targetPoint, grid);
-  const { originSquare, originPiece } = squaresandPieces;
+  const { originSquare, originPiece, targetSquare, targetPiece } = squaresandPieces;
   //Check if square has game piece on it
   if (originSquare.on === undefined) {
     console.log("No Piece Exists at source point!");
@@ -17,10 +17,23 @@ const resolveMove = (originPoint, targetPoint, gameState, grid, endGame) => {
       //Will resolving move be valid
       if (canValidMoveResolve(squaresandPieces, targetPoint, gameState, grid, endGame)) {
         //Checks for Pawn Promotion
-        originPiece.name === "Pawn" ? checkForPawnPromotion(squaresandPieces) : null;
+        let promotion;
+        if (originPiece.name === "Pawn" && (originPiece.point[1] === 0 || originPiece.point[1] === 7)) {
+          promotion = checkForPawnPromotion(squaresandPieces);
+        }
         originPiece.moved = true;
         console.log("Move is Valid! Board is updated.");
-        return true;
+
+        return {
+          result: true,
+          origin: originPoint,
+          target: targetPoint,
+          originPiece: originPiece,
+          targetPiece: targetPiece,
+          originSquare: originSquare,
+          targetSquare: targetSquare,
+          promotion: promotion,
+        };
       } else {
         //Switch squares back after valid move resolve check --------Try and find a fix for this..
         switchSquaresBack(squaresandPieces, originPoint);
@@ -52,6 +65,15 @@ const isChecked = (gameState, grid, kingSquare) => {
   const opponentsPieces = getOpponentsPieces(gameState, grid);
   const opponentsAvailableMoves = getMoves(grid, opponentsPieces);
   const kingIsChecked = opponentsAvailableMoves.find((move) => doMovesMatch(move, kingSquare.on.point));
+  //Returns an array with the kings location if checked
+  return kingIsChecked;
+};
+
+const isEnemyChecked = (gameState, grid) => {
+  const kingSquare = findEnemyKing(gameState, grid);
+  const myPieces = getMyPieces(gameState, grid);
+  const myAvailableMoves = getMoves(grid, myPieces);
+  const kingIsChecked = myAvailableMoves.find((move) => doMovesMatch(move, kingSquare.on.point));
   //Returns an array with the kings location if checked
   return kingIsChecked;
 };
@@ -117,7 +139,10 @@ const checkForCastling = (originPoint, targetPoint, gameState, grid) => {
               console.log("Castling Successful, Switching Squares!");
               c < 0 ? (c = 1) : (c = -1);
               castlingMove(c, squaresandPieces, grid);
-              return true;
+              return {
+                result: true,
+                direction: c,
+              };
             } else {
               console.log("Castling Not Available!, One of Squares is under Enemy Threat!");
               return false;
@@ -125,7 +150,7 @@ const checkForCastling = (originPoint, targetPoint, gameState, grid) => {
           }
         }
       } else {
-        console.log("Both pieces must belong to currentPlayer!");
+        console.log("Pieces must belong to currentPlayer!");
         return false;
       }
     } else {
@@ -157,7 +182,7 @@ const castlingMove = (direction, squaresandPieces, grid) => {
   newRookSquare.on = new pieceClasses[name2](name2, color2, newRookPoint, movement2);
 };
 
-//Checks for pawn promotion
+//Checks for pawn promotion ---------------------------------Needs update for UI later to new piece, or wait for UI refactor
 const checkForPawnPromotion = async (squaresandPieces) => {
   const { targetSquare, originPiece } = squaresandPieces;
   const y = getY(originPiece.point);
@@ -165,9 +190,11 @@ const checkForPawnPromotion = async (squaresandPieces) => {
     const newClass = await prompt(
       "Piece Promoted! Please type your new piece. Your Choices are: King, Queen, Knight, Bishop, Rook, Pawn",
       "Enter class name here"
-    ); //Change with UI prompt
+    ); //Change with UI prompt-------------------------------------------------
     const { color, point, movement } = originPiece;
     targetSquare.on = new pieceClasses[newClass](newClass, color, point, movement);
+    const string = newClass.toString();
+    return string;
   }
 };
 
@@ -208,6 +235,13 @@ const getOpponentsPieces = (gameState, grid) => {
   return piecesArray;
 };
 
+const getMyPieces = (gameState, grid) => {
+  const piecesArray = grid.flat().filter((square) => {
+    return square.on !== undefined ? (square.on.color === gameState.currentPlayer ? true : false) : null;
+  });
+  return piecesArray;
+};
+
 const getCurrentPlayerPieces = (gameState, grid) => {
   const piecesArray = grid.flat().filter((square) => {
     return square.on !== undefined ? (square.on.color === gameState.currentPlayer ? true : false) : null;
@@ -228,6 +262,15 @@ const findKing = (gameState, grid) => {
     .flat()
     .filter((square) => (square.on !== undefined ? true : false))
     .find((square) => square.on.name === "King" && square.on.color === gameState.currentPlayer);
+
+  return findKing;
+};
+
+const findEnemyKing = (gameState, grid) => {
+  const findKing = grid
+    .flat()
+    .filter((square) => (square.on !== undefined ? true : false))
+    .find((square) => square.on.name === "King" && square.on.color !== gameState.currentPlayer);
 
   return findKing;
 };
@@ -315,4 +358,80 @@ const simulateResolveMove = (originPoint, targetPoint, gameState, grid, endGame)
   }
 };
 
-export { resolveMove, isCheckmate, checkForCastling, getX, getY };
+const annotate = async (result, gameState, grid) => {
+  let movingPiece;
+  let isCapturing;
+  let activeSquare;
+  let string;
+  switch (result.originPiece.name) {
+    case "King":
+      movingPiece = "K";
+      break;
+    case "Queen":
+      movingPiece = "Q";
+      break;
+    case "Knight":
+      movingPiece = "N";
+      break;
+    case "Bishop":
+      movingPiece = "B";
+      break;
+    case "Rook":
+      movingPiece = "R";
+      break;
+    default:
+      movingPiece = "";
+  }
+
+  if (result.targetPiece !== undefined) {
+    isCapturing = true;
+  }
+
+  activeSquare = result.targetSquare.square;
+
+  if (isCapturing) {
+    if (result.originPiece.name === "Pawn") {
+      string = result.originSquare.square.charAt(0) + "x" + activeSquare;
+    } else {
+      string = movingPiece + "x" + activeSquare;
+    }
+  } else {
+    string = movingPiece + activeSquare;
+  }
+
+  const isCheck = isEnemyChecked(gameState, grid);
+  isCheck ? (string = string + "+") : null;
+
+  if (result.promotion) {
+    let finalString;
+    let temp = await result.promotion;
+    switch (temp) {
+      case "King":
+        finalString = "K";
+        break;
+      case "Queen":
+        finalString = "Q";
+        break;
+      case "Knight":
+        finalString = "N";
+        break;
+      case "Bishop":
+        finalString = "B";
+        break;
+      case "Rook":
+        finalString = "R";
+        break;
+      default:
+        finalString = "";
+    }
+    string = result.targetSquare.square + "=" + finalString;
+  }
+
+  return string;
+};
+
+const annotateCastling = (result) => {
+  return result.direction === 1 ? "O-O" : "O-O-O";
+};
+
+export { resolveMove, isCheckmate, checkForCastling, getX, getY, annotate, isEnemyChecked, annotateCastling };
