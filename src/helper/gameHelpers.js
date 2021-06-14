@@ -1,17 +1,42 @@
 import { pieceClasses } from "./boardHelpers";
 
-const resolveMove = (originPoint, targetPoint, gameState, grid, endGame) => {
+const resolveMove = (originPoint, targetPoint, gameState, grid, turnHistory, endGame) => {
   const squaresandPieces = getSquaresandPieces(originPoint, targetPoint, grid);
   const { originSquare, originPiece, targetSquare, targetPiece } = squaresandPieces;
-  //Check if square has game piece on it
-  if (originSquare.on === undefined) {
-    console.log("No Piece Exists at source point!");
-    return false;
-  }
-  //Check if game piece using square belongs to current player
-  else if (originSquare.on.color === gameState.currentPlayer) {
+  const castling =
+    originPiece.name === "King" &&
+    originPiece.color === gameState.currentPlayer &&
+    targetPiece.name === "Rook" &&
+    targetPiece.color === gameState.currentPlayer;
+  if (castling) {
+    const resolve = checkForCastling(originPoint, targetPoint, gameState, grid);
+    return resolve;
+  } else {
+    //Calculate the origin piece all available moves
     const availableMoves = originSquare.on.calculateAvailableMoves(grid);
-    //Check if the entered targetPoint is a valid move for current game piece
+
+    //Check for EnPassant
+    const enPassant = isEnPassantAvailable(turnHistory);
+    if (enPassant.result) {
+      //If moving piece is a pawn
+      if (originPiece.name === "Pawn") {
+        //Moving piece is on its 5th rank
+        let rank;
+        let color = originPiece.color;
+        color === "White" ? (rank = 4) : (rank = 3);
+        let y = originPiece.point[1] === rank;
+        //Calculate X from enpassantsquare, if those two match, then availablemoves the enPassantSquare. Then find a way to let the canvalidmoveresolve function handle the fact en passant worked
+        if (y && x) {
+          //Push available move into available moves
+          console.log("EnPassantttttttttt");
+          doMovesMatch(enPassant.enPassantSquare, targetPoint);
+          console.log(enPassant.enPassantSquare);
+          availableMoves.push(enPassant.enPassantSquare);
+          console.log(availableMoves);
+        }
+      }
+    }
+    //Check if the entered targetPoint is a match for an available moves
     const validMove = availableMoves.find((possibleMove) => doMovesMatch(possibleMove, targetPoint));
     if (validMove) {
       //Will resolving move be valid
@@ -44,10 +69,30 @@ const resolveMove = (originPoint, targetPoint, gameState, grid, endGame) => {
       console.log(`Target point ${targetPoint} is not a valid move for game piece!`);
       return false;
     }
-  } else {
-    console.log(`Piece doesn't belong to the ${gameState.currentPlayer} team!`);
-    return false;
   }
+};
+
+const isEnPassantAvailable = (history) => {
+  let moved;
+  let direction;
+  let x;
+  let y;
+  history === undefined
+    ? null
+    : (() => {
+        if (history.originPiece.name === "Pawn") {
+          const targetY = history.target[1];
+          const originY = history.origin[1];
+          moved = Math.abs(targetY - originY);
+          direction = history.originPiece.color === "White" ? 1 : -1;
+          x = history.target[0];
+          y = history.origin[1] + direction;
+        }
+      })();
+  return {
+    result: moved === 2 ? true : false,
+    enPassantSquare: [x, y],
+  };
 };
 
 const canValidMoveResolve = (squaresandPieces, targetPoint, gameState, grid, endGame) => {
@@ -141,6 +186,7 @@ const checkForCastling = (originPoint, targetPoint, gameState, grid) => {
               castlingMove(c, squaresandPieces, grid);
               return {
                 result: true,
+                type: "castling",
                 direction: c,
               };
             } else {
@@ -326,7 +372,6 @@ const simulateCheckmate = (gameState, grid, endGame) => {
 const simulateResolveMove = (originPoint, targetPoint, gameState, grid, endGame) => {
   const squaresandPieces = getSquaresandPieces(originPoint, targetPoint, grid);
   const { originSquare } = squaresandPieces;
-
   //Check if origin square has game piece on it
   if (originSquare.on === undefined) {
     console.log("No Piece Exists at source point!");
@@ -359,53 +404,15 @@ const simulateResolveMove = (originPoint, targetPoint, gameState, grid, endGame)
 };
 
 const annotate = async (result, gameState, grid) => {
-  let movingPiece;
-  let isCapturing;
-  let activeSquare;
   let string;
-  switch (result.originPiece.name) {
-    case "King":
-      movingPiece = "K";
-      break;
-    case "Queen":
-      movingPiece = "Q";
-      break;
-    case "Knight":
-      movingPiece = "N";
-      break;
-    case "Bishop":
-      movingPiece = "B";
-      break;
-    case "Rook":
-      movingPiece = "R";
-      break;
-    default:
-      movingPiece = "";
-  }
-
-  if (result.targetPiece !== undefined) {
-    isCapturing = true;
-  }
-
-  activeSquare = result.targetSquare.square;
-
-  if (isCapturing) {
-    if (result.originPiece.name === "Pawn") {
-      string = result.originSquare.square.charAt(0) + "x" + activeSquare;
-    } else {
-      string = movingPiece + "x" + activeSquare;
-    }
-  } else {
-    string = movingPiece + activeSquare;
-  }
-
-  const isCheck = isEnemyChecked(gameState, grid);
-  isCheck ? (string = string + "+") : null;
-
-  if (result.promotion) {
+  const type = result.type;
+  const promotion = result.promotion;
+  if (type === "castling") {
+    string = result.direction === 1 ? "O-O" : "O-O-O";
+  } else if (promotion) {
     let finalString;
-    let temp = await result.promotion;
-    switch (temp) {
+    let tempString = await promotion;
+    switch (tempString) {
       case "King":
         finalString = "K";
         break;
@@ -425,13 +432,43 @@ const annotate = async (result, gameState, grid) => {
         finalString = "";
     }
     string = result.targetSquare.square + "=" + finalString;
+  } else {
+    let name = result.originPiece.name;
+    let movingPiece;
+    let isCapturing = result.targetPiece !== undefined ? true : false;
+    let activeSquare = result.targetSquare.square;
+    switch (name) {
+      case "King":
+        movingPiece = "K";
+        break;
+      case "Queen":
+        movingPiece = "Q";
+        break;
+      case "Knight":
+        movingPiece = "N";
+        break;
+      case "Bishop":
+        movingPiece = "B";
+        break;
+      case "Rook":
+        movingPiece = "R";
+        break;
+      default:
+        movingPiece = "";
+    }
+    if (isCapturing) {
+      if (name === "Pawn") {
+        string = result.originSquare.square.charAt(0) + "x" + activeSquare;
+      } else {
+        string = movingPiece + "x" + activeSquare;
+      }
+    } else {
+      string = movingPiece + activeSquare;
+    }
+    const isCheck = isEnemyChecked(gameState, grid);
+    isCheck ? (string = string + "+") : null;
   }
-
   return string;
 };
 
-const annotateCastling = (result) => {
-  return result.direction === 1 ? "O-O" : "O-O-O";
-};
-
-export { resolveMove, isCheckmate, checkForCastling, getX, getY, annotate, isEnemyChecked, annotateCastling };
+export { resolveMove, isCheckmate, checkForCastling, getX, getY, annotate, isEnemyChecked };

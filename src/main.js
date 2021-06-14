@@ -20,7 +20,7 @@ async function Main() {
   window.game = game;
 
   emitter.on("move", (originPoint, targetPoint, mygame = game, myscene = scene) => {
-    const resolved = mygame.movePiece(originPoint, targetPoint);
+    const resolved = mygame.playerMove(originPoint, targetPoint);
     resolved ? updateScene(originPoint, targetPoint, mygame.gameState, myscene) : null;
     resolved ? mygame.switchTurn() : null;
   });

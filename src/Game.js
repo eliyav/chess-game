@@ -1,6 +1,6 @@
 import Board from "./Board";
 import Timer from "./component/Timer";
-import { resolveMove, isCheckmate, checkForCastling, annotate, annotateCastling } from "./helper/gameHelpers";
+import { resolveMove, isCheckmate, annotate } from "./helper/gameHelpers";
 import { setPieces, createGrid } from "./helper/boardHelpers";
 
 class Game {
@@ -12,22 +12,23 @@ class Game {
     this.history = [];
     this.rawHistoryData = [];
     this.turnCounter = 1;
-    this.timer = new Timer(this.gameState);
+    //this.timer = new Timer(this.gameState);
   }
 
-  setBoard = () => {
-    setPieces(this.board.grid, this.board.data.pieceInitialPoints, this.board.data.movement);
-    this.timer.startTimer();
-  };
+  playerMove = (originPoint, targetPoint) => {
+    const lastTurn = this.rawHistoryData[this.rawHistoryData.length - 1];
+    const resolve = resolveMove(originPoint, targetPoint, this.gameState, this.board.grid, lastTurn, this.endGame);
+    resolve.result
+      ? (async () => {
+          resolve.turn = this.turnCounter;
+          this.turnCounter++;
+          let turnHistory = await annotate(resolve, this.gameState, this.board.grid);
+          this.history.push(turnHistory);
+          this.rawHistoryData.push(resolve);
+        })()
+      : null;
 
-  resetBoard = () => {
-    this.board.grid = createGrid(this.board.data.boardSize, this.board.data.columnNames);
-    this.setBoard();
-    this.gameState.currentPlayer = "White";
-    this.history = [];
-    this.rawHistoryData = [];
-    this.turnCounter = 1;
-    return console.log("Board Has Been Reset!");
+    return resolve.result;
   };
 
   changePlayer = () => {
@@ -50,33 +51,19 @@ class Game {
     checkNewGame === "Yes" || checkNewGame === "yes" || checkNewGame === "YES" ? (this.gameState.currentPlayer = "White") : null;
   };
 
-  movePiece = (originPoint, targetPoint) => {
-    const resolve = resolveMove(originPoint, targetPoint, this.gameState, this.board.grid, this.endGame);
-    resolve.result
-      ? (async () => {
-          resolve.turn = this.turnCounter;
-          this.turnCounter++;
-          let turnHistory = await annotate(resolve, this.gameState, this.board.grid);
-          this.history.push(turnHistory);
-          this.rawHistoryData.push(resolve);
-        })()
-      : null;
-
-    return resolve.result;
+  setBoard = () => {
+    setPieces(this.board.grid, this.board.data.pieceInitialPoints, this.board.data.movement);
+    //this.timer.startTimer();
   };
 
-  castling = (originPoint, targetPoint) => {
-    const resolve = checkForCastling(originPoint, targetPoint, this.gameState, this.board.grid);
-    resolve.result
-      ? (() => {
-          resolve.turn = this.turnCounter;
-          this.turnCounter++;
-          let turnHistory = annotateCastling(resolve);
-          this.history.push(turnHistory);
-          console.log(this.history);
-        })()
-      : null;
-    resolve.result ? this.switchTurn() : null;
+  resetBoard = () => {
+    this.board.grid = createGrid(this.board.data.boardSize, this.board.data.columnNames);
+    this.setBoard();
+    this.gameState.currentPlayer = "White";
+    this.history = [];
+    this.rawHistoryData = [];
+    this.turnCounter = 1;
+    return console.log("Board Has Been Reset!");
   };
 }
 

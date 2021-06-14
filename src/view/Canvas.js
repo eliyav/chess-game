@@ -39,10 +39,9 @@ async function Canvas(engine, canvas, BABYLON, GUI, chessData) {
       animateDistance();
     });
   };
-
+  // animateDistance();
   //#endregion
 
-  animateDistance();
   return scene;
 }
 

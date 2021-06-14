@@ -23,6 +23,13 @@ const updateScene = (originPoint, targetPoint, gameState, scene) => {
   }
 };
 
+const renderScene = () => {
+  //Have database of different meshes
+  //Read grid for locations of all pieces
+  //Get point/name/color of each grid piece
+  //Render each mesh accordingly using calculatePoint
+};
+
 const calculatePoint = (x, y) => {
   //Calculate X
   if (x > 9 && x < 12) {
