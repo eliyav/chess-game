@@ -1,10 +1,10 @@
 import "babylonjs-loaders";
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui"; //Unused for now, leave
+import chessData from "./data/chessDataImport";
 import Game from "./Game";
 import Canvas from "./view/Canvas";
 import EventEmitter from "./component/EventEmitter";
-import chessData from "./data/chessDataImport";
 import { updateScene, calculatePoint } from "./helper/canvasHelpers";
 import assetTransforms from "./view/assetTransforms";
 

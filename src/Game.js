@@ -1,4 +1,5 @@
 import Board from "./Board";
+import Timer from "./component/Timer";
 import { resolveMove, isCheckmate, checkForCastling, annotate, annotateCastling } from "./helper/gameHelpers";
 import { setPieces, createGrid } from "./helper/boardHelpers";
 
@@ -9,11 +10,14 @@ class Game {
     this.teams = gameData.teams;
     this.board = new Board(gameData);
     this.history = [];
+    this.rawHistoryData = [];
     this.turnCounter = 1;
+    this.timer = new Timer(this.gameState);
   }
 
   setBoard = () => {
     setPieces(this.board.grid, this.board.data.pieceInitialPoints, this.board.data.movement);
+    this.timer.startTimer();
   };
 
   resetBoard = () => {
@@ -21,6 +25,7 @@ class Game {
     this.setBoard();
     this.gameState.currentPlayer = "White";
     this.history = [];
+    this.rawHistoryData = [];
     this.turnCounter = 1;
     return console.log("Board Has Been Reset!");
   };
@@ -53,9 +58,10 @@ class Game {
           this.turnCounter++;
           let turnHistory = await annotate(resolve, this.gameState, this.board.grid);
           this.history.push(turnHistory);
-          console.log(this.history);
+          this.rawHistoryData.push(resolve);
         })()
       : null;
+
     return resolve.result;
   };
 
