@@ -3,72 +3,84 @@ import { pieceClasses } from "./boardHelpers";
 const resolveMove = (originPoint, targetPoint, gameState, grid, turnHistory, endGame) => {
   const squaresandPieces = getSquaresandPieces(originPoint, targetPoint, grid);
   const { originSquare, originPiece, targetSquare, targetPiece } = squaresandPieces;
-  const castling =
-    originPiece.name === "King" &&
-    originPiece.color === gameState.currentPlayer &&
-    targetPiece.name === "Rook" &&
-    targetPiece.color === gameState.currentPlayer;
-  if (castling) {
-    const resolve = checkForCastling(originPoint, targetPoint, gameState, grid);
-    return resolve;
-  } else {
-    //Calculate the origin piece all available moves
-    const availableMoves = originSquare.on.calculateAvailableMoves(grid);
-
-    //Check for EnPassant
-    const enPassant = isEnPassantAvailable(turnHistory);
-    if (enPassant.result) {
-      //If moving piece is a pawn
-      if (originPiece.name === "Pawn") {
-        //Moving piece is on its 5th rank
-        let rank;
-        let color = originPiece.color;
-        color === "White" ? (rank = 4) : (rank = 3);
-        let y = originPiece.point[1] === rank;
-        //Calculate X from enpassantsquare, if those two match, then availablemoves the enPassantSquare. Then find a way to let the canvalidmoveresolve function handle the fact en passant worked
-        if (y && x) {
-          //Push available move into available moves
-          console.log("EnPassantttttttttt");
-          doMovesMatch(enPassant.enPassantSquare, targetPoint);
-          console.log(enPassant.enPassantSquare);
-          availableMoves.push(enPassant.enPassantSquare);
-          console.log(availableMoves);
+  //Check for castling move
+  const castling = originPiece.name === "King" && originPiece.color === gameState.currentPlayer;
+  let castling2 = false;
+  if (targetPiece !== undefined) {
+    castling2 = targetPiece.name === "Rook" && targetPiece.color === gameState.currentPlayer;
+    if (castling && castling2) {
+      const resolve = checkForCastling(originPoint, targetPoint, gameState, grid);
+      return resolve;
+    }
+  }
+  //Calculate the origin piece's all available moves
+  const availableMoves = originSquare.on.calculateAvailableMoves(grid);
+  //Check for EnPassant
+  const enPassant = isEnPassantAvailable(turnHistory);
+  if (enPassant.result) {
+    //If moving piece is a pawn
+    if (originPiece.name === "Pawn") {
+      //Moving piece is on its 5th rank
+      let rank;
+      let color = originPiece.color;
+      color === "White" ? (rank = 4) : (rank = 3);
+      let y = originPiece.point[1] === rank;
+      let x = turnHistory.origin[0];
+      let x1 = x - 1;
+      let x2 = x + 1;
+      let finalX = originPiece.point[0] === x1 || originPiece.point[0] === x2;
+      //Then find a way to let the canvalidmoveresolve function handle the fact en passant worked
+      if (y && finalX) {
+        if (doMovesMatch(enPassant.enPassantSquare, targetPoint)) {
+          if (canValidMoveResolve(squaresandPieces, targetPoint, gameState, grid, endGame)) {
+            turnHistory.targetSquare.on = undefined;
+            console.log(grid);
+            return {
+              result: true,
+              origin: originPoint,
+              target: targetPoint,
+              originPiece: originPiece,
+              targetPiece: targetPiece,
+              originSquare: originSquare,
+              targetSquare: targetSquare,
+            };
+          }
         }
       }
     }
-    //Check if the entered targetPoint is a match for an available moves
-    const validMove = availableMoves.find((possibleMove) => doMovesMatch(possibleMove, targetPoint));
-    if (validMove) {
-      //Will resolving move be valid
-      if (canValidMoveResolve(squaresandPieces, targetPoint, gameState, grid, endGame)) {
-        //Checks for Pawn Promotion
-        let promotion;
-        if (originPiece.name === "Pawn" && (originPiece.point[1] === 0 || originPiece.point[1] === 7)) {
-          promotion = checkForPawnPromotion(squaresandPieces);
-        }
-        originPiece.moved = true;
-        console.log("Move is Valid! Board is updated.");
-
-        return {
-          result: true,
-          origin: originPoint,
-          target: targetPoint,
-          originPiece: originPiece,
-          targetPiece: targetPiece,
-          originSquare: originSquare,
-          targetSquare: targetSquare,
-          promotion: promotion,
-        };
-      } else {
-        //Switch squares back after valid move resolve check --------Try and find a fix for this..
-        switchSquaresBack(squaresandPieces, originPoint);
-        console.log(`${gameState.currentPlayer} King will be in check if move is resolved`);
-        return false;
+  }
+  //Check if the entered targetPoint is a match for an available moves
+  const validMove = availableMoves.find((possibleMove) => doMovesMatch(possibleMove, targetPoint));
+  if (validMove) {
+    //Will resolving move be valid
+    if (canValidMoveResolve(squaresandPieces, targetPoint, gameState, grid, endGame)) {
+      //Checks for Pawn Promotion
+      let promotion;
+      if (originPiece.name === "Pawn" && (originPiece.point[1] === 0 || originPiece.point[1] === 7)) {
+        promotion = checkForPawnPromotion(squaresandPieces);
       }
+      originPiece.moved = true;
+      console.log("Move is Valid! Board is updated.");
+
+      return {
+        result: true,
+        origin: originPoint,
+        target: targetPoint,
+        originPiece: originPiece,
+        targetPiece: targetPiece,
+        originSquare: originSquare,
+        targetSquare: targetSquare,
+        promotion: promotion,
+      };
     } else {
-      console.log(`Target point ${targetPoint} is not a valid move for game piece!`);
+      //Switch squares back after valid move resolve check --------Try and find a fix for this..
+      switchSquaresBack(squaresandPieces, originPoint);
+      console.log(`${gameState.currentPlayer} King will be in check if move is resolved`);
       return false;
     }
+  } else {
+    console.log(`Target point ${targetPoint} is not a valid move for game piece!`);
+    return false;
   }
 };
 

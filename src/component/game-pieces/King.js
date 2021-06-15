@@ -18,7 +18,7 @@ class King extends GamePiece {
   calculateAvailableMoves(grid, currentPoint = this.point) {
     const kingMoves = [
       [0, 1],
-      [1, 1],
+      [1, 0],
       [1, 1],
       [1, -1],
       [0, -1],

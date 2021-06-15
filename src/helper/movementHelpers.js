@@ -67,12 +67,17 @@ const calcPawnMovement = (grid, currentPoint, direction, moved, color, finalObj)
   const [x, y] = currentPoint;
   const movePoint1 = [x, y + range * direction];
   const [moveX, moveY] = movePoint1;
-  bounds(moveX, grid) && bounds(moveY, grid) ? finalObj.push(movePoint1) : null;
+  if (grid[moveX][moveY].on === undefined) {
+    bounds(moveX, grid) && bounds(moveY, grid) ? finalObj.push(movePoint1) : null;
+  }
   //If he hasnt moved, then can move 2 spaces
   if (!moved) {
     range = 2;
     const movePoint2 = [x, y + range * direction];
-    finalObj.push(movePoint2);
+    const [moveX2, moveY2] = movePoint2;
+    if (grid[moveX2][moveY2].on === undefined) {
+      bounds(moveX2, grid) && bounds(moveY2, grid) ? finalObj.push(movePoint2) : null;
+    }
   }
   //Calculates Capture points and pushes them in final movement obj if are valid
   const capturePoint1 = [x - direction, y + direction];
