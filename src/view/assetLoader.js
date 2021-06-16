@@ -31,43 +31,44 @@ const assetsLoader = async (BABYLON) => {
 
   const meshesLoader = await Promise.all(meshesToLoad.map((mesh) => BABYLON.SceneLoader.ImportMeshAsync("", mesh, "")));
 
-  const finalMeshList = [[], [], []];
+  const finalMeshList = [];
+  const boardMesh = [];
 
   //Sort the loaded meshes
   meshesLoader.forEach((mesh) => {
     if (mesh.meshes[1].id.includes("-")) {
       let finalMesh = mesh.meshes[1];
-      [finalMesh.name, finalMesh.color, finalMesh.isPickable = false] = finalMesh.id.split("-");
-
-      return finalMesh.color === "White"
-        ? finalMeshList[0].push(finalMesh)
-        : finalMesh.color === "Black"
-        ? finalMeshList[1].push(finalMesh)
-        : finalMeshList[2].push(mesh.meshes);
+      [finalMesh.name, finalMesh.color, finalMesh.isPickable = false, finalMesh.isVisible = false, finalMesh.scalingDeterminant = 50] =
+        finalMesh.id.split("-");
+      return finalMeshList.push(finalMesh);
+    } else {
+      mesh.meshes[0].scalingDeterminant = 50;
+      mesh.meshes[1].scalingDeterminant = 50;
+      mesh.meshes[2].scalingDeterminant = 50;
+      mesh.meshes[3].scalingDeterminant = 50;
+      boardMesh.push(mesh);
     }
-    mesh.meshes.forEach((mesh) => (mesh.isPickable = true));
-    finalMeshList[2].push(mesh.meshes);
   });
 
-  //Clone needed pieces
-  const teams = 2;
-  const clonesNeeded = {
-    Pawn: 7,
-    Rook: 1,
-    Bishop: 1,
-    Knight: 1,
-  };
+  // //Clone needed pieces
+  // const teams = 2;
+  // const clonesNeeded = {
+  //   Pawn: 7,
+  //   Rook: 1,
+  //   Bishop: 1,
+  //   Knight: 1,
+  // };
 
-  for (let i = 0; i < teams; i++) {
-    Object.entries(clonesNeeded).forEach(([key, value]) => {
-      let meshToClone = finalMeshList[i].find((mesh) => mesh.name === key);
-      for (let j = 0; j < value; j++) {
-        let clone = meshToClone.clone(key);
-        finalMeshList[i].push(clone);
-      }
-    });
-  }
-  return finalMeshList;
+  // for (let i = 0; i < teams; i++) {
+  //   Object.entries(clonesNeeded).forEach(([key, value]) => {
+  //     let meshToClone = finalMeshList[i].find((mesh) => mesh.name === key);
+  //     for (let j = 0; j < value; j++) {
+  //       let clone = meshToClone.clone(key);
+  //       finalMeshList[i].push(clone);
+  //     }
+  //   });
+  // }
+  return { finalMeshList, boardMesh };
 };
 
 export default assetsLoader;

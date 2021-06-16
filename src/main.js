@@ -5,23 +5,22 @@ import chessData from "./data/chessDataImport";
 import Game from "./Game";
 import Canvas from "./view/Canvas";
 import EventEmitter from "./component/EventEmitter";
-import { updateScene, calculatePoint } from "./helper/canvasHelpers";
-import assetTransforms from "./view/assetTransforms";
+import { renderScene, calculatePoint } from "./helper/canvasHelpers";
 
 async function Main() {
   const canvas = document.getElementById("renderCanvas");
   const resetBoardButton = document.getElementById("reset-board");
   const engine = new BABYLON.Engine(canvas, true);
-  const scene = await Canvas(engine, canvas, BABYLON, GUI, chessData);
   const game = new Game(chessData);
+  game.setBoard();
+  const scene = await Canvas(engine, canvas, game, BABYLON, GUI);
   const emitter = new EventEmitter();
 
-  game.setBoard();
   window.game = game;
 
   emitter.on("move", (originPoint, targetPoint, mygame = game, myscene = scene) => {
     const resolved = mygame.playerMove(originPoint, targetPoint);
-    resolved ? updateScene(originPoint, targetPoint, mygame.gameState, myscene) : null;
+    resolved ? renderScene(game, scene) : null;
     resolved ? mygame.switchTurn() : null;
   });
 
@@ -29,7 +28,7 @@ async function Main() {
     const answer = prompt("Are you sure you want to reset the board?, Enter Yes or No");
     if (answer === "Yes" || answer === "yes" || answer === "YES") {
       game.resetBoard();
-      assetTransforms(scene.finalMeshList, chessData);
+      renderScene(game, scene);
     }
   });
 
@@ -38,6 +37,7 @@ async function Main() {
   //Refactor for the event to await another click event
   let tempMoves = [];
   scene.onPointerDown = async (e, pickResult) => {
+    console.log("clicked");
     //Calculate X/Y point for grid from the canvas X/Z
     if (pickResult.hit === false) {
       return console.log("Please click on the board!");

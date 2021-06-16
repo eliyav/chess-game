@@ -1,11 +1,11 @@
 import assetsLoader from "./assetLoader";
-import assetTransforms from "./assetTransforms";
+import { renderScene } from "../helper/canvasHelpers";
 
-async function Canvas(engine, canvas, BABYLON, GUI, chessData) {
+async function Canvas(engine, canvas, game, BABYLON, GUI) {
   const scene = new BABYLON.Scene(engine);
-
-  scene.finalMeshList = await assetsLoader(BABYLON);
-  await assetTransforms(scene.finalMeshList, chessData);
+  scene.meshesToRender = [];
+  scene.finalMeshes = await assetsLoader(BABYLON);
+  renderScene(game, scene, scene.finalMeshes);
 
   //#region camera
   const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 1, Math.PI / 4, 30, new BABYLON.Vector3(-1, 0, 0), scene);

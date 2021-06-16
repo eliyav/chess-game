@@ -1,35 +1,77 @@
-import { getX, getY } from "./gameHelpers";
-
-const updateScene = (originPoint, targetPoint, gameState, scene) => {
-  //Update the 3D Board
-  const team = gameState.currentPlayer;
-  const index = team === "White" ? 0 : 1;
-  const targetIndex = team === "White" ? 1 : 0;
-  const movingMesh = scene.finalMeshList[index].find((mesh) => mesh.point[0] === originPoint[0] && mesh.point[1] === originPoint[1]);
-  const targetMesh = scene.finalMeshList[targetIndex].find((mesh) => mesh.point[0] === targetPoint[0] && mesh.point[1] === targetPoint[1]);
-  //Calculate new Board Position
-  const xDiff = (getY(originPoint) - getY(targetPoint)) * 3;
-  const zDiff = (getX(originPoint) - getX(targetPoint)) * 3;
-  movingMesh.position.x += xDiff;
-  movingMesh.position.z += zDiff;
-  //console.log(movingMesh.position);
-
-  //Update Mesh point
-  movingMesh.point = targetPoint;
-  //Get rid of eaten piece
-  if (targetMesh) {
-    targetMesh.point = [8, 8];
-    targetMesh.isVisible = false;
+const renderScene = (game, scene) => {
+  //Clears old meshes/memory usage
+  if (scene.meshesToRender.length > 0) {
+    for (let i = 0; i < scene.meshesToRender.length; i++) {
+      const mesh = scene.meshesToRender[i];
+      scene.removeMesh(mesh);
+      mesh.dispose();
+    }
+    scene.meshesToRender = [];
   }
+  //Final Mesh List
+  const meshes = scene.finalMeshes.finalMeshList;
+  //Reads grid State
+  const grid = game.board.grid;
+  const filteredGrid = grid.flat().filter((square) => square.on !== undefined);
+  //For each active piece, creates a mesh and places on board
+  filteredGrid.forEach((square) => {
+    const { color, name, point } = square.on;
+    const match = meshes.find((mesh) => mesh.name === name && mesh.color === color);
+    let clone = match.clone(name);
+    const gridPoint = calculateGridPoint(point);
+    clone.position.z = gridPoint[0];
+    clone.position.x = gridPoint[1];
+    clone.isVisible = true;
+    scene.meshesToRender.push(clone);
+  });
 };
 
-const renderScene = () => {
-  //Have database of different meshes
-  //Read grid for locations of all pieces
-  //Get point/name/color of each grid piece
-  //Render each mesh accordingly using calculatePoint
-};
+const calculateGridPoint = (point) => {
+  const [x, y] = point;
+  let gridX, gridY;
+  //Calculate X
+  if (x === 0) {
+    gridX = 10.5;
+  } else if (x === 1) {
+    gridX = 7.5;
+  } else if (x === 2) {
+    gridX = 4.5;
+  } else if (x === 3) {
+    gridX = 1.5;
+  } else if (x === 4) {
+    gridX = -1.5;
+  } else if (x === 5) {
+    gridX = -4.5;
+  } else if (x === 6) {
+    gridX = -7.5;
+  } else if (x === 7) {
+    gridX = -10.5;
+  } else {
+    return console.log("You have not clicked a valid X coordinate", x);
+  }
+  //Calculate Y
+  if (y === 0) {
+    gridY = 10.5;
+  } else if (y === 1) {
+    gridY = 7.5;
+  } else if (y === 2) {
+    gridY = 4.5;
+  } else if (y === 3) {
+    gridY = 1.5;
+  } else if (y === 4) {
+    gridY = -1.5;
+  } else if (y === 5) {
+    gridY = -4.5;
+  } else if (y === 6) {
+    gridY = -7.5;
+  } else if (y === 7) {
+    gridY = -10.5;
+  } else {
+    return console.log("You have not clicked a valid Y coordinate", x);
+  }
 
+  return [gridX, gridY];
+};
 const calculatePoint = (x, y) => {
   //Calculate X
   if (x > 9 && x < 12) {
@@ -77,4 +119,4 @@ const calculatePoint = (x, y) => {
   return [canvasX, canvasY];
 };
 
-export { updateScene, calculatePoint };
+export { renderScene, calculatePoint };

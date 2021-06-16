@@ -386,7 +386,7 @@ const simulateResolveMove = (originPoint, targetPoint, gameState, grid, endGame)
   const { originSquare } = squaresandPieces;
   //Check if origin square has game piece on it
   if (originSquare.on === undefined) {
-    console.log("No Piece Exists at source point!");
+    //console.log("No Piece Exists at source point!");
     return false;
   } else if (originSquare.on.color === gameState.currentPlayer) {
     //Checks if the moving game piece belongs to current player
@@ -397,20 +397,20 @@ const simulateResolveMove = (originPoint, targetPoint, gameState, grid, endGame)
       //Will resolving move be valid
       if (canValidMoveResolve(squaresandPieces, targetPoint, gameState, grid, endGame)) {
         //***Check for pawn promotion here********************
-        console.log("Move is Valid! Board is updated.");
+        //console.log("Move is Valid! Board is updated.");
         return true;
       } else {
         //Switch squares back after valid move resolve check --------Try and find a fix for this..
         switchSquaresBack(squaresandPieces, originPoint);
-        console.log(`${gameState.currentPlayer} King will be in check if move is resolved`);
+        //console.log(`${gameState.currentPlayer} King will be in check if move is resolved`);
         return false;
       }
     } else {
-      console.log(`Target point ${targetPoint} is not a valid move for game piece!`);
+      //console.log(`Target point ${targetPoint} is not a valid move for game piece!`);
       return false;
     }
   } else {
-    console.log(`Piece doesn't belong to the ${gameState.currentPlayer} team!`);
+    //console.log(`Piece doesn't belong to the ${gameState.currentPlayer} team!`);
     return false;
   }
 };
