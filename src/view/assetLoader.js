@@ -49,25 +49,6 @@ const assetsLoader = async (BABYLON) => {
       boardMesh.push(mesh);
     }
   });
-
-  // //Clone needed pieces
-  // const teams = 2;
-  // const clonesNeeded = {
-  //   Pawn: 7,
-  //   Rook: 1,
-  //   Bishop: 1,
-  //   Knight: 1,
-  // };
-
-  // for (let i = 0; i < teams; i++) {
-  //   Object.entries(clonesNeeded).forEach(([key, value]) => {
-  //     let meshToClone = finalMeshList[i].find((mesh) => mesh.name === key);
-  //     for (let j = 0; j < value; j++) {
-  //       let clone = meshToClone.clone(key);
-  //       finalMeshList[i].push(clone);
-  //     }
-  //   });
-  // }
   return { finalMeshList, boardMesh };
 };
 

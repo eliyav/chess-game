@@ -37,7 +37,6 @@ async function Main() {
   //Refactor for the event to await another click event
   let tempMoves = [];
   scene.onPointerDown = async (e, pickResult) => {
-    console.log("clicked");
     //Calculate X/Y point for grid from the canvas X/Z
     if (pickResult.hit === false) {
       return console.log("Please click on the board!");

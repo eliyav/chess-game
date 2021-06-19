@@ -89,6 +89,7 @@ const isEnPassantAvailable = (history) => {
   let direction;
   let x;
   let y;
+  console.log(history);
   history === undefined
     ? null
     : (() => {
@@ -138,7 +139,7 @@ const isEnemyChecked = (gameState, grid) => {
 //Checks if castling is valid
 const checkForCastling = (originPoint, targetPoint, gameState, grid) => {
   const squaresandPieces = getSquaresandPieces(originPoint, targetPoint, grid);
-  const { originPiece, targetPiece } = squaresandPieces;
+  const { originPiece, targetPiece, originSquare, targetSquare } = squaresandPieces;
   //Check for valid castling pieces
   if (originPiece.moved === false && targetPiece.moved === false) {
     if (originPiece.name === "King" && targetPiece.name === "Rook") {
@@ -200,6 +201,12 @@ const checkForCastling = (originPoint, targetPoint, gameState, grid) => {
                 result: true,
                 type: "castling",
                 direction: c,
+                origin: originPoint,
+                target: targetPoint,
+                originPiece: originPiece,
+                targetPiece: targetPiece,
+                originSquare: originSquare,
+                targetSquare: targetSquare,
               };
             } else {
               console.log("Castling Not Available!, One of Squares is under Enemy Threat!");
