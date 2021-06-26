@@ -6,6 +6,7 @@ import Game from "./Game";
 import Canvas from "./view/Canvas";
 import EventEmitter from "./component/EventEmitter";
 import { renderScene, calculatePoint } from "./helper/canvasHelpers";
+import { io } from "socket.io-client";
 
 async function Main() {
   const canvas = document.getElementById("renderCanvas");
@@ -15,6 +16,13 @@ async function Main() {
   game.setBoard();
   const scene = await Canvas(engine, canvas, game, BABYLON, GUI);
   const emitter = new EventEmitter();
+  const socket = io("ws://localhost:3000");
+
+  socket.on("stateChange", (newState) => {
+    console.log(newState);
+    game.board.grid = newState;
+    renderScene(game, scene);
+  });
 
   window.game = game;
 
@@ -22,6 +30,7 @@ async function Main() {
     const resolved = mygame.playerMove(originPoint, targetPoint);
     resolved ? renderScene(game, scene) : null;
     resolved ? mygame.switchTurn() : null;
+    resolved ? socket.emit("stateChange", game.board.grid) : null;
   });
 
   emitter.on("reset-board", () => {
