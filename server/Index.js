@@ -9,9 +9,16 @@ const options = {
 const io = require("socket.io")(httpServer, options);
 
 io.on("connection", (socket) => {
-  socket.on("stateChange", (arg) => {
-    console.log(arg); // world
-    io.emit("stateChange", arg);
+  socket.on("get-id", () => {
+    socket.emit("sent-id", Math.random());
+  });
+  socket.on("join-room", (id) => {
+    socket.join(id);
+    socket.to(id).emit("welcome", "A new player has joined the room");
+  });
+  socket.on("stateChange", ({ originPoint, targetPoint, room }) => {
+    socket.broadcast.to(room).emit("welcome", "Move has been entered");
+    socket.broadcast.to(room).emit("stateChange", { originPoint, targetPoint });
   });
 });
 
