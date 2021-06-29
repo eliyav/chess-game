@@ -89,7 +89,6 @@ const isEnPassantAvailable = (history) => {
   let direction;
   let x;
   let y;
-  console.log(history);
   history === undefined
     ? null
     : (() => {

@@ -7,7 +7,7 @@ class Pawn extends GamePiece {
     this.moved = false;
     this.direction = this.color === "White" ? 1 : -1;
   }
-  //Add EnPasse rule
+
   calculateAvailableMoves(grid, currentPoint = this.point) {
     const availableMoves = [];
 

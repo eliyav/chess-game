@@ -14,10 +14,15 @@ io.on("connection", (socket) => {
   });
   socket.on("join-room", (id) => {
     socket.join(id);
-    socket.to(id).emit("welcome", "A new player has joined the room");
+    socket.to(id).emit("message", "A new player has joined the room");
+    const clients = io.sockets.adapter.rooms.get(id);
+    const serializedSet = [...clients.keys()];
+    socket.emit("room-info", serializedSet);
+    console.log(clients);
   });
+
   socket.on("stateChange", ({ originPoint, targetPoint, room }) => {
-    socket.broadcast.to(room).emit("welcome", "Move has been entered");
+    socket.broadcast.to(room).emit("message", "Move has been entered");
     socket.broadcast.to(room).emit("stateChange", { originPoint, targetPoint });
   });
 });

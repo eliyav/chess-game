@@ -11,26 +11,52 @@ import { io } from "socket.io-client";
 async function Main() {
   const canvas = document.getElementById("renderCanvas");
   const resetBoardButton = document.getElementById("reset-board");
+  const joinRoomButton = document.getElementById("join-room");
   const engine = new BABYLON.Engine(canvas, true);
   const game = new Game(chessData);
   game.setBoard();
   const scene = await Canvas(engine, canvas, game, BABYLON, GUI);
   const emitter = new EventEmitter();
+
+  //#region sockets
   const socket = io("ws://localhost:3000");
+  let room;
 
   socket.on("stateChange", (newState) => {
-    console.log(newState);
-    game.board.grid = newState;
+    const { originPoint, targetPoint } = newState;
+    game.playerMove(originPoint, targetPoint);
+    game.switchTurn();
     renderScene(game, scene);
+  });
+
+  socket.emit("get-id");
+  socket.on("sent-id", (id) => {
+    console.log(id);
+    room = id;
+  });
+
+  socket.on("message", (message) => {
+    console.log(message);
+  });
+
+  socket.on("room-info", (data) => {
+    console.log(data);
+  });
+
+  //#endregion
+
+  joinRoomButton.addEventListener("click", () => {
+    room = prompt("Please enter the room key");
+    socket.emit("join-room", room);
   });
 
   window.game = game;
 
   emitter.on("move", (originPoint, targetPoint, mygame = game, myscene = scene) => {
     const resolved = mygame.playerMove(originPoint, targetPoint);
-    resolved ? renderScene(game, scene) : null;
+    resolved ? renderScene(mygame, myscene) : null;
     resolved ? mygame.switchTurn() : null;
-    resolved ? socket.emit("stateChange", game.board.grid) : null;
+    resolved ? socket.emit("stateChange", { originPoint, targetPoint, room }) : null;
   });
 
   emitter.on("reset-board", () => {
