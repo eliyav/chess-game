@@ -29,21 +29,5 @@ io.on("connection", (socket) => {
 
 httpServer.listen(3000);
 
-// import express from "express";
-// import path, { dirname } from "path";
-// import { fileURLToPath } from "url";
-// import { WebSocket } from "socket.io";
-
-// // const __dirname = dirname(fileURLToPath(import.meta.url));
-
-// // const app = express();
-
-// // const ownRootPath = path.join(__dirname, "../../");
-
-// // const port = 3000;
-
-// // app.use(express.static(ownRootPath));
-
-// // app.listen(port, () => {
-// //   console.log("Server is up on port " + port + "!");
-// // });
+//this is the socket of each client in the room.
+//const clientSocket = io.sockets.sockets.get(clientId);
