@@ -9,15 +9,38 @@ import { renderScene, calculatePoint } from "./helper/canvasHelpers";
 import { io } from "socket.io-client";
 
 async function Main() {
-  const canvas = document.getElementById("renderCanvas");
+  let canvas, engine, game, scene;
+
+  const startGame = async () => {
+    canvas = document.getElementById("renderCanvas");
+    canvas.style.display = "block";
+    engine = new BABYLON.Engine(canvas, true);
+    game = new Game(chessData);
+    game.setBoard();
+    scene = await Canvas(engine, canvas, game, BABYLON, GUI);
+    //Scene Renderer
+    (async () => {
+      engine.runRenderLoop(function () {
+        scene.render();
+      });
+    })();
+  };
+
   const resetBoardButton = document.getElementById("reset-board");
   const joinRoomButton = document.getElementById("join-room");
-  const engine = new BABYLON.Engine(canvas, true);
-  const game = new Game(chessData);
-  game.setBoard();
-  const scene = await Canvas(engine, canvas, game, BABYLON, GUI);
-  const emitter = new EventEmitter();
+  const startGameButton = document.getElementById("start-game");
 
+  startGameButton.addEventListener("click", () => {
+    startGame();
+  });
+}
+
+Main();
+
+/*
+
+
+sockets------------------------------------
   //#region sockets
   const socket = io("ws://localhost:3000");
   let room;
@@ -45,30 +68,33 @@ async function Main() {
 
   //#endregion
 
+button events ----------------------------------
   joinRoomButton.addEventListener("click", () => {
     room = prompt("Please enter the room key");
     socket.emit("join-room", room);
   });
 
-  window.game = game;
-
-  emitter.on("move", (originPoint, targetPoint, mygame = game, myscene = scene) => {
-    const resolved = mygame.playerMove(originPoint, targetPoint);
-    resolved ? renderScene(mygame, myscene) : null;
-    resolved ? mygame.switchTurn() : null;
-    resolved ? socket.emit("stateChange", { originPoint, targetPoint, room }) : null;
-  });
-
-  emitter.on("reset-board", () => {
-    const answer = prompt("Are you sure you want to reset the board?, Enter Yes or No");
-    if (answer === "Yes" || answer === "yes" || answer === "YES") {
-      game.resetBoard();
-      renderScene(game, scene);
-    }
-  });
-
   resetBoardButton.addEventListener("click", () => emitter.emit("reset-board"));
 
+
+emitters----------------------------
+  const emitter = new EventEmitter();
+emitter.on("move", (originPoint, targetPoint, mygame = game, myscene = scene) => {
+  const resolved = mygame.playerMove(originPoint, targetPoint);
+  resolved ? renderScene(mygame, myscene) : null;
+  resolved ? mygame.switchTurn() : null;
+  resolved ? socket.emit("stateChange", { originPoint, targetPoint, room }) : null;
+});
+
+emitter.on("reset-board", () => {
+  const answer = prompt("Are you sure you want to reset the board?, Enter Yes or No");
+  if (answer === "Yes" || answer === "yes" || answer === "YES") {
+    game.resetBoard();
+    renderScene(game, scene);
+  }
+});
+
+onclick event--------------------------------------
   //Refactor for the event to await another click event
   let tempMoves = [];
   scene.onPointerDown = async (e, pickResult) => {
@@ -99,12 +125,7 @@ async function Main() {
     }
   };
 
-  //Scene Renderer
-  (async () => {
-    engine.runRenderLoop(function () {
-      scene.render();
-    });
-  })();
-}
 
-Main();
+
+
+*/

@@ -7,10 +7,22 @@
     <link rel="stylesheet" type="text/css" href="./index.css"></link>
 </head>
 <body>
+    <div class="container">
+    <div class="navbar">
+      <img src="assets/chess pic.png">
+      <button id="home">Home</button>
+      <button id="start-game">Start Offline Game -<br>Player vs Player</button>
+      <button id="create-room">Create Online Room</button>
+      <button id="join-room">Join Online Room</button>
+      <div class="navbar-game">
+        <p>Game Settings</p>
+        <p>Add hide/show with game start</p>
+        <button id="reset-board">Reset Board</button>
+      </div>
+    </div>
     <canvas id='renderCanvas' touch-action="none"></canvas>
-    <button id="reset-board">Reset Board</button>
-    <button id="join-room">Join Room</button>
     <script src='./src/main.js'></script>
+  </div>
   </div>
 </body>
 </html>

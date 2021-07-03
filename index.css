@@ -1,9 +1,61 @@
+body {
+  margin: 0px;
+}
+
+.container {
+  display: grid;
+  height: 100vh;
+  margin: 0;
+}
+
 #renderCanvas {
   height: 80%;
   width: 80%;
+  display: none;
 }
 
-.reset-board {
-  width: 100px;
+.navbar {
+  display: flex;
+  flex-direction: column;
+  width: 10%;
+  height: 100%;
+  background-color: #4d5a58;
+  align-items: center;
+}
+
+.navbar > button {
+  width: 100%;
+  margin-top: 10%;
+  font-weight: 600;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
+  background-color: #22568f;
+  color: white;
   height: 50px;
+  border-width: 5px;
+  border-style: inset;
+  border-color: #eea9cd;
+}
+
+.navbar > button:hover {
+  background-color: lightskyblue;
+  color: black;
+  font-weight: 800;
+  font-size: 1em;
+}
+
+.navbar > img {
+  width: 100%;
+  border-width: 10px;
+  border-style: ridge;
+  border-color: rgb(221, 218, 214);
+  box-sizing: border-box;
+}
+
+.navbar-game {
+  /* display: none; */
+  margin-top: 20%;
+}
+
+.navbar > #home {
+  margin-top: 2px;
 }
