@@ -34,7 +34,6 @@ const resolveMove = (originPoint, targetPoint, gameState, grid, turnHistory, end
         if (doMovesMatch(enPassant.enPassantSquare, targetPoint)) {
           if (canValidMoveResolve(squaresandPieces, targetPoint, gameState, grid, endGame)) {
             turnHistory.targetSquare.on = undefined;
-            console.log(grid);
             return {
               result: true,
               origin: originPoint,
@@ -247,12 +246,12 @@ const castlingMove = (direction, squaresandPieces, grid) => {
 };
 
 //Checks for pawn promotion ---------------------------------Needs update for UI later to new piece, or wait for UI refactor
-const checkForPawnPromotion = async (squaresandPieces) => {
+const checkForPawnPromotion = (squaresandPieces) => {
   const { targetSquare, originPiece } = squaresandPieces;
   const y = getY(originPiece.point);
   if (y === 7 || y === 0) {
-    const newClass = await prompt(
-      "Piece Promoted! Please type your new piece. Your Choices are: King, Queen, Knight, Bishop, Rook, Pawn",
+    const newClass = prompt(
+      "Piece Promoted! Please type your new piece. Your Choices are: Queen, Knight, Bishop, Rook",
       "Enter class name here"
     ); //Change with UI prompt-------------------------------------------------
     const { color, point, movement } = originPiece;
