@@ -2,6 +2,7 @@ import Board from "./Board";
 import Timer from "./component/Timer";
 import { resolveMove, isCheckmate, annotate } from "./helper/gameHelpers";
 import { setPieces, createGrid } from "./helper/boardHelpers";
+import { renderScene } from "./helper/canvasHelpers";
 
 class Game {
   constructor(gameData) {
@@ -19,10 +20,10 @@ class Game {
     const lastTurn = this.rawHistoryData[this.rawHistoryData.length - 1];
     const resolve = resolveMove(originPoint, targetPoint, this.gameState, this.board.grid, lastTurn, this.endGame);
     resolve.result
-      ? (async () => {
+      ? (() => {
           resolve.turn = this.turnCounter;
           this.turnCounter++;
-          let turnHistory = await annotate(resolve, this.gameState, this.board.grid);
+          let turnHistory = annotate(resolve, this.gameState, this.board.grid);
           this.history.push(turnHistory);
           this.rawHistoryData.push(resolve);
         })()
@@ -42,13 +43,7 @@ class Game {
   };
 
   endGame = () => {
-    console.log(`Game is over, ${this.gameState.currentPlayer} team wins!`);
-    let checkNewGame = "";
-    while (checkNewGame !== "Yes" && checkNewGame !== "No") {
-      checkNewGame = prompt("Game is over, would you like to play another game? Please type 'Yes' or 'No'");
-    }
-    checkNewGame === "Yes" || checkNewGame === "yes" || checkNewGame === "YES" ? this.resetBoard() : null;
-    checkNewGame === "Yes" || checkNewGame === "yes" || checkNewGame === "YES" ? (this.gameState.currentPlayer = "White") : null;
+    alert(`Game is over, ${this.gameState.currentPlayer} team wins!`);
   };
 
   setBoard = () => {

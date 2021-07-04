@@ -8,21 +8,29 @@
 </head>
 <body>
     <div class="container">
-    <div class="navbar">
-      <img src="assets/chess pic.png">
-      <button id="home">Home</button>
-      <button id="start-game">Start Offline Game -<br>Player vs Player</button>
-      <button id="create-room">Create Online Room</button>
-      <button id="join-room">Join Online Room</button>
-      <div class="navbar-game">
-        <p>Game Settings</p>
-        <p>Add hide/show with game start</p>
-        <button id="reset-board">Reset Board</button>
-      </div>
+      <div class="navbar">
+        <img src="assets/chess pic.png">
+        <button id="home">Home</button>
+        <button id="start-game">Start Offline Game -<br>Player vs Player</button>
+        <button id="create-room">Create Online Room</button>
+        <button id="join-room">Join Online Room</button>
+        <div class="game-settings">
+          <p>Game Settings</p>
+          <p>Add hide/show with game start</p>
+          <button id="reset-board">Reset Board</button>
+       </div>
     </div>
-    <canvas id='renderCanvas' touch-action="none"></canvas>
-    <script src='./src/main.js'></script>
-  </div>
-  </div>
+    <div class="middle-content">
+      <div id='intro'>
+        <h2>Welcome to the best place to play 3D chess online!</h2>
+        <h2>No account required, just send invite code to your friend and start playing</h2>
+        <h2>сыграем!! sygrayem!!</h2>
+    </div>
+      <canvas id='renderCanvas' touch-action="none"></canvas>
+    </div>
+    <div class='game-history'>Game Chat + History Annotation</div>
+    <div class='ui-settings'>Additional UI Settings</div>
+</div>
+<script src='./src/main.js'></script>
 </body>
 </html>

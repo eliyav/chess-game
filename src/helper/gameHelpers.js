@@ -420,7 +420,7 @@ const simulateResolveMove = (originPoint, targetPoint, gameState, grid, endGame)
   }
 };
 
-const annotate = async (result, gameState, grid) => {
+const annotate = (result, gameState, grid) => {
   let string;
   const type = result.type;
   const promotion = result.promotion;
@@ -428,7 +428,7 @@ const annotate = async (result, gameState, grid) => {
     string = result.direction === 1 ? "O-O" : "O-O-O";
   } else if (promotion) {
     let finalString;
-    let tempString = await promotion;
+    let tempString = promotion;
     switch (tempString) {
       case "King":
         finalString = "K";
