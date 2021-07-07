@@ -1,14 +1,16 @@
 import "babylonjs-loaders";
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui"; //Unused for now, leave
+import { io } from "socket.io-client";
 import chessData from "./data/chessDataImport";
 import Game from "./Game";
 import Canvas from "./view/Canvas";
 import EventEmitter from "./component/EventEmitter";
 import { renderScene, calculatePoint } from "./helper/canvasHelpers";
-import { io } from "socket.io-client";
 
 async function Main() {
+  let gameStarted = false;
+  let engine, game, scene, socket, emitter, room, tempMoves;
   //#region HTML Selectors
   const homeButton = document.getElementById("home");
   const resetBoardButton = document.getElementById("reset-board");
@@ -19,9 +21,8 @@ async function Main() {
   const middleContent = document.getElementById("intro");
   const gameAnnotation = document.querySelector(".game-history");
   //#endregion
-  let engine, game, scene, socket, emitter, room, tempMoves;
-  let gameStarted = false;
 
+  //#region buttons event listeners
   homeButton.addEventListener("click", () => {
     if (gameStarted === true) resetGameContext();
     canvas.style.display = "none";
@@ -33,36 +34,33 @@ async function Main() {
   });
 
   createRoomButton.addEventListener("click", () => {
-    startGame();
+    CreateOnlineGame();
   });
 
   joinRoomButton.addEventListener("click", () => {
-    startGame();
+    joinOnlineGame();
   });
 
-  const startOfflineGame = async () => {
+  const startOfflineGame = () => {
     if (gameStarted === false) activateGame();
     activateOfflineEmitter();
   };
 
-  const startGame = async () => {
-    activateGame();
+  const CreateOnlineGame = () => {
     activateSockets();
+    activateGame();
     activateEmitter();
+    //Activate Sockets and generate Room
+    //Use while loop for room size. While room is under 2 length wait for another player
+    //Once two players connected start game
+    //Add randomization of team side
   };
 
-  const resetGameContext = () => {
-    gameStarted = false;
-    game.resetBoard();
-    renderScene(game, scene);
-    gameAnnotation.innerHTML = "";
-    if (engine !== undefined) engine.stopRenderLoop();
-    scene.onPointerDown = undefined;
-    engine = undefined;
-    game = undefined;
-    scene = undefined;
-    tempMoves = undefined;
-  };
+  const joinOnlineGame = () => {};
+
+  //#endregion
+
+  //#region Functions
   const activateGame = async () => {
     gameStarted = true;
     canvas.style.display = "block";
@@ -80,6 +78,20 @@ async function Main() {
         scene.render();
       });
     })();
+  };
+
+  const resetGameContext = () => {
+    gameStarted = false;
+    game.resetBoard();
+    renderScene(game, scene);
+    gameAnnotation.innerHTML = "";
+    if (engine !== undefined) engine.stopRenderLoop();
+    scene.onPointerDown = undefined;
+    engine = undefined;
+    game = undefined;
+    emitter = undefined;
+    scene = undefined;
+    tempMoves = undefined;
   };
 
   const activateSockets = () => {
@@ -151,16 +163,26 @@ async function Main() {
       if (resolved) {
         renderScene(mygame, myscene);
         mygame.switchTurn();
+        console.log(myscene);
+        if (mygame.gameState.currentPlayer === "Black") {
+          myscene.cameras[0].alpha = 0;
+          //myscene.cameras[0].beta = 0;
+        } else {
+          myscene.cameras[0].alpha = -3.14;
+          //myscene.cameras[0].beta =
+        }
+
         gameAnnotation.innerHTML = game.history;
       }
     });
 
-    emitter.on("reset-board", () => {
+    emitter.on("reset-board", (myscene = scene) => {
       const answer = prompt("Are you sure you want to reset the board?, Enter Yes or No");
       if (answer === "Yes" || answer === "yes" || answer === "YES") {
         game.resetBoard();
         gameAnnotation.innerHTML = "";
         renderScene(game, scene);
+        myscene.cameras[0].alpha = -3.14;
       }
     });
   };
@@ -195,6 +217,7 @@ async function Main() {
       }
     };
   };
+  //#endregion
 }
 
 Main();

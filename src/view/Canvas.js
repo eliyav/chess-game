@@ -8,7 +8,7 @@ async function Canvas(engine, canvas, game, BABYLON, GUI) {
   renderScene(game, scene, scene.finalMeshes);
 
   //#region camera
-  const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 1, Math.PI / 4, 30, new BABYLON.Vector3(-1, 0, 0), scene);
+  const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 1, Math.PI / 3.5, 30, new BABYLON.Vector3(0, 0, 0), scene);
   //camera.attachControl(canvas, true);
   camera.useFramingBehavior = false;
   //#endregion
