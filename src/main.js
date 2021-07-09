@@ -17,6 +17,9 @@ async function Main() {
   const startGameButton = document.getElementById("start-game");
   const createRoomButton = document.getElementById("create-room");
   const joinRoomButton = document.getElementById("join-room");
+  const gameUndoButton = document.getElementById("undo-turn");
+  const gameDrawButton = document.getElementById("request-draw");
+  const gameResignButton = document.getElementById("resign-game");
   const canvas = document.getElementById("renderCanvas");
   const middleContent = document.getElementById("intro");
   const gameAnnotation = document.querySelector(".game-history");
@@ -79,7 +82,7 @@ async function Main() {
   };
   //#endregion
 
-  //#region Functions
+  //#region Game Activation Functions
   const activateGame = async () => {
     gameStarted = true;
     canvas.style.display = "block";
@@ -89,7 +92,7 @@ async function Main() {
     game.setBoard();
     scene = await Canvas(engine, canvas, game, BABYLON, GUI);
     tempMoves = [];
-
+    window.game = game;
     //Scene Renderer
     (async () => {
       engine.runRenderLoop(function () {
@@ -114,110 +117,6 @@ async function Main() {
     gameMode = undefined;
     room = undefined;
     socket = undefined;
-  };
-
-  const activateSockets = () => {
-    socket = io("ws://localhost:3000");
-
-    socket.on("stateChange", (newState) => {
-      const { originPoint, targetPoint } = newState;
-      game.playerMove(originPoint, targetPoint);
-      game.switchTurn();
-      renderScene(game, scene);
-    });
-
-    socket.on("reply-room-id", (id) => {
-      console.log(id);
-      room = id;
-    });
-
-    socket.on("message", (message) => {
-      console.log(message);
-    });
-
-    socket.on("room-info", (info) => {
-      let user;
-      if (info.length === 2) {
-        console.log("game has been activated");
-        socket.id === info[0] ? (user = "White") : (user = "Black");
-        activateOnlineGame(user);
-      }
-    });
-
-    socket.on("reset-board-request", () => {
-      const answer = prompt("Opponent has requested to reset the board, do you agree?, Enter Yes or No");
-      if (answer === "Yes" || answer === "yes" || answer === "YES") {
-        socket.emit("reset-board-response", "Yes");
-      }
-    });
-
-    socket.on("reset-board-resolve", (response) => {
-      if (response === "Yes") {
-        game.resetBoard();
-        renderScene(game, scene);
-      }
-    });
-  };
-
-  const activateEmitter = () => {
-    emitter = new EventEmitter();
-    if (resetBoardButton.getAttribute("listener") !== "true") {
-      resetBoardButton.setAttribute("listener", "true");
-      resetBoardButton.addEventListener("click", () => emitter.emit("reset-board"));
-    }
-
-    if (gameMode === "Online") {
-      //Game mode is online
-      emitter.on("move", (originPoint, targetPoint, mygame = game, myscene = scene) => {
-        const resolved = mygame.playerMove(originPoint, targetPoint);
-        if (resolved) {
-          renderScene(mygame, myscene);
-          mygame.switchTurn();
-          socket.emit("stateChange", { originPoint, targetPoint, room });
-          gameAnnotation.innerHTML = game.history;
-        }
-      });
-
-      emitter.on("reset-board", () => {
-        const answer = prompt("Are you sure you want to reset the board?, Enter Yes or No");
-        if (answer === "Yes" || answer === "yes" || answer === "YES") {
-          if (gameMode === "Offline") {
-            game.resetBoard();
-            gameAnnotation.innerHTML = "";
-            renderScene(game, scene);
-          } else {
-            socket.emit("reset-board");
-          }
-        }
-      });
-    } else {
-      //Game mode is offline
-      emitter.on("move", (originPoint, targetPoint, mygame = game, myscene = scene) => {
-        const resolved = mygame.playerMove(originPoint, targetPoint);
-        if (resolved) {
-          renderScene(mygame, myscene);
-          mygame.switchTurn();
-          if (mygame.gameState.currentPlayer === "Black") {
-            myscene.cameras[0].alpha = 0;
-            //myscene.cameras[0].beta = 0;
-          } else {
-            myscene.cameras[0].alpha = -3.14;
-            //myscene.cameras[0].beta =
-          }
-          gameAnnotation.innerHTML = game.history;
-        }
-      });
-
-      emitter.on("reset-board", (myscene = scene) => {
-        const answer = prompt("Are you sure you want to reset the board?, Enter Yes or No");
-        if (answer === "Yes" || answer === "yes" || answer === "YES") {
-          game.resetBoard();
-          gameAnnotation.innerHTML = "";
-          renderScene(game, scene);
-          myscene.cameras[0].alpha = -3.14;
-        }
-      });
-    }
   };
 
   const activateInput = () => {
@@ -262,6 +161,168 @@ async function Main() {
           }
         };
       }
+    }
+  };
+
+  //#endregion
+
+  //#region Sockets
+  const activateSockets = () => {
+    socket = io("ws://localhost:3000");
+
+    socket.on("stateChange", (newState) => {
+      const { originPoint, targetPoint } = newState;
+      game.playerMove(originPoint, targetPoint);
+      game.switchTurn();
+      renderScene(game, scene);
+    });
+
+    socket.on("reply-room-id", (id) => {
+      console.log(id);
+      room = id;
+    });
+
+    socket.on("message", (message) => {
+      console.log(message);
+    });
+
+    socket.on("room-info", (info) => {
+      let user;
+      if (info.length === 2) {
+        console.log("game has been activated");
+        socket.id === info[0] ? (user = "White") : (user = "Black");
+        activateOnlineGame(user);
+      }
+    });
+
+    socket.on("reset-board-request", () => {
+      const answer = prompt("Opponent has requested to reset the board, do you agree?, Enter Yes or No");
+      if (answer === "Yes" || answer === "yes" || answer === "YES") {
+        socket.emit("reset-board-response", "Yes");
+      }
+    });
+
+    socket.on("reset-board-resolve", (response) => {
+      if (response === "Yes") {
+        game.resetBoard();
+        renderScene(game, scene);
+      }
+    });
+
+    socket.on("draw-request", () => {
+      const answer = prompt("Opponent has offered a game Draw, do you accept?, Enter Yes or No");
+      if (answer === "Yes" || answer === "yes" || answer === "YES") {
+        socket.emit("draw-response", "Yes");
+      }
+    });
+
+    socket.on("draw-resolve", (response) => {
+      if (response === "Yes") {
+        game.resetBoard();
+        renderScene(game, scene);
+      }
+    });
+
+    socket.on("resign-request", () => {
+      game.resetBoard();
+      renderScene(game, scene);
+    });
+  };
+  //#endregion
+
+  //#region Emitter
+  const activateEmitter = () => {
+    emitter = new EventEmitter();
+    if (resetBoardButton.getAttribute("listener") !== "true") {
+      resetBoardButton.setAttribute("listener", "true");
+      resetBoardButton.addEventListener("click", () => emitter.emit("reset-board"));
+    }
+
+    if (gameDrawButton.getAttribute("listener") !== "true") {
+      gameDrawButton.setAttribute("listener", "true");
+      gameDrawButton.addEventListener("click", () => emitter.emit("draw"));
+    }
+
+    if (gameResignButton.getAttribute("listener") !== "true") {
+      gameResignButton.setAttribute("listener", "true");
+      gameResignButton.addEventListener("click", () => emitter.emit("resign"));
+    }
+
+    if (gameMode === "Online") {
+      //Game mode is online
+      emitter.on("move", (originPoint, targetPoint, mygame = game, myscene = scene) => {
+        const resolved = mygame.playerMove(originPoint, targetPoint);
+        if (resolved) {
+          renderScene(mygame, myscene);
+          mygame.switchTurn();
+          socket.emit("stateChange", { originPoint, targetPoint, room });
+          gameAnnotation.innerHTML = game.history;
+        }
+      });
+
+      emitter.on("reset-board", () => {
+        const answer = prompt("Are you sure you want to reset the board?, Enter Yes or No");
+        if (answer === "Yes" || answer === "yes" || answer === "YES") {
+          socket.emit("reset-board");
+        }
+      });
+
+      emitter.on("draw", () => {
+        const answer = prompt("Are you sure you want to reset the board?, Enter Yes or No");
+        if (answer === "Yes" || answer === "yes" || answer === "YES") {
+          socket.emit("draw");
+        }
+      });
+
+      emitter.on("resign", () => {
+        const answer = prompt("Are you sure you want to resign the game?, Enter Yes or No");
+        if (answer === "Yes" || answer === "yes" || answer === "YES") {
+          game.resetBoard();
+          renderScene(game, scene);
+          socket.emit("resign-game");
+        }
+      });
+    } else {
+      //Game mode is offline
+      emitter.on("move", (originPoint, targetPoint, mygame = game, myscene = scene) => {
+        const resolved = mygame.playerMove(originPoint, targetPoint);
+        if (resolved) {
+          renderScene(mygame, myscene);
+          mygame.switchTurn();
+          if (mygame.gameState.currentPlayer === "Black") {
+            myscene.cameras[0].alpha = 0;
+            //myscene.cameras[0].beta = 0;
+          } else {
+            myscene.cameras[0].alpha = -3.14;
+            //myscene.cameras[0].beta =
+          }
+          gameAnnotation.innerHTML = game.history;
+        }
+      });
+
+      emitter.on("reset-board", (myscene = scene) => {
+        const answer = prompt("Are you sure you want to reset the board?, Enter Yes or No");
+        if (answer === "Yes" || answer === "yes" || answer === "YES") {
+          game.resetBoard();
+          gameAnnotation.innerHTML = "";
+          renderScene(game, scene);
+          myscene.cameras[0].alpha = -3.14;
+        }
+      });
+
+      emitter.on("draw", () => {
+        const answer = prompt("Are you sure you want to reset the board?, Enter Yes or No");
+        if (answer === "Yes" || answer === "yes" || answer === "YES") {
+          //Add Based on Turn effect
+        }
+      });
+
+      emitter.on("resign", () => {
+        const answer = prompt("Are you sure you want to resign the game?, Enter Yes or No");
+        if (answer === "Yes" || answer === "yes" || answer === "YES") {
+          //Add based on turn effect
+        }
+      });
     }
   };
   //#endregion

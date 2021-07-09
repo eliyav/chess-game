@@ -75,9 +75,25 @@ body {
 }
 
 .middle-content {
-  background-color: lime;
+  background-image: url("/assets/chess-background.jfif");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   grid-row: 1/3;
   text-align: center;
+}
+
+#intro {
+  margin-top: 5%;
+  color: rgb(226, 16, 135);
+  font-size: 1.6rem;
+  text-shadow: -1px -1px 0px rgb(41, 143, 184);
+  text-shadow: 1px 1px 0px rgb(65, 187, 235);
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}
+
+#intro2 {
+  margin-top: 10%;
 }
 
 .game-history {

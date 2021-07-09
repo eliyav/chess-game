@@ -52,6 +52,28 @@ io.on("connection", (socket) => {
       socket.emit("reset-board-resolve", "No");
     }
   });
+
+  socket.on("draw", () => {
+    socket.to(room).emit("message", "Opponent has requested a game Draw!");
+    socket.to(room).emit("draw-request");
+  });
+
+  socket.on("draw-response", (answer) => {
+    if (answer === "Yes") {
+      socket.to(room).emit("message", "Opponent has agreed for game Draw!");
+      socket.to(room).emit("draw-resolve", "Yes");
+      socket.emit("draw-resolve", "Yes");
+    } else {
+      socket.to(room).emit("message", "Opponent has declined for game Draw!");
+      socket.to(room).emit("draw-resolve", "No");
+      socket.emit("draw-resolve", "No");
+    }
+  });
+
+  socket.on("resign-game", () => {
+    socket.to(room).emit("message", "Opponent has resigned the game!");
+    socket.to(room).emit("resign-request");
+  });
 });
 
 httpServer.listen(3000);

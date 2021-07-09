@@ -10,7 +10,7 @@ import rookBlack from "../../assets/black pieces/rook-black.gltf";
 import bishopBlack from "../../assets/black pieces/bishop-black.gltf";
 import knightBlack from "../../assets/black pieces/knight-black.gltf";
 import kingBlack from "../../assets/black pieces/king-black.gltf";
-import queenBlack from "../../assets/black pieces/queen-black.gltf";
+import queenBlack from "../../assets/black pieces/queen-black2.gltf";
 
 const assetsLoader = async (BABYLON) => {
   let meshesToLoad = [
