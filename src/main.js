@@ -10,7 +10,7 @@ import { renderScene, calculatePoint } from "./helper/canvasHelpers";
 
 async function Main() {
   let gameStarted = false;
-  let engine, game, scene, socket, emitter, room, players, tempMoves, gameMode;
+  let engine, game, scene, socket, emitter, room, player, tempMoves, gameMode;
   //#region HTML Selectors
   const homeButton = document.getElementById("home");
   const resetBoardButton = document.getElementById("reset-board");
@@ -56,7 +56,6 @@ async function Main() {
     socket.emit("request-room-id");
     await activateGame();
     activateEmitter();
-    let counter;
   };
 
   const joinOnlineGame = async () => {
@@ -66,12 +65,17 @@ async function Main() {
     await activateGame();
     activateEmitter();
     room = prompt("Please enter the room key");
-    console.log(room);
     socket.emit("join-room", room);
   };
 
-  const activateOnlineGame = () => {
+  const activateOnlineGame = (user) => {
     activateInput();
+    if (user === "White") {
+      player = "White";
+    } else {
+      player = "Black";
+      scene.cameras[0].alpha = 0;
+    }
   };
   //#endregion
 
@@ -100,7 +104,7 @@ async function Main() {
     if (game !== undefined && scene !== undefined) renderScene(game, scene);
     if (scene !== undefined) scene.onPointerDown = undefined;
     gameStarted = false;
-    players = undefined;
+    player = undefined;
     gameAnnotation.innerHTML = "";
     engine = undefined;
     game = undefined;
@@ -132,14 +136,29 @@ async function Main() {
     });
 
     socket.on("room-info", (info) => {
-      console.log(info);
+      let user;
       if (info.length === 2) {
         console.log("game has been activated");
-        activateOnlineGame();
+        socket.id === info[0] ? (user = "White") : (user = "Black");
+        activateOnlineGame(user);
       }
-      players = info;
+    });
+
+    socket.on("reset-board-request", () => {
+      const answer = prompt("Opponent has requested to reset the board, do you agree?, Enter Yes or No");
+      if (answer === "Yes" || answer === "yes" || answer === "YES") {
+        socket.emit("reset-board-response", "Yes");
+      }
+    });
+
+    socket.on("reset-board-resolve", (response) => {
+      if (response === "Yes") {
+        game.resetBoard();
+        renderScene(game, scene);
+      }
     });
   };
+
   const activateEmitter = () => {
     emitter = new EventEmitter();
     if (resetBoardButton.getAttribute("listener") !== "true") {
@@ -162,9 +181,13 @@ async function Main() {
       emitter.on("reset-board", () => {
         const answer = prompt("Are you sure you want to reset the board?, Enter Yes or No");
         if (answer === "Yes" || answer === "yes" || answer === "YES") {
-          game.resetBoard();
-          gameAnnotation.innerHTML = "";
-          renderScene(game, scene);
+          if (gameMode === "Offline") {
+            game.resetBoard();
+            gameAnnotation.innerHTML = "";
+            renderScene(game, scene);
+          } else {
+            socket.emit("reset-board");
+          }
         }
       });
     } else {
@@ -202,30 +225,40 @@ async function Main() {
     if (scene !== undefined) {
       if (scene.onPointerDown === undefined) {
         scene.onPointerDown = async (e, pickResult) => {
+          let isCurrentPlayer;
           //Calculate X/Y point for grid from the canvas X/Z
-          if (pickResult.hit === false) {
-            return console.log("Please click on the board!");
+          if (gameMode === "Online") {
+            isCurrentPlayer = player === game.gameState.currentPlayer;
           } else {
-            const y = pickResult.pickedPoint.x;
-            const x = pickResult.pickedPoint.z;
-            if (x > 12 || y > 12 || x < -12 || y < -12) {
-              return console.log("Please click on a square!");
-            }
-            const point = calculatePoint(x, y);
-            //If point is valid, push it to tempMoves
-            if (tempMoves.length === 0) {
-              if (game.board.grid[point[0]][point[1]].on === undefined) {
-                return console.log("Not a game piece!");
-              }
-              typeof point == "object" && game.board.grid[point[0]][point[1]].on.color === game.gameState.currentPlayer
-                ? tempMoves.push(point)
-                : null;
+            isCurrentPlayer = true;
+          }
+          if (isCurrentPlayer) {
+            if (pickResult.hit === false) {
+              return console.log("Please click on the board!");
             } else {
-              typeof point == "object" ? tempMoves.push(point) : null;
+              const y = pickResult.pickedPoint.x;
+              const x = pickResult.pickedPoint.z;
+              if (x > 12 || y > 12 || x < -12 || y < -12) {
+                return console.log("Please click on a square!");
+              }
+              const point = calculatePoint(x, y);
+              //If point is valid, push it to tempMoves
+              if (tempMoves.length === 0) {
+                if (game.board.grid[point[0]][point[1]].on === undefined) {
+                  return console.log("Not a game piece!");
+                }
+                typeof point == "object" && game.board.grid[point[0]][point[1]].on.color === game.gameState.currentPlayer
+                  ? tempMoves.push(point)
+                  : null;
+              } else {
+                typeof point == "object" ? tempMoves.push(point) : null;
+              }
+              //If tempmoves contains 2 points, move the piece
+              tempMoves.length === 2 ? emitter.emit("move", tempMoves[0], tempMoves[1]) : null;
+              tempMoves.length >= 2 ? (tempMoves = []) : null;
             }
-            //If tempmoves contains 2 points, move the piece
-            tempMoves.length === 2 ? emitter.emit("move", tempMoves[0], tempMoves[1]) : null;
-            tempMoves.length >= 2 ? (tempMoves = []) : null;
+          } else {
+            console.log("Opponents Turn!");
           }
         };
       }
