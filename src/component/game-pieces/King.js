@@ -1,5 +1,5 @@
-import GamePiece from "./GamePiece";
-import { calcKingMoves } from "../../helper/movementHelpers.js";
+import GamePiece from "./game-piece";
+import { calcKingMoves } from "../../helper/movement-helpers.js";
 
 class King extends GamePiece {
   constructor(name, color, point, movement) {

@@ -1,4 +1,4 @@
-import { pieceClasses } from "./boardHelpers";
+import { pieceClasses } from "./board-helpers";
 
 const resolveMove = (originPoint, targetPoint, gameState, grid, turnHistory, endGame) => {
   const squaresandPieces = getSquaresandPieces(originPoint, targetPoint, grid);

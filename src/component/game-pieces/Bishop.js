@@ -1,5 +1,5 @@
-import GamePiece from "./GamePiece";
-import { filterToFinalMoves, calcHorizontalMovements } from "../../helper/movementHelpers.js";
+import GamePiece from "./game-piece";
+import { filterToFinalMoves, calcHorizontalMovements } from "../../helper/movement-helpers.js";
 
 class Bishop extends GamePiece {
   constructor(name, color, point, movement) {

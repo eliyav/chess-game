@@ -1,5 +1,5 @@
-import GamePiece from "./GamePiece";
-import { filterToFinalMoves, calcVerticalMovements, calcHorizontalMovements } from "../../helper/movementHelpers.js";
+import GamePiece from "./game-piece";
+import { filterToFinalMoves, calcVerticalMovements, calcHorizontalMovements } from "../../helper/movement-helpers.js";
 
 class Queen extends GamePiece {
   constructor(name, color, point, movement) {
