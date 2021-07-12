@@ -3,10 +3,12 @@ import * as BABYLON from "babylonjs";
 import Game from "./game";
 import createScene from "./view/create-scene";
 import assetLoader from "./view/asset-loader";
+import introScene from "./view/intro-scene";
 import activateEmitter from "./component/events/offline-emitter";
 import activateInput from "./component/events/activate-input";
 import { renderScene } from "./helper/canvas-helpers";
 import addEventListeners from "./component/events/add-event-listeners";
+import sky from "../assets/sky.jpg";
 
 async function Main() {
   const gameContext = {
@@ -14,24 +16,49 @@ async function Main() {
   };
   //#region HTML Selectors
   const canvas = document.getElementById("renderCanvas");
-  const middleContent = document.getElementById("intro");
-  const homeButton = document.getElementById("home");
-  const startGameButton = document.getElementById("start-game");
-  const createRoomButton = document.getElementById("create-room");
-  const joinRoomButton = document.getElementById("join-room");
+  gameContext.scene = activateScene();
+  gameContext.scene.boardMesh = await introScene();
+  const boardMesh = gameContext.scene.boardMesh;
+  console.log(boardMesh);
+  let alpha = Math.PI / 2;
+  let beta = 0;
+  let gamma = 0;
+
+  const photoDome = new BABYLON.PhotoDome("testdome", sky, { size: 1000 }, gameContext.scene);
+
+  const animateDistance = () => {
+    requestAnimationFrame(() => {
+      alpha += 0.01;
+      beta += 0.01;
+      gamma += 0.01;
+      // boardMesh[0].rotation = new BABYLON.Vector3(0, 0, 0);
+      //boardMesh[1].rotation.y = beta;
+      boardMesh[0].rotate(new BABYLON.Vector3(0, beta, 0), (1 * Math.PI) / 500, BABYLON.Space.LOCAL);
+      boardMesh[1].rotate(new BABYLON.Vector3(0, -beta * 2, 0), (1 * Math.PI) / 500, BABYLON.Space.LOCAL);
+      // boardMesh[2].rotation = new BABYLON.Vector3(0, 0, 0);
+      animateDistance();
+    });
+  };
+  animateDistance();
+
+  // const middleContent = document.getElementById("intro");
+  // const homeButton = document.getElementById("home");
+  // const startGameButton = document.getElementById("start-game");
+  // const createRoomButton = document.getElementById("create-room");
+  // const joinRoomButton = document.getElementById("join-room");
   //#endregion
 
   //#region Event listeners
-  homeButton.addEventListener("click", () => {
-    canvas.style.display = "none";
-    middleContent.style.display = "block";
-  });
+  // homeButton.addEventListener("click", () => {
+  //   canvas.style.display = "none";
+  //   middleContent.style.display = "block";
+  // });
 
-  startGameButton.addEventListener("click", () => startOfflineGame());
+  // startGameButton.addEventListener("click", () => startOfflineGame());
 
-  createRoomButton.addEventListener("click", () => createOnlineGame());
+  // createRoomButton.addEventListener("click", () => createOnlineGame());
 
-  joinRoomButton.addEventListener("click", () => joinOnlineGame());
+  // joinRoomButton.addEventListener("click", () => joinOnlineGame());
 
   //#endregion
 
@@ -72,25 +99,22 @@ async function Main() {
     socket.emit("join-room", room);
   };
 
-  const activateScene = () => {
-    canvas.style.display = "block";
-    middleContent.style.display = "none";
+  function activateScene() {
     const { engine, scene } = createScene(canvas);
     (() => {
       engine.runRenderLoop(function () {
         scene.render();
       });
     })();
-
     return scene;
-  };
+  }
 
-  const activateGame = (mode) => {
-    const game = new Game(mode);
-    game.setBoard();
+  // const activateGame = (mode) => {
+  //   const game = new Game(mode);
+  //   game.setBoard();
 
-    return game;
-  };
+  //   return game;
+  // };
 
   // const activateOnlineGame = (user) => {
   //   activateInput();

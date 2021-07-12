@@ -6,7 +6,7 @@ function createScene(canvas) {
   scene.meshesToRender = [];
 
   const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 1, Math.PI / 3.5, 30, new BABYLON.Vector3(0, 0, 0), scene);
-  //camera.attachControl(canvas, true);
+  camera.attachControl(canvas, true);
   camera.useFramingBehavior = false;
 
   const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(10, 1, 0), scene);
