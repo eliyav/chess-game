@@ -18,7 +18,6 @@ async function Main() {
     },
     game: undefined,
   };
-  let advancedTexture;
   const canvas = document.getElementById("renderCanvas");
   appContext.game = new Game();
   appContext.game.setBoard();

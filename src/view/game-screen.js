@@ -17,20 +17,6 @@ const gameScreen = async (canvas, appContext) => {
 
   scene.finalMeshes = await assetsLoader();
 
-  //   const advancedTexture2 = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GameScreenUI", true, scene);
-  //   const button2 = GUI.Button.CreateSimpleButton("button1", "Home Screen");
-  //   button2.width = 0.1;
-  //   button2.height = "35px";
-  //   button2.color = "white";
-  //   button2.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
-  //   button2.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  //   button2.paddingTop = "5px";
-  //   button2.paddingLeft = "5px";
-  //   advancedTexture2.addControl(button2);
-  //   button2.onPointerUpObservable.add(function () {
-  //     appContext.showScene = 0;
-  //   });
-
   return scene;
 };
 

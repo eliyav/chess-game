@@ -24,30 +24,6 @@ const startScreen = async (canvas, appContext) => {
   const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(10, 1, 0), scene);
   const light2 = new BABYLON.HemisphericLight("light2", new BABYLON.Vector3(-10, 1, 0), scene);
   const light3 = new BABYLON.HemisphericLight("light3", new BABYLON.Vector3(0, 1, 0), scene);
-  console.log(appContext);
-  // const advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("StartScreenUI", true, scene);
-  // const button = GUI.Button.CreateSimpleButton("button", "Start Offline Game");
-  // button.width = 0.1;
-  // button.height = "35px";
-  // button.color = "white";
-  // button.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
-  // button.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  // button.paddingTop = "5px";
-  // button.paddingLeft = "5px";
-  // advancedTexture.addControl(button);
-  // button.onPointerUpObservable.add(function () {
-  //   appContext.showScene = 1;
-  // });
-  // const button2 = GUI.Button.CreateSimpleButton("but2", "Scene2");
-  // button2.width = 0.1;
-  // button2.height = "30px";
-  // button2.color = "white";
-  // //button.background = "green";
-  // button2.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
-  // button2.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  // button2.paddingTop = "5px";
-  // button2.left = "200px";
-  // advancedTexture.addControl(button2);
 
   let boardMesh = board;
 
