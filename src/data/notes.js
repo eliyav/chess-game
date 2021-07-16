@@ -31,3 +31,65 @@
 // } else {
 //   return false;
 // }
+
+///After full canvas update didnt need below functions
+
+// import activateEmitter from "./component/events/offline-emitter";
+// import activateInput from "./component/events/activate-input";
+// import { renderScene } from "./helper/canvas-helpers";
+// import addEventListeners from "./component/events/add-event-listeners";
+// import assetLoader from "./view/asset-loader";
+
+//#region Start Game Modes
+//   const startOfflineGame = async () => {
+//     appContext.gameStarted === true
+//       ? (() => {
+//           canvas.style.display = "block";
+//           middleContent.style.display = "none";
+//           appContext.game.resetBoard();
+//           renderScene(appContext.game, appContext.scene);
+//         })()
+//       : (async () => {
+//           appContext.gameStarted = true;
+//           appContext.game = activateGame("Offline");
+//           appContext.scene = activateScene();
+//           appContext.scene.finalMeshes = await assetLoader(BABYLON.SceneLoader.ImportMeshAsync);
+//           appContext.emitter = activateEmitter(appContext.scene, appContext.game);
+//           activateInput(appContext.scene, appContext.game, appContext.emitter);
+//           addEventListeners(appContext.emitter);
+//           renderScene(appContext.game, appContext.scene);
+//         })();
+//   };
+
+//   const createOnlineGame = async () => {
+//     activateSockets();
+//     socket.emit("request-room-id");
+//     activateGame("Online");
+//     activateEmitter();
+//   };
+
+//   const joinOnlineGame = async () => {
+//     gameMode = "Online";
+//     activateSockets();
+//     await activateGame("Online");
+//     activateEmitter();
+//     room = prompt("Please enter the room key");
+//     socket.emit("join-room", room);
+//   };
+
+// const activateGame = (mode) => {
+//   const game = new Game(mode);
+//   game.setBoard();
+
+//   return game;
+// };
+
+// const activateOnlineGame = (user) => {
+//   activateInput();
+//   if (user === "White") {
+//     player = "White";
+//   } else {
+//     player = "Black";
+//     scene.cameras[0].alpha = 0;
+//   }
+// };
