@@ -12,7 +12,7 @@ import knightBlack from "../../assets/black-pieces/knight-black.gltf";
 import kingBlack from "../../assets/black-pieces/king-black.gltf";
 import queenBlack from "../../assets/black-pieces/queen-black2.gltf";
 
-const assetsLoader = async (sceneLoader) => {
+const assetsLoader = async () => {
   let meshesToLoad = [
     board,
     pawnWhite,
@@ -29,7 +29,7 @@ const assetsLoader = async (sceneLoader) => {
     queenBlack,
   ];
 
-  const meshesLoader = await Promise.all(meshesToLoad.map((mesh) => sceneLoader("", mesh, "")));
+  const meshesLoader = await Promise.all(meshesToLoad.map((mesh) => BABYLON.SceneLoader.ImportMeshAsync("", mesh, "")));
 
   const finalMeshList = [];
   const boardMesh = [];

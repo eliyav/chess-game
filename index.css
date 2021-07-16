@@ -1,10 +1,12 @@
 * {
   margin: 0;
+  height: 100%;
+  width: 100%;
 }
 
 #renderCanvas {
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%;
 }
 
 /*

@@ -4,7 +4,7 @@ import { setPieces, createGrid } from "./helper/board-helpers";
 import chessData from "./data/chess-data-import";
 
 class Game {
-  constructor(mode) {
+  constructor() {
     this.chessData = chessData;
     this.gameState = chessData.initialState;
     this.teams = chessData.teams;
@@ -12,7 +12,6 @@ class Game {
     this.history = [];
     this.rawHistoryData = [];
     this.turnCounter = 1;
-    this.gameMode = mode;
     this.player;
     //this.timer = new Timer(this.gameState);
   }
