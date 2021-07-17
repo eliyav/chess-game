@@ -85,12 +85,12 @@ const startScreen = async (canvas, appContext) => {
       boardClone2.rotate(new BABYLON.Vector3(0, -beta * 2, 0), (1 * Math.PI) / 500, BABYLON.Space.LOCAL);
       loadedBoardPieces.forEach((mesh, idx) => {
         //check the array index, might cause the problem with loading all of them
-        mesh.meshes[1].position.y > -15 ? (mesh.meshes[1].position.y -= 0.02) : (mesh.meshes[1].position.y = 15);
+        mesh.meshes[1].position.y > -15 ? (mesh.meshes[0].position.y -= 0.02) : (mesh.meshes[0].position.y = 15);
         mesh.meshes[1].rotate(
           new BABYLON.Vector3(
-            alpha * rotationMultiplier[idx - 1],
-            -beta * 2 * rotationMultiplier[idx + 2],
-            gamma * rotationMultiplier[idx - 1]
+            alpha * rotationMultiplier[rotationMultiplier.length - 1 - idx],
+            -beta * 2 * rotationMultiplier[rotationMultiplier.length - 1 - idx],
+            gamma * rotationMultiplier[rotationMultiplier.length - 1 - idx]
           ),
           (3 * Math.PI) / 500,
           BABYLON.Space.LOCAL

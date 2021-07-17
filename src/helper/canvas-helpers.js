@@ -72,6 +72,54 @@ const calculateGridPoint = (point) => {
 
   return [gridX, gridY];
 };
+
+const reverseCalculateGridPoint = (point) => {
+  const [x, y] = point;
+  let indexX, indexY;
+  //Calculate X
+  if (x === 10.5) {
+    indexX = 0;
+  } else if (x === 7.5) {
+    indexX = 1;
+  } else if (x === 4.5) {
+    indexX = 2;
+  } else if (x === 1.5) {
+    indexX = 3;
+  } else if (x === -1.5) {
+    indexX = 4;
+  } else if (x === -4.5) {
+    indexX = 5;
+  } else if (x === -7.5) {
+    indexX = 6;
+  } else if (x === -10.5) {
+    indexX = 7;
+  } else {
+    return console.log("Error");
+  }
+  //Calculate Y
+  if (y === 10.5) {
+    indexY = 0;
+  } else if (y === 7.5) {
+    indexY = 1;
+  } else if (y === 4.5) {
+    indexY = 2;
+  } else if (y === 1.5) {
+    indexY = 3;
+  } else if (y === -1.5) {
+    indexY = 4;
+  } else if (y === -4.5) {
+    indexY = 5;
+  } else if (y === -7.5) {
+    indexY = 6;
+  } else if (y === -10.5) {
+    indexY = 7;
+  } else {
+    return console.log("Error");
+  }
+
+  return [indexX, indexY];
+};
+
 const calculatePoint = (x, y) => {
   //Calculate X
   if (x > 9 && x < 12) {
@@ -119,4 +167,4 @@ const calculatePoint = (x, y) => {
   return [canvasX, canvasY];
 };
 
-export { renderScene, calculatePoint };
+export { renderScene, calculatePoint, reverseCalculateGridPoint, calculateGridPoint };

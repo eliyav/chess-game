@@ -2,7 +2,6 @@ import EventEmitter from "./event-emitter";
 import { renderScene } from "../../helper/canvas-helpers";
 
 const activateEmitter = (scene, game) => {
-  const gameAnnotation = document.querySelector(".game-history");
   const emitter = new EventEmitter();
 
   emitter.on("move", (originPoint, targetPoint) => {
@@ -16,7 +15,6 @@ const activateEmitter = (scene, game) => {
       } else {
         scene.cameras[0].alpha = -3.14;
       }
-      gameAnnotation.innerHTML = game.history;
     }
   });
 
@@ -24,7 +22,6 @@ const activateEmitter = (scene, game) => {
     const answer = prompt("Are you sure you want to reset the board?, Enter Yes or No");
     if (answer === "Yes" || answer === "yes" || answer === "YES") {
       game.resetBoard();
-      gameAnnotation.innerHTML = "";
       renderScene(game, scene);
       scene.cameras[0].alpha = -3.14;
     }

@@ -38,11 +38,14 @@ const assetsLoader = async () => {
   meshesLoader.forEach((mesh) => {
     if (mesh.meshes[1].id.includes("-")) {
       let finalMesh = mesh.meshes[1];
-      [finalMesh.name, finalMesh.color, finalMesh.isPickable = false, finalMesh.isVisible = false, finalMesh.scalingDeterminant = 50] =
+      [finalMesh.name, finalMesh.color, finalMesh.isPickable = true, finalMesh.isVisible = false, finalMesh.scalingDeterminant = 50] =
         finalMesh.id.split("-");
       return finalMeshList.push(finalMesh);
     } else {
-      mesh.meshes.forEach((mesh) => (mesh.scalingDeterminant = 50));
+      mesh.meshes.forEach((mesh) => {
+        mesh.scalingDeterminant = 50;
+        mesh.isPickable = false;
+      });
       boardMesh.push(mesh);
     }
   });
