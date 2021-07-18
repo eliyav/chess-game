@@ -488,4 +488,4 @@ const annotate = (result, gameState, grid) => {
   return string;
 };
 
-export { resolveMove, isCheckmate, checkForCastling, getX, getY, annotate, isEnemyChecked };
+export { resolveMove, isCheckmate, checkForCastling, getX, getY, annotate, isEnemyChecked, doMovesMatch };

@@ -41,25 +41,6 @@
 // import assetLoader from "./view/asset-loader";
 
 //#region Start Game Modes
-//   const startOfflineGame = async () => {
-//     appContext.gameStarted === true
-//       ? (() => {
-//           canvas.style.display = "block";
-//           middleContent.style.display = "none";
-//           appContext.game.resetBoard();
-//           renderScene(appContext.game, appContext.scene);
-//         })()
-//       : (async () => {
-//           appContext.gameStarted = true;
-//           appContext.game = activateGame("Offline");
-//           appContext.scene = activateScene();
-//           appContext.scene.finalMeshes = await assetLoader(BABYLON.SceneLoader.ImportMeshAsync);
-//           appContext.emitter = activateEmitter(appContext.scene, appContext.game);
-//           activateInput(appContext.scene, appContext.game, appContext.emitter);
-//           addEventListeners(appContext.emitter);
-//           renderScene(appContext.game, appContext.scene);
-//         })();
-//   };
 
 //   const createOnlineGame = async () => {
 //     activateSockets();
@@ -76,13 +57,6 @@
 //     room = prompt("Please enter the room key");
 //     socket.emit("join-room", room);
 //   };
-
-// const activateGame = (mode) => {
-//   const game = new Game(mode);
-//   game.setBoard();
-
-//   return game;
-// };
 
 // const activateOnlineGame = (user) => {
 //   activateInput();
