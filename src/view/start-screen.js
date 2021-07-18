@@ -1,6 +1,6 @@
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
-import sky from "../../assets/sky.jpg";
+import space from "../../assets/space.jpg";
 import board from "../../assets/board.gltf";
 import pawnWhite from "../../assets/white-pieces/pawn-white.gltf";
 import rookWhite from "../../assets/white-pieces/rook-white.gltf";
@@ -68,7 +68,7 @@ const startScreen = async (canvas, appContext) => {
   boardClone2.position = new BABYLON.Vector3(30, -30, 30);
   boardClone2.rotation = new BABYLON.Vector3(-0.2, 0, 0.8);
 
-  const photoDome = new BABYLON.PhotoDome("skydome", sky, { size: 1000 }, scene);
+  const photoDome = new BABYLON.PhotoDome("spacedome", space, { size: 500 }, scene);
 
   const rotationMultiplier = [1, -2, 3, -1, 5, -3, 1, -2, 2, -3, 1, -1];
   let alpha = Math.PI / 2;

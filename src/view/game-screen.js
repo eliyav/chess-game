@@ -1,7 +1,7 @@
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
 import assetsLoader from "./asset-loader";
-import sky from "../../assets/sky.jpg";
+import space from "../../assets/space.jpg";
 
 const gameScreen = async (canvas, appContext) => {
   const scene = new BABYLON.Scene(appContext.engine);
@@ -13,7 +13,7 @@ const gameScreen = async (canvas, appContext) => {
   const light2 = new BABYLON.HemisphericLight("light2", new BABYLON.Vector3(-10, 1, 0), scene);
   const light3 = new BABYLON.HemisphericLight("light3", new BABYLON.Vector3(0, 1, 0), scene);
 
-  const photoDome = new BABYLON.PhotoDome("skydome", sky, { size: 1000 }, scene);
+  const photoDome = new BABYLON.PhotoDome("spacedome", space, { size: 1000 }, scene);
 
   scene.finalMeshes = await assetsLoader();
 
