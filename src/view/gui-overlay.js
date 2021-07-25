@@ -1,4 +1,5 @@
 import * as GUI from "babylonjs-gui";
+import activateSockets from "../../server/sockets";
 
 function createGUI(appContext) {
   const advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("StartUI", true, appContext.scenes.startScreen);
@@ -31,6 +32,8 @@ function createGUI(appContext) {
   advancedTexture.addControl(button1);
   button1.onPointerUpObservable.add(function () {
     appContext.gameMode.mode = "online";
+    appContext.sockets = activateSockets(appContext);
+    appContext.sockets.emit("request-room-id");
     appContext.scenes.startScreen.detachControl();
     appContext.showScene === 0 ? (appContext.showScene = 1) : (appContext.showScene = 0);
   });
@@ -46,6 +49,9 @@ function createGUI(appContext) {
   advancedTexture.addControl(button2);
   button2.onPointerUpObservable.add(function () {
     appContext.gameMode.mode = "online";
+    appContext.sockets = activateSockets(appContext);
+    let room = prompt("Please enter the room key");
+    appContext.sockets.emit("join-room", room);
     appContext.scenes.startScreen.detachControl();
     appContext.showScene === 0 ? (appContext.showScene = 1) : (appContext.showScene = 0);
   });

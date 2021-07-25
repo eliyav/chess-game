@@ -27,6 +27,7 @@ io.on("connection", (socket) => {
     const clients = io.sockets.adapter.rooms.get(room);
     const serializedSet = [...clients.keys()];
     socket.to(room).emit("room-info", serializedSet);
+    socket.emit("reply-room-id", room);
     socket.emit("room-info", serializedSet);
     console.log(clients);
   });

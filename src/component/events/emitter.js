@@ -4,13 +4,12 @@ import { renderScene } from "../../helper/canvas-helpers";
 const activateEmitter = (appContext) => {
   const emitter = new EventEmitter();
   const {
-    gameMode: gameMode,
-    game: game,
+    gameMode,
+    game,
     scenes: { gameScreen: scene },
   } = appContext;
 
   emitter.on("move", (originPoint, targetPoint) => {
-    console.log("emitter activated");
     renderScene(game, scene);
     if (gameMode.mode === "offline") {
       const resolved = game.playerMove(originPoint, targetPoint);
@@ -36,12 +35,12 @@ const activateEmitter = (appContext) => {
         }
       }
     } else if (gameMode.mode === "online") {
-      console.log("!");
       const resolved = game.playerMove(originPoint, targetPoint);
       if (resolved) {
         renderScene(game, scene);
         game.switchTurn();
-        //socket.emit("stateChange", { originPoint, targetPoint, room });
+        const room = gameMode.room;
+        appContext.sockets.emit("stateChange", { originPoint, targetPoint, room });
       }
     }
   });

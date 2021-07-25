@@ -5,6 +5,7 @@ import chessData from "./data/chess-data-import";
 
 class Game {
   constructor() {
+    //destructure this
     this.chessData = chessData;
     this.gameState = chessData.initialState;
     this.teams = chessData.teams;
@@ -23,7 +24,7 @@ class Game {
       ? (() => {
           resolve.turn = this.turnCounter;
           this.turnCounter++;
-          let turnHistory = annotate(resolve, this.gameState, this.board.grid);
+          const turnHistory = annotate(resolve, this.gameState, this.board.grid);
           this.history.push(turnHistory);
           this.rawHistoryData.push(resolve);
         })()

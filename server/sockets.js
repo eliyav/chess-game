@@ -1,19 +1,25 @@
 import { io } from "socket.io-client";
+import { renderScene } from "../src/helper/canvas-helpers";
 
-const activateSocket = (game, scene) => {
+const activateSocket = (appContext) => {
+  let {
+    game,
+    scenes: { gameScreen: scene },
+    gameMode,
+  } = appContext;
+
   const socket = io("ws://localhost:3000");
-  let room;
 
   socket.on("stateChange", (newState) => {
     const { originPoint, targetPoint } = newState;
     game.playerMove(originPoint, targetPoint);
     game.switchTurn();
-    renderScene(game, scene, finalMeshes);
+    renderScene(game, scene);
   });
 
   socket.on("reply-room-id", (id) => {
     console.log(id);
-    room = id;
+    gameMode.room = id;
   });
 
   socket.on("message", (message) => {
@@ -21,11 +27,11 @@ const activateSocket = (game, scene) => {
   });
 
   socket.on("room-info", (info) => {
-    let user;
+    let player;
     if (info.length === 2) {
       console.log("game has been activated");
-      socket.id === info[0] ? (user = "White") : (user = "Black");
-      activateOnlineGame(user);
+      socket.id === info[0] ? (player = "White") : (player = "Black");
+      appContext.gameMode.player = player;
     }
   });
 
