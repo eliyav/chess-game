@@ -1,13 +1,7 @@
 import { io } from "socket.io-client";
 import { renderScene } from "../src/helper/canvas-helpers";
 
-const activateSocket = (appContext) => {
-  let {
-    game,
-    scenes: { gameScreen: scene },
-    gameMode,
-  } = appContext;
-
+const activateSocket = (game, gameMode, scene) => {
   const socket = io("ws://localhost:3000");
 
   socket.on("stateChange", (newState) => {
@@ -31,7 +25,7 @@ const activateSocket = (appContext) => {
     if (info.length === 2) {
       console.log("game has been activated");
       socket.id === info[0] ? (player = "White") : (player = "Black");
-      appContext.gameMode.player = player;
+      gameMode.player = player;
     }
   });
 
@@ -45,7 +39,7 @@ const activateSocket = (appContext) => {
   socket.on("reset-board-resolve", (response) => {
     if (response === "Yes") {
       game.resetBoard();
-      renderScene(game, scene, finalMeshes);
+      renderScene(game, scene);
     }
   });
 
@@ -59,13 +53,13 @@ const activateSocket = (appContext) => {
   socket.on("draw-resolve", (response) => {
     if (response === "Yes") {
       game.resetBoard();
-      renderScene(game, scene, finalMeshes);
+      renderScene(game, gameScene);
     }
   });
 
   socket.on("resign-request", () => {
     game.resetBoard();
-    renderScene(game, scene, finalMeshes);
+    renderScene(game, gameScene);
   });
 
   return socket;

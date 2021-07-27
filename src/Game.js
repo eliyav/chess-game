@@ -10,11 +10,14 @@ class Game {
     this.gameState = chessData.initialState;
     this.teams = chessData.teams;
     this.board = new Board(chessData);
+    this.moves = [];
     this.history = [];
     this.rawHistoryData = [];
     this.turnCounter = 1;
     this.player;
     //this.timer = new Timer(this.gameState);
+
+    this.setBoard();
   }
 
   playerMove(originPoint, targetPoint) {

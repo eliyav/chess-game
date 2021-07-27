@@ -1,15 +1,15 @@
-const renderScene = (game, scene) => {
+const renderScene = (game, gameScene) => {
   //Clears old meshes/memory usage
-  if (scene.meshesToRender.length > 0) {
-    for (let i = 0; i < scene.meshesToRender.length; i++) {
-      const mesh = scene.meshesToRender[i];
-      scene.removeMesh(mesh);
+  if (gameScene.meshesToRender.length > 0) {
+    for (let i = 0; i < gameScene.meshesToRender.length; i++) {
+      const mesh = gameScene.meshesToRender[i];
+      gameScene.removeMesh(mesh);
       mesh.dispose();
     }
-    scene.meshesToRender = [];
+    gameScene.meshesToRender = [];
   }
   //Final Mesh List
-  const meshes = scene.finalMeshes.finalMeshList;
+  const meshes = gameScene.finalMeshes.finalMeshList;
   //Reads grid State
   const grid = game.board.grid;
   const filteredGrid = grid.flat().filter((square) => square.on !== undefined);
@@ -18,15 +18,37 @@ const renderScene = (game, scene) => {
     const { color, name, point } = square.on;
     const match = meshes.find((mesh) => mesh.name === name && mesh.color === color);
     let clone = match.clone(name);
-    const gridPoint = calculateGridPoint(point);
+    const gridPoint = calculateGridPosition(point);
     clone.position.z = gridPoint[0];
     clone.position.x = gridPoint[1];
     clone.isVisible = true;
-    scene.meshesToRender.push(clone);
+    gameScene.meshesToRender.push(clone);
   });
 };
 
-const calculateGridPoint = (point) => {
+const displayPieceMoves = (mesh, currentMove, grid, gameScene) => {
+  const [x, y] = calcIndexFromMeshPosition([mesh.position.z, mesh.position.x]);
+  const piece = grid[x][y].on;
+  const moves = piece.calculateAvailableMoves(grid);
+  currentMove.push(piece.point);
+  moves.forEach((point) => {
+    displayMovementSquares(point, gameScene);
+  });
+};
+
+const displayMovementSquares = (point, gameScene) => {
+  const plane = BABYLON.MeshBuilder.CreatePlane(`plane`, { width: 2.8, height: 2.8 });
+  const gridPosition = calculatePlanePosition(point); //Spawned Plane has opposite Y then loaded Mesh
+  plane.point = point;
+  [plane.position.z, plane.position.x] = gridPosition; //Z is X ---- X is Y
+  plane.position.y += 0.01;
+  plane.material = gameScene.materials.find((material) => material.id === "greenMat");
+  plane.material.diffuseColor = new BABYLON.Color3(0, 1, 0.2);
+  plane.rotation = new BABYLON.Vector3(Math.PI / 2, 0, 0);
+  gameScene.meshesToRender.push(plane);
+};
+
+const calculateGridPosition = (point) => {
   const [x, y] = point;
   let gridX, gridY;
   //Calculate X
@@ -67,13 +89,60 @@ const calculateGridPoint = (point) => {
   } else if (y === 7) {
     gridY = -10.5;
   } else {
-    return console.log("You have not clicked a valid Y coordinate", x);
+    return console.log("You have not clicked a valid Y coordinate", y);
   }
 
   return [gridX, gridY];
 };
 
-const reverseCalculateGridPoint = (point) => {
+const calculatePlanePosition = (point) => {
+  const [x, y] = point;
+  let gridX, gridY;
+  //Calculate X
+  if (x === 0) {
+    gridX = 10.5;
+  } else if (x === 1) {
+    gridX = 7.5;
+  } else if (x === 2) {
+    gridX = 4.5;
+  } else if (x === 3) {
+    gridX = 1.5;
+  } else if (x === 4) {
+    gridX = -1.5;
+  } else if (x === 5) {
+    gridX = -4.5;
+  } else if (x === 6) {
+    gridX = -7.5;
+  } else if (x === 7) {
+    gridX = -10.5;
+  } else {
+    return console.log("You have not clicked a valid X coordinate", x);
+  }
+  //Calculate Y
+  if (y === 0) {
+    gridY = -10.5;
+  } else if (y === 1) {
+    gridY = -7.5;
+  } else if (y === 2) {
+    gridY = -4.5;
+  } else if (y === 3) {
+    gridY = -1.5;
+  } else if (y === 4) {
+    gridY = 1.5;
+  } else if (y === 5) {
+    gridY = 4.5;
+  } else if (y === 6) {
+    gridY = 7.5;
+  } else if (y === 7) {
+    gridY = 10.5;
+  } else {
+    return console.log("You have not clicked a valid Y coordinate", y);
+  }
+
+  return [gridX, gridY];
+};
+
+const calcIndexFromMeshPosition = (point) => {
   const [x, y] = point;
   let indexX, indexY;
   //Calculate X
@@ -167,4 +236,4 @@ const calculatePoint = (x, y) => {
   return [canvasX, canvasY];
 };
 
-export { renderScene, calculatePoint, reverseCalculateGridPoint, calculateGridPoint };
+export { renderScene, calculatePoint, calcIndexFromMeshPosition, calculateGridPosition, displayPieceMoves };

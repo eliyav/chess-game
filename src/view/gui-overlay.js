@@ -1,9 +1,8 @@
 import * as GUI from "babylonjs-gui";
-import activateSockets from "../../server/sockets";
 
-function createGUI(appContext) {
-  const advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("StartUI", true, appContext.scenes.startScreen);
-  const advancedTexture2 = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GameUI", true, appContext.scenes.gameScreen);
+function createGUI(startScene, gameScene, showScene, gameMode, emitter, socket) {
+  const advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("StartUI", true, startScene);
+  const advancedTexture2 = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GameUI", true, gameScene);
 
   //Start Screen
   const button = GUI.Button.CreateSimpleButton("button", "Start Offline Game");
@@ -16,9 +15,9 @@ function createGUI(appContext) {
   button.paddingLeft = "5px";
   advancedTexture.addControl(button);
   button.onPointerUpObservable.add(function () {
-    appContext.gameMode.mode = "offline";
-    appContext.scenes.startScreen.detachControl();
-    appContext.showScene === 0 ? (appContext.showScene = 1) : (appContext.showScene = 0);
+    gameMode.mode = "offline";
+    startScene.detachControl();
+    showScene.sceneIndex === 0 ? (showScene.sceneIndex = 1) : (showScene.sceneIndex = 0);
   });
 
   const button1 = GUI.Button.CreateSimpleButton("button1", "Start Online Game");
@@ -31,11 +30,10 @@ function createGUI(appContext) {
   button1.left = 200;
   advancedTexture.addControl(button1);
   button1.onPointerUpObservable.add(function () {
-    appContext.gameMode.mode = "online";
-    appContext.sockets = activateSockets(appContext);
-    appContext.sockets.emit("request-room-id");
-    appContext.scenes.startScreen.detachControl();
-    appContext.showScene === 0 ? (appContext.showScene = 1) : (appContext.showScene = 0);
+    gameMode.mode = "online";
+    socket.emit("request-room-id");
+    startScene.detachControl();
+    showScene.sceneIndex === 0 ? (showScene.sceneIndex = 1) : (showScene.sceneIndex = 0);
   });
 
   const button2 = GUI.Button.CreateSimpleButton("button2", "Join Online Game");
@@ -48,12 +46,11 @@ function createGUI(appContext) {
   button2.left = 400;
   advancedTexture.addControl(button2);
   button2.onPointerUpObservable.add(function () {
-    appContext.gameMode.mode = "online";
-    appContext.sockets = activateSockets(appContext);
+    gameMode.mode = "online";
     let room = prompt("Please enter the room key");
-    appContext.sockets.emit("join-room", room);
-    appContext.scenes.startScreen.detachControl();
-    appContext.showScene === 0 ? (appContext.showScene = 1) : (appContext.showScene = 0);
+    socket.emit("join-room", room);
+    startScene.detachControl();
+    showScene.sceneIndex === 0 ? (showScene.sceneIndex = 1) : (showScene.sceneIndex = 0);
   });
 
   //Game Screen
@@ -67,8 +64,8 @@ function createGUI(appContext) {
   button01.paddingLeft = "5px";
   advancedTexture2.addControl(button01);
   button01.onPointerUpObservable.add(function () {
-    appContext.scenes.gameScreen.detachControl();
-    appContext.showScene === 0 ? (appContext.showScene = 1) : (appContext.showScene = 0);
+    gameScene.detachControl();
+    showScene.sceneIndex === 0 ? (showScene.sceneIndex = 1) : (showScene.sceneIndex = 0);
   });
 
   const button02 = GUI.Button.CreateSimpleButton("button02", "Reset Board");
@@ -81,7 +78,7 @@ function createGUI(appContext) {
   button02.left = 200;
   advancedTexture2.addControl(button02);
   button02.onPointerUpObservable.add(function () {
-    appContext.emitter.emit("reset-board");
+    emitter.emit("reset-board");
   });
 }
 

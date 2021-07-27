@@ -1,34 +1,29 @@
 import EventEmitter from "./event-emitter";
 import { renderScene } from "../../helper/canvas-helpers";
 
-const activateEmitter = (appContext) => {
+const activateEmitter = (game, gameMode, gameScene) => {
   const emitter = new EventEmitter();
-  const {
-    gameMode,
-    game,
-    scenes: { gameScreen: scene },
-  } = appContext;
 
   emitter.on("move", (originPoint, targetPoint) => {
-    renderScene(game, scene);
+    renderScene(game, gameScene);
     if (gameMode.mode === "offline") {
       const resolved = game.playerMove(originPoint, targetPoint);
       if (resolved) {
-        renderScene(game, scene);
+        renderScene(game, gameScene);
         game.switchTurn();
         if (game.gameState.currentPlayer === "Black") {
           const animateTurnSwitch = () => {
             requestAnimationFrame(() => {
-              scene.cameras[0].alpha += 0.05;
-              scene.cameras[0].alpha < 0 ? animateTurnSwitch() : (scene.cameras[0].alpha = 0);
+              gameScene.cameras[0].alpha += 0.05;
+              gameScene.cameras[0].alpha < 0 ? animateTurnSwitch() : (gameScene.cameras[0].alpha = 0);
             });
           };
           animateTurnSwitch();
         } else {
           const animateTurnSwitch = () => {
             requestAnimationFrame(() => {
-              scene.cameras[0].alpha -= 0.05;
-              scene.cameras[0].alpha > -3.14 ? animateTurnSwitch() : (scene.cameras[0].alpha = -3.14);
+              gameScene.cameras[0].alpha -= 0.05;
+              gameScene.cameras[0].alpha > -3.14 ? animateTurnSwitch() : (gameScene.cameras[0].alpha = -3.14);
             });
           };
           animateTurnSwitch();
@@ -37,10 +32,10 @@ const activateEmitter = (appContext) => {
     } else if (gameMode.mode === "online") {
       const resolved = game.playerMove(originPoint, targetPoint);
       if (resolved) {
-        renderScene(game, scene);
+        renderScene(game, gameScene);
         game.switchTurn();
         const room = gameMode.room;
-        appContext.sockets.emit("stateChange", { originPoint, targetPoint, room });
+        sockets.emit("stateChange", { originPoint, targetPoint, room });
       }
     }
   });
@@ -49,8 +44,8 @@ const activateEmitter = (appContext) => {
     const answer = prompt("Are you sure you want to reset the board?, Enter Yes or No");
     if (answer === "Yes" || answer === "yes" || answer === "YES") {
       game.resetBoard();
-      renderScene(game, scene);
-      scene.cameras[0].alpha = -3.14;
+      renderScene(game, gameScene);
+      gameScene.cameras[0].alpha = -3.14;
     }
   });
 
@@ -92,7 +87,7 @@ export default activateEmitter;
       const answer = prompt("Are you sure you want to resign the game?, Enter Yes or No");
       if (answer === "Yes" || answer === "yes" || answer === "YES") {
         game.resetBoard();
-        renderScene(game, scene, finalMeshes);
+        renderScene(appContext, finalMeshes);
         socket.emit("resign-game");
       }
     });
