@@ -14,15 +14,17 @@ import bishopBlack from "../../assets/black-pieces/bishop-black.gltf";
 import knightBlack from "../../assets/black-pieces/knight-black.gltf";
 import kingBlack from "../../assets/black-pieces/king-black.gltf";
 import queenBlack from "../../assets/black-pieces/queen-black2.gltf";
+import space2 from "../../assets/space2.jpg";
+import blackMetal from "../../assets/black-metal.jpg";
+import whiteMetal from "../../assets/white-metal.jpg";
 
 const startScreen = async (canvas, engine) => {
   const scene = new BABYLON.Scene(engine);
   const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 1, Math.PI / 3.5, 30, new BABYLON.Vector3(0, 0, 0), scene);
   camera.attachControl(canvas, true);
   camera.useFramingBehavior = false;
-  const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(10, 1, 0), scene);
-  const light2 = new BABYLON.HemisphericLight("light2", new BABYLON.Vector3(-10, 1, 0), scene);
-  const light3 = new BABYLON.HemisphericLight("light3", new BABYLON.Vector3(0, 1, 0), scene);
+
+  const light = new BABYLON.HemisphericLight("light3", new BABYLON.Vector3(0, 1, 0), scene);
 
   let boardMesh = board;
 
@@ -44,16 +46,27 @@ const startScreen = async (canvas, engine) => {
   const loadedBoardMesh = await BABYLON.SceneLoader.ImportMeshAsync("", boardMesh, "", scene);
   const loadedBoardPieces = await Promise.all(boardPieces.map((mesh) => BABYLON.SceneLoader.ImportMeshAsync("", mesh, "", scene)));
 
+  const materialWhite = new BABYLON.StandardMaterial("White", scene);
+  materialWhite.diffuseTexture = new BABYLON.Texture(whiteMetal, scene);
+  materialWhite.refractionTexture = new BABYLON.Texture(space2, scene);
+
+  const materialBlack = new BABYLON.StandardMaterial("Black", scene);
+  materialBlack.diffuseTexture = new BABYLON.Texture(blackMetal, scene);
+  materialBlack.refractionTexture = new BABYLON.Texture(space2, scene);
+
   loadedBoardMesh.meshes.forEach((mesh) => {
     mesh.scalingDeterminant = 8;
   });
   loadedBoardPieces.forEach((mesh) => {
-    mesh.meshes[1].scalingDeterminant = 40;
-    mesh.meshes[1].position.y = 15;
-    mesh.meshes[1].position.x = 10;
+    const finalMesh = mesh.meshes[1];
+    [finalMesh.name, finalMesh.color] = finalMesh.id.split("-");
+    finalMesh.color === "White" ? (finalMesh.material = materialWhite) : (finalMesh.material = materialBlack);
+    finalMesh.scalingDeterminant = 40;
+    finalMesh.position.y = 15;
+    finalMesh.position.x = 10;
     const num = Math.random();
     const test = num > 0.5 ? -1 : 1;
-    mesh.meshes[1].position.z = Math.random() * 15 * test;
+    finalMesh.position.z = Math.random() * 15 * test;
   });
 
   const boardClone = loadedBoardMesh.meshes[0].clone("Board1");
@@ -68,7 +81,7 @@ const startScreen = async (canvas, engine) => {
   boardClone2.position = new BABYLON.Vector3(30, -30, 30);
   boardClone2.rotation = new BABYLON.Vector3(-0.2, 0, 0.8);
 
-  //const photoDome = new BABYLON.PhotoDome("spacedome", space, { size: 500 }, scene);
+  const photoDome = new BABYLON.PhotoDome("spacedome", space, { size: 500 }, scene);
 
   const rotationMultiplier = [1, -2, 3, -1, 5, -3, 1, -2, 2, -3, 1, -1];
   let alpha = Math.PI / 2;

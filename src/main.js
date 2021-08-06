@@ -1,6 +1,6 @@
 import "babylonjs-loaders";
 import * as BABYLON from "babylonjs";
-import initializeApp from "./helper/app-helpers";
+import initializeApp from "./app";
 
 async function Main() {
   const canvas = document.getElementById("renderCanvas");

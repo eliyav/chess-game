@@ -1,5 +1,5 @@
 import EventEmitter from "./event-emitter";
-import { renderScene } from "../../helper/canvas-helpers";
+import { renderScene } from "../helper/canvas-helpers";
 
 const activateEmitter = (game, gameMode, gameScene) => {
   const emitter = new EventEmitter();

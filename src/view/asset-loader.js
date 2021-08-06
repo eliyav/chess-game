@@ -12,7 +12,7 @@ import knightBlack from "../../assets/black-pieces/knight-black.gltf";
 import kingBlack from "../../assets/black-pieces/king-black.gltf";
 import queenBlack from "../../assets/black-pieces/queen-black2.gltf";
 
-const assetsLoader = async () => {
+const assetsLoader = async (materialWhite, materialBlack) => {
   let meshesToLoad = [
     board,
     pawnWhite,
@@ -40,6 +40,7 @@ const assetsLoader = async () => {
       let finalMesh = mesh.meshes[1];
       [finalMesh.name, finalMesh.color, finalMesh.isPickable = true, finalMesh.isVisible = false, finalMesh.scalingDeterminant = 50] =
         finalMesh.id.split("-");
+      finalMesh.color === "White" ? (finalMesh.material = materialWhite) : (finalMesh.material = materialBlack);
       return finalMeshList.push(finalMesh);
     } else {
       mesh.meshes.forEach((mesh) => {
