@@ -11,23 +11,34 @@ const activateEmitter = (game, gameMode, gameScene) => {
       if (resolved) {
         renderScene(game, gameScene);
         game.switchTurn();
-        if (game.gameState.currentPlayer === "Black") {
-          const animateTurnSwitch = () => {
-            requestAnimationFrame(() => {
-              gameScene.cameras[0].alpha += 0.05;
-              gameScene.cameras[0].alpha < 0 ? animateTurnSwitch() : (gameScene.cameras[0].alpha = 0);
-            });
-          };
-          animateTurnSwitch();
-        } else {
-          const animateTurnSwitch = () => {
-            requestAnimationFrame(() => {
+        const currentPlayer = game.gameState.currentPlayer;
+        const animateTurnSwitch = (color) => {
+          let target = color === "Black" ? 0 : -3.14;
+          requestAnimationFrame(() => {
+            let alpha = gameScene.cameras[0].alpha;
+            const absAlpha = Math.abs(alpha);
+            const divisible = Math.floor(absAlpha / Math.PI);
+            if (divisible > 1) {
+              const remainder = absAlpha / Math.PI - divisible;
+              let newAlpha = remainder * Math.PI;
+              console.log(`Alpha:${alpha}; AbsAlpha:${absAlpha}; remainder:${remainder};newAlpha:${newAlpha}`);
+              alpha < 0 ? (newAlpha *= -1) : null;
+              console.log(`Alpha:${alpha}; AbsAlpha:${absAlpha}; remainder:${remainder};newAlpha:${newAlpha}`);
+              gameScene.cameras[0].alpha = newAlpha;
+              alpha = newAlpha;
+              //builtd new direction rotation based on the alpha and the target.
+            }
+            const direction = alpha > target ? "negative" : "positive";
+            if (direction === "negative") {
               gameScene.cameras[0].alpha -= 0.05;
-              gameScene.cameras[0].alpha > -3.14 ? animateTurnSwitch() : (gameScene.cameras[0].alpha = -3.14);
-            });
-          };
-          animateTurnSwitch();
-        }
+              gameScene.cameras[0].alpha < target ? null : animateTurnSwitch(color);
+            } else if (direction === "positive") {
+              gameScene.cameras[0].alpha += 0.05;
+              gameScene.cameras[0].alpha > target ? null : animateTurnSwitch(color);
+            }
+          });
+        };
+        animateTurnSwitch(currentPlayer);
       }
     } else if (gameMode.mode === "online") {
       const resolved = game.playerMove(originPoint, targetPoint);

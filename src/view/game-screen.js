@@ -1,10 +1,6 @@
 import * as BABYLON from "babylonjs";
-import * as GUI from "babylonjs-gui";
 import assetsLoader from "./asset-loader";
 import space from "../../assets/space.jpg";
-import space2 from "../../assets/space2.jpg";
-import blackMetal from "../../assets/black-metal.jpg";
-import whiteMetal from "../../assets/white-metal.jpg";
 
 const gameScreen = async (canvas, engine) => {
   const scene = new BABYLON.Scene(engine);
@@ -19,15 +15,7 @@ const gameScreen = async (canvas, engine) => {
 
   const photoDome = new BABYLON.PhotoDome("spacedome", space, { size: 1000 }, scene);
 
-  const materialWhite = new BABYLON.StandardMaterial("White", scene);
-  materialWhite.diffuseTexture = new BABYLON.Texture(whiteMetal, scene);
-  materialWhite.refractionTexture = new BABYLON.Texture(space2, scene);
-
-  const materialBlack = new BABYLON.StandardMaterial("Black", scene);
-  materialBlack.diffuseTexture = new BABYLON.Texture(blackMetal, scene);
-  materialBlack.refractionTexture = new BABYLON.Texture(space2, scene);
-
-  scene.finalMeshes = await assetsLoader(materialWhite, materialBlack);
+  scene.finalMeshes = await assetsLoader(scene, "gameScreen");
 
   return scene;
 };
