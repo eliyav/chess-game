@@ -26,6 +26,23 @@ const renderScene = (game, gameScene) => {
   });
 };
 
+const rotateCamera = (currentPlayer, gameScene) => {
+  let target = currentPlayer === "Black" ? 0 : Math.PI;
+  currentPlayer === "Black" ? (gameScene.cameras[0].alpha = Math.PI + 0.01) : (gameScene.cameras[0].alpha = 0 + 0.0001);
+  const animateTurnSwitch = () => {
+    requestAnimationFrame(() => {
+      if (currentPlayer === "Black") {
+        gameScene.cameras[0].alpha -= 0.05;
+        gameScene.cameras[0].alpha < target ? null : animateTurnSwitch(currentPlayer);
+      } else {
+        gameScene.cameras[0].alpha += 0.05;
+        gameScene.cameras[0].alpha > target ? null : animateTurnSwitch(currentPlayer);
+      }
+    });
+  };
+  animateTurnSwitch(currentPlayer);
+};
+
 const displayPieceMoves = (mesh, currentMove, grid, gameScene) => {
   const [x, y] = calcIndexFromMeshPosition([mesh.position.z, mesh.position.x]);
   const piece = grid[x][y].on;
@@ -236,4 +253,4 @@ const calculatePoint = (x, y) => {
   return [canvasX, canvasY];
 };
 
-export { renderScene, calculatePoint, calcIndexFromMeshPosition, calculateGridPosition, displayPieceMoves };
+export { renderScene, calculatePoint, calcIndexFromMeshPosition, calculateGridPosition, displayPieceMoves, rotateCamera };

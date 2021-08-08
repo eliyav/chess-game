@@ -1,5 +1,5 @@
 import EventEmitter from "./event-emitter";
-import { renderScene } from "../helper/canvas-helpers";
+import { renderScene, rotateCamera } from "../helper/canvas-helpers";
 
 const activateEmitter = (game, gameMode, gameScene) => {
   const emitter = new EventEmitter();
@@ -12,33 +12,7 @@ const activateEmitter = (game, gameMode, gameScene) => {
         renderScene(game, gameScene);
         game.switchTurn();
         const currentPlayer = game.gameState.currentPlayer;
-        const animateTurnSwitch = (color) => {
-          let target = color === "Black" ? 0 : -3.14;
-          requestAnimationFrame(() => {
-            let alpha = gameScene.cameras[0].alpha;
-            const absAlpha = Math.abs(alpha);
-            const divisible = Math.floor(absAlpha / Math.PI);
-            if (divisible > 1) {
-              const remainder = absAlpha / Math.PI - divisible;
-              let newAlpha = remainder * Math.PI;
-              console.log(`Alpha:${alpha}; AbsAlpha:${absAlpha}; remainder:${remainder};newAlpha:${newAlpha}`);
-              alpha < 0 ? (newAlpha *= -1) : null;
-              console.log(`Alpha:${alpha}; AbsAlpha:${absAlpha}; remainder:${remainder};newAlpha:${newAlpha}`);
-              gameScene.cameras[0].alpha = newAlpha;
-              alpha = newAlpha;
-              //builtd new direction rotation based on the alpha and the target.
-            }
-            const direction = alpha > target ? "negative" : "positive";
-            if (direction === "negative") {
-              gameScene.cameras[0].alpha -= 0.05;
-              gameScene.cameras[0].alpha < target ? null : animateTurnSwitch(color);
-            } else if (direction === "positive") {
-              gameScene.cameras[0].alpha += 0.05;
-              gameScene.cameras[0].alpha > target ? null : animateTurnSwitch(color);
-            }
-          });
-        };
-        animateTurnSwitch(currentPlayer);
+        rotateCamera(currentPlayer, gameScene);
       }
     } else if (gameMode.mode === "online") {
       const resolved = game.playerMove(originPoint, targetPoint);
