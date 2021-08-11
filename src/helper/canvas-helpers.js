@@ -27,16 +27,80 @@ const renderScene = (game, gameScene) => {
 };
 
 const rotateCamera = (currentPlayer, gameScene) => {
-  let target = currentPlayer === "Black" ? 0 : Math.PI;
-  currentPlayer === "Black" ? (gameScene.cameras[0].alpha = Math.PI + 0.01) : (gameScene.cameras[0].alpha = 0 + 0.0001);
+  let a = gameScene.cameras[0].alpha;
+  let divisible;
+  let subtractedDivisible;
+  let piDistance;
+  let remainingDistance;
+  let remainder;
+  if (currentPlayer === "Black") {
+    if (a < 0) {
+      divisible = Math.ceil(a / Math.PI);
+      subtractedDivisible = a - divisible * Math.PI;
+      piDistance = Math.abs(Math.PI + subtractedDivisible);
+      remainder = divisible % 2;
+      remainder ? (remainingDistance = piDistance) : (remainingDistance = Math.PI - piDistance);
+    } else {
+      divisible = Math.floor(a / Math.PI);
+      subtractedDivisible = a - divisible * Math.PI;
+      piDistance = Math.PI - subtractedDivisible;
+      remainder = divisible % 2;
+      remainder ? (remainingDistance = piDistance) : (remainingDistance = Math.PI - piDistance);
+    }
+  } else {
+    if (a < 0) {
+      divisible = Math.ceil(a / Math.PI);
+      subtractedDivisible = a - divisible * Math.PI;
+      piDistance = Math.abs(Math.PI + subtractedDivisible);
+      remainder = divisible % 2;
+      remainder ? (remainingDistance = Math.PI - piDistance) : (remainingDistance = piDistance);
+    } else {
+      divisible = Math.floor(a / Math.PI);
+      subtractedDivisible = a - divisible * Math.PI;
+      piDistance = Math.PI - subtractedDivisible;
+      remainder = divisible % 2;
+      remainder ? (remainingDistance = Math.PI - piDistance) : (remainingDistance = piDistance);
+    }
+  }
+
   const animateTurnSwitch = () => {
     requestAnimationFrame(() => {
       if (currentPlayer === "Black") {
-        gameScene.cameras[0].alpha -= 0.05;
-        gameScene.cameras[0].alpha < target ? null : animateTurnSwitch(currentPlayer);
+        if (remainingDistance > 0) {
+          if (remainder) {
+            if (remainder < 0) {
+              gameScene.cameras[0].alpha -= 0.05;
+            } else {
+              gameScene.cameras[0].alpha += 0.05;
+            }
+          } else {
+            if (a > 0) {
+              gameScene.cameras[0].alpha -= 0.05;
+            } else {
+              gameScene.cameras[0].alpha += 0.05;
+            }
+          }
+          remainingDistance -= 0.05;
+          animateTurnSwitch(currentPlayer);
+        }
       } else {
-        gameScene.cameras[0].alpha += 0.05;
-        gameScene.cameras[0].alpha > target ? null : animateTurnSwitch(currentPlayer);
+        if (remainingDistance > 0) {
+          if (remainder) {
+            if (remainder < 0) {
+              gameScene.cameras[0].alpha += 0.05;
+            } else {
+              gameScene.cameras[0].alpha -= 0.05;
+            }
+          } else {
+            if (a > 0) {
+              gameScene.cameras[0].alpha += 0.05;
+            } else {
+              gameScene.cameras[0].alpha -= 0.05;
+            }
+          }
+          remainingDistance -= 0.05;
+          animateTurnSwitch(currentPlayer);
+        }
       }
     });
   };
