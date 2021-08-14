@@ -12,6 +12,13 @@ const gameScreen = async (canvas, engine) => {
   const light = new BABYLON.HemisphericLight("light3", new BABYLON.Vector3(0, 1, 0), scene);
 
   const greenMat = new BABYLON.StandardMaterial("greenMat", scene);
+  greenMat.diffuseColor = new BABYLON.Color3(0, 1, 0.2);
+
+  const orangeMat = new BABYLON.StandardMaterial("orangeMat", scene);
+  orangeMat.diffuseColor = new BABYLON.Color3(1, 0.64, 0);
+
+  const redMat = new BABYLON.StandardMaterial("redMat", scene);
+  redMat.diffuseColor = new BABYLON.Color3(1, 0, 0);
 
   const photoDome = new BABYLON.PhotoDome("spacedome", space, { size: 1000 }, scene);
 

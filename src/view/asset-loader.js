@@ -52,6 +52,7 @@ const assetsLoader = async (scene, description) => {
         let finalMesh = mesh.meshes[1];
         [finalMesh.name, finalMesh.color, finalMesh.isPickable = true, finalMesh.isVisible = false, finalMesh.scalingDeterminant = 50] =
           finalMesh.id.split("-");
+        finalMesh.id === "Knight-White" ? (finalMesh.rotation = new BABYLON.Vector3(0, Math.PI, 0)) : null;
         finalMesh.color === "White" ? (finalMesh.material = materialWhite) : (finalMesh.material = materialBlack);
         return finalMeshList.push(finalMesh);
       } else {

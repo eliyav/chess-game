@@ -1,3 +1,5 @@
+import { doMovesMatch } from "./game-helpers";
+
 const renderScene = (game, gameScene) => {
   //Clears old meshes/memory usage
   if (gameScene.meshesToRender.length > 0) {
@@ -66,7 +68,7 @@ const rotateCamera = (currentPlayer, gameScene) => {
   const animateTurnSwitch = () => {
     requestAnimationFrame(() => {
       if (currentPlayer === "Black") {
-        if (remainingDistance > 0) {
+        if (remainingDistance > 0.05) {
           if (remainder) {
             if (remainder < 0) {
               gameScene.cameras[0].alpha -= 0.05;
@@ -82,9 +84,26 @@ const rotateCamera = (currentPlayer, gameScene) => {
           }
           remainingDistance -= 0.05;
           animateTurnSwitch(currentPlayer);
+        } else if (remainingDistance > 0) {
+          if (remainder) {
+            if (remainder < 0) {
+              gameScene.cameras[0].alpha -= 0.01;
+            } else {
+              gameScene.cameras[0].alpha += 0.01;
+            }
+          } else {
+            if (a > 0) {
+              gameScene.cameras[0].alpha -= 0.01;
+            } else {
+              gameScene.cameras[0].alpha += 0.01;
+            }
+          }
+          remainingDistance -= 0.01;
+          animateTurnSwitch(currentPlayer);
         }
       } else {
-        if (remainingDistance > 0) {
+        //If other player
+        if (remainingDistance > 0.05) {
           if (remainder) {
             if (remainder < 0) {
               gameScene.cameras[0].alpha += 0.05;
@@ -99,6 +118,22 @@ const rotateCamera = (currentPlayer, gameScene) => {
             }
           }
           remainingDistance -= 0.05;
+          animateTurnSwitch(currentPlayer);
+        } else if (remainingDistance > 0) {
+          if (remainder) {
+            if (remainder < 0) {
+              gameScene.cameras[0].alpha += 0.01;
+            } else {
+              gameScene.cameras[0].alpha -= 0.01;
+            }
+          } else {
+            if (a > 0) {
+              gameScene.cameras[0].alpha += 0.01;
+            } else {
+              gameScene.cameras[0].alpha -= 0.01;
+            }
+          }
+          remainingDistance -= 0.01;
           animateTurnSwitch(currentPlayer);
         }
       }
@@ -110,23 +145,37 @@ const rotateCamera = (currentPlayer, gameScene) => {
 const displayPieceMoves = (mesh, currentMove, grid, gameScene) => {
   const [x, y] = calcIndexFromMeshPosition([mesh.position.z, mesh.position.x]);
   const piece = grid[x][y].on;
+  displayMovementSquares([x, y], gameScene, "piece");
   const moves = piece.calculateAvailableMoves(grid);
   currentMove.push(piece.point);
   moves.forEach((point) => {
-    displayMovementSquares(point, gameScene);
+    displayMovementSquares(point, gameScene, "target");
   });
 };
 
-const displayMovementSquares = (point, gameScene) => {
-  const plane = BABYLON.MeshBuilder.CreatePlane(`plane`, { width: 2.8, height: 2.8 });
-  const gridPosition = calculatePlanePosition(point); //Spawned Plane has opposite Y then loaded Mesh
-  plane.point = point;
-  [plane.position.z, plane.position.x] = gridPosition; //Z is X ---- X is Y
-  plane.position.y += 0.01;
-  plane.material = gameScene.materials.find((material) => material.id === "greenMat");
-  plane.material.diffuseColor = new BABYLON.Color3(0, 1, 0.2);
-  plane.rotation = new BABYLON.Vector3(Math.PI / 2, 0, 0);
-  gameScene.meshesToRender.push(plane);
+const displayMovementSquares = (point, gameScene, desc) => {
+  if (desc === "target") {
+    const plane = BABYLON.MeshBuilder.CreatePlane(`plane`, { width: 2.8, height: 2.8 });
+    const gridPosition = calculatePlanePosition(point[0]); //Spawned Plane has opposite Y then loaded Mesh
+    plane.point = point[0];
+    [plane.position.z, plane.position.x] = gridPosition; //Z is X ---- X is Y
+    plane.position.y += 0.01;
+    if (point[1] === "capture") {
+      plane.material = gameScene.materials.find((material) => material.id === "redMat");
+    } else {
+      plane.material = gameScene.materials.find((material) => material.id === "orangeMat");
+    }
+    plane.rotation = new BABYLON.Vector3(Math.PI / 2, 0, 0);
+    gameScene.meshesToRender.push(plane);
+  } else if (desc === "piece") {
+    const torus = BABYLON.MeshBuilder.CreateTorus("torus", { diameter: 2.6, thickness: 0.2, tessellation: 16 });
+    const gridPosition = calculatePlanePosition(point); //Spawned Torus has opposite Y then loaded Mesh
+    torus.point = point;
+    [torus.position.z, torus.position.x] = gridPosition; //Z is X ---- X is Y
+    torus.position.y += 0.01;
+    torus.material = gameScene.materials.find((material) => material.id === "greenMat");
+    gameScene.meshesToRender.push(torus);
+  }
 };
 
 const calculateGridPosition = (point) => {
@@ -223,6 +272,7 @@ const calculatePlanePosition = (point) => {
   return [gridX, gridY];
 };
 
+//For game pieces calculation as their index is flipped from blender importing
 const calcIndexFromMeshPosition = (point) => {
   const [x, y] = point;
   let indexX, indexY;

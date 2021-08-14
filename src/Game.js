@@ -22,7 +22,7 @@ class Game {
 
   playerMove(originPoint, targetPoint) {
     const lastTurn = this.rawHistoryData[this.rawHistoryData.length - 1];
-    const resolve = resolveMove(originPoint, targetPoint, this.gameState, this.board.grid, lastTurn, this.endGame);
+    const resolve = resolveMove(originPoint, targetPoint, this.gameState, this.board.grid, lastTurn);
     resolve.result
       ? (() => {
           resolve.turn = this.turnCounter;

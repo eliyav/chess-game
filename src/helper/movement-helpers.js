@@ -5,13 +5,15 @@ const filterToFinalMoves = (grid, color, movesObj, targetArray) => {
     for (let i = 0; i < array.length; i++) {
       let [x, y] = array[i];
       const square = grid[x][y];
-      if (square.on === undefined) {
-        targetArray.push(array[i]);
-      } else if (square.on.color === color) {
-        break;
+      if (square.on !== undefined) {
+        if (square.on.color !== color) {
+          targetArray.push([array[i], "capture"]);
+          break;
+        } else if (square.on.color === color) {
+          break;
+        }
       } else {
-        targetArray.push(array[i]);
-        break;
+        targetArray.push([array[i], "movement"]);
       }
     }
   });
@@ -68,7 +70,7 @@ const calcPawnMovement = (grid, currentPoint, direction, moved, color, finalObj)
   const movePoint1 = [x, y + range * direction];
   const [moveX, moveY] = movePoint1;
   if (grid[moveX][moveY].on === undefined) {
-    bounds(moveX, grid) && bounds(moveY, grid) ? finalObj.push(movePoint1) : null;
+    bounds(moveX, grid) && bounds(moveY, grid) ? finalObj.push([movePoint1, "movement"]) : null;
   }
   //If he hasnt moved, then can move 2 spaces
   if (!moved) {
@@ -76,7 +78,7 @@ const calcPawnMovement = (grid, currentPoint, direction, moved, color, finalObj)
     const movePoint2 = [x, y + range * direction];
     const [moveX2, moveY2] = movePoint2;
     if (grid[moveX2][moveY2].on === undefined) {
-      bounds(moveX2, grid) && bounds(moveY2, grid) ? finalObj.push(movePoint2) : null;
+      bounds(moveX2, grid) && bounds(moveY2, grid) ? finalObj.push([movePoint2, "movement"]) : null;
     }
   }
   //Calculates Capture points and pushes them in final movement obj if are valid
@@ -94,7 +96,13 @@ const calcKnightMovement = (grid, currentPoint, color, moves, finalObj) => {
     const resultY = y + moveY;
     if (bounds(resultX, grid) && bounds(resultY, grid)) {
       const square = grid[resultX][resultY];
-      square.on === undefined || square.on.color !== color ? finalObj.push([resultX, resultY]) : null;
+      const result = [resultX, resultY];
+
+      if (square.on !== undefined) {
+        square.on.color !== color ? finalObj.push([result, "capture"]) : null;
+      } else {
+        finalObj.push([result, "movement"]);
+      }
     }
   });
 };
@@ -107,7 +115,12 @@ const calcKingMoves = (grid, currentPoint, color, moves, finalObj) => {
     const resultY = y + moveY;
     if (bounds(resultX, grid) && bounds(resultY, grid)) {
       const square = grid[resultX][resultY];
-      square.on === undefined || square.on.color !== color ? finalObj.push([resultX, resultY]) : null;
+      const result = [resultX, resultY];
+      if (square.on !== undefined) {
+        square.on.color !== color ? finalObj.push([result, "capture"]) : null;
+      } else {
+        finalObj.push([result, "movement"]);
+      }
     }
   });
 };
@@ -118,7 +131,7 @@ const checkForValidPawnCapture = (capturePoint, color, grid, finalObj) => {
   const [captureX, captureY] = capturePoint;
   if (bounds(captureX, grid) && bounds(captureY, grid)) {
     const captureSquare = grid[captureX][captureY];
-    captureSquare.on === undefined ? null : captureSquare.on.color !== color ? finalObj.push(capturePoint) : null;
+    captureSquare.on === undefined ? null : captureSquare.on.color !== color ? finalObj.push([capturePoint, "capture"]) : null;
   }
 };
 
