@@ -33,39 +33,39 @@ var e,t=arguments[3];!function(t,n){"object"==typeof exports&&"object"==typeof m
 },{}],"HPsM":[function(require,module,exports) {
 "use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=void 0;var t=s(require("./board")),e=require("./helper/game-helpers"),a=require("./helper/board-helpers"),r=s(require("./data/chess-data-import"));function s(t){return t&&t.__esModule?t:{default:t}}class i{constructor(){this.chessData=r.default,this.gameState=r.default.initialState,this.teams=r.default.teams,this.board=new t.default(r.default),this.moves=[],this.history=[],this.rawHistoryData=[],this.turnCounter=1,this.player,this.setBoard()}playerMove(t,a){const r=this.rawHistoryData[this.rawHistoryData.length-1],s=(0,e.resolveMove)(t,a,this.gameState,this.board.grid,r);return s.result&&(()=>{s.turn=this.turnCounter,this.turnCounter++;const t=(0,e.annotate)(s,this.gameState,this.board.grid);this.history.push(t),this.rawHistoryData.push(s)})(),s.result}changePlayer(){this.gameState.currentPlayer=this.gameState.currentPlayer===this.teams[0]?this.teams[1]:this.teams[0],console.log(`${this.gameState.currentPlayer} team's turn!`)}switchTurn(t=this.gameState,a=this.board.grid){this.changePlayer(),(0,e.isCheckmate)(t,a,this.endGame)&&this.endGame()}endGame(){alert(`Game is over, ${this.gameState.currentPlayer} team wins!`)}setBoard(){(0,a.setPieces)(this.board.grid,this.board.data.pieceInitialPoints,this.board.data.movement)}resetBoard(){return this.board.grid=(0,a.createGrid)(this.board.data.boardSize,this.board.data.columnNames),this.setBoard(),this.gameState.currentPlayer="White",this.history=[],this.rawHistoryData=[],this.turnCounter=1,console.log("Board Has Been Reset!")}}var h=i;exports.default=h;
 },{"./board":"DZpg","./helper/game-helpers":"x08z","./helper/board-helpers":"FmCn","./data/chess-data-import":"cDg5"}],"dILV":[function(require,module,exports) {
-module.exports="/space.32b4e2af.jpg";
+module.exports="space.32b4e2af.jpg";
 },{}],"gpYY":[function(require,module,exports) {
-module.exports="/board.ed6bd3e6.gltf";
+module.exports="board.ed6bd3e6.gltf";
 },{}],"Y1ib":[function(require,module,exports) {
-module.exports="/pawn-white.e5a19fff.gltf";
+module.exports="pawn-white.e5a19fff.gltf";
 },{}],"jtHN":[function(require,module,exports) {
-module.exports="/rook-white.f4db24e0.gltf";
+module.exports="rook-white.f4db24e0.gltf";
 },{}],"VkPT":[function(require,module,exports) {
-module.exports="/bishop-white.2afc166a.gltf";
+module.exports="bishop-white.2afc166a.gltf";
 },{}],"ELdN":[function(require,module,exports) {
-module.exports="/knight-white.c8088290.gltf";
+module.exports="knight-white.c8088290.gltf";
 },{}],"fE2w":[function(require,module,exports) {
-module.exports="/king-white.7bc3862b.gltf";
+module.exports="king-white.7bc3862b.gltf";
 },{}],"RYHJ":[function(require,module,exports) {
-module.exports="/queen-white.3754306a.gltf";
+module.exports="queen-white.3754306a.gltf";
 },{}],"MLgr":[function(require,module,exports) {
-module.exports="/pawn-black.ea3fa19c.gltf";
+module.exports="pawn-black.ea3fa19c.gltf";
 },{}],"aizS":[function(require,module,exports) {
-module.exports="/rook-black.d91da390.gltf";
+module.exports="rook-black.d91da390.gltf";
 },{}],"r8ye":[function(require,module,exports) {
-module.exports="/bishop-black.027d4f96.gltf";
+module.exports="bishop-black.027d4f96.gltf";
 },{}],"D5u4":[function(require,module,exports) {
-module.exports="/knight-black.9bbc12a3.gltf";
+module.exports="knight-black.9bbc12a3.gltf";
 },{}],"WrLY":[function(require,module,exports) {
-module.exports="/king-black.a7d4ff34.gltf";
+module.exports="king-black.a7d4ff34.gltf";
 },{}],"Mlcy":[function(require,module,exports) {
-module.exports="/queen-black2.3d75dd48.gltf";
+module.exports="queen-black2.3d75dd48.gltf";
 },{}],"YJyH":[function(require,module,exports) {
-module.exports="/space2.fa7df92a.jpg";
+module.exports="space2.fa7df92a.jpg";
 },{}],"Kkeh":[function(require,module,exports) {
-module.exports="/black-metal.63a5409e.jpg";
+module.exports="black-metal.63a5409e.jpg";
 },{}],"AvsX":[function(require,module,exports) {
-module.exports="/white-metal.fa6ac0a3.jpg";
+module.exports="white-metal.fa6ac0a3.jpg";
 },{}],"HSqU":[function(require,module,exports) {
 "use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.default=void 0;var e=k(require("babylonjs")),t=g(require("../../assets/board.gltf")),a=g(require("../../assets/white-pieces/pawn-white.gltf")),r=g(require("../../assets/white-pieces/rook-white.gltf")),s=g(require("../../assets/white-pieces/bishop-white.gltf")),i=g(require("../../assets/white-pieces/knight-white.gltf")),n=g(require("../../assets/white-pieces/king-white.gltf")),l=g(require("../../assets/white-pieces/queen-white.gltf")),o=g(require("../../assets/black-pieces/pawn-black.gltf")),c=g(require("../../assets/black-pieces/rook-black.gltf")),u=g(require("../../assets/black-pieces/bishop-black.gltf")),f=g(require("../../assets/black-pieces/knight-black.gltf")),d=g(require("../../assets/black-pieces/king-black.gltf")),h=g(require("../../assets/black-pieces/queen-black2.gltf")),p=g(require("../../assets/space2.jpg")),w=g(require("../../assets/black-metal.jpg")),m=g(require("../../assets/white-metal.jpg"));function g(e){return e&&e.__esModule?e:{default:e}}function b(e){if("function"!=typeof WeakMap)return null;var t=new WeakMap,a=new WeakMap;return(b=function(e){return e?a:t})(e)}function k(e,t){if(!t&&e&&e.__esModule)return e;if(null===e||"object"!=typeof e&&"function"!=typeof e)return{default:e};var a=b(t);if(a&&a.has(e))return a.get(e);var r={},s=Object.defineProperty&&Object.getOwnPropertyDescriptor;for(var i in e)if("default"!==i&&Object.prototype.hasOwnProperty.call(e,i)){var n=s?Object.getOwnPropertyDescriptor(e,i):null;n&&(n.get||n.set)?Object.defineProperty(r,i,n):r[i]=e[i]}return r.default=e,a&&a.set(e,r),r}const M=async(g,b)=>{const k=new e.StandardMaterial("White",g);k.diffuseTexture=new e.Texture(m.default,g),k.refractionTexture=new e.Texture(p.default,g);const M=new e.StandardMaterial("Black",g);if(M.diffuseTexture=new e.Texture(w.default,g),M.refractionTexture=new e.Texture(p.default,g),"gameScreen"===b){let p=[t.default,a.default,r.default,s.default,i.default,n.default,l.default,o.default,c.default,u.default,f.default,d.default,h.default];const w=await Promise.all(p.map(t=>e.SceneLoader.ImportMeshAsync("",t,""))),m=[],g=[];return w.forEach(t=>{if(t.meshes[1].id.includes("-")){let a=t.meshes[1];return[a.name,a.color,a.isPickable=!0,a.isVisible=!1,a.scalingDeterminant=50]=a.id.split("-"),"Knight-White"===a.id&&(a.rotation=new e.Vector3(0,Math.PI,0)),"White"===a.color?a.material=k:a.material=M,m.push(a)}t.meshes.forEach(e=>{e.scalingDeterminant=50,e.isPickable=!1}),g.push(t)}),{finalMeshList:m,boardMesh:g}}if("startScreen"===b){let p=t.default,w=[a.default,r.default,s.default,i.default,n.default,l.default,o.default,c.default,u.default,f.default,d.default,h.default];const m=await e.SceneLoader.ImportMeshAsync("",p,"",g),b=await Promise.all(w.map(t=>e.SceneLoader.ImportMeshAsync("",t,"",g)));m.meshes.forEach(e=>{e.scalingDeterminant=8}),b.forEach(e=>{const t=e.meshes[1];[t.name,t.color]=t.id.split("-"),"White"===t.color?t.material=k:t.material=M,t.scalingDeterminant=40,t.position.y=15,t.position.x=10;const a=Math.random()>.5?-1:1;t.position.z=15*Math.random()*a});const q=m.meshes[0].clone("Board1"),y=m.meshes[0].clone("Board2");m.meshes.forEach(e=>{e.isVisible=!1}),q.position=new e.Vector3(10,0,-10),q.rotation=new e.Vector3(.2,0,0),y.position=new e.Vector3(30,-30,30),y.rotation=new e.Vector3(-.2,0,.8);const P=[1,-2,3,-4,5,-3,1,-2,2,-3,-4,-1];let x=Math.PI/2,O=Math.PI/1.5,j=Math.PI/1;const I=()=>{requestAnimationFrame(()=>{x+=.02,O+=.02,j+=.02,q.rotate(new e.Vector3(0,O,0),1*Math.PI/500,e.Space.LOCAL),y.rotate(new e.Vector3(0,2*-O,0),1*Math.PI/500,e.Space.LOCAL),b.forEach((t,a)=>{t.meshes[1].position.y>-15?t.meshes[1].position.y-=.02:t.meshes[1].position.y=15,t.meshes[1].rotate(new e.Vector3(x*P[P.length-1-a],2*-O*P[P.length-1-a],j*P[P.length-1-a]),3*Math.PI/500,e.Space.LOCAL)}),I()})};I()}};var q=M;exports.default=q;
 },{"babylonjs":"c1Zz","../../assets/board.gltf":"gpYY","../../assets/white-pieces/pawn-white.gltf":"Y1ib","../../assets/white-pieces/rook-white.gltf":"jtHN","../../assets/white-pieces/bishop-white.gltf":"VkPT","../../assets/white-pieces/knight-white.gltf":"ELdN","../../assets/white-pieces/king-white.gltf":"fE2w","../../assets/white-pieces/queen-white.gltf":"RYHJ","../../assets/black-pieces/pawn-black.gltf":"MLgr","../../assets/black-pieces/rook-black.gltf":"aizS","../../assets/black-pieces/bishop-black.gltf":"r8ye","../../assets/black-pieces/knight-black.gltf":"D5u4","../../assets/black-pieces/king-black.gltf":"WrLY","../../assets/black-pieces/queen-black2.gltf":"Mlcy","../../assets/space2.jpg":"YJyH","../../assets/black-metal.jpg":"Kkeh","../../assets/white-metal.jpg":"AvsX"}],"GcwC":[function(require,module,exports) {
@@ -178,4 +178,4 @@ function t(t){t=t||{},this.ms=t.min||100,this.max=t.max||1e4,this.factor=t.facto
 },{"./game":"HPsM","./view/start-screen":"GcwC","./view/game-screen":"Y7iX","./events/emitter":"YrnE","./helper/canvas-helpers":"ddk1","./view/gui-overlay":"Xikc","../src/events/input-controller":"yLnB","../server/sockets":"kM4U"}],"HJDO":[function(require,module,exports) {
 "use strict";require("babylonjs-loaders");var e=a(require("babylonjs")),t=n(require("./app"));function n(e){return e&&e.__esModule?e:{default:e}}function r(e){if("function"!=typeof WeakMap)return null;var t=new WeakMap,n=new WeakMap;return(r=function(e){return e?n:t})(e)}function a(e,t){if(!t&&e&&e.__esModule)return e;if(null===e||"object"!=typeof e&&"function"!=typeof e)return{default:e};var n=r(t);if(n&&n.has(e))return n.get(e);var a={},o=Object.defineProperty&&Object.getOwnPropertyDescriptor;for(var c in e)if("default"!==c&&Object.prototype.hasOwnProperty.call(e,c)){var u=o?Object.getOwnPropertyDescriptor(e,c):null;u&&(u.get||u.set)?Object.defineProperty(a,c,u):a[c]=e[c]}return a.default=e,n&&n.set(e,a),a}async function o(){const n=document.getElementById("renderCanvas"),r=new e.Engine(n,!0),a=await(0,t.default)(n,r),{showScene:o,scenes:{startScene:c,gameScene:u}}=a;r.runRenderLoop(function(){switch(o.sceneIndex){case 0:u.detachControl(),c.attachControl(),c.render();break;case 1:u.attachControl(),u.render()}})}o();
 },{"babylonjs-loaders":"MqkJ","babylonjs":"c1Zz","./app":"vZyd"}]},{},["HJDO"], null)
-//# sourceMappingURL=/main.76b859ac.js.map
+//# sourceMappingURL=main.76b859ac.js.map
