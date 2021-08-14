@@ -19,11 +19,11 @@ import whiteMetal from "../../assets/white-metal.jpg";
 const assetsLoader = async (scene, description) => {
   const materialWhite = new BABYLON.StandardMaterial("White", scene);
   materialWhite.diffuseTexture = new BABYLON.Texture(whiteMetal, scene);
-  materialWhite.refractionTexture = new BABYLON.Texture(space2, scene);
+  //materialWhite.refractionTexture = new BABYLON.Texture(space2, scene);
 
   const materialBlack = new BABYLON.StandardMaterial("Black", scene);
   materialBlack.diffuseTexture = new BABYLON.Texture(blackMetal, scene);
-  materialBlack.refractionTexture = new BABYLON.Texture(space2, scene);
+  //materialBlack.refractionTexture = new BABYLON.Texture(space2, scene);
 
   if (description === "gameScreen") {
     let meshesToLoad = [

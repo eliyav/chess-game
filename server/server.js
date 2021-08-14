@@ -11,7 +11,7 @@ const io = require("socket.io")(httpServer, options);
 io.on("connection", (socket) => {
   let room;
   socket.on("request-room-id", () => {
-    room = "abc";
+    room = Math.random();
     socket.join(room);
     socket.emit("message", "You have created a new Game Room!");
     socket.emit("reply-room-id", room);
