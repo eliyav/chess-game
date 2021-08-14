@@ -7,14 +7,6 @@ class King extends GamePiece {
     this.moved = false;
   }
 
-  castlingAvailable = (grid) => {
-    //Refactor later here instead of button
-    //Check Target Square is your own rook, and if so, that he hasn't moved
-    //Check squares are unoccupied between king and rook
-    //The king is not in check
-    //None of the castling involved squares are one of the opponents available moves
-  };
-
   calculateAvailableMoves(grid, currentPoint = this.point) {
     const kingMoves = [
       [0, 1],
