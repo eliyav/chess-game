@@ -13,7 +13,7 @@ const inputController = (mesh, game, gameMode, gameScene) => {
       if (currentMove.length === 0) {
         //If mesh belongs to current player
         if (mesh.color === game.gameState.currentPlayer) {
-          displayPieceMoves(mesh, currentMove, game.board.grid, gameScene);
+          displayPieceMoves(mesh, currentMove, game, gameScene);
         }
         //If there is already a mesh selected, and you select another of your own meshes
       } else if (mesh.color === game.gameState.currentPlayer) {
@@ -33,7 +33,7 @@ const inputController = (mesh, game, gameMode, gameScene) => {
         } else {
           currentMove.length = 0;
           renderScene(game, gameScene);
-          displayPieceMoves(mesh, currentMove, game.board.grid, gameScene);
+          displayPieceMoves(mesh, currentMove, game, gameScene);
         }
       } else if (mesh.id === "plane") {
         currentMove.push(mesh.point);

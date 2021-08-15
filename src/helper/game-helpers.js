@@ -48,7 +48,12 @@ const resolveMove = (originPoint, targetPoint, gameState, grid, turnHistory) => 
     }
   }
   //Calculate the origin piece's all available moves
-  const availableMoves = originSquare.on.calculateAvailableMoves(grid);
+  let availableMoves;
+  if (originPiece.name === "Pawn") {
+    availableMoves = originSquare.on.calculateAvailableMoves(grid, turnHistory);
+  } else {
+    availableMoves = originSquare.on.calculateAvailableMoves(grid);
+  }
   //Check if the entered targetPoint is a match for an available moves
   const validMove = availableMoves.find((possibleMove) => doMovesMatch(possibleMove[0], targetPoint));
   if (validMove) {
@@ -85,6 +90,7 @@ const resolveMove = (originPoint, targetPoint, gameState, grid, turnHistory) => 
 };
 
 const isEnPassantAvailable = (history) => {
+  console.log("!");
   let moved;
   let direction;
   let x;
@@ -118,7 +124,6 @@ const canValidMoveResolve = (squaresandPieces, targetPoint, gameState, grid) => 
 const isChecked = (gameState, grid, kingSquare) => {
   const opponentsPieces = getOpponentsPieces(gameState, grid);
   const opponentsAvailableMoves = getMoves(grid, opponentsPieces);
-  console.log(opponentsAvailableMoves);
   const kingIsChecked = opponentsAvailableMoves.find((move) => doMovesMatch(move[0], kingSquare.on.point));
   //Returns an array with the kings location if checked
   return kingIsChecked;
@@ -487,4 +492,15 @@ const annotate = (result, gameState, grid) => {
   return string;
 };
 
-export { resolveMove, isCheckmate, checkForCastling, getX, getY, annotate, isEnemyChecked, doMovesMatch, getSquaresandPieces };
+export {
+  resolveMove,
+  isCheckmate,
+  checkForCastling,
+  getX,
+  getY,
+  annotate,
+  isEnemyChecked,
+  doMovesMatch,
+  getSquaresandPieces,
+  isEnPassantAvailable,
+};

@@ -142,11 +142,19 @@ const rotateCamera = (currentPlayer, gameScene) => {
   animateTurnSwitch(currentPlayer);
 };
 
-const displayPieceMoves = (mesh, currentMove, grid, gameScene) => {
+const displayPieceMoves = (mesh, currentMove, game, gameScene) => {
+  const grid = game.board.grid;
+  const turnHistory = game.rawHistoryData[game.rawHistoryData.length - 1];
+  console.log(turnHistory);
   const [x, y] = calcIndexFromMeshPosition([mesh.position.z, mesh.position.x]);
   const piece = grid[x][y].on;
   displayMovementSquares([x, y], gameScene, "piece");
-  const moves = piece.calculateAvailableMoves(grid);
+  let moves;
+  if (piece.name === "Pawn") {
+    moves = piece.calculateAvailableMoves(grid, turnHistory);
+  } else {
+    moves = piece.calculateAvailableMoves(grid);
+  }
   currentMove.push(piece.point);
   moves.forEach((point) => {
     displayMovementSquares(point, gameScene, "target");
@@ -162,8 +170,10 @@ const displayMovementSquares = (point, gameScene, desc) => {
     plane.position.y += 0.01;
     if (point[1] === "capture") {
       plane.material = gameScene.materials.find((material) => material.id === "redMat");
-    } else {
+    } else if (point[1] === "movement") {
       plane.material = gameScene.materials.find((material) => material.id === "orangeMat");
+    } else if (point[1] === "enPassant") {
+      plane.material = gameScene.materials.find((material) => material.id === "purpleMat");
     }
     plane.rotation = new BABYLON.Vector3(Math.PI / 2, 0, 0);
     gameScene.meshesToRender.push(plane);

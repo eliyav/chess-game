@@ -20,6 +20,9 @@ const gameScreen = async (canvas, engine) => {
   const redMat = new BABYLON.StandardMaterial("redMat", scene);
   redMat.diffuseColor = new BABYLON.Color3(1, 0, 0);
 
+  const purpleMat = new BABYLON.StandardMaterial("purpleMat", scene);
+  purpleMat.diffuseColor = new BABYLON.Color3(1, 0, 1);
+
   const photoDome = new BABYLON.PhotoDome("spacedome", space, { size: 1000 }, scene);
 
   scene.finalMeshes = await assetsLoader(scene, "gameScreen");
