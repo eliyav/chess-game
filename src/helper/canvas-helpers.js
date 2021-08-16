@@ -144,14 +144,16 @@ const rotateCamera = (currentPlayer, gameScene) => {
 
 const displayPieceMoves = (mesh, currentMove, game, gameScene) => {
   const grid = game.board.grid;
+  const gameState = game.gameState;
   const turnHistory = game.rawHistoryData[game.rawHistoryData.length - 1];
-  console.log(turnHistory);
   const [x, y] = calcIndexFromMeshPosition([mesh.position.z, mesh.position.x]);
   const piece = grid[x][y].on;
   displayMovementSquares([x, y], gameScene, "piece");
   let moves;
   if (piece.name === "Pawn") {
     moves = piece.calculateAvailableMoves(grid, turnHistory);
+  } else if (piece.name === "King") {
+    moves = piece.calculateAvailableMoves(grid, gameState, turnHistory);
   } else {
     moves = piece.calculateAvailableMoves(grid);
   }

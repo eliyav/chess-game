@@ -1,6 +1,5 @@
 import { doMovesMatch } from "../helper/game-helpers";
 import { renderScene, calcIndexFromMeshPosition, displayPieceMoves } from "../helper/canvas-helpers";
-import { getSquaresandPieces, checkForCastling } from "../helper/game-helpers";
 
 const inputController = (mesh, game, gameMode, gameScene) => {
   const currentMove = game.moves;
@@ -17,24 +16,9 @@ const inputController = (mesh, game, gameMode, gameScene) => {
         }
         //If there is already a mesh selected, and you select another of your own meshes
       } else if (mesh.color === game.gameState.currentPlayer) {
-        //Check for castling first
-        const [x, y] = calcIndexFromMeshPosition([mesh.position.z, mesh.position.x]);
-        const ownPiece = game.board.grid[x][y].on;
-        const squaresandPieces = getSquaresandPieces(currentMove[0], ownPiece.point, game.board.grid);
-        const { originSquare, originPiece, targetSquare, targetPiece } = squaresandPieces;
-        //Check for castling move
-        const castling = originPiece.name === "King" && originPiece.color === game.gameState.currentPlayer;
-        let castling2 = false;
-        castling2 = targetPiece.name === "Rook" && targetPiece.color === game.gameState.currentPlayer;
-        if (castling && castling2) {
-          const resolve = checkForCastling(currentMove[0], ownPiece.point, game.gameState, game.board.grid);
-          console.log(resolve);
-          resolve ? currentMove.push(ownPiece.point) : null;
-        } else {
-          currentMove.length = 0;
-          renderScene(game, gameScene);
-          displayPieceMoves(mesh, currentMove, game, gameScene);
-        }
+        currentMove.length = 0;
+        renderScene(game, gameScene);
+        displayPieceMoves(mesh, currentMove, game, gameScene);
       } else if (mesh.id === "plane") {
         currentMove.push(mesh.point);
       } else if (mesh.color) {
@@ -44,7 +28,14 @@ const inputController = (mesh, game, gameMode, gameScene) => {
           const opponentsPiece = game.board.grid[x][y].on;
           const [originalPieceX, originalPieceY] = currentMove[0];
           const originalPiece = game.board.grid[originalPieceX][originalPieceY].on;
-          const moves = originalPiece.calculateAvailableMoves(game.board.grid);
+          let moves;
+          if (originalPiece.name === "Pawn") {
+            moves = originalPiece.calculateAvailableMoves(grid, turnHistory);
+          } else if (originalPiece.name === "King") {
+            moves = originalPiece.calculateAvailableMoves(grid, gameState, turnHistory);
+          } else {
+            moves = originalPiece.calculateAvailableMoves(grid);
+          }
           const checkIfTrue = moves.find((move) => doMovesMatch(move[0], opponentsPiece.point));
           if (checkIfTrue) {
             const [x, y] = calcIndexFromMeshPosition([mesh.position.z, mesh.position.x]);

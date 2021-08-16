@@ -24,13 +24,11 @@ class Pawn extends GamePiece {
         const x2 = x - 1;
         const potential1 = [x1, y];
         const potential2 = [x2, y];
-        console.log(targetSquare, potential1, potential2);
         if (doMovesMatch(potential1, targetSquare) || doMovesMatch(potential2, targetSquare)) {
           availableMoves.push([targetSquare, "enPassant"]);
         }
       }
     }
-    console.log(availableMoves);
 
     return availableMoves;
   }

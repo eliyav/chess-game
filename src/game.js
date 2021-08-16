@@ -27,8 +27,8 @@ class Game {
       ? (() => {
           resolve.turn = this.turnCounter;
           this.turnCounter++;
-          const turnHistory = annotate(resolve, this.gameState, this.board.grid);
-          this.history.push(turnHistory);
+          //const turnHistory = annotate(resolve, this.gameState, this.board.grid, lastTurn);
+          //this.history.push(turnHistory);
           this.rawHistoryData.push(resolve);
         })()
       : null;
@@ -42,8 +42,9 @@ class Game {
   }
 
   switchTurn(gameState = this.gameState, grid = this.board.grid) {
+    const turnHistory = this.rawHistoryData[this.rawHistoryData.length - 1];
     this.changePlayer();
-    isCheckmate(gameState, grid, this.endGame) ? this.endGame() : null;
+    isCheckmate(gameState, grid, turnHistory) ? this.endGame() : null;
   }
 
   endGame() {
