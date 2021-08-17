@@ -6,6 +6,13 @@
     "scene" : 0,
     "scenes" : [
         {
+            "extras" : {
+                "glTF2ExportSettings" : {
+                    "export_apply" : 1,
+                    "export_extras" : 1,
+                    "export_format" : "GLTF_EMBEDDED"
+                }
+            },
             "name" : "Scene",
             "nodes" : [
                 0,
@@ -45,13 +52,29 @@
             ]
         },
         {
+            "extras" : {},
             "mesh" : 0,
-            "name" : "White Squares"
+            "name" : "White Squares",
+            "scale" : [
+                50.04878616333008,
+                50.04878616333008,
+                50.04878616333008
+            ],
+            "translation" : [
+                0,
+                0.4930126667022705,
+                0
+            ]
         },
         {
             "extras" : {},
             "mesh" : 1,
             "name" : "Plane",
+            "scale" : [
+                50,
+                50,
+                50
+            ],
             "translation" : [
                 0,
                 -0.009999999776482582,

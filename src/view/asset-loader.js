@@ -1,5 +1,5 @@
 import * as BABYLON from "babylonjs";
-import board from "../../assets/board.gltf";
+import board from "../../assets/board2.gltf";
 import pawnWhite from "../../assets/white-pieces/pawn-white.gltf";
 import rookWhite from "../../assets/white-pieces/rook-white.gltf";
 import bishopWhite from "../../assets/white-pieces/bishop-white.gltf";
@@ -25,6 +25,11 @@ const assetsLoader = async (scene, description) => {
   materialBlack.diffuseFresnelParameters = new BABYLON.FresnelParameters();
   materialBlack.diffuseFresnelParameters.leftColor = new BABYLON.Color3.White();
   materialBlack.diffuseFresnelParameters.rightColor = new BABYLON.Color3.Black();
+
+  const boardMaterial = new BABYLON.StandardMaterial("Black", scene);
+  boardMaterial.diffuseFresnelParameters = new BABYLON.FresnelParameters();
+  boardMaterial.diffuseFresnelParameters.leftColor = new BABYLON.Color3.Black();
+  boardMaterial.diffuseFresnelParameters.rightColor = new BABYLON.Color3.Black();
 
   if (description === "gameScreen") {
     let meshesToLoad = [
@@ -53,17 +58,24 @@ const assetsLoader = async (scene, description) => {
         let finalMesh = mesh.meshes[1];
         [finalMesh.name, finalMesh.color, finalMesh.isPickable = true, finalMesh.isVisible = false, finalMesh.scalingDeterminant = 50] =
           finalMesh.id.split("-");
+        finalMesh.position.y += 0.5;
         finalMesh.id === "Knight-White" ? (finalMesh.rotation = new BABYLON.Vector3(0, Math.PI, 0)) : null;
         finalMesh.color === "White" ? (finalMesh.material = materialWhite) : (finalMesh.material = materialBlack);
         return finalMeshList.push(finalMesh);
       } else {
         mesh.meshes.forEach((mesh) => {
-          mesh.scalingDeterminant = 50;
+          //mesh.scalingDeterminant = 50;
           mesh.isPickable = false;
         });
         boardMesh.push(mesh);
       }
     });
+
+    boardMesh[0].meshes[0].material = boardMaterial;
+    //boardMesh[0].meshes[1].material = boardMaterial; //Squares
+    boardMesh[0].meshes[2].material = boardMaterial;
+    boardMesh[0].meshes[3].material = boardMaterial;
+
     return { finalMeshList, boardMesh };
   } else if (description === "startScreen") {
     let boardMesh = board;
@@ -87,7 +99,7 @@ const assetsLoader = async (scene, description) => {
     const loadedBoardPieces = await Promise.all(boardPieces.map((mesh) => BABYLON.SceneLoader.ImportMeshAsync("", mesh, "", scene)));
 
     loadedBoardMesh.meshes.forEach((mesh) => {
-      mesh.scalingDeterminant = 8;
+      //mesh.scalingDeterminant = 8;
     });
     loadedBoardPieces.forEach((mesh) => {
       const finalMesh = mesh.meshes[1];
@@ -100,6 +112,11 @@ const assetsLoader = async (scene, description) => {
       const test = num > 0.5 ? -1 : 1;
       finalMesh.position.z = Math.random() * 15 * test;
     });
+
+    loadedBoardMesh.meshes[0].material = boardMaterial;
+    //loadedBoardMesh[0].meshes[1].material = boardMaterial; //Squares
+    loadedBoardMesh.meshes[2].material = boardMaterial;
+    loadedBoardMesh.meshes[3].material = boardMaterial;
 
     const boardClone = loadedBoardMesh.meshes[0].clone("Board1");
     const boardClone2 = loadedBoardMesh.meshes[0].clone("Board2");

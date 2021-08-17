@@ -170,7 +170,7 @@ const displayMovementSquares = (point, gameScene, desc) => {
     const gridPosition = calculatePlanePosition(point[0]); //Spawned Plane has opposite Y then loaded Mesh
     plane.point = point[0];
     [plane.position.z, plane.position.x] = gridPosition; //Z is X ---- X is Y
-    plane.position.y += 0.01;
+    plane.position.y += 0.51;
     if (point[1] === "capture") {
       plane.material = gameScene.materials.find((material) => material.id === "redMat");
     } else if (point[1] === "movement") {
@@ -187,7 +187,7 @@ const displayMovementSquares = (point, gameScene, desc) => {
     const gridPosition = calculatePlanePosition(point); //Spawned Torus has opposite Y then loaded Mesh
     torus.point = point;
     [torus.position.z, torus.position.x] = gridPosition; //Z is X ---- X is Y
-    torus.position.y += 0.01;
+    torus.position.y += 0.51;
     torus.material = gameScene.materials.find((material) => material.id === "greenMat");
     gameScene.meshesToRender.push(torus);
   }
