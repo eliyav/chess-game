@@ -151,7 +151,7 @@ const displayPieceMoves = (mesh, currentMove, game, gameScene) => {
   displayMovementSquares([x, y], gameScene, "piece");
   let moves;
   if (piece.name === "Pawn") {
-    moves = piece.calculateAvailableMoves(grid, turnHistory);
+    moves = piece.calculateAvailableMoves(grid, turnHistory, true);
   } else if (piece.name === "King") {
     moves = piece.calculateAvailableMoves(grid, gameState, turnHistory, true);
   } else {
