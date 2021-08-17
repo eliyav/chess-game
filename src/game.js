@@ -48,7 +48,8 @@ class Game {
   }
 
   endGame() {
-    alert(`Game is over, ${this.gameState.currentPlayer} team wins!`);
+    const winningTeam = this.gameState.currentPlayer === "White" ? "Black" : "White";
+    alert(`Game is over, ${winningTeam} player wins!`);
   }
 
   setBoard() {

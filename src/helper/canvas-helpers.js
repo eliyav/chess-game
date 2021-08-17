@@ -153,11 +153,12 @@ const displayPieceMoves = (mesh, currentMove, game, gameScene) => {
   if (piece.name === "Pawn") {
     moves = piece.calculateAvailableMoves(grid, turnHistory);
   } else if (piece.name === "King") {
-    moves = piece.calculateAvailableMoves(grid, gameState, turnHistory);
+    moves = piece.calculateAvailableMoves(grid, gameState, turnHistory, true);
   } else {
     moves = piece.calculateAvailableMoves(grid);
   }
   currentMove.push(piece.point);
+  //Add filter check of canValidMoveResolve to each move before displaying them
   moves.forEach((point) => {
     displayMovementSquares(point, gameScene, "target");
   });
@@ -176,6 +177,8 @@ const displayMovementSquares = (point, gameScene, desc) => {
       plane.material = gameScene.materials.find((material) => material.id === "orangeMat");
     } else if (point[1] === "enPassant") {
       plane.material = gameScene.materials.find((material) => material.id === "purpleMat");
+    } else if (point[1] === "castling") {
+      plane.material = gameScene.materials.find((material) => material.id === "blueMat");
     }
     plane.rotation = new BABYLON.Vector3(Math.PI / 2, 0, 0);
     gameScene.meshesToRender.push(plane);

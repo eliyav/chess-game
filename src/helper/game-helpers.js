@@ -3,16 +3,32 @@ import { pieceClasses } from "./board-helpers";
 const resolveMove = (originPoint, targetPoint, gameState, grid, turnHistory) => {
   const squaresandPieces = getSquaresandPieces(originPoint, targetPoint, grid);
   const { originSquare, originPiece, targetSquare, targetPiece } = squaresandPieces;
-  //Check for castling move
-  // const castling = originPiece.name === "King" && originPiece.color === gameState.currentPlayer;
-  // let castling2 = false;
-  // if (targetPiece !== undefined) {
-  //   castling2 = targetPiece.name === "Rook" && targetPiece.color === gameState.currentPlayer;
-  //   if (castling && castling2) {
-  //     const resolve = checkForCastling(originPoint, targetPoint, gameState, grid);
-  //     return resolve;
-  //   }
-  // }
+
+  //Check for castling
+  const castling = originPiece.name === "King" && originPiece.color === gameState.currentPlayer;
+  let castling2 = false;
+  if (targetPiece !== undefined) {
+    castling2 = targetPiece.name === "Rook" && targetPiece.color === gameState.currentPlayer;
+    if (castling && castling2) {
+      console.log("just left to switch squares");
+      const a = getX(originPoint);
+      const b = getX(targetPoint);
+      let c = a - b;
+      c < 0 ? (c = 1) : (c = -1);
+      castlingMove(c, squaresandPieces, grid);
+      return {
+        result: true,
+        type: "castling",
+        direction: c,
+        origin: originPoint,
+        target: targetPoint,
+        originPiece: originPiece,
+        targetPiece: targetPiece,
+        originSquare: originSquare,
+        targetSquare: targetSquare,
+      };
+    }
+  }
 
   //Check for EnPassant
   const enPassant = isEnPassantAvailable(turnHistory);
@@ -139,22 +155,38 @@ const isEnemyChecked = (gameState, grid, turnHistory) => {
   return kingIsChecked;
 };
 
-const calcCastling = (grid, gameState, turnHistory, color, currentPoint) => {
-  //Check for castling first
+const calcCastling = (grid, gameState, turnHistory, currentPoint, movesObj) => {
   const [x, y] = currentPoint;
-  const targetPiece = grid[0][0].on;
   const piece = grid[x][y].on;
+  let targetPiece;
+  let targetPiece2;
+
+  if (piece.color === "White") {
+    targetPiece = grid[0][0].on;
+    targetPiece2 = grid[7][0].on;
+  } else {
+    targetPiece = grid[0][7].on;
+    targetPiece2 = grid[7][7].on;
+  }
   //Check for castling move
-  const castling = piece.name === "King" && !piece.moved;
-  let castling2 = false;
-  castling2 = targetPiece.name === "Rook" && !targetPiece.moved;
-  if (castling && castling2) {
-    const resolve = checkForCastling(piece.point, targetPiece.point, gameState, grid, turnHistory);
+  const castling1 = piece.name === "King" && !piece.moved;
+  const castling2 = targetPiece.name === "Rook" && !targetPiece.moved;
+  if (castling1 && castling2) {
+    const resolve = checkForCastling(piece.point, targetPiece.point, gameState, grid, turnHistory, movesObj);
+    resolve[0] ? movesObj.push(resolve[1]) : null;
+  }
+
+  //Check for second castling move
+  const castling3 = piece.name === "King" && !piece.moved;
+  const castling4 = targetPiece2.name === "Rook" && !targetPiece2.moved;
+  if (castling3 && castling4) {
+    const resolve = checkForCastling(piece.point, targetPiece2.point, gameState, grid, turnHistory, movesObj);
+    resolve[0] ? movesObj.push(resolve[1]) : null;
   }
 };
 
 //Checks if castling is valid
-const checkForCastling = (originPoint, targetPoint, gameState, grid, turnHistory) => {
+const checkForCastling = (originPoint, targetPoint, gameState, grid, turnHistory, movesObj) => {
   const squaresandPieces = getSquaresandPieces(originPoint, targetPoint, grid);
   const { originPiece, targetPiece, originSquare, targetSquare } = squaresandPieces;
   //Check for valid castling pieces
@@ -166,7 +198,7 @@ const checkForCastling = (originPoint, targetPoint, gameState, grid, turnHistory
         const kingSquare = findKing(gameState, grid);
         const isKingChecked = isChecked(gameState, grid, turnHistory, kingSquare);
         if (isKingChecked) {
-          console.log("King is checked!");
+          //console.log("King is checked!");
           return false;
         } else {
           //Check squares between king and rook are unoccupied.
@@ -189,13 +221,13 @@ const checkForCastling = (originPoint, targetPoint, gameState, grid, turnHistory
           }
           const squaresInUse = squaresInBetween
             .map((point) => {
-              const square = game.board.grid[getX(point)][getY(point)];
+              const square = grid[getX(point)][getY(point)];
               return square.on === undefined ? false : true;
             })
             .filter((result) => result === true);
 
           if (squaresInUse.length) {
-            console.log("Squares in between are in use by other game pieces, Castling not available!");
+            //console.log("Squares in between are in use by other game pieces, Castling not available!");
             return false;
           } else {
             //Check if opponents pieces, threathen any of the spaces in between
@@ -211,36 +243,24 @@ const checkForCastling = (originPoint, targetPoint, gameState, grid, turnHistory
               }
             }
             if (isThereOverlap.length === 0) {
-              console.log("Castling Successful, Switching Squares!");
-              c < 0 ? (c = 1) : (c = -1);
-              castlingMove(c, squaresandPieces, game.board.grid);
-              return {
-                result: true,
-                type: "castling",
-                direction: c,
-                origin: originPoint,
-                target: targetPoint,
-                originPiece: originPiece,
-                targetPiece: targetPiece,
-                originSquare: originSquare,
-                targetSquare: targetSquare,
-              };
+              console.log("Castling Available!");
+              return [true, [targetPoint, "castling"]];
             } else {
-              console.log("Castling Not Available!, One of Squares is under Enemy Threat!");
+              //console.log("Castling Not Available!, One of Squares is under Enemy Threat!");
               return false;
             }
           }
         }
       } else {
-        console.log("Pieces must belong to currentPlayer!");
+        //console.log("Pieces must belong to currentPlayer!");
         return false;
       }
     } else {
-      console.log("Moving piece must be King, target piece needs to be Rook!");
+      //console.log("Moving piece must be King, target piece needs to be Rook!");
       return false;
     }
   } else {
-    console.log("Both King and Rook need to have not moved!");
+    //console.log("Both King and Rook need to have not moved!");
     return false;
   }
 };

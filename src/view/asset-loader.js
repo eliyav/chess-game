@@ -12,18 +12,19 @@ import bishopBlack from "../../assets/black-pieces/bishop-black.gltf";
 import knightBlack from "../../assets/black-pieces/knight-black.gltf";
 import kingBlack from "../../assets/black-pieces/king-black.gltf";
 import queenBlack from "../../assets/black-pieces/queen-black.gltf";
-import space2 from "../../assets/space2.jpg";
 import blackMetal from "../../assets/black-metal.jpg";
 import whiteMetal from "../../assets/white-metal.jpg";
 
 const assetsLoader = async (scene, description) => {
   const materialWhite = new BABYLON.StandardMaterial("White", scene);
-  materialWhite.diffuseTexture = new BABYLON.Texture(whiteMetal, scene);
-  //materialWhite.refractionTexture = new BABYLON.Texture(space2, scene);
+  materialWhite.diffuseFresnelParameters = new BABYLON.FresnelParameters();
+  materialWhite.diffuseFresnelParameters.leftColor = new BABYLON.Color3.Black();
+  materialWhite.diffuseFresnelParameters.rightColor = new BABYLON.Color3.White();
 
   const materialBlack = new BABYLON.StandardMaterial("Black", scene);
-  materialBlack.diffuseTexture = new BABYLON.Texture(blackMetal, scene);
-  //materialBlack.refractionTexture = new BABYLON.Texture(space2, scene);
+  materialBlack.diffuseFresnelParameters = new BABYLON.FresnelParameters();
+  materialBlack.diffuseFresnelParameters.leftColor = new BABYLON.Color3.White();
+  materialBlack.diffuseFresnelParameters.rightColor = new BABYLON.Color3.Black();
 
   if (description === "gameScreen") {
     let meshesToLoad = [

@@ -6,9 +6,10 @@ class King extends GamePiece {
   constructor(name, color, point, movement) {
     super(name, color, point, movement);
     this.moved = false;
+    this.castling = false;
   }
 
-  calculateAvailableMoves(grid, gameState, turnHistory, currentPoint = this.point) {
+  calculateAvailableMoves(grid, gameState, turnHistory, castle = this.castling, currentPoint = this.point) {
     const kingMoves = [
       [0, 1],
       [1, 0],
@@ -24,7 +25,9 @@ class King extends GamePiece {
 
     calcKingMoves(grid, currentPoint, this.color, kingMoves, availableMoves);
 
-    calcCastling(grid, gameState, turnHistory, this.color, currentPoint);
+    if (castle) {
+      calcCastling(grid, gameState, turnHistory, currentPoint, availableMoves);
+    }
 
     return availableMoves;
   }

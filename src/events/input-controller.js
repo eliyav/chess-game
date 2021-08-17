@@ -16,9 +16,33 @@ const inputController = (mesh, game, gameMode, gameScene) => {
         }
         //If there is already a mesh selected, and you select another of your own meshes
       } else if (mesh.color === game.gameState.currentPlayer) {
-        currentMove.length = 0;
-        renderScene(game, gameScene);
-        displayPieceMoves(mesh, currentMove, game, gameScene);
+        const [x, y] = currentMove[0];
+        const originalPiece = game.board.grid[x][y].on;
+        const [meshX, meshY] = calcIndexFromMeshPosition([mesh.position.z, mesh.position.x]);
+        const newPiece = game.board.grid[x][y].on;
+        if (originalPiece === newPiece) {
+          currentMove.length = 0;
+          renderScene(game, gameScene);
+        } else {
+          if (mesh.name === "Rook" && originalPiece.name === "King") {
+            //Checks for castling
+            const turnHistory = game.rawHistoryData[game.rawHistoryData.length - 1];
+            const castlingPiece = game.board.grid[x][y].on;
+            const castlingMoves = castlingPiece.calculateAvailableMoves(game.board.grid, game.gameState, turnHistory, true);
+            const isItCastling = castlingMoves.filter((move) => doMovesMatch(move[0], [meshX, meshY]));
+            if (isItCastling.length > 0) {
+              currentMove.push([meshX, meshY]);
+            } else {
+              currentMove.length = 0;
+              renderScene(game, gameScene);
+              displayPieceMoves(mesh, currentMove, game, gameScene);
+            }
+          } else {
+            currentMove.length = 0;
+            renderScene(game, gameScene);
+            displayPieceMoves(mesh, currentMove, game, gameScene);
+          }
+        }
       } else if (mesh.id === "plane") {
         currentMove.push(mesh.point);
       } else if (mesh.color) {
