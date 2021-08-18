@@ -12,21 +12,51 @@ import bishopBlack from "../../assets/black-pieces/bishop-black.gltf";
 import knightBlack from "../../assets/black-pieces/knight-black.gltf";
 import kingBlack from "../../assets/black-pieces/king-black.gltf";
 import queenBlack from "../../assets/black-pieces/queen-black.gltf";
-import blackMetal from "../../assets/black-metal.jpg";
-import whiteMetal from "../../assets/white-metal.jpg";
 
 const assetsLoader = async (scene, description) => {
   const materialWhite = new BABYLON.StandardMaterial("White", scene);
+  materialWhite.specularPower = 2;
+  materialWhite.diffuseColor = new BABYLON.Color3(0, 0, 0);
+  materialWhite.emissiveColor = new BABYLON.Color3(0.6, 0.6, 0.6);
+
+  // Fresnel
+  materialWhite.reflectionFresnelParameters = new BABYLON.FresnelParameters();
+  materialWhite.reflectionFresnelParameters.bias = 0.5;
+
   materialWhite.diffuseFresnelParameters = new BABYLON.FresnelParameters();
-  materialWhite.diffuseFresnelParameters.leftColor = new BABYLON.Color3.Black();
-  materialWhite.diffuseFresnelParameters.rightColor = new BABYLON.Color3.White();
+  materialWhite.diffuseFresnelParameters.leftColor = new BABYLON.Color3.White();
+  materialWhite.diffuseFresnelParameters.rightColor = new BABYLON.Color3.Black();
+  materialWhite.diffuseFresnelParameters.power = 12;
+  materialWhite.diffuseFresnelParameters.bias = 0.5;
+
+  materialWhite.emissiveFresnelParameters = new BABYLON.FresnelParameters();
+  materialWhite.emissiveFresnelParameters.bias = 0.5;
+  materialWhite.emissiveFresnelParameters.power = 3;
+  materialWhite.emissiveFresnelParameters.leftColor = BABYLON.Color3.Black();
+  materialWhite.emissiveFresnelParameters.rightColor = BABYLON.Color3.White();
 
   const materialBlack = new BABYLON.StandardMaterial("Black", scene);
-  materialBlack.diffuseFresnelParameters = new BABYLON.FresnelParameters();
-  materialBlack.diffuseFresnelParameters.leftColor = new BABYLON.Color3.White();
-  materialBlack.diffuseFresnelParameters.rightColor = new BABYLON.Color3.Black();
+  materialBlack.specularPower = 12;
+  materialBlack.diffuseColor = new BABYLON.Color3(0, 0, 0);
+  materialBlack.emissiveColor = new BABYLON.Color3(0, 0, 0);
 
-  const boardMaterial = new BABYLON.StandardMaterial("Black", scene);
+  // Fresnel
+  materialBlack.reflectionFresnelParameters = new BABYLON.FresnelParameters();
+  materialBlack.reflectionFresnelParameters.bias = 0.5;
+
+  materialBlack.diffuseFresnelParameters = new BABYLON.FresnelParameters();
+  materialBlack.diffuseFresnelParameters.leftColor = new BABYLON.Color3.Black();
+  materialBlack.diffuseFresnelParameters.rightColor = new BABYLON.Color3.Black();
+  materialBlack.diffuseFresnelParameters.power = 24;
+  materialBlack.diffuseFresnelParameters.bias = 0.8;
+
+  materialBlack.emissiveFresnelParameters = new BABYLON.FresnelParameters();
+  materialBlack.emissiveFresnelParameters.bias = 0.8;
+  materialBlack.emissiveFresnelParameters.power = 24;
+  materialBlack.emissiveFresnelParameters.leftColor = BABYLON.Color3.Black();
+  materialBlack.emissiveFresnelParameters.rightColor = BABYLON.Color3.White();
+
+  const boardMaterial = new BABYLON.StandardMaterial("Board", scene);
   boardMaterial.diffuseFresnelParameters = new BABYLON.FresnelParameters();
   boardMaterial.diffuseFresnelParameters.leftColor = new BABYLON.Color3.Black();
   boardMaterial.diffuseFresnelParameters.rightColor = new BABYLON.Color3.Black();

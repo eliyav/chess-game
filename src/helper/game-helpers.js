@@ -168,12 +168,17 @@ const calcCastling = (grid, gameState, turnHistory, currentPoint, movesObj) => {
     targetPiece = grid[0][7].on;
     targetPiece2 = grid[7][7].on;
   }
+  console.log(targetPiece);
+  console.log(targetPiece2);
   //Check for castling move
   const castling1 = piece.name === "King" && !piece.moved;
   const castling2 = targetPiece.name === "Rook" && !targetPiece.moved;
   if (castling1 && castling2) {
     const resolve = checkForCastling(piece.point, targetPiece.point, gameState, grid, turnHistory, movesObj);
-    resolve[0] ? movesObj.push(resolve[1]) : null;
+    if (resolve !== false) {
+      console.log(resolve);
+      resolve[0] ? movesObj.push(resolve[1]) : null;
+    }
   }
 
   //Check for second castling move
@@ -181,7 +186,10 @@ const calcCastling = (grid, gameState, turnHistory, currentPoint, movesObj) => {
   const castling4 = targetPiece2.name === "Rook" && !targetPiece2.moved;
   if (castling3 && castling4) {
     const resolve = checkForCastling(piece.point, targetPiece2.point, gameState, grid, turnHistory, movesObj);
-    resolve[0] ? movesObj.push(resolve[1]) : null;
+    if (resolve !== false) {
+      console.log(resolve);
+      resolve[0] ? movesObj.push(resolve[1]) : null;
+    }
   }
 };
 

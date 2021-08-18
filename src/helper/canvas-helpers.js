@@ -157,6 +157,7 @@ const displayPieceMoves = (mesh, currentMove, game, gameScene) => {
   } else {
     moves = piece.calculateAvailableMoves(grid);
   }
+  console.log(piece);
   currentMove.push(piece.point);
   //Add filter check of canValidMoveResolve to each move before displaying them
   moves.forEach((point) => {

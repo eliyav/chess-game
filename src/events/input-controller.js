@@ -19,7 +19,7 @@ const inputController = (mesh, game, gameMode, gameScene) => {
         const [x, y] = currentMove[0];
         const originalPiece = game.board.grid[x][y].on;
         const [meshX, meshY] = calcIndexFromMeshPosition([mesh.position.z, mesh.position.x]);
-        const newPiece = game.board.grid[x][y].on;
+        const newPiece = game.board.grid[meshX][meshY].on;
         if (originalPiece === newPiece) {
           currentMove.length = 0;
           renderScene(game, gameScene);
@@ -32,6 +32,7 @@ const inputController = (mesh, game, gameMode, gameScene) => {
             const isItCastling = castlingMoves.filter((move) => doMovesMatch(move[0], [meshX, meshY]));
             if (isItCastling.length > 0) {
               currentMove.push([meshX, meshY]);
+              console.log("called");
             } else {
               currentMove.length = 0;
               renderScene(game, gameScene);
