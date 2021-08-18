@@ -1,5 +1,6 @@
 import * as BABYLON from "babylonjs";
-import board from "../../assets/board2.gltf";
+import board from "../../assets/board.gltf";
+import chessText from "../../assets/chess.gltf";
 import pawnWhite from "../../assets/white-pieces/pawn-white.gltf";
 import rookWhite from "../../assets/white-pieces/rook-white.gltf";
 import bishopWhite from "../../assets/white-pieces/bishop-white.gltf";
@@ -12,6 +13,7 @@ import bishopBlack from "../../assets/black-pieces/bishop-black.gltf";
 import knightBlack from "../../assets/black-pieces/knight-black.gltf";
 import kingBlack from "../../assets/black-pieces/king-black.gltf";
 import queenBlack from "../../assets/black-pieces/queen-black.gltf";
+import moon from "../../assets/moon.jpg";
 
 const assetsLoader = async (scene, description) => {
   const materialWhite = new BABYLON.StandardMaterial("White", scene);
@@ -107,8 +109,12 @@ const assetsLoader = async (scene, description) => {
     boardMesh[0].meshes[3].material = boardMaterial;
 
     return { finalMeshList, boardMesh };
+
+    //Start Screen
   } else if (description === "startScreen") {
     let boardMesh = board;
+
+    let textMeshes = [chessText];
 
     let boardPieces = [
       pawnWhite,
@@ -127,6 +133,20 @@ const assetsLoader = async (scene, description) => {
 
     const loadedBoardMesh = await BABYLON.SceneLoader.ImportMeshAsync("", boardMesh, "", scene);
     const loadedBoardPieces = await Promise.all(boardPieces.map((mesh) => BABYLON.SceneLoader.ImportMeshAsync("", mesh, "", scene)));
+    const textLoader = await Promise.all(textMeshes.map((mesh) => BABYLON.SceneLoader.ImportMeshAsync("", mesh, "")));
+
+    const titleText = textLoader[0].meshes[0];
+    titleText.position.x = -20;
+    titleText.position.z = 0.2;
+    titleText.position.y = 16;
+    titleText.rotation = new BABYLON.Vector3(-0.5, 2, -0.2);
+
+    const titleMaterial = new BABYLON.StandardMaterial("TextMaterial", scene);
+    titleMaterial.diffuseColor = new BABYLON.Color3(0.52, 0.52, 0.52);
+    titleMaterial.diffuseTexture = new BABYLON.Texture(moon, scene);
+    titleMaterial.specularColor = new BABYLON.Color3(0.3, 0.3, 0.3);
+
+    textLoader[0].meshes[1].material = titleMaterial;
 
     loadedBoardMesh.meshes.forEach((mesh) => {
       //mesh.scalingDeterminant = 8;
@@ -139,8 +159,11 @@ const assetsLoader = async (scene, description) => {
       finalMesh.position.y = 15;
       finalMesh.position.x = 10;
       const num = Math.random();
-      const test = num > 0.5 ? -1 : 1;
-      finalMesh.position.z = Math.random() * 15 * test;
+      const pos = num > 0.5 ? -1 : 1;
+      const distance = 15;
+      const speed = Math.random() * 0.5;
+      finalMesh.speed = speed;
+      finalMesh.position.z = Math.random() * distance * pos;
     });
 
     loadedBoardMesh.meshes[0].material = boardMaterial;
@@ -173,7 +196,7 @@ const assetsLoader = async (scene, description) => {
         boardClone.rotate(new BABYLON.Vector3(0, beta, 0), (1 * Math.PI) / 500, BABYLON.Space.LOCAL);
         boardClone2.rotate(new BABYLON.Vector3(0, -beta * 2, 0), (1 * Math.PI) / 500, BABYLON.Space.LOCAL);
         loadedBoardPieces.forEach((mesh, idx) => {
-          mesh.meshes[1].position.y > -15 ? (mesh.meshes[1].position.y -= 0.02) : (mesh.meshes[1].position.y = 15);
+          mesh.meshes[1].position.y > -15 ? (mesh.meshes[1].position.y -= mesh.meshes[1].speed) : (mesh.meshes[1].position.y = 15);
           mesh.meshes[1].rotate(
             new BABYLON.Vector3(
               alpha * rotationMultiplier[rotationMultiplier.length - 1 - idx],
