@@ -425,7 +425,7 @@ const simulateCheckmate = (gameState, grid, turnHistory) => {
   pieces.forEach((piece) => {
     let availableMoves;
     if (piece.name === "Pawn") {
-      availableMoves = piece.on.calculateAvailableMoves(grid, turnHistory);
+      availableMoves = piece.calculateAvailableMoves(grid, turnHistory);
     } else if (piece.name === "King") {
       availableMoves = piece.calculateAvailableMoves(grid, gameState, turnHistory);
     } else {
@@ -471,7 +471,6 @@ const simulateResolveMove = (originPoint, targetPoint, gameState, grid, turnHist
     if (validMove) {
       //Will resolving move be valid
       if (canValidMoveResolve(squaresandPieces, targetPoint, gameState, grid, turnHistory)) {
-        //***Check for pawn promotion here********************
         //console.log("Move is Valid! Board is updated.");
         return true;
       } else {
@@ -570,4 +569,6 @@ export {
   getSquaresandPieces,
   isEnPassantAvailable,
   calcCastling,
+  canValidMoveResolve,
+  switchSquaresBack,
 };

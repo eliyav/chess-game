@@ -32,7 +32,6 @@ const inputController = (mesh, game, gameMode, gameScene) => {
             const isItCastling = castlingMoves.filter((move) => doMovesMatch(move[0], [meshX, meshY]));
             if (isItCastling.length > 0) {
               currentMove.push([meshX, meshY]);
-              console.log("called");
             } else {
               currentMove.length = 0;
               renderScene(game, gameScene);
@@ -56,6 +55,7 @@ const inputController = (mesh, game, gameMode, gameScene) => {
           const originalPiece = game.board.grid[originalPieceX][originalPieceY].on;
           const turnHistory = game.rawHistoryData[game.rawHistoryData.length - 1];
           let moves;
+          console.log(originalPiece);
           if (originalPiece.name === "Pawn") {
             moves = originalPiece.calculateAvailableMoves(game.board.grid, turnHistory);
           } else if (originalPiece.name === "King") {
@@ -63,11 +63,13 @@ const inputController = (mesh, game, gameMode, gameScene) => {
           } else {
             moves = originalPiece.calculateAvailableMoves(game.board.grid);
           }
+          console.log(moves);
           const checkIfTrue = moves.find((move) => doMovesMatch(move[0], opponentsPiece.point));
+          console.log(checkIfTrue);
           if (checkIfTrue) {
             const [x, y] = calcIndexFromMeshPosition([mesh.position.z, mesh.position.x]);
             const piece = game.board.grid[x][y].on;
-            currentMove.push(piece.point);
+            currentMove.push(opponentsPiece.point);
           }
         }
       }

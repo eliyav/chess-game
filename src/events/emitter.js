@@ -26,8 +26,8 @@ const activateEmitter = (game, gameMode, gameScene) => {
   });
 
   emitter.on("reset-board", () => {
-    const answer = prompt("Are you sure you want to reset the board?, Enter Yes or No");
-    if (answer === "Yes" || answer === "yes" || answer === "YES") {
+    const answer = confirm("Are you sure you want to reset the board?");
+    if (answer) {
       game.resetBoard();
       renderScene(game, gameScene);
       gameScene.cameras[0].alpha = -3.14;
@@ -35,15 +35,15 @@ const activateEmitter = (game, gameMode, gameScene) => {
   });
 
   emitter.on("draw", () => {
-    const answer = prompt("Are you sure you want to reset the board?, Enter Yes or No");
-    if (answer === "Yes" || answer === "yes" || answer === "YES") {
+    const answer = confirm("Are you sure you want to reset the board?");
+    if (answer) {
       //Add Based on Turn effect
     }
   });
 
   emitter.on("resign", () => {
-    const answer = prompt("Are you sure you want to resign the game?, Enter Yes or No");
-    if (answer === "Yes" || answer === "yes" || answer === "YES") {
+    const answer = confirm("Are you sure you want to resign the game?");
+    if (answer) {
       //Add based on turn effect
     }
   });
@@ -52,29 +52,3 @@ const activateEmitter = (game, gameMode, gameScene) => {
 };
 
 export default activateEmitter;
-
-/*
-    emitter.on("reset-board", () => {
-      const answer = prompt("Are you sure you want to reset the board?, Enter Yes or No");
-      if (answer === "Yes" || answer === "yes" || answer === "YES") {
-        socket.emit("reset-board");
-      }
-    });
-
-    emitter.on("draw", () => {
-      const answer = prompt("Are you sure you want to reset the board?, Enter Yes or No");
-      if (answer === "Yes" || answer === "yes" || answer === "YES") {
-        socket.emit("draw");
-      }
-    });
-
-    emitter.on("resign", () => {
-      const answer = prompt("Are you sure you want to resign the game?, Enter Yes or No");
-      if (answer === "Yes" || answer === "yes" || answer === "YES") {
-        game.resetBoard();
-        renderScene(appContext, finalMeshes);
-        socket.emit("resign-game");
-      }
-    });
-
-    */

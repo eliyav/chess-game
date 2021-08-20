@@ -30,10 +30,8 @@ const activateSocket = (game, gameMode, scene) => {
   });
 
   socket.on("reset-board-request", () => {
-    const answer = prompt("Opponent has requested to reset the board, do you agree?, Enter Yes or No");
-    if (answer === "Yes" || answer === "yes" || answer === "YES") {
-      socket.emit("reset-board-response", "Yes");
-    }
+    const answer = confirm("Opponent has requested to reset the board, do you agree?");
+    answer && socket.emit("reset-board-response", "Yes");
   });
 
   socket.on("reset-board-resolve", (response) => {
@@ -44,10 +42,8 @@ const activateSocket = (game, gameMode, scene) => {
   });
 
   socket.on("draw-request", () => {
-    const answer = prompt("Opponent has offered a game Draw, do you accept?, Enter Yes or No");
-    if (answer === "Yes" || answer === "yes" || answer === "YES") {
-      socket.emit("draw-response", "Yes");
-    }
+    const answer = confirm("Opponent has offered a game Draw, do you accept?");
+    answer && socket.emit("draw-response", "Yes");
   });
 
   socket.on("draw-resolve", (response) => {

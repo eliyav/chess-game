@@ -9,7 +9,8 @@ const gameScreen = async (canvas, engine) => {
   camera.useFramingBehavior = false;
   scene.meshesToRender = [];
 
-  const light = new BABYLON.HemisphericLight("light3", new BABYLON.Vector3(0, 1, 0), scene);
+  const light = new BABYLON.HemisphericLight("light3", new BABYLON.Vector3(0, 100, 0), scene);
+  light.intensity = 0.7;
 
   const greenMat = new BABYLON.StandardMaterial("greenMat", scene);
   greenMat.diffuseColor = new BABYLON.Color3(0, 1, 0.2);

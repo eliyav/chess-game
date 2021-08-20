@@ -197,6 +197,7 @@ const assetsLoader = async (scene, description) => {
         boardClone2.rotate(new BABYLON.Vector3(0, -beta * 2, 0), (1 * Math.PI) / 500, BABYLON.Space.LOCAL);
         loadedBoardPieces.forEach((mesh, idx) => {
           mesh.meshes[1].position.y > -15 ? (mesh.meshes[1].position.y -= mesh.meshes[1].speed) : (mesh.meshes[1].position.y = 15);
+          //Add here for the x/z and speed to reset upon reaching -15
           mesh.meshes[1].rotate(
             new BABYLON.Vector3(
               alpha * rotationMultiplier[rotationMultiplier.length - 1 - idx],

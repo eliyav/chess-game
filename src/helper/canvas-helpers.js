@@ -1,4 +1,4 @@
-import { doMovesMatch } from "./game-helpers";
+import { getSquaresandPieces, canValidMoveResolve, switchSquaresBack } from "./game-helpers";
 
 const renderScene = (game, gameScene) => {
   //Clears old meshes/memory usage
@@ -157,10 +157,19 @@ const displayPieceMoves = (mesh, currentMove, game, gameScene) => {
   } else {
     moves = piece.calculateAvailableMoves(grid);
   }
-  console.log(piece);
   currentMove.push(piece.point);
   //Add filter check of canValidMoveResolve to each move before displaying them
-  moves.forEach((point) => {
+  const finalResults = [];
+  const isItCheckmate = moves.map((move) => {
+    const [pieceX, pieceY] = piece.point;
+    const squaresandPieces = getSquaresandPieces(piece.point, move[0], grid);
+    const validMove = canValidMoveResolve(squaresandPieces, move[0], gameState, grid, turnHistory);
+    switchSquaresBack(squaresandPieces, [pieceX, pieceY]);
+    return validMove ? move : null;
+  });
+
+  const finalMovesToDisplay = isItCheckmate.filter((move) => move !== null);
+  finalMovesToDisplay.forEach((point) => {
     displayMovementSquares(point, gameScene, "target");
   });
 };
