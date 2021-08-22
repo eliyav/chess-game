@@ -25,8 +25,10 @@ class King extends GamePiece {
 
     calcKingMoves(grid, currentPoint, this.color, kingMoves, availableMoves);
 
-    if (castle) {
-      calcCastling(grid, gameState, turnHistory, currentPoint, availableMoves);
+    if (!this.moved) {
+      if (castle) {
+        calcCastling(grid, gameState, turnHistory, currentPoint, availableMoves);
+      }
     }
 
     return availableMoves;

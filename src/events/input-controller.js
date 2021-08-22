@@ -48,14 +48,12 @@ const inputController = (mesh, game, gameMode, gameScene) => {
       } else if (mesh.color) {
         //If second selection is an enemy piece, calculate move of original piece and push move if matches
         if (mesh.color !== game.gameState.currentPlayer) {
-          console.log("!");
           const [x, y] = calcIndexFromMeshPosition([mesh.position.z, mesh.position.x]);
           const opponentsPiece = game.board.grid[x][y].on;
           const [originalPieceX, originalPieceY] = currentMove[0];
           const originalPiece = game.board.grid[originalPieceX][originalPieceY].on;
           const turnHistory = game.rawHistoryData[game.rawHistoryData.length - 1];
           let moves;
-          console.log(originalPiece);
           if (originalPiece.name === "Pawn") {
             moves = originalPiece.calculateAvailableMoves(game.board.grid, turnHistory);
           } else if (originalPiece.name === "King") {
@@ -63,9 +61,7 @@ const inputController = (mesh, game, gameMode, gameScene) => {
           } else {
             moves = originalPiece.calculateAvailableMoves(game.board.grid);
           }
-          console.log(moves);
           const checkIfTrue = moves.find((move) => doMovesMatch(move[0], opponentsPiece.point));
-          console.log(checkIfTrue);
           if (checkIfTrue) {
             const [x, y] = calcIndexFromMeshPosition([mesh.position.z, mesh.position.x]);
             const piece = game.board.grid[x][y].on;

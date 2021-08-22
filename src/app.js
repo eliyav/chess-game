@@ -27,7 +27,7 @@ const initializeApp = async (canvas, engine) => {
 
   appContext.emitter = activateEmitter(game, gameMode, gameScene);
   //appContext.socket = activateSocket(game, gameMode, gameScene);
-  createGUI(startScene, gameScene, showScene, gameMode, appContext.emitter, appContext.socket);
+  createGUI(startScene, gameScene, showScene, gameMode, appContext.emitter, appContext.socket, game);
   renderScene(game, gameScene);
 
   gameScene.onPointerDown = async (e, pickResult) => {

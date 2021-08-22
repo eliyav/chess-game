@@ -10,7 +10,6 @@ const resolveMove = (originPoint, targetPoint, gameState, grid, turnHistory) => 
   if (targetPiece !== undefined) {
     castling2 = targetPiece.name === "Rook" && targetPiece.color === gameState.currentPlayer;
     if (castling && castling2) {
-      console.log("just left to switch squares");
       const a = getX(originPoint);
       const b = getX(targetPoint);
       let c = a - b;
@@ -168,27 +167,26 @@ const calcCastling = (grid, gameState, turnHistory, currentPoint, movesObj) => {
     targetPiece = grid[0][7].on;
     targetPiece2 = grid[7][7].on;
   }
-  console.log(targetPiece);
-  console.log(targetPiece2);
   //Check for castling move
   const castling1 = piece.name === "King" && !piece.moved;
-  const castling2 = targetPiece.name === "Rook" && !targetPiece.moved;
-  if (castling1 && castling2) {
-    const resolve = checkForCastling(piece.point, targetPiece.point, gameState, grid, turnHistory, movesObj);
-    if (resolve !== false) {
-      console.log(resolve);
-      resolve[0] ? movesObj.push(resolve[1]) : null;
+  if (targetPiece !== undefined) {
+    const castling2 = targetPiece.name === "Rook" && !targetPiece.moved;
+    if (castling1 && castling2) {
+      const resolve = checkForCastling(piece.point, targetPiece.point, gameState, grid, turnHistory, movesObj);
+      if (resolve !== false) {
+        resolve[0] ? movesObj.push(resolve[1]) : null;
+      }
     }
   }
-
   //Check for second castling move
   const castling3 = piece.name === "King" && !piece.moved;
-  const castling4 = targetPiece2.name === "Rook" && !targetPiece2.moved;
-  if (castling3 && castling4) {
-    const resolve = checkForCastling(piece.point, targetPiece2.point, gameState, grid, turnHistory, movesObj);
-    if (resolve !== false) {
-      console.log(resolve);
-      resolve[0] ? movesObj.push(resolve[1]) : null;
+  if (targetPiece2 !== undefined) {
+    const castling4 = targetPiece2.name === "Rook" && !targetPiece2.moved;
+    if (castling3 && castling4) {
+      const resolve = checkForCastling(piece.point, targetPiece2.point, gameState, grid, turnHistory, movesObj);
+      if (resolve !== false) {
+        resolve[0] ? movesObj.push(resolve[1]) : null;
+      }
     }
   }
 };
@@ -251,7 +249,7 @@ const checkForCastling = (originPoint, targetPoint, gameState, grid, turnHistory
               }
             }
             if (isThereOverlap.length === 0) {
-              console.log("Castling Available!");
+              //console.log("Castling Available!");
               return [true, [targetPoint, "castling"]];
             } else {
               //console.log("Castling Not Available!, One of Squares is under Enemy Threat!");

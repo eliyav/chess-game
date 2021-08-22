@@ -28,17 +28,17 @@ const assetsLoader = async (scene, description) => {
   materialWhite.diffuseFresnelParameters = new BABYLON.FresnelParameters();
   materialWhite.diffuseFresnelParameters.leftColor = new BABYLON.Color3.White();
   materialWhite.diffuseFresnelParameters.rightColor = new BABYLON.Color3.Black();
-  materialWhite.diffuseFresnelParameters.power = 12;
+  materialWhite.diffuseFresnelParameters.power = 6;
   materialWhite.diffuseFresnelParameters.bias = 0.5;
 
   materialWhite.emissiveFresnelParameters = new BABYLON.FresnelParameters();
   materialWhite.emissiveFresnelParameters.bias = 0.5;
   materialWhite.emissiveFresnelParameters.power = 3;
   materialWhite.emissiveFresnelParameters.leftColor = BABYLON.Color3.Black();
-  materialWhite.emissiveFresnelParameters.rightColor = BABYLON.Color3.White();
+  materialWhite.emissiveFresnelParameters.rightColor = BABYLON.Color3.Black();
 
   const materialBlack = new BABYLON.StandardMaterial("Black", scene);
-  materialBlack.specularPower = 12;
+  materialBlack.specularPower = 16;
   materialBlack.diffuseColor = new BABYLON.Color3(0, 0, 0);
   materialBlack.emissiveColor = new BABYLON.Color3(0, 0, 0);
 

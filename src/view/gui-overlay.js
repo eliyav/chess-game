@@ -1,6 +1,6 @@
 import * as GUI from "babylonjs-gui";
 
-function createGUI(startScene, gameScene, showScene, gameMode, emitter, socket) {
+function createGUI(startScene, gameScene, showScene, gameMode, emitter, socket, game) {
   const advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("StartUI", true, startScene);
   const advancedTexture2 = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GameUI", true, gameScene);
 
@@ -79,6 +79,27 @@ function createGUI(startScene, gameScene, showScene, gameMode, emitter, socket) 
   advancedTexture2.addControl(button02);
   button02.onPointerUpObservable.add(function () {
     emitter.emit("reset-board");
+  });
+
+  const button03 = GUI.Button.CreateSimpleButton("button03", "Camera");
+  button03.width = 0.1;
+  button03.height = "35px";
+  button03.color = "white";
+  button03.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+  button03.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  button03.paddingTop = "5px";
+  button03.left = 400;
+  advancedTexture2.addControl(button03);
+  button03.onPointerUpObservable.add(function () {
+    if (game.gameState.currentPlayer === "Black") {
+      gameScene.cameras[0].alpha = 0;
+      gameScene.cameras[0].beta = Math.PI / 4;
+      gameScene.cameras[0].radius = 35;
+    } else {
+      gameScene.cameras[0].alpha = Math.PI;
+      gameScene.cameras[0].beta = Math.PI / 4;
+      gameScene.cameras[0].radius = 35;
+    }
   });
 }
 
