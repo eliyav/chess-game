@@ -17,7 +17,7 @@ function createGUI(startScene, gameScene, showScene, gameMode, emitter, socket, 
   button.onPointerUpObservable.add(function () {
     gameMode.mode = "offline";
     startScene.detachControl();
-    showScene.sceneIndex === 0 ? (showScene.sceneIndex = 1) : (showScene.sceneIndex = 0);
+    showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);
   });
 
   const button1 = GUI.Button.CreateSimpleButton("button1", "Start Online Game");
@@ -33,7 +33,7 @@ function createGUI(startScene, gameScene, showScene, gameMode, emitter, socket, 
     gameMode.mode = "online";
     socket.emit("request-room-id");
     startScene.detachControl();
-    showScene.sceneIndex === 0 ? (showScene.sceneIndex = 1) : (showScene.sceneIndex = 0);
+    showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);
   });
 
   const button2 = GUI.Button.CreateSimpleButton("button2", "Join Online Game");
@@ -50,7 +50,7 @@ function createGUI(startScene, gameScene, showScene, gameMode, emitter, socket, 
     let room = prompt("Please enter the room key");
     socket.emit("join-room", room);
     startScene.detachControl();
-    showScene.sceneIndex === 0 ? (showScene.sceneIndex = 1) : (showScene.sceneIndex = 0);
+    showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);
   });
 
   //Game Screen
@@ -65,7 +65,7 @@ function createGUI(startScene, gameScene, showScene, gameMode, emitter, socket, 
   advancedTexture2.addControl(button01);
   button01.onPointerUpObservable.add(function () {
     gameScene.detachControl();
-    showScene.sceneIndex === 0 ? (showScene.sceneIndex = 1) : (showScene.sceneIndex = 0);
+    showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);
   });
 
   const button02 = GUI.Button.CreateSimpleButton("button02", "Reset Board");
@@ -91,7 +91,7 @@ function createGUI(startScene, gameScene, showScene, gameMode, emitter, socket, 
   button03.left = 400;
   advancedTexture2.addControl(button03);
   button03.onPointerUpObservable.add(function () {
-    if (game.gameState.currentPlayer === "Black") {
+    if (game.state.currentPlayer === "Black") {
       gameScene.cameras[0].alpha = 0;
       gameScene.cameras[0].beta = Math.PI / 4;
       gameScene.cameras[0].radius = 35;

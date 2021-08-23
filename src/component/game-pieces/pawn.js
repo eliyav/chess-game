@@ -20,13 +20,15 @@ class Pawn extends GamePiece {
         result = isEnPassantAvailable(turnHistory);
         if (result.result) {
           const targetSquare = result.enPassantSquare;
-          const [x, y] = availableMoves[0][0];
-          const x1 = x + 1;
-          const x2 = x - 1;
-          const potential1 = [x1, y];
-          const potential2 = [x2, y];
-          if (doMovesMatch(potential1, targetSquare) || doMovesMatch(potential2, targetSquare)) {
-            availableMoves.push([targetSquare, "enPassant"]);
+          if (availableMoves.length !== 0) {
+            const [x, y] = availableMoves[0][0];
+            const x1 = x + 1;
+            const x2 = x - 1;
+            const potential1 = [x1, y];
+            const potential2 = [x2, y];
+            if (doMovesMatch(potential1, targetSquare) || doMovesMatch(potential2, targetSquare)) {
+              availableMoves.push([targetSquare, "enPassant"]);
+            }
           }
         }
       }

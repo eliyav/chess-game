@@ -5,16 +5,16 @@ import initializeApp from "./app";
 async function Main() {
   const canvas = document.getElementById("renderCanvas");
   const engine = new BABYLON.Engine(canvas, true);
-  const appContext = await initializeApp(canvas, engine);
+  const app = await initializeApp(canvas, engine);
 
   const {
     showScene,
     scenes: { startScene, gameScene },
-  } = appContext;
+  } = app;
 
   (() => {
     engine.runRenderLoop(function () {
-      switch (showScene.sceneIndex) {
+      switch (showScene.index) {
         case 0:
           gameScene.detachControl();
           startScene.attachControl();
@@ -24,7 +24,7 @@ async function Main() {
           gameScene.attachControl();
           gameScene.render();
           break;
-        case 2:
+        default:
           break;
       }
     });

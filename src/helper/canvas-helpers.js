@@ -144,8 +144,8 @@ const rotateCamera = (currentPlayer, gameScene) => {
 
 const displayPieceMoves = (mesh, currentMove, game, gameScene) => {
   const grid = game.board.grid;
-  const gameState = game.gameState;
-  const turnHistory = game.rawHistoryData[game.rawHistoryData.length - 1];
+  const state = game.state;
+  const turnHistory = game.turnHistory[game.turnHistory.length - 1];
   const [x, y] = calcIndexFromMeshPosition([mesh.position.z, mesh.position.x]);
   const piece = grid[x][y].on;
   displayMovementSquares([x, y], gameScene, "piece");
@@ -153,7 +153,7 @@ const displayPieceMoves = (mesh, currentMove, game, gameScene) => {
   if (piece.name === "Pawn") {
     moves = piece.calculateAvailableMoves(grid, turnHistory, true);
   } else if (piece.name === "King") {
-    moves = piece.calculateAvailableMoves(grid, gameState, turnHistory, true);
+    moves = piece.calculateAvailableMoves(grid, state, turnHistory, true);
   } else {
     moves = piece.calculateAvailableMoves(grid);
   }
@@ -163,7 +163,7 @@ const displayPieceMoves = (mesh, currentMove, game, gameScene) => {
   const isItCheckmate = moves.map((move) => {
     const [pieceX, pieceY] = piece.point;
     const squaresandPieces = getSquaresandPieces(piece.point, move[0], grid);
-    const validMove = canValidMoveResolve(squaresandPieces, move[0], gameState, grid, turnHistory);
+    const validMove = canValidMoveResolve(squaresandPieces, move[0], state, grid, turnHistory);
     switchSquaresBack(squaresandPieces, [pieceX, pieceY]);
     return validMove ? move : null;
   });

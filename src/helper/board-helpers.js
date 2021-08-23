@@ -16,13 +16,13 @@ const createGrid = (boardSize, columnNames) => {
   );
 };
 
-const setPieces = (grid, pieceInitialPoints, movement) => {
+const setPieces = (grid, pieceInitialPoints, movementArray) => {
   pieceInitialPoints.forEach((array) =>
     array.forEach((ele) => {
       const { name, color, points } = ele;
       points.forEach((point) => {
         const squareIndex = grid[point[0]][point[1]];
-        squareIndex.on = new pieceClasses[name](name, color, point, movement);
+        squareIndex.on = new pieceClasses[name](name, color, point, movementArray);
       });
     })
   );

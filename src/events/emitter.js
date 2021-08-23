@@ -4,14 +4,14 @@ import { renderScene, rotateCamera } from "../helper/canvas-helpers";
 const activateEmitter = (game, gameMode, gameScene) => {
   const emitter = new EventEmitter();
 
-  emitter.on("move", (originPoint, targetPoint) => {
+  emitter.on("playerMove", (originPoint, targetPoint) => {
     renderScene(game, gameScene);
     if (gameMode.mode === "offline") {
       const resolved = game.playerMove(originPoint, targetPoint);
       if (resolved) {
         renderScene(game, gameScene);
         game.switchTurn();
-        const currentPlayer = game.gameState.currentPlayer;
+        const currentPlayer = game.state.currentPlayer;
         rotateCamera(currentPlayer, gameScene);
       }
     } else if (gameMode.mode === "online") {
@@ -23,6 +23,7 @@ const activateEmitter = (game, gameMode, gameScene) => {
         sockets.emit("stateChange", { originPoint, targetPoint, room });
       }
     }
+    game.moves.length = 0;
   });
 
   emitter.on("reset-board", () => {

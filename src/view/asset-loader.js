@@ -1,4 +1,5 @@
 import * as BABYLON from "babylonjs";
+import { createMeshMaterials } from "../component/materials";
 import board from "../../assets/board.gltf";
 import chessText from "../../assets/chess.gltf";
 import pawnWhite from "../../assets/white-pieces/pawn-white.gltf";
@@ -16,54 +17,9 @@ import queenBlack from "../../assets/black-pieces/queen-black.gltf";
 import moon from "../../assets/moon.jpg";
 
 const assetsLoader = async (scene, description) => {
-  const materialWhite = new BABYLON.StandardMaterial("White", scene);
-  materialWhite.specularPower = 2;
-  materialWhite.diffuseColor = new BABYLON.Color3(0, 0, 0);
-  materialWhite.emissiveColor = new BABYLON.Color3(0.6, 0.6, 0.6);
-
-  // Fresnel
-  materialWhite.reflectionFresnelParameters = new BABYLON.FresnelParameters();
-  materialWhite.reflectionFresnelParameters.bias = 0.5;
-
-  materialWhite.diffuseFresnelParameters = new BABYLON.FresnelParameters();
-  materialWhite.diffuseFresnelParameters.leftColor = new BABYLON.Color3.White();
-  materialWhite.diffuseFresnelParameters.rightColor = new BABYLON.Color3.Black();
-  materialWhite.diffuseFresnelParameters.power = 6;
-  materialWhite.diffuseFresnelParameters.bias = 0.5;
-
-  materialWhite.emissiveFresnelParameters = new BABYLON.FresnelParameters();
-  materialWhite.emissiveFresnelParameters.bias = 0.5;
-  materialWhite.emissiveFresnelParameters.power = 3;
-  materialWhite.emissiveFresnelParameters.leftColor = BABYLON.Color3.Black();
-  materialWhite.emissiveFresnelParameters.rightColor = BABYLON.Color3.Black();
-
-  const materialBlack = new BABYLON.StandardMaterial("Black", scene);
-  materialBlack.specularPower = 16;
-  materialBlack.diffuseColor = new BABYLON.Color3(0, 0, 0);
-  materialBlack.emissiveColor = new BABYLON.Color3(0, 0, 0);
-
-  // Fresnel
-  materialBlack.reflectionFresnelParameters = new BABYLON.FresnelParameters();
-  materialBlack.reflectionFresnelParameters.bias = 0.5;
-
-  materialBlack.diffuseFresnelParameters = new BABYLON.FresnelParameters();
-  materialBlack.diffuseFresnelParameters.leftColor = new BABYLON.Color3.Black();
-  materialBlack.diffuseFresnelParameters.rightColor = new BABYLON.Color3.Black();
-  materialBlack.diffuseFresnelParameters.power = 24;
-  materialBlack.diffuseFresnelParameters.bias = 0.8;
-
-  materialBlack.emissiveFresnelParameters = new BABYLON.FresnelParameters();
-  materialBlack.emissiveFresnelParameters.bias = 0.8;
-  materialBlack.emissiveFresnelParameters.power = 24;
-  materialBlack.emissiveFresnelParameters.leftColor = BABYLON.Color3.Black();
-  materialBlack.emissiveFresnelParameters.rightColor = BABYLON.Color3.White();
-
-  const boardMaterial = new BABYLON.StandardMaterial("Board", scene);
-  boardMaterial.diffuseFresnelParameters = new BABYLON.FresnelParameters();
-  boardMaterial.diffuseFresnelParameters.leftColor = new BABYLON.Color3.Black();
-  boardMaterial.diffuseFresnelParameters.rightColor = new BABYLON.Color3.Black();
-
+  const materials = createMeshMaterials(scene);
   if (description === "gameScreen") {
+    //Game Scene
     let meshesToLoad = [
       board,
       pawnWhite,
@@ -92,7 +48,7 @@ const assetsLoader = async (scene, description) => {
           finalMesh.id.split("-");
         finalMesh.position.y += 0.5;
         finalMesh.id === "Knight-White" ? (finalMesh.rotation = new BABYLON.Vector3(0, Math.PI, 0)) : null;
-        finalMesh.color === "White" ? (finalMesh.material = materialWhite) : (finalMesh.material = materialBlack);
+        finalMesh.color === "White" ? (finalMesh.material = materials.white) : (finalMesh.material = materials.black);
         return finalMeshList.push(finalMesh);
       } else {
         mesh.meshes.forEach((mesh) => {
@@ -103,15 +59,13 @@ const assetsLoader = async (scene, description) => {
       }
     });
 
-    boardMesh[0].meshes[0].material = boardMaterial;
-    //boardMesh[0].meshes[1].material = boardMaterial; //Squares
-    boardMesh[0].meshes[2].material = boardMaterial;
-    boardMesh[0].meshes[3].material = boardMaterial;
+    boardMesh[0].meshes[0].material = materials.board;
+    boardMesh[0].meshes[2].material = materials.board;
+    boardMesh[0].meshes[3].material = materials.board;
 
     return { finalMeshList, boardMesh };
-
-    //Start Screen
   } else if (description === "startScreen") {
+    //Start Scene
     let boardMesh = board;
 
     let textMeshes = [chessText];
@@ -154,7 +108,7 @@ const assetsLoader = async (scene, description) => {
     loadedBoardPieces.forEach((mesh) => {
       const finalMesh = mesh.meshes[1];
       [finalMesh.name, finalMesh.color] = finalMesh.id.split("-");
-      finalMesh.color === "White" ? (finalMesh.material = materialWhite) : (finalMesh.material = materialBlack);
+      finalMesh.color === "White" ? (finalMesh.material = materials.white) : (finalMesh.material = materials.black);
       finalMesh.scalingDeterminant = 40;
       finalMesh.position.y = 15;
       finalMesh.position.x = 10;
@@ -166,10 +120,9 @@ const assetsLoader = async (scene, description) => {
       finalMesh.position.z = Math.random() * distance * pos;
     });
 
-    loadedBoardMesh.meshes[0].material = boardMaterial;
-    //loadedBoardMesh[0].meshes[1].material = boardMaterial; //Squares
-    loadedBoardMesh.meshes[2].material = boardMaterial;
-    loadedBoardMesh.meshes[3].material = boardMaterial;
+    loadedBoardMesh.meshes[0].material = materials.board;
+    loadedBoardMesh.meshes[2].material = materials.board;
+    loadedBoardMesh.meshes[3].material = materials.board;
 
     const boardClone = loadedBoardMesh.meshes[0].clone("Board1");
     const boardClone2 = loadedBoardMesh.meshes[0].clone("Board2");
