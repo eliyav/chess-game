@@ -89,6 +89,14 @@ const calcPawnMovement = (grid, currentPoint, direction, moved, color, finalObj)
   checkForValidPawnCapture(capturePoint2, color, grid, finalObj);
 };
 
+const checkForValidPawnCapture = (capturePoint, color, grid, finalObj) => {
+  const [captureX, captureY] = capturePoint;
+  if (bounds(captureX, grid) && bounds(captureY, grid)) {
+    const captureSquare = grid[captureX][captureY];
+    captureSquare.on === undefined ? null : captureSquare.on.color !== color ? finalObj.push([capturePoint, "capture"]) : null;
+  }
+};
+
 const calcKnightMovement = (grid, currentPoint, color, moves, finalObj) => {
   let [x, y] = currentPoint;
   moves.forEach((move) => {
@@ -98,7 +106,6 @@ const calcKnightMovement = (grid, currentPoint, color, moves, finalObj) => {
     if (bounds(resultX, grid) && bounds(resultY, grid)) {
       const square = grid[resultX][resultY];
       const result = [resultX, resultY];
-
       if (square.on !== undefined) {
         square.on.color !== color ? finalObj.push([result, "capture"]) : null;
       } else {
@@ -128,14 +135,6 @@ const calcKingMoves = (grid, currentPoint, color, moves, finalObj) => {
 
 const bounds = (num, grid) => num >= grid.length - grid.length && num <= grid.length - 1;
 
-const checkForValidPawnCapture = (capturePoint, color, grid, finalObj) => {
-  const [captureX, captureY] = capturePoint;
-  if (bounds(captureX, grid) && bounds(captureY, grid)) {
-    const captureSquare = grid[captureX][captureY];
-    captureSquare.on === undefined ? null : captureSquare.on.color !== color ? finalObj.push([capturePoint, "capture"]) : null;
-  }
-};
-
 const calcUpRight = (grid, currentPoint, movement, finalObj) => {
   let [x, y] = currentPoint;
   let upRightX = x + movement;
@@ -145,23 +144,23 @@ const calcUpRight = (grid, currentPoint, movement, finalObj) => {
 
 const calcUpLeft = (grid, currentPoint, movement, finalObj) => {
   let [x, y] = currentPoint;
-  let upRightX = x - movement;
-  let upRightY = y + movement;
-  bounds(upRightX, grid) && bounds(upRightY, grid) ? finalObj.push([upRightX, upRightY]) : null;
+  let upLeftX = x - movement;
+  let upLeftY = y + movement;
+  bounds(upLeftX, grid) && bounds(upLeftY, grid) ? finalObj.push([upLeftX, upLeftY]) : null;
 };
 
 const calcDownRight = (grid, currentPoint, movement, finalObj) => {
   let [x, y] = currentPoint;
-  let upRightX = x + movement;
-  let upRightY = y - movement;
-  bounds(upRightX, grid) && bounds(upRightY, grid) ? finalObj.push([upRightX, upRightY]) : null;
+  let downRightX = x + movement;
+  let downRightY = y - movement;
+  bounds(downRightX, grid) && bounds(downRightY, grid) ? finalObj.push([downRightX, downRightY]) : null;
 };
 
 const calcDownLeft = (grid, currentPoint, movement, finalObj) => {
   let [x, y] = currentPoint;
-  let upRightX = x - movement;
-  let upRightY = y - movement;
-  bounds(upRightX, grid) && bounds(upRightY, grid) ? finalObj.push([upRightX, upRightY]) : null;
+  let downLeftX = x - movement;
+  let downLeftY = y - movement;
+  bounds(downLeftX, grid) && bounds(downLeftY, grid) ? finalObj.push([downLeftX, downLeftY]) : null;
 };
 
 const calcUp = (grid, currentPoint, movement, finalObj) => {

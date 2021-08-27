@@ -1,4 +1,5 @@
 import * as GUI from "babylonjs-gui";
+import { renderScene } from "../helper/canvas-helpers";
 
 function createGUI(startScene, gameScene, showScene, gameMode, emitter, socket, game) {
   const advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("StartUI", true, startScene);
@@ -64,6 +65,9 @@ function createGUI(startScene, gameScene, showScene, gameMode, emitter, socket, 
   button01.paddingLeft = "5px";
   advancedTexture2.addControl(button01);
   button01.onPointerUpObservable.add(function () {
+    game.resetBoard();
+    renderScene(game, gameScene);
+    gameScene.cameras[0].alpha = Math.PI;
     gameScene.detachControl();
     showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);
   });

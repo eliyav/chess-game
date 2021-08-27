@@ -6,7 +6,7 @@ class Queen extends GamePiece {
     super(name, color, point, movement);
     this.moved = false;
   }
-  calculateAvailableMoves(grid, currentPoint = this.point) {
+  calculateAvailableMoves(grid, state, turnHistory, boolean, currentPoint = this.point) {
     const availableMoves = [];
     const verticalMovements = {
       up: [],

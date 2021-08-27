@@ -9,7 +9,6 @@ const gameScreen = async (canvas, engine) => {
   camera.attachControl(canvas, true);
   camera.lowerRadiusLimit = 25;
   camera.upperRadiusLimit = 200;
-  scene.meshesToRender = [];
 
   const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 100, 0), scene);
   light.intensity = 0.7;

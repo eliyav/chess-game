@@ -13,11 +13,10 @@ const initializeApp = async (canvas, engine) => {
     game: new Game(chessData),
     gameMode: { mode: undefined, player: undefined, room: undefined },
     showScene: { index: 0 },
-    scenes: {
-      startScene: await startScreen(canvas, engine),
-      gameScene: await gameScreen(canvas, engine),
-    },
+    scenes: {},
   };
+  app.scenes.startScene = await startScreen(canvas, engine, app.showScene);
+  app.scenes.gameScene = await gameScreen(canvas, engine);
 
   const {
     game,
@@ -28,16 +27,16 @@ const initializeApp = async (canvas, engine) => {
 
   app.emitter = activateEmitter(game, gameMode, gameScene);
   //appContext.socket = activateSocket(game, gameMode, gameScene);
-  createGUI(startScene, gameScene, showScene, gameMode, app.emitter, app.socket, game);
+  createGUI(startScene, gameScene, showScene, gameMode, app.emitter, app.socket, game, canvas, engine);
   renderScene(game, gameScene);
 
   gameScene.onPointerDown = async (e, pickResult) => {
     const mesh = pickResult.pickedMesh;
-    const isCompleteMove = inputController(mesh, game, gameMode, gameScene);
+    const isCompleteMove = inputController(mesh, game, gameScene);
     isCompleteMove
       ? (() => {
-          const [origin, target] = game.moves;
-          app.emitter.emit("playerMove", origin, target);
+          const [originPoint, targetPoint] = game.moves;
+          app.emitter.emit("playerMove", originPoint, targetPoint);
         })()
       : null;
   };

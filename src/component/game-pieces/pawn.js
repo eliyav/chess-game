@@ -9,7 +9,7 @@ class Pawn extends GamePiece {
     this.direction = this.color === "White" ? 1 : -1;
   }
 
-  calculateAvailableMoves(grid, turnHistory, boolean, currentPoint = this.point) {
+  calculateAvailableMoves(grid, state, turnHistory, boolean, currentPoint = this.point) {
     const availableMoves = [];
 
     calcPawnMovement(grid, currentPoint, this.direction, this.moved, this.color, availableMoves);
@@ -21,14 +21,13 @@ class Pawn extends GamePiece {
         if (result.result) {
           const targetSquare = result.enPassantSquare;
           if (availableMoves.length !== 0) {
-            console.log(currentPoint);
             const [x, y] = currentPoint;
+            const direction = this.color === "White" ? 1 : -1;
             const x1 = x - 1;
             const x2 = x + 1;
-            const y1 = y + 1;
-            const y2 = y + 1;
-            const potential1 = [x1, y1];
-            const potential2 = [x2, y2];
+            const newY = y + direction;
+            const potential1 = [x1, newY];
+            const potential2 = [x2, newY];
             if (doMovesMatch(potential1, targetSquare) || doMovesMatch(potential2, targetSquare)) {
               availableMoves.push([targetSquare, "enPassant"]);
             }
@@ -36,7 +35,6 @@ class Pawn extends GamePiece {
         }
       }
     }
-
     return availableMoves;
   }
 }

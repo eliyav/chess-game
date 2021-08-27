@@ -34,10 +34,9 @@ const resolveMove = (originPoint, targetPoint, state, grid, turnHistory) => {
   if (enPassant.result) {
     //If moving piece is a pawn
     if (originPiece.name === "Pawn") {
-      //Moving piece is on its 5th rank
       let rank;
-      let color = originPiece.color;
-      color === "White" ? (rank = 4) : (rank = 3);
+      //Moving piece needs to be on its 5th rank
+      originPiece.color === "White" ? (rank = 4) : (rank = 3);
       let y = originPiece.point[1] === rank;
       let x = turnHistory.origin[0];
       let x1 = x - 1;
@@ -63,14 +62,8 @@ const resolveMove = (originPoint, targetPoint, state, grid, turnHistory) => {
     }
   }
   //Calculate the origin piece's all available moves
-  let availableMoves;
-  if (originPiece.name === "Pawn") {
-    availableMoves = originSquare.on.calculateAvailableMoves(grid, turnHistory);
-  } else if (originPiece.name === "King") {
-    availableMoves = originSquare.on.calculateAvailableMoves(grid, state, turnHistory);
-  } else {
-    availableMoves = originSquare.on.calculateAvailableMoves(grid);
-  }
+  let availableMoves = originSquare.on.calculateAvailableMoves(grid, state, turnHistory);
+
   //Check if the entered targetPoint is a match for an available moves
   const validMove = availableMoves.find((possibleMove) => doMovesMatch(possibleMove[0], targetPoint));
   if (validMove) {
@@ -183,7 +176,7 @@ const calcCastling = (grid, state, turnHistory, currentPoint, movesObj) => {
   if (targetPiece2 !== undefined) {
     const castling4 = targetPiece2.name === "Rook" && !targetPiece2.moved;
     if (castling3 && castling4) {
-      const resolve = checkForCastling(piece.point, targetPiece2.point, state, grid, turnHistory, movesObj);
+      const resolve = checkForCastling(piece.point, targetPiece2.point, state, grid, turnHistory);
       if (resolve !== false) {
         resolve[0] ? movesObj.push(resolve[1]) : null;
       }
@@ -192,7 +185,7 @@ const calcCastling = (grid, state, turnHistory, currentPoint, movesObj) => {
 };
 
 //Checks if castling is valid
-const checkForCastling = (originPoint, targetPoint, state, grid, turnHistory, movesObj) => {
+const checkForCastling = (originPoint, targetPoint, state, grid, turnHistory) => {
   const squaresandPieces = getSquaresandPieces(originPoint, targetPoint, grid);
   const { originPiece, targetPiece, originSquare, targetSquare } = squaresandPieces;
   //Check for valid castling pieces
@@ -279,9 +272,9 @@ const castlingMove = (direction, squaresandPieces, grid) => {
   targetSquare.on = undefined;
   //Move King 2 Spaces from current location in the direction of rook
   //Move the Rook 1 space in that same direction from the kings original location
-  const newKingX = getX(point) + direction * 2;
-  const newRookX = getX(point) + direction;
-  const y = getY(point);
+  const [x, y] = point;
+  const newKingX = x + direction * 2;
+  const newRookX = x + direction;
   const newKingPoint = [newKingX, y];
   const newRookPoint = [newRookX, y];
   const newKingSquare = grid[newKingX][y];
@@ -290,19 +283,32 @@ const castlingMove = (direction, squaresandPieces, grid) => {
   newRookSquare.on = new pieceClasses[name2](name2, color2, newRookPoint, movement2);
 };
 
-//Checks for pawn promotion ---------------------------------Needs update for UI later to new piece, or wait for UI refactor
+//Checks for pawn promotion ---------------------------------Needs update to a "promotion scene" to with eventlistener
 const checkForPawnPromotion = (squaresandPieces) => {
   const { targetSquare, originPiece } = squaresandPieces;
   const y = getY(originPiece.point);
   if (y === 7 || y === 0) {
-    const newClass = prompt(
-      "Piece Promoted! Please type your new piece. Your Choices are: Queen, Knight, Bishop, Rook",
-      "Enter class name here"
-    ); //Change with UI prompt-------------------------------------------------
+    let newClass;
+    do {
+      newClass = prompt(
+        "Piece Promoted! Please type your new piece. Your Choices are: Queen, Knight, Bishop, Rook",
+        "Enter class name here"
+      );
+    } while (
+      newClass !== "Queen" &&
+      newClass !== "queen" &&
+      newClass !== "Knight" &&
+      newClass !== "knight" &&
+      newClass !== "Bishop" &&
+      newClass !== "bishop" &&
+      newClass !== "Rook" &&
+      newClass !== "rook"
+    );
+    const char = newClass.charAt(0).toUpperCase();
+    const finalString = newClass.replace(newClass.charAt(0), char);
     const { color, point, movement } = originPiece;
-    targetSquare.on = new pieceClasses[newClass](newClass, color, point, movement);
-    const string = newClass.toString();
-    return string;
+    targetSquare.on = new pieceClasses[finalString](finalString, color, point, movement);
+    return finalString;
   }
 };
 
@@ -359,15 +365,7 @@ const getCurrentPlayerPieces = (state, grid) => {
 
 const getMoves = (grid, state, turnHistory, gamePieces) => {
   const availableMoves = gamePieces
-    .map((square) => {
-      if (square.on.name === "Pawn") {
-        return square.on.calculateAvailableMoves(grid, turnHistory);
-      } else if (square.on.name === "King") {
-        return square.on.calculateAvailableMoves(grid, state, turnHistory);
-      } else {
-        return square.on.calculateAvailableMoves(grid);
-      }
-    })
+    .map((square) => square.on.calculateAvailableMoves(grid, state, turnHistory))
     .flat()
     .filter((move) => (move[0] !== undefined ? true : false));
 
@@ -421,14 +419,7 @@ const simulateCheckmate = (state, grid, turnHistory) => {
   const pieces = currentPlayerPieces.map((piece) => piece.on);
   //For each piece, iterate on its available moves
   pieces.forEach((piece) => {
-    let availableMoves;
-    if (piece.name === "Pawn") {
-      availableMoves = piece.calculateAvailableMoves(grid, turnHistory);
-    } else if (piece.name === "King") {
-      availableMoves = piece.calculateAvailableMoves(grid, state, turnHistory);
-    } else {
-      availableMoves = piece.calculateAvailableMoves(grid);
-    }
+    let availableMoves = piece.calculateAvailableMoves(grid, state, turnHistory);
     const originPoint = [...piece.point];
     //For Each available move, check if after resolving it, the player is still in check.
     const isItCheckmate = availableMoves.map((move) => {
@@ -456,14 +447,7 @@ const simulateResolveMove = (originPoint, targetPoint, state, grid, turnHistory)
     return false;
   } else if (originSquare.on.color === state.currentPlayer) {
     //Checks if the moving game piece belongs to current player
-    let availableMoves;
-    if (originPiece.name === "Pawn") {
-      availableMoves = originSquare.on.calculateAvailableMoves(grid, turnHistory);
-    } else if (originPiece.name === "King") {
-      availableMoves = originSquare.on.calculateAvailableMoves(grid, state, turnHistory);
-    } else {
-      availableMoves = originSquare.on.calculateAvailableMoves(grid);
-    }
+    let availableMoves = originSquare.on.calculateAvailableMoves(grid, state, turnHistory);
     //Check if the entered targetPoint is a valid move for current game piece
     const validMove = availableMoves.find((possibleMove) => doMovesMatch(possibleMove[0], targetPoint));
     if (validMove) {

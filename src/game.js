@@ -22,8 +22,8 @@ class Game {
       ? (() => {
           resolve.turn = this.turnCounter;
           this.turnCounter++;
-          //const annotation = annotate(resolve, this.state, this.board.grid, lastTurn);
-          //this.annotations.push(annotation);
+          const annotation = annotate(resolve, this.state, this.board.grid, lastTurn);
+          this.annotations.push(annotation);
           this.turnHistory.push(resolve);
         })()
       : null;

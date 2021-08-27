@@ -7,7 +7,7 @@ class Rook extends GamePiece {
     this.moved = false;
   }
 
-  calculateAvailableMoves(grid, currentPoint = this.point) {
+  calculateAvailableMoves(grid, state, turnHistory, boolean, currentPoint = this.point) {
     const availableMoves = [];
     const verticalMovements = {
       up: [],

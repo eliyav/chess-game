@@ -11,8 +11,7 @@ const activateEmitter = (game, gameMode, gameScene) => {
       if (resolved) {
         renderScene(game, gameScene);
         game.switchTurn();
-        const currentPlayer = game.state.currentPlayer;
-        rotateCamera(currentPlayer, gameScene);
+        rotateCamera(game.state.currentPlayer, gameScene);
       }
     } else if (gameMode.mode === "online") {
       const resolved = game.playerMove(originPoint, targetPoint);
@@ -31,21 +30,7 @@ const activateEmitter = (game, gameMode, gameScene) => {
     if (answer) {
       game.resetBoard();
       renderScene(game, gameScene);
-      gameScene.cameras[0].alpha = -3.14;
-    }
-  });
-
-  emitter.on("draw", () => {
-    const answer = confirm("Are you sure you want to reset the board?");
-    if (answer) {
-      //Add Based on Turn effect
-    }
-  });
-
-  emitter.on("resign", () => {
-    const answer = confirm("Are you sure you want to resign the game?");
-    if (answer) {
-      //Add based on turn effect
+      gameScene.cameras[0].alpha = Math.PI;
     }
   });
 

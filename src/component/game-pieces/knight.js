@@ -6,7 +6,7 @@ class Knight extends GamePiece {
     super(name, color, point, movement);
     this.moved = false;
   }
-  calculateAvailableMoves(grid, currentPoint = this.point) {
+  calculateAvailableMoves(grid, state, turnHistory, boolean, currentPoint = this.point) {
     const knightMoves = [
       [1, 2],
       [2, 1],
