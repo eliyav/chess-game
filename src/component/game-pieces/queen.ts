@@ -1,13 +1,34 @@
 import GamePiece from "./game-piece";
 import { filterToFinalMoves, calcVerticalMovements, calcHorizontalMovements } from "../../helper/movement-helpers.js";
 
-class Queen extends GamePiece {
-  constructor(name, color, point, movement) {
-    super(name, color, point, movement);
-    this.moved = false;
+interface Square {
+  square : string,
+  on?: undefined
   }
-  calculateAvailableMoves(grid, state, turnHistory, boolean, currentPoint = this.point) {
-    const availableMoves = [];
+
+interface State {
+  currentPlayer: string,
+}
+
+interface TurnHistory {
+  result: boolean;
+  type: string;
+  direction: number;
+  origin: number[];
+  target: number[];
+  originPiece: any;
+  targetPiece: any;
+  originSquare: Square;
+  targetSquare: Square;
+  promotion?: undefined;
+}
+
+class Queen extends GamePiece {
+  constructor(name: string, color: string, point: number [], movement: number[]) {
+    super(name, color, point, movement);
+  }
+  calculateAvailableMoves(grid: Square[][], state: State, turnHistory: TurnHistory, boolean: boolean, currentPoint = this.point) {
+    const availableMoves: number[][] = [];
     const verticalMovements = {
       up: [],
       down: [],

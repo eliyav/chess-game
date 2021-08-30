@@ -1,6 +1,9 @@
 import * as BABYLON from "babylonjs";
 
-function createMovementMaterials(scene) {
+type Scene = BABYLON.Scene;
+type StandardMaterial = BABYLON.StandardMaterial;
+
+function createMovementMaterials(scene: Scene): void {
   const greenMat = new BABYLON.StandardMaterial("greenMat", scene);
   greenMat.diffuseColor = new BABYLON.Color3(0, 1, 0.2);
   greenMat.specularColor = new BABYLON.Color3(0.15, 0.15, 0.15);
@@ -22,7 +25,13 @@ function createMovementMaterials(scene) {
   blueMat.specularColor = new BABYLON.Color3(0.15, 0.15, 0.15);
 }
 
-function createMeshMaterials(scene) {
+type Materials = {
+  white: StandardMaterial;
+  black: StandardMaterial;
+  board: StandardMaterial;
+}
+
+function createMeshMaterials(scene: Scene) : Materials {
   const white = new BABYLON.StandardMaterial("white", scene);
   white.specularPower = 2;
   white.diffuseColor = new BABYLON.Color3(0, 0, 0);
@@ -33,8 +42,8 @@ function createMeshMaterials(scene) {
   white.reflectionFresnelParameters.bias = 0.5;
 
   white.diffuseFresnelParameters = new BABYLON.FresnelParameters();
-  white.diffuseFresnelParameters.leftColor = new BABYLON.Color3.White();
-  white.diffuseFresnelParameters.rightColor = new BABYLON.Color3.Black();
+  white.diffuseFresnelParameters.leftColor = BABYLON.Color3.White();
+  white.diffuseFresnelParameters.rightColor = BABYLON.Color3.Black();
   white.diffuseFresnelParameters.power = 6;
   white.diffuseFresnelParameters.bias = 0.5;
 
@@ -54,8 +63,8 @@ function createMeshMaterials(scene) {
   black.reflectionFresnelParameters.bias = 0.5;
 
   black.diffuseFresnelParameters = new BABYLON.FresnelParameters();
-  black.diffuseFresnelParameters.leftColor = new BABYLON.Color3.Black();
-  black.diffuseFresnelParameters.rightColor = new BABYLON.Color3.Black();
+  black.diffuseFresnelParameters.leftColor = BABYLON.Color3.Black();
+  black.diffuseFresnelParameters.rightColor = BABYLON.Color3.Black();
   black.diffuseFresnelParameters.power = 24;
   black.diffuseFresnelParameters.bias = 0.8;
 
@@ -67,8 +76,8 @@ function createMeshMaterials(scene) {
 
   const board = new BABYLON.StandardMaterial("board", scene);
   board.diffuseFresnelParameters = new BABYLON.FresnelParameters();
-  board.diffuseFresnelParameters.leftColor = new BABYLON.Color3.Black();
-  board.diffuseFresnelParameters.rightColor = new BABYLON.Color3.Black();
+  board.diffuseFresnelParameters.leftColor = BABYLON.Color3.Black();
+  board.diffuseFresnelParameters.rightColor = BABYLON.Color3.Black();
 
   return { white, black, board };
 }

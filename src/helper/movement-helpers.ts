@@ -1,4 +1,4 @@
-//Filters the moves from the final movements object and enters them in the available moves array
+//Filters the moves from the final movements object and enters them in the available moves array 
 const filterToFinalMoves = (grid, color, movesObj, targetArray) => {
   const movementsArrays = Object.values(movesObj);
   movementsArrays.forEach((array) => {

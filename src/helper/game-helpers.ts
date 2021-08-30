@@ -1,6 +1,30 @@
 import { pieceClasses } from "./board-helpers";
 
-const resolveMove = (originPoint, targetPoint, state, grid, turnHistory) => {
+interface Square {
+  square : string,
+  on?: undefined
+  }
+
+interface TurnHistory {
+  result: boolean;
+  type?: string;
+  direction?: number;
+  origin: number[];
+  target: number[];
+  originPiece: any;
+  targetPiece: any;
+  originSquare: Square;
+  targetSquare: Square;
+  promotion?: string | undefined;
+  turn? : number;
+}
+
+type State = {
+  currentPlayer: string,
+}
+
+
+const resolveMove = (originPoint: number[], targetPoint: number [], state:State, grid: Square[][], turnHistory: TurnHistory) : TurnHistory  => {
   const squaresandPieces = getSquaresandPieces(originPoint, targetPoint, grid);
   const { originSquare, originPiece, targetSquare, targetPiece } = squaresandPieces;
 
@@ -99,7 +123,14 @@ const resolveMove = (originPoint, targetPoint, state, grid, turnHistory) => {
   }
 };
 
-const isEnPassantAvailable = (history) => {
+type EnPassant = number | undefined
+
+type Move = {
+  result: boolean,
+  enPassantSquare: EnPassant[]
+}
+
+const isEnPassantAvailable = (history: TurnHistory) : Move => {
   let moved;
   let direction;
   let x;

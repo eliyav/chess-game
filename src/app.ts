@@ -5,18 +5,35 @@ import startScreen from "./view/start-screen";
 import gameScreen from "./view/game-screen";
 import activateEmitter from "./events/emitter";
 import createGUI from "./view/gui-overlay";
-import inputController from "../src/events/input-controller";
-import activateSocket from "../server/sockets";
+import inputController from "./events/input-controller";
+import activateSocket from "./server/sockets";
+import { Engine } from "babylonjs/Engines/engine";
+import { Scene } from "babylonjs/scene";
+import EventEmitter from "./events/event-emitter";
 
-const initializeApp = async (canvas, engine) => {
-  const app = {
+const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
+  const app: app = {
     game: new Game(chessData),
     gameMode: { mode: undefined, player: undefined, room: undefined },
     showScene: { index: 0 },
-    scenes: {},
+    scenes: { 
+      startScene: await startScreen(canvas, engine), 
+      gameScene: await gameScreen(canvas, engine)
+    },
+    emitter: undefined,
   };
-  app.scenes.startScene = await startScreen(canvas, engine, app.showScene);
-  app.scenes.gameScene = await gameScreen(canvas, engine);
+
+  interface app{
+    game: Game,
+    gameMode: {mode: string | undefined, player: string | undefined , room: number | undefined}
+    showScene: {index: number},
+    scenes: {
+     startScene: Scene,
+     gameScene: Scene,
+    }
+    emitter?: EventEmitter,
+    socket?: undefined,
+  }
 
   const {
     game,
@@ -27,7 +44,7 @@ const initializeApp = async (canvas, engine) => {
 
   app.emitter = activateEmitter(game, gameMode, gameScene);
   //appContext.socket = activateSocket(game, gameMode, gameScene);
-  createGUI(startScene, gameScene, showScene, gameMode, app.emitter, app.socket, game, canvas, engine);
+  createGUI(startScene, gameScene, showScene, gameMode, app.emitter, app.socket, game);
   renderScene(game, gameScene);
 
   gameScene.onPointerDown = async (e, pickResult) => {
@@ -36,7 +53,9 @@ const initializeApp = async (canvas, engine) => {
     isCompleteMove
       ? (() => {
           const [originPoint, targetPoint] = game.moves;
-          app.emitter.emit("playerMove", originPoint, targetPoint);
+          if(typeof app.emitter !== "undefined"){
+            app.emitter.emit("playerMove", originPoint, targetPoint);
+          }
         })()
       : null;
   };

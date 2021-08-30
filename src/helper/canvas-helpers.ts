@@ -1,5 +1,5 @@
 import { getSquaresandPieces, canValidMoveResolve, switchSquaresBack } from "./game-helpers";
-
+ 
 const renderScene = (game, gameScene) => {
   //Clears old meshes/memory usage
   !gameScene.meshesToRender ? (gameScene.meshesToRender = []) : null;

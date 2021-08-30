@@ -1,5 +1,5 @@
 import { io } from "socket.io-client";
-import { renderScene } from "../src/helper/canvas-helpers";
+import { renderScene } from "../helper/canvas-helpers";
 
 const activateSocket = (game, gameMode, scene) => {
   const socket = io("ws://localhost:3000");

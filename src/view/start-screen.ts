@@ -2,8 +2,8 @@ import * as BABYLON from "babylonjs";
 import space from "../../assets/space.jpg";
 import assetsLoader from "./asset-loader";
 
-const startScreen = async (canvas, engine, showScene) => {
-  const scene = new BABYLON.Scene(engine);
+const startScreen = async (canvas, engine) => {
+  const scene: BABYLON.Scene = new BABYLON.Scene(engine);
   const camera = new BABYLON.ArcRotateCamera("camera", Math.PI / 1, Math.PI / 3.5, 30, new BABYLON.Vector3(0, 0, 0), scene);
   camera.useFramingBehavior = false;
 
@@ -11,7 +11,7 @@ const startScreen = async (canvas, engine, showScene) => {
 
   const photoDome = new BABYLON.PhotoDome("spaceDome", space, { size: 500 }, scene);
 
-  scene.finalMeshes = await assetsLoader(scene, "startScreen", showScene);
+  scene.finalMeshes = await assetsLoader(scene, "startScreen");
 
   return scene;
 };

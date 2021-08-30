@@ -2,15 +2,42 @@ import GamePiece from "./game-piece";
 import { calcPawnMovement } from "../../helper/movement-helpers.js";
 import { isEnPassantAvailable, doMovesMatch } from "../../helper/game-helpers";
 
+interface Square {
+  square : string,
+  on?: undefined
+  }
+
+interface State {
+  currentPlayer: string,
+}
+
+interface TurnHistory {
+  result: boolean;
+  type: string;
+  direction: number;
+  origin: number[];
+  target: number[];
+  originPiece: any;
+  targetPiece: any;
+  originSquare: Square;
+  targetSquare: Square;
+  promotion?: undefined;
+}
+
+type EnPassant = number | undefined
+
+type Move = string | EnPassant[];
+
 class Pawn extends GamePiece {
-  constructor(name, color, point, movement) {
+  direction: number;
+
+  constructor(name: string, color: string, point: number [], movement: number[]) {
     super(name, color, point, movement);
-    this.moved = false;
     this.direction = this.color === "White" ? 1 : -1;
   }
 
-  calculateAvailableMoves(grid, state, turnHistory, boolean, currentPoint = this.point) {
-    const availableMoves = [];
+  calculateAvailableMoves(grid: Square[][], state: State, turnHistory: TurnHistory, boolean: boolean, currentPoint = this.point) {
+    const availableMoves: Move[][] = [];
 
     calcPawnMovement(grid, currentPoint, this.direction, this.moved, this.color, availableMoves);
 

@@ -1,19 +1,26 @@
-class EventEmitter {
+type listeners = {
+  [index: string] : () => void,
+  [index: number] : () => void,
+  f: () => void}
+
+class EventEmitter { 
+  listeners: listeners;
+  
   constructor() {
     this.listeners = {};
   }
 
-  addListener(event, fn) {
+  addListener(event: string, fn: () => void) {
     this.listeners[event] = this.listeners[event] || [];
     this.listeners[event].push(fn);
     return this;
   }
 
-  on(event, fn) {
+  on(event: string, fn: (originPoint: number[], targetPoint: number[]) => void) {
     return this.addListener(event, fn);
   }
 
-  removeListener(event, fn) {
+  removeListener(event: string, fn: () => void) {
     let lis = this.listeners[event];
     if (!lis) return this;
     for (let i = lis.length; i > 0; i--) {
@@ -25,11 +32,11 @@ class EventEmitter {
     return this;
   }
 
-  off(event, fn) {
+  off(event: string, fn: () => void) {
     return this.removeListener(event, fn);
   }
 
-  once(event, fn) {
+  once(event: string, fn: () => void) {
     this.listeners[event] = this.listeners[event] || [];
     const onceWrapper = () => {
       fn();
@@ -39,7 +46,7 @@ class EventEmitter {
     return this;
   }
 
-  emit(event, ...args) {
+  emit(event: string, ...args: number[]) {
     let fns = this.listeners[event];
     if (!fns) return false;
     fns.forEach((f) => {
@@ -48,12 +55,12 @@ class EventEmitter {
     return true;
   }
 
-  listenerCount(event) {
+  listenerCount(event:string) {
     let fns = this.listeners[event] || [];
     return fns.length;
   }
 
-  rawListeners(event) {
+  rawListeners(event: string) {
     return this.listeners[event];
   }
 }

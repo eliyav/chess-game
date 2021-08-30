@@ -1,4 +1,25 @@
-const chessData = {
+type State = {
+  currentPlayer: string,
+}
+
+interface InitialPoints {
+  name: string,
+  color: string,
+  points: number[][]
+}
+
+interface Data {
+  boardSize: number;
+  columnNames: string[][];
+  teams: string[];
+  pieces: string[];
+  movement: number[];
+  initialState: State;
+  pieceInitialPoints: InitialPoints[][];
+  gridInitialPoints: InitialPoints[][];
+}
+
+const chessData: Data = {
   boardSize: 8,
   columnNames: [["a"], ["b"], ["c"], ["d"], ["e"], ["f"], ["g"], ["h"]],
   teams: ["White", "Black"],

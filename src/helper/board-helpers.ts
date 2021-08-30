@@ -5,9 +5,21 @@ import Knight from "../component/game-pieces/knight";
 import King from "../component/game-pieces/king";
 import Queen from "../component/game-pieces/queen";
 
-const pieceClasses = { Pawn, Rook, Bishop, Knight, King, Queen };
+const pieceClasses: PiecesClasses = { Pawn, Rook, Bishop, Knight, King, Queen };
 
-const createGrid = (boardSize, columnNames) => {
+interface PiecesClasses {
+  [index: string]: typeof Pawn | typeof Rook | typeof Bishop | typeof Knight | typeof King| typeof Queen
+  }
+
+
+type PieceType = Pawn | Rook | Bishop | Knight | King | Queen;
+
+interface Square {
+square : string,
+on?: PieceType
+}
+
+const createGrid = (boardSize: number, columnNames: string[][]) => {
   return Array.from({ length: boardSize }, (array, idx) =>
     Array.from({ length: boardSize }, (obj, idx2) => ({
       square: columnNames[idx][0] + (idx2 + 1),
@@ -16,7 +28,13 @@ const createGrid = (boardSize, columnNames) => {
   );
 };
 
-const setPieces = (grid, pieceInitialPoints, movementArray) => {
+interface PieceInitialPoints {
+  name: string,
+  color: string,
+  points: number[][]
+}
+
+const setPieces = (grid: Square[][], pieceInitialPoints: PieceInitialPoints[][], movementArray: number[]) : void => {
   pieceInitialPoints.forEach((array) =>
     array.forEach((ele) => {
       const { name, color, points } = ele;

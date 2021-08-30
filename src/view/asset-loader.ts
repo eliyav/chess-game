@@ -16,7 +16,7 @@ import kingBlack from "../../assets/black-pieces/king-black.gltf";
 import queenBlack from "../../assets/black-pieces/queen-black.gltf";
 import moon from "../../assets/moon.jpg";
 
-const assetsLoader = async (scene, description, showScene) => {
+const assetsLoader = async (scene, description) => {
   const materials = createMeshMaterials(scene);
   if (description === "gameScreen") {
     //Game Scene
@@ -140,29 +140,27 @@ const assetsLoader = async (scene, description, showScene) => {
 
     const animateDistance = () => {
       requestAnimationFrame(() => {
-        if (showScene.index === 0) {
-          alpha += 0.02;
-          beta += 0.02;
-          gamma += 0.02;
-          boardClone.rotate(new BABYLON.Vector3(0, beta, 0), Math.PI / 500, BABYLON.Space.LOCAL);
-          boardClone2.rotate(new BABYLON.Vector3(0, -beta * 2, 0), Math.PI / 500, BABYLON.Space.LOCAL);
-          loadedPiecesMeshes.forEach((mesh) => {
-            const piece = mesh.meshes[1];
-            piece.position.y -= piece.speed;
-            if (piece.position.y < -15) {
-              resetMesh(piece);
-            }
-            piece.rotate(
-              new BABYLON.Vector3(
-                alpha * rotationArray[piece.rotationIndex],
-                beta * rotationArray[piece.rotationIndex2],
-                gamma * rotationArray[piece.rotationIndex3]
-              ),
-              (3 * Math.PI) / 500,
-              BABYLON.Space.LOCAL
-            );
-          });
-        }
+        alpha += 0.02;
+        beta += 0.02;
+        gamma += 0.02;
+        boardClone.rotate(new BABYLON.Vector3(0, beta, 0), Math.PI / 500, BABYLON.Space.LOCAL);
+        boardClone2.rotate(new BABYLON.Vector3(0, -beta * 2, 0), Math.PI / 500, BABYLON.Space.LOCAL);
+        loadedPiecesMeshes.forEach((mesh) => {
+          const piece = mesh.meshes[1];
+          piece.position.y -= piece.speed;
+          if (piece.position.y < -15) {
+            resetMesh(piece);
+          }
+          piece.rotate(
+            new BABYLON.Vector3(
+              alpha * rotationArray[piece.rotationIndex],
+              beta * rotationArray[piece.rotationIndex2],
+              gamma * rotationArray[piece.rotationIndex3]
+            ),
+            (3 * Math.PI) / 500,
+            BABYLON.Space.LOCAL
+          );
+        });
         animateDistance();
       });
     };

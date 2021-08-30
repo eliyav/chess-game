@@ -2,8 +2,51 @@ import { resolveMove, isCheckmate, annotate } from "./helper/game-helpers";
 import { setPieces, createGrid } from "./helper/board-helpers";
 import Board from "./component/board";
 
+interface Data {
+  boardSize: number;
+  columnNames: string[][];
+  teams: string[];
+  pieces: string[];
+  movement: number[];
+  initialState: State;
+  pieceInitialPoints: InitialPoints[][];
+  gridInitialPoints: InitialPoints[][];
+}
+
+type State = {
+  currentPlayer: string,
+}
+
+interface InitialPoints {
+  name: string,
+  color: string,
+  points: number[][]
+}
+
+interface Square {
+  square : string,
+  on?: undefined
+  }
+
+type MoveType = number[] | number | index;
+
+type index = {
+  [index:number]: number
+}
+
+type Move = string | MoveType[];
+
 class Game {
-  constructor(chessData) {
+  state: State;
+  teams: string[];
+  turnCounter: number;
+  board;
+  moves: Move[];
+  annotations: string[];
+  turnHistory: any //Fix this any declaration later
+  player: undefined;
+
+  constructor(chessData: Data) {
     this.state = chessData.initialState;
     this.teams = chessData.teams;
     this.board = new Board(chessData);
@@ -15,7 +58,7 @@ class Game {
     this.setBoard();
   }
 
-  playerMove(originPoint, targetPoint) {
+  playerMove(originPoint: number[], targetPoint: number[]) : boolean {
     const lastTurn = this.turnHistory[this.turnHistory.length - 1];
     const resolve = resolveMove(originPoint, targetPoint, this.state, this.board.grid, lastTurn);
     resolve.result

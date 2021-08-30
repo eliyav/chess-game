@@ -1,10 +1,15 @@
-import EventEmitter from "./event-emitter";
+import EventEmitter from "./event-emitter"; 
 import { renderScene, rotateCamera } from "../helper/canvas-helpers";
+import Game from "../game";
+ 
+//Fix Any on GameScene. Camera not showing up on Scene class
 
-const activateEmitter = (game, gameMode, gameScene) => {
+type GameMode = {mode: string | undefined, player: string | undefined , room: number | undefined}
+
+const activateEmitter = (game: Game, gameMode: GameMode, gameScene: any) : EventEmitter => {
   const emitter = new EventEmitter();
 
-  emitter.on("playerMove", (originPoint, targetPoint) => {
+  emitter.on("playerMove", (originPoint, targetPoint)=> {
     renderScene(game, gameScene);
     if (gameMode.mode === "offline") {
       const resolved = game.playerMove(originPoint, targetPoint);
@@ -14,13 +19,13 @@ const activateEmitter = (game, gameMode, gameScene) => {
         rotateCamera(game.state.currentPlayer, gameScene);
       }
     } else if (gameMode.mode === "online") {
-      const resolved = game.playerMove(originPoint, targetPoint);
-      if (resolved) {
-        renderScene(game, gameScene);
-        game.switchTurn();
-        const room = gameMode.room;
-        sockets.emit("stateChange", { originPoint, targetPoint, room });
-      }
+      // const resolved = game.playerMove(originPoint, targetPoint);
+      // if (resolved) {
+      //   renderScene(game, gameScene);
+      //   game.switchTurn();
+      //   const room = gameMode.room;
+      //   sockets.emit("stateChange", { originPoint, targetPoint, room });
+      // }
     }
     game.moves.length = 0;
   });
