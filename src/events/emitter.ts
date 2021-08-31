@@ -1,7 +1,7 @@
 import EventEmitter from "./event-emitter"; 
 import { renderScene, rotateCamera } from "../helper/canvas-helpers";
 import Game from "../game";
- 
+
 //Fix Any on GameScene. Camera not showing up on Scene class
 
 type GameMode = {mode: string | undefined, player: string | undefined , room: number | undefined}
@@ -9,14 +9,16 @@ type GameMode = {mode: string | undefined, player: string | undefined , room: nu
 const activateEmitter = (game: Game, gameMode: GameMode, gameScene: any) : EventEmitter => {
   const emitter = new EventEmitter();
 
-  emitter.on("playerMove", (originPoint, targetPoint)=> {
+  emitter.on("playerMove", (originPoint, targetPoint) => {
     renderScene(game, gameScene);
     if (gameMode.mode === "offline") {
-      const resolved = game.playerMove(originPoint, targetPoint);
-      if (resolved) {
-        renderScene(game, gameScene);
-        game.switchTurn();
-        rotateCamera(game.state.currentPlayer, gameScene);
+      if(typeof originPoint !== "undefined" && typeof targetPoint !== "undefined"){
+        const resolved = game.playerMove(originPoint, targetPoint);
+        if (resolved) {
+          renderScene(game, gameScene);
+          game.switchTurn();
+          rotateCamera(game.state.currentPlayer, gameScene);
+        }
       }
     } else if (gameMode.mode === "online") {
       // const resolved = game.playerMove(originPoint, targetPoint);

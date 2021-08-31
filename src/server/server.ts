@@ -1,4 +1,6 @@
+//@ts-ignore
 const app = require("express")();
+//@ts-ignore
 const httpServer = require("http").createServer(app);
 const options = {
   cors: {
@@ -6,10 +8,11 @@ const options = {
     methods: ["GET", "POST"],
   },
 };
+//@ts-ignore
 const io = require("socket.io")(httpServer, options);
 
-io.on("connection", (socket) => {
-  let room;
+io.on("connection", (socket: any) => {
+  let room: any;
   socket.on("request-room-id", () => {
     room = Math.random();
     socket.join(room);
@@ -20,7 +23,7 @@ io.on("connection", (socket) => {
     socket.emit("room-info", serializedSet);
     console.log(clients);
   });
-  socket.on("join-room", (roomNumber) => {
+  socket.on("join-room", (roomNumber: any) => {
     room = roomNumber;
     socket.join(room);
     socket.to(room).emit("message", "A new player has joined the room");
@@ -32,7 +35,7 @@ io.on("connection", (socket) => {
     console.log(clients);
   });
 
-  socket.on("stateChange", ({ originPoint, targetPoint, room }) => {
+  socket.on("stateChange", ({ originPoint, targetPoint, room }: any) => {
     socket.to(room).emit("message", "Move has been entered");
     socket.to(room).emit("stateChange", { originPoint, targetPoint });
   });
@@ -42,7 +45,7 @@ io.on("connection", (socket) => {
     socket.to(room).emit("reset-board-request");
   });
 
-  socket.on("reset-board-response", (answer) => {
+  socket.on("reset-board-response", (answer: any) => {
     if (answer === "Yes") {
       socket.to(room).emit("message", "Opponent has agreed to reset the board!");
       socket.to(room).emit("reset-board-resolve", "Yes");
@@ -59,7 +62,7 @@ io.on("connection", (socket) => {
     socket.to(room).emit("draw-request");
   });
 
-  socket.on("draw-response", (answer) => {
+  socket.on("draw-response", (answer: any) => {
     if (answer === "Yes") {
       socket.to(room).emit("message", "Opponent has agreed for game Draw!");
       socket.to(room).emit("draw-resolve", "Yes");

@@ -1,7 +1,7 @@
 import * as GUI from "babylonjs-gui";
 import { renderScene } from "../helper/canvas-helpers";
 
-function createGUI(startScene, gameScene, showScene, gameMode, emitter, socket, game) {
+function createGUI(startScene: any, gameScene: any, showScene: any, gameMode: any, emitter: any, socket: any, game: any) {
   const advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("StartUI", true, startScene);
   const advancedTexture2 = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GameUI", true, gameScene);
 

@@ -1,11 +1,6 @@
-type listeners = {
-  [index: string] : () => void,
-  [index: number] : () => void,
-  f: () => void}
-
 class EventEmitter { 
-  listeners: listeners;
-  
+  listeners: any; //Correct this later
+
   constructor() {
     this.listeners = {};
   }
@@ -16,7 +11,7 @@ class EventEmitter {
     return this;
   }
 
-  on(event: string, fn: (originPoint: number[], targetPoint: number[]) => void) {
+  on(event: string, fn: (originPoint?: number[], targetPoint?: number[]) => void) {
     return this.addListener(event, fn);
   }
 
@@ -46,10 +41,10 @@ class EventEmitter {
     return this;
   }
 
-  emit(event: string, ...args: number[]) {
+  emit(event: string, ...args: [number[], number[]]) {  /// Fix this emit is not always for player move
     let fns = this.listeners[event];
     if (!fns) return false;
-    fns.forEach((f) => {
+    fns.forEach((f: (arg0: number[], arg1: number[]) => void) => {
       f(...args);
     });
     return true;

@@ -2,7 +2,7 @@ import "babylonjs-loaders";
 import * as BABYLON from "babylonjs";
 import initializeApp from "./app";
 import { Engine } from "babylonjs/Engines/engine";
-
+ 
 async function Main() {
   const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
   const engine:Engine = new BABYLON.Engine(canvas, true);

@@ -1,7 +1,8 @@
 import { io } from "socket.io-client";
+import Game from "../game";
 import { renderScene } from "../helper/canvas-helpers";
 
-const activateSocket = (game, gameMode, scene) => {
+const activateSocket = (game:Game, gameMode:{mode: string | undefined, player: string | undefined , room: number | undefined}, scene: any) => {
   const socket = io("ws://localhost:3000");
 
   socket.on("stateChange", (newState) => {
@@ -49,13 +50,13 @@ const activateSocket = (game, gameMode, scene) => {
   socket.on("draw-resolve", (response) => {
     if (response === "Yes") {
       game.resetBoard();
-      renderScene(game, gameScene);
+      renderScene(game, scene);
     }
   });
 
   socket.on("resign-request", () => {
     game.resetBoard();
-    renderScene(game, gameScene);
+    renderScene(game, scene);
   });
 
   return socket;

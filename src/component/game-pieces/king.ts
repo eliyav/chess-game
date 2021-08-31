@@ -1,33 +1,17 @@
 import GamePiece from "./game-piece";
-import { calcKingMoves } from "../../helper/movement-helpers.js";
+import { calcKingMoves } from "../../helper/movement-helpers";
 import { calcCastling } from "../../helper/game-helpers";
-
-interface Square {
-  square : string,
-  on?: undefined
-  }
+import {Square} from "../../helper/board-helpers";
+import {TurnHistory} from "../../helper/game-helpers";
 
 interface State {
   currentPlayer: string,
 }
 
-interface TurnHistory {
-  result: boolean;
-  type: string;
-  direction: number;
-  origin: number[];
-  target: number[];
-  originPiece: any;
-  targetPiece: any;
-  originSquare: Square;
-  targetSquare: Square;
-  promotion?: undefined;
-}
-
 class King extends GamePiece {
   castling: boolean;
 
-  constructor(name: string, color: string, point: number[], movement: number[]) {
+  constructor(name: string, color: string, point: [number, number], movement: number[]) {
     super(name, color, point, movement);
     this.castling = false;
   }

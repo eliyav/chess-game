@@ -1,6 +1,9 @@
+import { Material } from "babylonjs/Materials/material";
+import { Scene } from "babylonjs/scene";
+import Game from "../game";
 import { getSquaresandPieces, canValidMoveResolve, switchSquaresBack } from "./game-helpers";
- 
-const renderScene = (game, gameScene) => {
+
+const renderScene = (game: Game, gameScene: any) => {
   //Clears old meshes/memory usage
   !gameScene.meshesToRender ? (gameScene.meshesToRender = []) : null;
   if (gameScene.meshesToRender.length > 0) {
@@ -14,31 +17,37 @@ const renderScene = (game, gameScene) => {
   //Final Piece Mesh List
   const meshesList = gameScene.finalMeshes.piecesMeshes;
   //Filters Grid state for all active squares
+  
+  //@ts-ignore
   const filteredSquares = game.board.grid.flat().filter((square) => square.on !== undefined);
   //For each active piece, creates a mesh clone and places on board
+  //@ts-ignore
   filteredSquares.forEach((square) => {
     const { name, color, point } = square.on;
+  //@ts-ignore
     const clone = meshesList.find((mesh) => mesh.name === name && mesh.color === color).clone(name);
     [clone.position.z, clone.position.x, clone.isVisible = true] = calcMeshCanvasPosition(point);
     gameScene.meshesToRender.push(clone);
   });
 };
 
-const displayPieceMoves = (mesh, currentMove, game, gameScene) => {
+const displayPieceMoves = (mesh: any, currentMove: number[][], game: Game, gameScene: any) => {
   const grid = game.board.grid;
   const state = game.state;
   const turnHistory = game.turnHistory[game.turnHistory.length - 1];
+  //@ts-ignore
   const [x, y] = calcIndexFromMeshPosition([mesh.position.z, mesh.position.x]);
   const piece = grid[x][y].on;
   displayMovementSquares([x, y], gameScene, "piece");
-  let moves = piece.calculateAvailableMoves(grid, state, turnHistory, true);
-  currentMove.push(piece.point);
+  let moves = piece!.calculateAvailableMoves(grid, state, turnHistory, true);
+  currentMove.push(piece!.point);
   //Add filter to display only moves that can resolve
   const isValidMoveToDisplay = moves
-    .map((move) => {
+  //@ts-ignore
+    .map((move: number[][]) => {
       //Check for checkmate if move resolves
-      const [pieceX, pieceY] = piece.point;
-      const squaresandPieces = getSquaresandPieces(piece.point, move[0], grid);
+      const [pieceX, pieceY] = piece!.point;
+      const squaresandPieces = getSquaresandPieces(piece!.point, move[0], grid);
       const validMove = canValidMoveResolve(squaresandPieces, move[0], state, grid, turnHistory);
       switchSquaresBack(squaresandPieces, [pieceX, pieceY]);
       return validMove ? move : null;
@@ -49,40 +58,42 @@ const displayPieceMoves = (mesh, currentMove, game, gameScene) => {
     });
 };
 
-const displayMovementSquares = (point, gameScene, desc) => {
+const displayMovementSquares = (point: any, gameScene: any, desc:string) => {
   if (desc === "target") {
-    const plane = BABYLON.MeshBuilder.CreatePlane(`plane`, { width: 2.8, height: 2.8 });
+    const plane: any = BABYLON.MeshBuilder.CreatePlane(`plane`, { width: 2.8, height: 2.8 });
     [plane.position.z, plane.position.x] = calcBabylonCanvasPosition(point[0]); //Z is X ---- X is Y
     plane.point = point[0];
     plane.position.y += 0.51;
     plane.rotation = new BABYLON.Vector3(Math.PI / 2, 0, 0);
     if (point[1] === "capture") {
-      plane.material = gameScene.materials.find((material) => material.id === "redMat");
+      plane.material = gameScene.materials.find((material: Material) => material.id === "redMat");
     } else if (point[1] === "movement") {
-      plane.material = gameScene.materials.find((material) => material.id === "orangeMat");
+      plane.material = gameScene.materials.find((material: Material) => material.id === "orangeMat");
     } else if (point[1] === "enPassant") {
-      plane.material = gameScene.materials.find((material) => material.id === "purpleMat");
+      plane.material = gameScene.materials.find((material: Material) => material.id === "purpleMat");
     } else if (point[1] === "castling") {
-      plane.material = gameScene.materials.find((material) => material.id === "blueMat");
+      plane.material = gameScene.materials.find((material: Material) => material.id === "blueMat");
     }
     gameScene.meshesToRender.push(plane);
   } else if (desc === "piece") {
     const torus = BABYLON.MeshBuilder.CreateTorus("torus", { diameter: 2.6, thickness: 0.2, tessellation: 16 });
     [torus.position.z, torus.position.x] = calcBabylonCanvasPosition(point); //Z is X ---- X is Y
+    //@ts-ignore
     torus.point = point;
     torus.position.y += 0.51;
-    torus.material = gameScene.materials.find((material) => material.id === "greenMat");
+    torus.material = gameScene.materials.find((material: Material) => material.id === "greenMat");
     gameScene.meshesToRender.push(torus);
   }
 };
 
-const rotateCamera = (currentPlayer, gameScene) => {
+const rotateCamera = (currentPlayer: string, gameScene: any) => {
+  //@ts-ignore
   let a = gameScene.cameras[0].alpha;
   let divisible;
   let subtractedDivisible;
   let piDistance;
-  let remainingDistance;
-  let remainder;
+  let remainingDistance: number;
+  let remainder: number;
   if (currentPlayer === "Black") {
     if (a < 0) {
       divisible = Math.ceil(a / Math.PI);
@@ -113,7 +124,7 @@ const rotateCamera = (currentPlayer, gameScene) => {
     }
   }
 
-  const animateTurnSwitch = () => {
+  const animateTurnSwitch = (currentPlayer: string = "") => {
     requestAnimationFrame(() => {
       if (currentPlayer === "Black") {
         if (remainingDistance > 0.05) {
@@ -191,7 +202,7 @@ const rotateCamera = (currentPlayer, gameScene) => {
 };
 
 //Calculate canvas position for loaded meshes
-const calcMeshCanvasPosition = (point) => {
+const calcMeshCanvasPosition = (point: number[]): number[] | void => {
   const [x, y] = point;
   let gridX, gridY;
   //Calculate X
@@ -239,7 +250,7 @@ const calcMeshCanvasPosition = (point) => {
 };
 
 //For Babylon meshes, they have different x/y/z relation than loaded meshes
-const calcBabylonCanvasPosition = (point) => {
+const calcBabylonCanvasPosition = (point: number[]): number[] | void => {
   const [x, y] = point;
   let gridX, gridY;
   //Calculate X
@@ -287,7 +298,7 @@ const calcBabylonCanvasPosition = (point) => {
 };
 
 //For game pieces calculation as their index is flipped from blender importing
-const calcIndexFromMeshPosition = (point) => {
+const calcIndexFromMeshPosition = (point: number[]): number[] | void => {
   const [x, y] = point;
   let indexX, indexY;
   //Calculate X
@@ -332,53 +343,6 @@ const calcIndexFromMeshPosition = (point) => {
   }
 
   return [indexX, indexY];
-};
-
-const calculatePoint = (x, y) => {
-  //Calculate X
-  if (x > 9 && x < 12) {
-    x = 0;
-  } else if (x > 6 && x < 9) {
-    x = 1;
-  } else if (x > 3 && x < 6) {
-    x = 2;
-  } else if (x > 0 && x < 3) {
-    x = 3;
-  } else if (x < 0 && x > -3) {
-    x = 4;
-  } else if (x < -3 && x > -6) {
-    x = 5;
-  } else if (x < -6 && x > -9) {
-    x = 6;
-  } else if (x < -9 && x > -12) {
-    x = 7;
-  } else {
-    return console.log("You have not clicked a valid X coordinate", x);
-  }
-  //Calculate Y
-  if (y < -9 && y > -12) {
-    y = 0;
-  } else if (y < -6 && y > -9) {
-    y = 1;
-  } else if (y < -3 && y > -6) {
-    y = 2;
-  } else if (y < 0 && y > -3) {
-    y = 3;
-  } else if (y > 0 && y < 3) {
-    y = 4;
-  } else if (y > 3 && y < 6) {
-    y = 5;
-  } else if (y > 6 && y < 9) {
-    y = 6;
-  } else if (y > 9 && y < 12) {
-    y = 7;
-  } else {
-    return console.log("You have not clicked a valid Y coordinate", y);
-  }
-
-  const canvasX = x;
-  const canvasY = y;
-  return [canvasX, canvasY];
 };
 
 export { renderScene, rotateCamera, displayPieceMoves, calcIndexFromMeshPosition };

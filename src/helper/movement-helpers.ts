@@ -1,7 +1,9 @@
+import { Square } from "./board-helpers";
 //Filters the moves from the final movements object and enters them in the available moves array 
-const filterToFinalMoves = (grid, color, movesObj, targetArray) => {
+const filterToFinalMoves = (grid: Square[][], color: string, movesObj: { up?: never[]; down?: never[]; right?: never[]; left?: never[]; upRight?: never[]; upLeft?: never[]; downRight?: never[]; downLeft?: never[]; }, targetArray: any[][]) => {
+  //@ts-ignore
   const movementsArrays = Object.values(movesObj);
-  movementsArrays.forEach((array) => {
+  movementsArrays.forEach((array: string | any[]) => {
     for (let i = 0; i < array.length; i++) {
       let [x, y] = array[i];
       const square = grid[x][y];
@@ -18,9 +20,10 @@ const filterToFinalMoves = (grid, color, movesObj, targetArray) => {
     }
   });
 };
-
+ 
 //Calculates Horizontal Movements by calculating each direction from the current point and adds them to the final movements object
-const calcHorizontalMovements = (grid, currentPoint, movement, finalObj) => {
+const calcHorizontalMovements = (grid: Square[][], currentPoint: [number, number], movement: number, finalObj: { upRight: never[]; upLeft: never[]; downRight: never[]; downLeft: never[]; }) => {
+  //@ts-ignore
   for (const [key, value] of Object.entries(finalObj)) {
     switch (key) {
       case "upRight":
@@ -42,7 +45,8 @@ const calcHorizontalMovements = (grid, currentPoint, movement, finalObj) => {
 };
 
 //Calculates Vertical Movements by calculating each direction from the current point and adds them to the final movements object
-const calcVerticalMovements = (grid, currentPoint, movement, finalObj) => {
+const calcVerticalMovements = (grid: Square[][], currentPoint: [number, number], movement: number, finalObj: { up: never[]; down: never[]; right: never[]; left: never[]; }) => {
+  //@ts-ignore
   for (const [key, value] of Object.entries(finalObj)) {
     switch (key) {
       case "up":
@@ -63,7 +67,7 @@ const calcVerticalMovements = (grid, currentPoint, movement, finalObj) => {
   }
 };
 
-const calcPawnMovement = (grid, currentPoint, direction, moved, color, finalObj) => {
+const calcPawnMovement = (grid: Square[][], currentPoint: [number, number], direction: number, moved: boolean, color: string, finalObj: (string | any[])[][]) => {
   //Calculate Pawn Movement based on current point
   let range = 1;
   const [x, y] = currentPoint;
@@ -89,7 +93,7 @@ const calcPawnMovement = (grid, currentPoint, direction, moved, color, finalObj)
   checkForValidPawnCapture(capturePoint2, color, grid, finalObj);
 };
 
-const checkForValidPawnCapture = (capturePoint, color, grid, finalObj) => {
+const checkForValidPawnCapture = (capturePoint: any[], color: any, grid: Square[][], finalObj: any[][]) => {
   const [captureX, captureY] = capturePoint;
   if (bounds(captureX, grid) && bounds(captureY, grid)) {
     const captureSquare = grid[captureX][captureY];
@@ -97,9 +101,9 @@ const checkForValidPawnCapture = (capturePoint, color, grid, finalObj) => {
   }
 };
 
-const calcKnightMovement = (grid, currentPoint, color, moves, finalObj) => {
+const calcKnightMovement = (grid: Square[][], currentPoint: number[], color: string, moves: any[], finalObj: number[][] | (string | any[])[][]) => {
   let [x, y] = currentPoint;
-  moves.forEach((move) => {
+  moves.forEach((move: [any, any]) => {
     const [moveX, moveY] = move;
     const resultX = x + moveX;
     const resultY = y + moveY;
@@ -107,17 +111,19 @@ const calcKnightMovement = (grid, currentPoint, color, moves, finalObj) => {
       const square = grid[resultX][resultY];
       const result = [resultX, resultY];
       if (square.on !== undefined) {
+        //@ts-ignore
         square.on.color !== color ? finalObj.push([result, "capture"]) : null;
       } else {
+        //@ts-ignore
         finalObj.push([result, "movement"]);
       }
     }
   });
 };
 
-const calcKingMoves = (grid, currentPoint, color, moves, finalObj) => {
+const calcKingMoves = (grid: Square[][], currentPoint: number[] | [any, any], color: string, moves: any[], finalObj: number[][] | (string | any[])[][]) => {
   let [x, y] = currentPoint;
-  moves.forEach((move) => {
+  moves.forEach((move: [any, any]) => {
     const [moveX, moveY] = move;
     const resultX = x + moveX;
     const resultY = y + moveY;
@@ -125,63 +131,65 @@ const calcKingMoves = (grid, currentPoint, color, moves, finalObj) => {
       const square = grid[resultX][resultY];
       const result = [resultX, resultY];
       if (square.on !== undefined) {
+        //@ts-ignore
         square.on.color !== color ? finalObj.push([result, "capture"]) : null;
       } else {
+        //@ts-ignore
         finalObj.push([result, "movement"]);
       }
     }
   });
 };
 
-const bounds = (num, grid) => num >= grid.length - grid.length && num <= grid.length - 1;
+const bounds = (num: number, grid: Square[][]) => num >= grid.length - grid.length && num <= grid.length - 1;
 
-const calcUpRight = (grid, currentPoint, movement, finalObj) => {
+const calcUpRight = (grid: Square[][], currentPoint: [number, number], movement: any, finalObj: any[][]) => {
   let [x, y] = currentPoint;
   let upRightX = x + movement;
   let upRightY = y + movement;
   bounds(upRightX, grid) && bounds(upRightY, grid) ? finalObj.push([upRightX, upRightY]) : null;
 };
 
-const calcUpLeft = (grid, currentPoint, movement, finalObj) => {
+const calcUpLeft = (grid: Square[][], currentPoint: [number, number], movement: number, finalObj: any[][]) => {
   let [x, y] = currentPoint;
   let upLeftX = x - movement;
   let upLeftY = y + movement;
   bounds(upLeftX, grid) && bounds(upLeftY, grid) ? finalObj.push([upLeftX, upLeftY]) : null;
 };
 
-const calcDownRight = (grid, currentPoint, movement, finalObj) => {
+const calcDownRight = (grid: Square[][], currentPoint: [number, number], movement: number, finalObj: any[][]) => {
   let [x, y] = currentPoint;
   let downRightX = x + movement;
   let downRightY = y - movement;
   bounds(downRightX, grid) && bounds(downRightY, grid) ? finalObj.push([downRightX, downRightY]) : null;
 };
 
-const calcDownLeft = (grid, currentPoint, movement, finalObj) => {
+const calcDownLeft = (grid: Square[][], currentPoint: [number, number], movement: number, finalObj: number[][]) => {
   let [x, y] = currentPoint;
   let downLeftX = x - movement;
   let downLeftY = y - movement;
   bounds(downLeftX, grid) && bounds(downLeftY, grid) ? finalObj.push([downLeftX, downLeftY]) : null;
 };
 
-const calcUp = (grid, currentPoint, movement, finalObj) => {
+const calcUp = (grid: Square[][], currentPoint: [number, number], movement: any, finalObj: any[][]) => {
   let [x, y] = currentPoint;
   let upY = y + movement;
   bounds(upY, grid) ? finalObj.push([x, upY]) : null;
 };
 
-const calcDown = (grid, currentPoint, movement, finalObj) => {
+const calcDown = (grid: Square[][], currentPoint: [number, number], movement: number, finalObj: any[][]) => {
   let [x, y] = currentPoint;
   let downY = y - movement;
   bounds(downY, grid) ? finalObj.push([x, downY]) : null;
 };
 
-const calcRight = (grid, currentPoint, movement, finalObj) => {
+const calcRight = (grid: Square[][], currentPoint: [number, number], movement: any, finalObj: any[][]) => {
   let [x, y] = currentPoint;
   let rightX = x + movement;
   bounds(rightX, grid) ? finalObj.push([rightX, y]) : null;
 };
 
-const calcLeft = (grid, currentPoint, movement, finalObj) => {
+const calcLeft = (grid: Square[][], currentPoint: [number, number], movement: number, finalObj: any[][]) => {
   let [x, y] = currentPoint;
   let leftX = x - movement;
   bounds(leftX, grid) ? finalObj.push([leftX, y]) : null;

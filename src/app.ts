@@ -6,11 +6,11 @@ import gameScreen from "./view/game-screen";
 import activateEmitter from "./events/emitter";
 import createGUI from "./view/gui-overlay";
 import inputController from "./events/input-controller";
-import activateSocket from "./server/sockets";
 import { Engine } from "babylonjs/Engines/engine";
 import { Scene } from "babylonjs/scene";
 import EventEmitter from "./events/event-emitter";
-
+import activateSocket from "./server/sockets";
+ 
 const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
   const app: app = {
     game: new Game(chessData),

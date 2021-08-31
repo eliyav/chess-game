@@ -1,11 +1,11 @@
 class GamePiece {
   name: string;
   color: string;
-  point: number[];
+  point: [number, number];
   movement: number[];
   moved: boolean;
 
-  constructor(name: string, color: string, point: number[], movement: number[]) {
+  constructor(name: string, color: string, point: [number, number], movement: number[]) {
     this.name = name;
     this.color = color;
     this.point = point;

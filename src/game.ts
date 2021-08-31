@@ -27,21 +27,17 @@ interface Square {
   square : string,
   on?: undefined
   }
-
-type MoveType = number[] | number | index;
-
+ 
 type index = {
   [index:number]: number
 }
-
-type Move = string | MoveType[];
 
 class Game {
   state: State;
   teams: string[];
   turnCounter: number;
   board;
-  moves: Move[];
+  moves: number[][];
   annotations: string[];
   turnHistory: any //Fix this any declaration later
   player: undefined;
@@ -61,16 +57,19 @@ class Game {
   playerMove(originPoint: number[], targetPoint: number[]) : boolean {
     const lastTurn = this.turnHistory[this.turnHistory.length - 1];
     const resolve = resolveMove(originPoint, targetPoint, this.state, this.board.grid, lastTurn);
+    //@ts-ignore
     resolve.result
       ? (() => {
+        //@ts-ignore
           resolve.turn = this.turnCounter;
           this.turnCounter++;
+          //@ts-ignore
           const annotation = annotate(resolve, this.state, this.board.grid, lastTurn);
           this.annotations.push(annotation);
           this.turnHistory.push(resolve);
         })()
       : null;
-
+//@ts-ignore
     return resolve.result;
   }
 
@@ -91,6 +90,7 @@ class Game {
   }
 
   setBoard() {
+    //@ts-ignore
     setPieces(this.board.grid, this.board.pieceInitialPoints, this.board.movementArray);
   }
 
