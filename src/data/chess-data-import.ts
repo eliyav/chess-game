@@ -1,11 +1,7 @@
+import { PieceInitialPoints } from "../component/board"
+
 type State = {
   currentPlayer: string,
-}
-
-interface InitialPoints {
-  name: string,
-  color: string,
-  points: number[][]
 }
 
 interface Data {
@@ -15,8 +11,8 @@ interface Data {
   pieces: string[];
   movement: number[];
   initialState: State;
-  pieceInitialPoints: InitialPoints[][];
-  gridInitialPoints: InitialPoints[][];
+  pieceInitialPoints: PieceInitialPoints[][];
+  gridInitialPoints: PieceInitialPoints[][];
 }
 
 const chessData: Data = {

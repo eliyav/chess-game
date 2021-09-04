@@ -10,7 +10,7 @@
   },
   "browserslist": [
     "last 1 Chrome version"
-  ],
+  ], 
   "author": "",
   "license": "ISC",
   "dependencies": {

@@ -35,8 +35,8 @@ class Pawn extends GamePiece implements PieceInstance {
             const x1 = x - 1;
             const x2 = x + 1;
             const newY = y + direction;
-            const potential1 = [x1, newY];
-            const potential2 = [x2, newY];
+            const potential1: [number, number] = [x1, newY];
+            const potential2: [number, number] = [x2, newY];
             if (doMovesMatch(potential1, targetSquare) || doMovesMatch(potential2, targetSquare)) { 
               availableMoves.push([targetSquare, "enPassant"]);
           }
