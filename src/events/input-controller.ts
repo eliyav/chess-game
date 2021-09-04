@@ -3,7 +3,7 @@ import { renderScene, calcIndexFromMeshPosition, displayPieceMoves } from "../he
 import Game from "../game";
 import { Scene } from "babylonjs/scene";
 
-const inputController = (mesh: any, game: Game, gameScene: Scene) => { //Fix this any call
+const inputController = (mesh: any, game: Game, gameScene: Scene) => {
   const currentMove = game.moves;
   //If mesh
   if (mesh) {
@@ -17,7 +17,6 @@ const inputController = (mesh: any, game: Game, gameScene: Scene) => { //Fix thi
     } else if (mesh.color === game.state.currentPlayer) {
       const [x, y] = currentMove[0];
       const originalPiece = game.board.grid[x][y].on;
-        //@ts-ignore
       const [meshX, meshY] = calcIndexFromMeshPosition([mesh.position.z, mesh.position.x]);
       const newPiece = game.board.grid[meshX][meshY].on;
       if (originalPiece === newPiece) {
@@ -29,8 +28,7 @@ const inputController = (mesh: any, game: Game, gameScene: Scene) => { //Fix thi
           const turnHistory = game.turnHistory[game.turnHistory.length - 1];
           const castlingPiece = game.board.grid[x][y].on;
           const castlingMoves = castlingPiece!.calculateAvailableMoves(game.board.grid, game.state, turnHistory, true);
-          //@ts-ignore
-          const isItCastling = castlingMoves.filter((move: any) => doMovesMatch(move[0], [meshX, meshY]));
+          const isItCastling = castlingMoves.filter((move) => doMovesMatch(move[0], [meshX, meshY]));
           if (isItCastling.length > 0) {
             currentMove.push([meshX, meshY]);
           } else {
@@ -56,7 +54,6 @@ const inputController = (mesh: any, game: Game, gameScene: Scene) => { //Fix thi
         const originalPiece = game.board.grid[originalPieceX][originalPieceY].on;
         const turnHistory = game.turnHistory[game.turnHistory.length - 1];
         let moves = originalPiece!.calculateAvailableMoves(game.board.grid, game.state, turnHistory, false);
-        //@ts-ignore
         const checkIfTrue = moves.find((move) => doMovesMatch(move[0], opponentsPiece!.point));
         checkIfTrue ? currentMove.push(opponentsPiece!.point) : null;
       }

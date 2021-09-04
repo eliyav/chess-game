@@ -7,23 +7,23 @@ interface Data {
   pieces: string[];
   movement: number[];
   initialState: State;
-  pieceInitialPoints: InitialPoints[][];
-  gridInitialPoints: InitialPoints[][];
+  pieceInitialPoints: PieceInitialPoints[][];
+  gridInitialPoints: PieceInitialPoints[][];
 }
 
 type State = {
   currentPlayer: string,
 }
 
-interface InitialPoints {
+export interface PieceInitialPoints {
   name: string,
   color: string,
-  points: number[][]
+  points: [number,number][]
 }
 
 class Board {
   movementArray: number[];
-  pieceInitialPoints: InitialPoints[][];
+  pieceInitialPoints: PieceInitialPoints[][];
   boardSize: number;
   columnNames: string[][];
   grid;

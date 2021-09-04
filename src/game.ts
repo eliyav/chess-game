@@ -1,6 +1,7 @@
 import { resolveMove, isCheckmate, annotate } from "./helper/game-helpers";
 import { setPieces, createGrid } from "./helper/board-helpers";
 import Board from "./component/board";
+import {PieceInitialPoints} from "./component/board"
 
 interface Data {
   boardSize: number;
@@ -9,19 +10,15 @@ interface Data {
   pieces: string[];
   movement: number[];
   initialState: State;
-  pieceInitialPoints: InitialPoints[][];
-  gridInitialPoints: InitialPoints[][];
+  pieceInitialPoints: PieceInitialPoints[][];
+  gridInitialPoints: PieceInitialPoints[][];
 }
 
 type State = {
   currentPlayer: string,
 }
 
-interface InitialPoints {
-  name: string,
-  color: string,
-  points: number[][]
-}
+
 
 interface Square {
   square : string,
@@ -37,7 +34,7 @@ class Game {
   teams: string[];
   turnCounter: number;
   board;
-  moves: number[][];
+  moves: [number, number][];
   annotations: string[];
   turnHistory: any //Fix this any declaration later
   player: undefined;
@@ -54,23 +51,22 @@ class Game {
     this.setBoard();
   }
 
-  playerMove(originPoint: number[], targetPoint: number[]) : boolean {
+  playerMove(originPoint: [number, number], targetPoint: [number, number]) : boolean {
     const lastTurn = this.turnHistory[this.turnHistory.length - 1];
     const resolve = resolveMove(originPoint, targetPoint, this.state, this.board.grid, lastTurn);
-    //@ts-ignore
-    resolve.result
+    if(typeof resolve !== "boolean"){
+      resolve.result
       ? (() => {
-        //@ts-ignore
           resolve.turn = this.turnCounter;
           this.turnCounter++;
-          //@ts-ignore
           const annotation = annotate(resolve, this.state, this.board.grid, lastTurn);
           this.annotations.push(annotation);
           this.turnHistory.push(resolve);
         })()
       : null;
-//@ts-ignore
     return resolve.result;
+    }
+    return false
   }
 
   changePlayer() {
@@ -90,7 +86,6 @@ class Game {
   }
 
   setBoard() {
-    //@ts-ignore
     setPieces(this.board.grid, this.board.pieceInitialPoints, this.board.movementArray);
   }
 

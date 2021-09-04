@@ -3,12 +3,14 @@ import { calcKingMoves } from "../../helper/movement-helpers";
 import { calcCastling } from "../../helper/game-helpers";
 import {Square} from "../../helper/board-helpers";
 import {TurnHistory} from "../../helper/game-helpers";
+import {PieceInstance} from "./bishop"
+import {Move} from "./bishop"
 
 interface State {
   currentPlayer: string,
 }
 
-class King extends GamePiece {
+class King extends GamePiece implements PieceInstance {
   castling: boolean;
 
   constructor(name: string, color: string, point: [number, number], movement: number[]) {
@@ -16,8 +18,8 @@ class King extends GamePiece {
     this.castling = false;
   }
 
-  calculateAvailableMoves(grid: Square[][], state: State, turnHistory: TurnHistory, castle = this.castling, currentPoint = this.point) {
-    const kingMoves = [
+  calculateAvailableMoves(grid: Square[][], state: State, turnHistory: TurnHistory, boolean: boolean, currentPoint = this.point) {
+    const kingMoves: [number,number][] = [
       [0, 1],
       [1, 0],
       [1, 1],
@@ -28,12 +30,12 @@ class King extends GamePiece {
       [-1, 1],
     ];
 
-    const availableMoves: number[][] = [];
+    const availableMoves: Move[] = [];
 
     calcKingMoves(grid, currentPoint, this.color, kingMoves, availableMoves);
 
     if (!this.moved) {
-      if (castle) {
+      if (boolean) {
         calcCastling(grid, state, turnHistory, currentPoint, availableMoves);
       }
     }

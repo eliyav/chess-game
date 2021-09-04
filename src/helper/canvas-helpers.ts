@@ -18,24 +18,20 @@ const renderScene = (game: Game, gameScene: any) => {
   const meshesList = gameScene.finalMeshes.piecesMeshes;
   //Filters Grid state for all active squares
   
-  //@ts-ignore
   const filteredSquares = game.board.grid.flat().filter((square) => square.on !== undefined);
   //For each active piece, creates a mesh clone and places on board
-  //@ts-ignore
   filteredSquares.forEach((square) => {
-    const { name, color, point } = square.on;
-  //@ts-ignore
-    const clone = meshesList.find((mesh) => mesh.name === name && mesh.color === color).clone(name);
+    const { name, color, point } = square.on!;
+    const clone = meshesList.find((mesh: any) => mesh.name === name && mesh.color === color).clone(name);
     [clone.position.z, clone.position.x, clone.isVisible = true] = calcMeshCanvasPosition(point);
     gameScene.meshesToRender.push(clone);
   });
 };
 
-const displayPieceMoves = (mesh: any, currentMove: number[][], game: Game, gameScene: any) => {
+const displayPieceMoves = (mesh: any, currentMove: [number,number][], game: Game, gameScene: any) => {
   const grid = game.board.grid;
   const state = game.state;
   const turnHistory = game.turnHistory[game.turnHistory.length - 1];
-  //@ts-ignore
   const [x, y] = calcIndexFromMeshPosition([mesh.position.z, mesh.position.x]);
   const piece = grid[x][y].on;
   displayMovementSquares([x, y], gameScene, "piece");
@@ -43,8 +39,7 @@ const displayPieceMoves = (mesh: any, currentMove: number[][], game: Game, gameS
   currentMove.push(piece!.point);
   //Add filter to display only moves that can resolve
   const isValidMoveToDisplay = moves
-  //@ts-ignore
-    .map((move: number[][]) => {
+    .map((move) => {
       //Check for checkmate if move resolves
       const [pieceX, pieceY] = piece!.point;
       const squaresandPieces = getSquaresandPieces(piece!.point, move[0], grid);
@@ -202,9 +197,10 @@ const rotateCamera = (currentPlayer: string, gameScene: any) => {
 };
 
 //Calculate canvas position for loaded meshes
-const calcMeshCanvasPosition = (point: number[]): number[] | void => {
+const calcMeshCanvasPosition = (point: [number,number]) => {
   const [x, y] = point;
-  let gridX, gridY;
+  let gridX: number;
+  let gridY: number;
   //Calculate X
   if (x === 0) {
     gridX = 10.5;
@@ -220,10 +216,8 @@ const calcMeshCanvasPosition = (point: number[]): number[] | void => {
     gridX = -4.5;
   } else if (x === 6) {
     gridX = -7.5;
-  } else if (x === 7) {
-    gridX = -10.5;
   } else {
-    return console.log("You have not clicked a valid X coordinate", x);
+    gridX = -10.5;
   }
   //Calculate Y
   if (y === 0) {
@@ -240,19 +234,19 @@ const calcMeshCanvasPosition = (point: number[]): number[] | void => {
     gridY = -4.5;
   } else if (y === 6) {
     gridY = -7.5;
-  } else if (y === 7) {
-    gridY = -10.5;
   } else {
-    return console.log("You have not clicked a valid Y coordinate", y);
+    gridY = -10.5;
   }
 
-  return [gridX, gridY];
+const result: [number, number] = [gridX, gridY]
+  return result
 };
 
 //For Babylon meshes, they have different x/y/z relation than loaded meshes
-const calcBabylonCanvasPosition = (point: number[]): number[] | void => {
+const calcBabylonCanvasPosition = (point: [number, number]) => {
   const [x, y] = point;
-  let gridX, gridY;
+  let gridX:number
+  let gridY: number;
   //Calculate X
   if (x === 0) {
     gridX = 10.5;
@@ -268,11 +262,10 @@ const calcBabylonCanvasPosition = (point: number[]): number[] | void => {
     gridX = -4.5;
   } else if (x === 6) {
     gridX = -7.5;
-  } else if (x === 7) {
-    gridX = -10.5;
   } else {
-    return console.log("You have not clicked a valid X coordinate", x);
+    gridX = -10.5;
   }
+
   //Calculate Y
   if (y === 0) {
     gridY = -10.5;
@@ -288,19 +281,19 @@ const calcBabylonCanvasPosition = (point: number[]): number[] | void => {
     gridY = 4.5;
   } else if (y === 6) {
     gridY = 7.5;
-  } else if (y === 7) {
-    gridY = 10.5;
   } else {
-    return console.log("You have not clicked a valid Y coordinate", y);
+    gridY = 10.5;
   }
 
-  return [gridX, gridY];
+  const result: [number, number] = [gridX, gridY]
+  return result;
 };
 
 //For game pieces calculation as their index is flipped from blender importing
-const calcIndexFromMeshPosition = (point: number[]): number[] | void => {
+const calcIndexFromMeshPosition = (point: [number,number]) => {
   const [x, y] = point;
-  let indexX, indexY;
+  let indexX: number
+  let indexY: number;
   //Calculate X
   if (x === 10.5) {
     indexX = 0;
@@ -316,10 +309,8 @@ const calcIndexFromMeshPosition = (point: number[]): number[] | void => {
     indexX = 5;
   } else if (x === -7.5) {
     indexX = 6;
-  } else if (x === -10.5) {
-    indexX = 7;
   } else {
-    return console.log("Error");
+    indexX = 7;
   }
   //Calculate Y
   if (y === 10.5) {
@@ -336,13 +327,11 @@ const calcIndexFromMeshPosition = (point: number[]): number[] | void => {
     indexY = 5;
   } else if (y === -7.5) {
     indexY = 6;
-  } else if (y === -10.5) {
-    indexY = 7;
   } else {
-    return console.log("Error");
+    indexY = 7;
   }
-
-  return [indexX, indexY];
+  const result: [number, number] = [indexX, indexY]
+  return result;
 };
 
-export { renderScene, rotateCamera, displayPieceMoves, calcIndexFromMeshPosition };
+export {renderScene, rotateCamera, displayPieceMoves, calcIndexFromMeshPosition};

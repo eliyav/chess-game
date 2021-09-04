@@ -2,17 +2,16 @@ import GamePiece from "./game-piece";
 import { calcPawnMovement } from "../../helper/movement-helpers";
 import { isEnPassantAvailable, doMovesMatch } from "../../helper/game-helpers";
 import {Square} from "../../helper/board-helpers";
-import {TurnHistory} from "../../helper/game-helpers"
+import {TurnHistory} from "../../helper/game-helpers";
+import {PieceInstance} from "./bishop";
+import {Move} from "./bishop"
+
 
 interface State {
   currentPlayer: string,
 }
 
-type EnPassant = number | undefined
-
-type Move = string | EnPassant[];
-
-class Pawn extends GamePiece {
+class Pawn extends GamePiece implements PieceInstance {
   direction: number;
 
   constructor(name: string, color: string, point: [number, number], movement: number[]) {
@@ -21,7 +20,7 @@ class Pawn extends GamePiece {
   }
 
   calculateAvailableMoves(grid: Square[][], state: State, turnHistory: TurnHistory, boolean: boolean, currentPoint = this.point) {
-    const availableMoves: Move[][] = [];
+    const availableMoves: Move[] = [];
 
     calcPawnMovement(grid, currentPoint, this.direction, this.moved, this.color, availableMoves);
     if (boolean) {
@@ -38,10 +37,9 @@ class Pawn extends GamePiece {
             const newY = y + direction;
             const potential1 = [x1, newY];
             const potential2 = [x2, newY];
-            //@ts-ignore
-            if (doMovesMatch(potential1, targetSquare) || doMovesMatch(potential2, targetSquare)) {
+            if (doMovesMatch(potential1, targetSquare) || doMovesMatch(potential2, targetSquare)) { 
               availableMoves.push([targetSquare, "enPassant"]);
-            }
+          }
           }
         }
       }

@@ -7,13 +7,19 @@ interface State {
   currentPlayer: string,
 }
 
-class Bishop extends GamePiece {
+export interface PieceInstance {
+  calculateAvailableMoves(grid: Square[][], state: State, turnHistory: TurnHistory, boolean : boolean, currentPoint: [number, number]):  Move[];
+}
+
+export type Move = [[number,number], string]
+
+class Bishop extends GamePiece implements PieceInstance {
   constructor(name: string, color: string, point: [number, number], movement: number[]) {
     super(name, color, point, movement);
   }
 
   calculateAvailableMoves(grid: Square[][], state: State, turnHistory: TurnHistory, boolean : boolean, currentPoint = this.point) {
-    const availableMoves: number[][] = [];
+    const availableMoves: Move[] = [];
     const horizantalMovements = {
       upRight: [],
       upLeft: [],
@@ -27,7 +33,7 @@ class Bishop extends GamePiece {
 
     filterToFinalMoves(grid, this.color, horizantalMovements, availableMoves);
 
-    return availableMoves;
+    return availableMoves; 
   }
 }
 
