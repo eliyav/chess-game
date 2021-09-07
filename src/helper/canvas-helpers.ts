@@ -1,7 +1,13 @@
+import { ArcRotateCamera } from "babylonjs/Cameras/arcRotateCamera";
 import { Material } from "babylonjs/Materials/material";
-import { Scene } from "babylonjs/scene";
+import { Move } from "../component/game-pieces/bishop";
 import Game from "../game";
+import { CustomScene } from "../view/start-screen";
 import { getSquaresandPieces, canValidMoveResolve, switchSquaresBack } from "./game-helpers";
+
+interface CustomMesh extends BABYLON.Mesh {
+  point?: Point,
+}
 
 const renderScene = (game: Game, gameScene: any) => {
   //Clears old meshes/memory usage
@@ -28,13 +34,13 @@ const renderScene = (game: Game, gameScene: any) => {
   });
 };
 
-const displayPieceMoves = (mesh: any, currentMove: [number,number][], game: Game, gameScene: any) => {
+const displayPieceMoves = (mesh: any, currentMove: Point[], game: Game, gameScene: any) => {
   const grid = game.board.grid;
   const state = game.state;
   const turnHistory = game.turnHistory[game.turnHistory.length - 1];
   const [x, y] = calcIndexFromMeshPosition([mesh.position.z, mesh.position.x]);
   const piece = grid[x][y].on;
-  displayMovementSquares([x, y], gameScene, "piece");
+  displayMovementSquares([[x, y], ""], gameScene, "piece");
   let moves = piece!.calculateAvailableMoves(grid, state, turnHistory, true);
   currentMove.push(piece!.point);
   //Add filter to display only moves that can resolve
@@ -49,40 +55,38 @@ const displayPieceMoves = (mesh: any, currentMove: [number,number][], game: Game
     })
     .filter((move) => move !== null)
     .forEach((point) => {
-      displayMovementSquares(point, gameScene, "target");
+      displayMovementSquares(point!, gameScene, "target");
     });
 };
 
-const displayMovementSquares = (point: any, gameScene: any, desc:string) => {
+const displayMovementSquares = (move: Move, gameScene: any, desc:string) => {
   if (desc === "target") {
     const plane: any = BABYLON.MeshBuilder.CreatePlane(`plane`, { width: 2.8, height: 2.8 });
-    [plane.position.z, plane.position.x] = calcBabylonCanvasPosition(point[0]); //Z is X ---- X is Y
-    plane.point = point[0];
+    [plane.position.z, plane.position.x] = calcBabylonCanvasPosition(move[0]); //Z is X ---- X is Y
+    plane.point = move[0];
     plane.position.y += 0.51;
     plane.rotation = new BABYLON.Vector3(Math.PI / 2, 0, 0);
-    if (point[1] === "capture") {
+    if (move[1] === "capture") {
       plane.material = gameScene.materials.find((material: Material) => material.id === "redMat");
-    } else if (point[1] === "movement") {
+    } else if (move[1] === "movement") {
       plane.material = gameScene.materials.find((material: Material) => material.id === "orangeMat");
-    } else if (point[1] === "enPassant") {
+    } else if (move[1] === "enPassant") {
       plane.material = gameScene.materials.find((material: Material) => material.id === "purpleMat");
-    } else if (point[1] === "castling") {
+    } else if (move[1] === "castling") {
       plane.material = gameScene.materials.find((material: Material) => material.id === "blueMat");
     }
     gameScene.meshesToRender.push(plane);
   } else if (desc === "piece") {
-    const torus = BABYLON.MeshBuilder.CreateTorus("torus", { diameter: 2.6, thickness: 0.2, tessellation: 16 });
-    [torus.position.z, torus.position.x] = calcBabylonCanvasPosition(point); //Z is X ---- X is Y
-    //@ts-ignore
-    torus.point = point;
+    const torus: CustomMesh = BABYLON.MeshBuilder.CreateTorus("torus", { diameter: 2.6, thickness: 0.2, tessellation: 16 });
+    [torus.position.z, torus.position.x] = calcBabylonCanvasPosition(move[0]); //Z is X ---- X is Y
+    torus.point = move[0];
     torus.position.y += 0.51;
     torus.material = gameScene.materials.find((material: Material) => material.id === "greenMat");
     gameScene.meshesToRender.push(torus);
   }
 };
 
-const rotateCamera = (currentPlayer: string, gameScene: any) => {
-  //@ts-ignore
+const rotateCamera = (currentPlayer: string, gameScene: CustomScene | any) => {
   let a = gameScene.cameras[0].alpha;
   let divisible;
   let subtractedDivisible;
@@ -197,7 +201,7 @@ const rotateCamera = (currentPlayer: string, gameScene: any) => {
 };
 
 //Calculate canvas position for loaded meshes
-const calcMeshCanvasPosition = (point: [number,number]) => {
+const calcMeshCanvasPosition = (point: Point) => {
   const [x, y] = point;
   let gridX: number;
   let gridY: number;
@@ -290,7 +294,7 @@ const calcBabylonCanvasPosition = (point: [number, number]) => {
 };
 
 //For game pieces calculation as their index is flipped from blender importing
-const calcIndexFromMeshPosition = (point: [number,number]) => {
+const calcIndexFromMeshPosition = (point: Point) => {
   const [x, y] = point;
   let indexX: number
   let indexY: number;

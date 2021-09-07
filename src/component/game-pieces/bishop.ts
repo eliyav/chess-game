@@ -2,19 +2,16 @@ import GamePiece from "./game-piece";
 import { filterToFinalMoves, calcHorizontalMovements } from "../../helper/movement-helpers";
 import {Square} from "../../helper/board-helpers";
 import {TurnHistory} from "../../helper/game-helpers";
-
-interface State {
-  currentPlayer: string,
-}
+import {State} from "../../data/chess-data-import"
 
 export interface PieceInstance {
-  calculateAvailableMoves(grid: Square[][], state: State, turnHistory: TurnHistory, boolean : boolean, currentPoint: [number, number]):  Move[];
+  calculateAvailableMoves(grid: Square[][], state: State, turnHistory: TurnHistory, boolean : boolean, currentPoint: Point):  Move[];
 }
 
-export type Move = [[number,number], string]
+export type Move = [Point, string]
 
 class Bishop extends GamePiece implements PieceInstance {
-  constructor(name: string, color: string, point: [number, number], movement: number[]) {
+  constructor(name: string, color: string, point: Point, movement: number[]) {
     super(name, color, point, movement);
   }
 

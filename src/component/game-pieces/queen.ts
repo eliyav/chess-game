@@ -2,12 +2,8 @@ import GamePiece from "./game-piece";
 import { filterToFinalMoves, calcVerticalMovements, calcHorizontalMovements } from "../../helper/movement-helpers";
 import {Square} from "../../helper/board-helpers";
 import {TurnHistory} from "../../helper/game-helpers";
-import {PieceInstance} from "./bishop";
-import {Move} from "./bishop"
-
-interface State {
-  currentPlayer: string,
-}
+import {PieceInstance, Move} from "./bishop";
+import {State} from "../../data/chess-data-import";
 
 class Queen extends GamePiece implements PieceInstance {
   constructor(name: string, color: string, point: [number, number], movement: number[]) {

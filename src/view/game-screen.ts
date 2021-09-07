@@ -3,9 +3,10 @@ import assetsLoader from "./asset-loader"
 import space from "../../assets/space.jpg";
 import { createMovementMaterials } from "../component/materials";
 import { Engine } from "babylonjs/Engines/engine";
+import { CustomScene } from "./start-screen";
 
-const gameScreen = async (canvas: HTMLCanvasElement, engine: Engine) => {
-  const scene = new BABYLON.Scene(engine);
+const gameScreen = async (canvas: HTMLCanvasElement, engine: Engine): Promise<CustomScene> => {
+  const scene: CustomScene = new BABYLON.Scene(engine);
   const camera = new BABYLON.ArcRotateCamera("camera", Math.PI, Math.PI / 4, 35, new BABYLON.Vector3(0, 0, 0), scene);
   camera.attachControl(canvas, true);
   camera.lowerRadiusLimit = 25;
@@ -26,7 +27,6 @@ const gameScreen = async (canvas: HTMLCanvasElement, engine: Engine) => {
 
   createMovementMaterials(scene);
 
-  //@ts-ignore
   scene.finalMeshes = await assetsLoader(scene, "gameScreen");
 
   return scene;

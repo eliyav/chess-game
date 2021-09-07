@@ -4,7 +4,7 @@ import Bishop from "../component/game-pieces/bishop";
 import Knight from "../component/game-pieces/knight";
 import King from "../component/game-pieces/king";
 import Queen from "../component/game-pieces/queen";
-import { PieceInitialPoints } from "../component/board";
+import { PieceInitialPoints } from "../data/chess-data-import";
  
 const pieceClasses: PiecesClasses = { Pawn, Rook, Bishop, Knight, King, Queen };
 
@@ -31,7 +31,7 @@ const createGrid = (boardSize: number, columnNames: string[][]) : Square[][] => 
 
 
 
-const setPieces = (grid: Square[][], pieceInitialPoints: PieceInitialPoints[][], movementArray: number[]) : void => {
+const setPieces = (grid: Square[][], pieceInitialPoints: PieceInitialPoints[][], movementArray: number[])=> {
   pieceInitialPoints.forEach((array) =>
     array.forEach((ele) => {
       const { name, color, points } = ele;

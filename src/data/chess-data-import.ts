@@ -1,10 +1,8 @@
-import { PieceInitialPoints } from "../component/board"
-
-type State = {
+export type State = {
   currentPlayer: string,
 }
 
-interface Data {
+export interface Data {
   boardSize: number;
   columnNames: string[][];
   teams: string[];
@@ -13,6 +11,12 @@ interface Data {
   initialState: State;
   pieceInitialPoints: PieceInitialPoints[][];
   gridInitialPoints: PieceInitialPoints[][];
+}
+
+export interface PieceInitialPoints {
+  name: string,
+  color: string,
+  points: Point[]
 }
 
 const chessData: Data = {

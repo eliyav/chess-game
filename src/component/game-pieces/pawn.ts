@@ -1,15 +1,9 @@
 import GamePiece from "./game-piece";
 import { calcPawnMovement } from "../../helper/movement-helpers";
-import { isEnPassantAvailable, doMovesMatch } from "../../helper/game-helpers";
+import { isEnPassantAvailable, doMovesMatch, TurnHistory } from "../../helper/game-helpers";
 import {Square} from "../../helper/board-helpers";
-import {TurnHistory} from "../../helper/game-helpers";
-import {PieceInstance} from "./bishop";
-import {Move} from "./bishop"
-
-
-interface State {
-  currentPlayer: string,
-}
+import {PieceInstance, Move} from "./bishop";
+import {State} from "../../data/chess-data-import";
 
 class Pawn extends GamePiece implements PieceInstance {
   direction: number;

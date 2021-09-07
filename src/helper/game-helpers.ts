@@ -1,7 +1,7 @@
 import { pieceClasses, Square} from "./board-helpers";
 import {Move} from "../component/game-pieces/bishop"
 import { PieceType } from "./board-helpers";
-import { filterPixelShader } from "babylonjs/Shaders/filter.fragment";
+import { State } from "../data/chess-data-import";
 
 export interface TurnHistory {
   result: boolean;
@@ -16,14 +16,8 @@ export interface TurnHistory {
   promotion?: string | undefined;
   turn? : number;
 }
- 
-type State = {
-  currentPlayer: string,
-}
 
-
-
-const resolveMove = (originPoint: [number, number], targetPoint: [number,number], state:State, grid: Square[][], turnHistory: TurnHistory) : TurnHistory | boolean  => {
+const resolveMove = (originPoint: Point, targetPoint: Point, state:State, grid: Square[][], turnHistory: TurnHistory) : TurnHistory | boolean  => {
   const squaresandPieces = getSquaresandPieces(originPoint, targetPoint, grid);
   const { originSquare, originPiece, targetSquare, targetPiece } = squaresandPieces;
 
@@ -126,7 +120,7 @@ const resolveMove = (originPoint: [number, number], targetPoint: [number,number]
 
 type EnPassantResult = {
   result: boolean,
-  enPassantSquare: [number,number]
+  enPassantSquare: Point
 }
 
 const isEnPassantAvailable = (history: TurnHistory) : EnPassantResult => {
@@ -153,7 +147,7 @@ const isEnPassantAvailable = (history: TurnHistory) : EnPassantResult => {
   };
 };
 
-const canValidMoveResolve = (squaresandPieces: SquaresandPieces, targetPoint: [number,number], state: State, grid: Square[][], turnHistory: TurnHistory) => {
+const canValidMoveResolve = (squaresandPieces: SquaresandPieces, targetPoint: Point, state: State, grid: Square[][], turnHistory: TurnHistory) => {
   //Resolve switch of squares
   switchSquares(squaresandPieces, targetPoint);
   //Check if resolve causes current players king to be check
@@ -216,7 +210,7 @@ const calcCastling = (grid: Square[][], state: State, turnHistory: TurnHistory, 
 };
 
 //Checks if castling is valid
-const checkForCastling = (originPoint: [number,number], targetPoint: [number,number], state: State , grid: Square[][], turnHistory: TurnHistory) => {
+const checkForCastling = (originPoint: Point, targetPoint: Point, state: State , grid: Square[][], turnHistory: TurnHistory) => {
   const squaresandPieces = getSquaresandPieces(originPoint, targetPoint, grid);
   const { originPiece, targetPiece, originSquare, targetSquare } = squaresandPieces;
   //Check for valid castling pieces
@@ -353,7 +347,7 @@ const switchSquares = (squaresandPieces: SquaresandPieces, point: [number, numbe
   return true;
 };
 
-const switchSquaresBack = (squaresandPieces: SquaresandPieces, point: [number,number]) => {
+const switchSquaresBack = (squaresandPieces: SquaresandPieces, point: Point) => {
   const { originSquare, targetSquare, originPiece, targetPiece } = squaresandPieces;
   originSquare.on = originPiece;
   originSquare.on!.point = [getX(point), getY(point)];
@@ -362,17 +356,17 @@ const switchSquaresBack = (squaresandPieces: SquaresandPieces, point: [number,nu
 };
 
 //General Helper functions
-const getX = (point: [number,number]) => {
+const getX = (point: Point) => {
   const [x, y] = point;
   return x;
 };
 
-const getY = (point: [number,number]) => {
+const getY = (point: Point) => {
   const [x, y] = point;
   return y;
 };
 
-const doMovesMatch = (move: [number, number], move2:[number,number]) => getX(move) == getX(move2) && getY(move) == getY(move2);
+const doMovesMatch = (move: Point, move2:Point) => getX(move) == getX(move2) && getY(move) == getY(move2);
 
 const getOpponentsPieces = (state: State, grid:Square[][]) => {
   const piecesArray = grid.flat().filter((square) => {

@@ -1,14 +1,9 @@
 import GamePiece from "./game-piece";
 import { calcKingMoves } from "../../helper/movement-helpers";
-import { calcCastling } from "../../helper/game-helpers";
+import { calcCastling, TurnHistory } from "../../helper/game-helpers";
 import {Square} from "../../helper/board-helpers";
-import {TurnHistory} from "../../helper/game-helpers";
-import {PieceInstance} from "./bishop"
-import {Move} from "./bishop"
-
-interface State {
-  currentPlayer: string,
-}
+import {PieceInstance, Move} from "./bishop"
+import {State} from "../../data/chess-data-import"
 
 class King extends GamePiece implements PieceInstance {
   castling: boolean;
@@ -19,7 +14,7 @@ class King extends GamePiece implements PieceInstance {
   }
 
   calculateAvailableMoves(grid: Square[][], state: State, turnHistory: TurnHistory, boolean: boolean, currentPoint = this.point) {
-    const kingMoves: [number,number][] = [
+    const kingMoves: Point[] = [
       [0, 1],
       [1, 0],
       [1, 1],

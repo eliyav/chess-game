@@ -1,33 +1,8 @@
 import { resolveMove, isCheckmate, annotate } from "./helper/game-helpers";
 import { setPieces, createGrid } from "./helper/board-helpers";
 import Board from "./component/board";
-import {PieceInitialPoints} from "./component/board"
-
-interface Data {
-  boardSize: number;
-  columnNames: string[][];
-  teams: string[];
-  pieces: string[];
-  movement: number[];
-  initialState: State;
-  pieceInitialPoints: PieceInitialPoints[][];
-  gridInitialPoints: PieceInitialPoints[][];
-}
-
-type State = {
-  currentPlayer: string,
-}
-
-
-
-interface Square {
-  square : string,
-  on?: undefined
-  }
- 
-type index = {
-  [index:number]: number
-}
+import {Data, State} from "./data/chess-data-import"
+import { TurnHistory } from "./helper/game-helpers";
 
 class Game {
   state: State;
@@ -36,7 +11,7 @@ class Game {
   board;
   moves: [number, number][];
   annotations: string[];
-  turnHistory: any //Fix this any declaration later
+  turnHistory: TurnHistory[];
   player: undefined;
 
   constructor(chessData: Data) {

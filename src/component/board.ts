@@ -1,32 +1,12 @@
-import { createGrid } from "../helper/board-helpers";
-
-interface Data {
-  boardSize: number;
-  columnNames: string[][];
-  teams: string[];
-  pieces: string[];
-  movement: number[];
-  initialState: State;
-  pieceInitialPoints: PieceInitialPoints[][];
-  gridInitialPoints: PieceInitialPoints[][];
-}
-
-type State = {
-  currentPlayer: string,
-}
-
-export interface PieceInitialPoints {
-  name: string,
-  color: string,
-  points: [number,number][]
-}
+import { createGrid, Square } from "../helper/board-helpers";
+import {Data, PieceInitialPoints} from "../data/chess-data-import"
 
 class Board {
   movementArray: number[];
   pieceInitialPoints: PieceInitialPoints[][];
   boardSize: number;
   columnNames: string[][];
-  grid;
+  grid: Square[][];
 
   constructor({ boardSize, pieceInitialPoints, movement, columnNames}: Data) {
     this.movementArray = movement;

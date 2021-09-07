@@ -11,7 +11,7 @@ class EventEmitter {
     return this;
   }
 
-  on(event: string, fn: (originPoint?: [number,number], targetPoint?: [number,number]) => void) {
+  on(event: string, fn: (originPoint?: Point, targetPoint?: Point) => void) {
     return this.addListener(event, fn);
   }
 
