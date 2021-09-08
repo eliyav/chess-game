@@ -8,7 +8,7 @@ import {State} from "../../data/chess-data-import";
 class Pawn extends GamePiece implements PieceInstance {
   direction: number;
 
-  constructor(name: string, color: string, point: [number, number], movement: number[]) {
+  constructor(name: string, color: string, point: Point, movement: number[]) {
     super(name, color, point, movement);
     this.direction = this.color === "White" ? 1 : -1;
   }
@@ -29,8 +29,8 @@ class Pawn extends GamePiece implements PieceInstance {
             const x1 = x - 1;
             const x2 = x + 1;
             const newY = y + direction;
-            const potential1: [number, number] = [x1, newY];
-            const potential2: [number, number] = [x2, newY];
+            const potential1: Point = [x1, newY];
+            const potential2: Point = [x2, newY];
             if (doMovesMatch(potential1, targetSquare) || doMovesMatch(potential2, targetSquare)) { 
               availableMoves.push([targetSquare, "enPassant"]);
           }

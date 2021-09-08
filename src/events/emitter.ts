@@ -1,12 +1,13 @@
 import EventEmitter from "./event-emitter"; 
 import { renderScene, rotateCamera } from "../helper/canvas-helpers";
 import Game from "../game";
+import {CustomScene} from "../view/start-screen"
 
 //Fix Any on GameScene. Camera not showing up on Scene class
 
 type GameMode = {mode: string | undefined, player: string | undefined , room: number | undefined}
 
-const activateEmitter = (game: Game, gameMode: GameMode, gameScene: any) : EventEmitter => {
+const activateEmitter = (game: Game, gameMode: GameMode, gameScene: CustomScene) : EventEmitter => {
   const emitter = new EventEmitter();
 
   emitter.on("playerMove", (originPoint, targetPoint) => {
@@ -37,7 +38,8 @@ const activateEmitter = (game: Game, gameMode: GameMode, gameScene: any) : Event
     if (answer) {
       game.resetBoard();
       renderScene(game, gameScene);
-      gameScene.cameras[0].alpha = Math.PI;
+      let camera:any = gameScene.cameras[0]
+      camera.alpha = Math.PI;
     }
   });
 

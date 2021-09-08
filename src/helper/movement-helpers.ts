@@ -105,7 +105,7 @@ const calcPawnMovement = (grid: Square[][], currentPoint: Point, direction: numb
   checkForValidPawnCapture(capturePoint2, color, grid, finalObj);
 };
 
-const checkForValidPawnCapture = (capturePoint: Point, color: any, grid: Square[][], finalObj: Move[]) => {
+const checkForValidPawnCapture = (capturePoint: Point, color: string, grid: Square[][], finalObj: Move[]) => {
   const [captureX, captureY] = capturePoint;
   if (bounds(captureX, grid) && bounds(captureY, grid)) {
     const captureSquare = grid[captureX][captureY];

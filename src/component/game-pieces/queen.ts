@@ -6,7 +6,7 @@ import {PieceInstance, Move} from "./bishop";
 import {State} from "../../data/chess-data-import";
 
 class Queen extends GamePiece implements PieceInstance {
-  constructor(name: string, color: string, point: [number, number], movement: number[]) {
+  constructor(name: string, color: string, point: Point, movement: number[]) {
     super(name, color, point, movement);
   }
   calculateAvailableMoves(grid: Square[][], state: State, turnHistory: TurnHistory, boolean: boolean, currentPoint = this.point) {

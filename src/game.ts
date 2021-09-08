@@ -9,7 +9,7 @@ class Game {
   teams: string[];
   turnCounter: number;
   board;
-  moves: [number, number][];
+  moves: Point[];
   annotations: string[];
   turnHistory: TurnHistory[];
   player: undefined;
@@ -26,7 +26,7 @@ class Game {
     this.setBoard();
   }
 
-  playerMove(originPoint: [number, number], targetPoint: [number, number]) : boolean {
+  playerMove(originPoint: Point, targetPoint: Point) : boolean {
     const lastTurn = this.turnHistory[this.turnHistory.length - 1];
     const resolve = resolveMove(originPoint, targetPoint, this.state, this.board.grid, lastTurn);
     if(typeof resolve !== "boolean"){

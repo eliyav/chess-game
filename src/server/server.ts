@@ -1,6 +1,5 @@
-//@ts-ignore
 const app = require("express")();
-//@ts-ignore
+
 const httpServer = require("http").createServer(app);
 const options = {
   cors: {
@@ -8,7 +7,7 @@ const options = {
     methods: ["GET", "POST"],
   },
 };
-//@ts-ignore
+
 const io = require("socket.io")(httpServer, options);
 
 io.on("connection", (socket: any) => {

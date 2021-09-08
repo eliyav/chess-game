@@ -10,7 +10,7 @@
   },
   "browserslist": [
     "last 1 Chrome version"
-  ], 
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -22,6 +22,7 @@
     "socket.io-client": "^4.2.0"
   },
   "devDependencies": {
+    "@types/node": "^16.7.13",
     "typescript": "^4.4.2"
   }
 }

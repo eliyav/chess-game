@@ -6,11 +6,11 @@ import {PieceInstance, Move} from "./bishop"
 import {State} from "../../data/chess-data-import"
 
 class Knight extends GamePiece implements PieceInstance {
-  constructor(name: string, color: string, point: [number, number], movement: number[]) {
+  constructor(name: string, color: string, point: Point, movement: number[]) {
     super(name, color, point, movement);
   }
   calculateAvailableMoves(grid: Square[][], state: State, turnHistory: TurnHistory, boolean: boolean, currentPoint = this.point) {
-    const knightMoves: [number, number][] = [
+    const knightMoves: Point[] = [
       [1, 2],
       [2, 1],
       [2, -1],
