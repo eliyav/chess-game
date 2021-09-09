@@ -10,6 +10,7 @@ import { Engine } from "babylonjs/Engines/engine";
 import { Scene } from "babylonjs/scene";
 import EventEmitter from "./events/event-emitter";
 import activateSocket from "./server/sockets";
+import { ChessPieceMesh } from "./view/asset-loader";
  
 const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
   const app: app = {
@@ -48,17 +49,20 @@ const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
   renderScene(game, gameScene);
 
   gameScene.onPointerDown = async (e, pickResult) => {
-    const mesh = pickResult.pickedMesh;
-    const isCompleteMove = inputController(mesh, game, gameScene);
-    isCompleteMove
-      ? (() => {
-          const [originPoint, targetPoint] = game.moves;
-          if(typeof app.emitter !== "undefined"){
-            app.emitter.emit("playerMove", originPoint, targetPoint);
-          }
-        })()
-      : null;
-  };
+    if(pickResult.pickedMesh !== null){
+      const mesh: ChessPieceMesh = pickResult.pickedMesh;
+      const isCompleteMove = inputController(mesh, game, gameScene);
+      isCompleteMove
+        ? (() => {
+            const [originPoint, targetPoint] = game.moves;
+            if(typeof app.emitter !== "undefined"){
+              app.emitter.emit("playerMove", originPoint, targetPoint);
+            }
+          })()
+        : null;
+    };
+    }
+
 
   return app;
 };
