@@ -2,8 +2,9 @@ import { doMovesMatch } from "../helper/game-helpers";
 import { renderScene, calcIndexFromMeshPosition, displayPieceMoves } from "../helper/canvas-helpers";
 import Game from "../game";
 import { Scene } from "babylonjs/scene";
+import { ChessPieceMesh } from "../view/asset-loader";
 
-const inputController = (mesh: any, game: Game, gameScene: Scene) => {
+const inputController = (mesh: ChessPieceMesh, game: Game, gameScene: Scene) => {
   const currentMove = game.moves;
   //If mesh
   if (mesh) {
@@ -44,7 +45,9 @@ const inputController = (mesh: any, game: Game, gameScene: Scene) => {
         }
       }
     } else if (mesh.id === "plane") {
-      currentMove.push(mesh.point);
+      if(typeof mesh.point !== "undefined"){
+        currentMove.push(mesh.point);
+      }
     } else if (mesh.color) {
       //If second selection is an enemy mesh, calculate move of original piece and push move if matches
       if (mesh.color !== game.state.currentPlayer) {

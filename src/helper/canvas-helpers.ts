@@ -1,11 +1,11 @@
 import { Material } from "babylonjs/Materials/material";
 import { AbstractMesh } from "babylonjs/Meshes/abstractMesh";
-import { Mesh } from "babylonjs/Meshes/mesh";
 import { Nullable } from "babylonjs/types";
 import { Move } from "../component/game-pieces/bishop";
 import Game from "../game";
 import { CustomScene } from "../view/start-screen";
 import { getSquaresandPieces, canValidMoveResolve, switchSquaresBack } from "./game-helpers";
+import { ChessPieceMesh } from "../view/asset-loader";
 
 const renderScene = (game: Game, gameScene: CustomScene) => {
   //Clears old meshes/memory usage
@@ -33,7 +33,7 @@ const renderScene = (game: Game, gameScene: CustomScene) => {
   });
 };
 
-const displayPieceMoves = (mesh: Mesh, currentMove: Point[], game: Game, gameScene: CustomScene) => {
+const displayPieceMoves = (mesh: ChessPieceMesh, currentMove: Point[], game: Game, gameScene: CustomScene) => {
   const grid = game.board.grid;
   const state = game.state;
   const turnHistory = game.turnHistory[game.turnHistory.length - 1];

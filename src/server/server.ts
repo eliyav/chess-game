@@ -11,7 +11,7 @@ const options = {
 const io = require("socket.io")(httpServer, options);
 
 io.on("connection", (socket: any) => {
-  let room: any;
+  let room: number;
   socket.on("request-room-id", () => {
     room = Math.random();
     socket.join(room);
@@ -22,7 +22,7 @@ io.on("connection", (socket: any) => {
     socket.emit("room-info", serializedSet);
     console.log(clients);
   });
-  socket.on("join-room", (roomNumber: any) => {
+  socket.on("join-room", (roomNumber: number) => {
     room = roomNumber;
     socket.join(room);
     socket.to(room).emit("message", "A new player has joined the room");
@@ -34,7 +34,13 @@ io.on("connection", (socket: any) => {
     console.log(clients);
   });
 
-  socket.on("stateChange", ({ originPoint, targetPoint, room }: any) => {
+interface StateChange {
+  originPoint: Point,
+  targetPoint: Point,
+  room: number,
+}
+
+  socket.on("stateChange", ({ originPoint, targetPoint, room }: StateChange) => {
     socket.to(room).emit("message", "Move has been entered");
     socket.to(room).emit("stateChange", { originPoint, targetPoint });
   });
@@ -44,7 +50,7 @@ io.on("connection", (socket: any) => {
     socket.to(room).emit("reset-board-request");
   });
 
-  socket.on("reset-board-response", (answer: any) => {
+  socket.on("reset-board-response", (answer: string) => {
     if (answer === "Yes") {
       socket.to(room).emit("message", "Opponent has agreed to reset the board!");
       socket.to(room).emit("reset-board-resolve", "Yes");
@@ -61,7 +67,7 @@ io.on("connection", (socket: any) => {
     socket.to(room).emit("draw-request");
   });
 
-  socket.on("draw-response", (answer: any) => {
+  socket.on("draw-response", (answer: string) => {
     if (answer === "Yes") {
       socket.to(room).emit("message", "Opponent has agreed for game Draw!");
       socket.to(room).emit("draw-resolve", "Yes");

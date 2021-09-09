@@ -9,8 +9,8 @@ export interface TurnHistory {
   direction?: number;
   origin: number[];
   target: number[];
-  originPiece: any;
-  targetPiece: any;
+  originPiece: PieceType | undefined;
+  targetPiece: PieceType | undefined;
   originSquare: Square;
   targetSquare: Square;
   promotion?: string | undefined;
@@ -132,11 +132,11 @@ const isEnPassantAvailable = (history: TurnHistory) : EnPassantResult => {
   history === undefined
     ? null
     : (() => {
-        if (history.originPiece.name === "Pawn") {
+        if (history.originPiece!.name === "Pawn") {
           const targetY = history.target[1];
           const originY = history.origin[1];
           moved = Math.abs(targetY - originY);
-          direction = history.originPiece.color === "White" ? 1 : -1;
+          direction = history.originPiece!.color === "White" ? 1 : -1;
           x = history.target[0];
           y = history.origin[1] + direction;
         }
@@ -528,7 +528,7 @@ const annotate = (result: TurnHistory, state: State, grid: Square[][], turnHisto
     }
     string = result.targetSquare.square + "=" + finalString;
   } else {
-    let name = result.originPiece.name;
+    let name = result.originPiece!.name;
     let movingPiece;
     let isCapturing = result.targetPiece !== undefined ? true : false;
     let activeSquare = result.targetSquare.square;

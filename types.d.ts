@@ -1,11 +1,5 @@
-declare module "*.jpg" {
-    const value: any;
-    export = value;
-  }
+declare module "*.jpg"
 
-declare  module "*.gltf" {
-    const value: any;
-    export = value;
-  }
+declare  module "*.gltf"
 
-type Point = [number, number];
+type Point = [number,number];

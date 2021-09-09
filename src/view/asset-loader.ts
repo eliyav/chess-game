@@ -22,6 +22,17 @@ import { AbstractMesh } from "babylonjs/Meshes/abstractMesh";
 export interface ChessPieceMesh extends AbstractMesh {
   name: string,
   color?: string,
+  point?: Point,
+}
+
+interface DisplayMesh extends AbstractMesh {
+  name: string,
+  color?: string,
+  point?: Point,
+  speed?: number,
+  rotationIndex?: number,
+  rotationIndex2?: number,
+  rotationIndex3?: number,
 }
 
 const assetsLoader = async (scene: Scene, description: string) => {
@@ -111,10 +122,12 @@ const assetsLoader = async (scene: Scene, description: string) => {
 
     const rotationArray = [-5, -4, -3, -2, -1, 1, 2, 3, 4, 5];
 
-    loadedPiecesMeshes.forEach((mesh: any) => {
-      const finalMesh = mesh.meshes[1];
-      [finalMesh.name, finalMesh.color, finalMesh.scalingDeterminant = 40, finalMesh.position.y = 17, finalMesh.position.x = 10] =
-        finalMesh.id.split("-");
+    loadedPiecesMeshes.forEach((mesh) => {
+      const finalMesh: DisplayMesh = mesh.meshes[1];
+      [finalMesh.name, finalMesh.color] = finalMesh.id.split("-");
+      finalMesh.scalingDeterminant = 40, 
+      finalMesh.position.y = 17, 
+      finalMesh.position.x = 10,
       finalMesh.color === "White" ? (finalMesh.material = materials.white) : (finalMesh.material = materials.black);
       finalMesh.speed = Math.random() * 0.6;
       finalMesh.position.z = calcRandomZ();
@@ -150,17 +163,17 @@ const assetsLoader = async (scene: Scene, description: string) => {
         gamma += 0.02;
         boardClone!.rotate(new BABYLON.Vector3(0, beta, 0), Math.PI / 500, BABYLON.Space.LOCAL);
         boardClone2!.rotate(new BABYLON.Vector3(0, -beta * 2, 0), Math.PI / 500, BABYLON.Space.LOCAL);
-        loadedPiecesMeshes.forEach((mesh: any) => {
-          const piece = mesh.meshes[1];
-          piece.position.y -= piece.speed;
+        loadedPiecesMeshes.forEach((mesh) => {
+          const piece: DisplayMesh = mesh.meshes[1];
+          piece.position.y -= piece.speed!;
           if (piece.position.y < -15) {
             resetMesh(piece);
           }
           piece.rotate(
             new BABYLON.Vector3(
-              alpha * rotationArray[piece.rotationIndex],
-              beta * rotationArray[piece.rotationIndex2],
-              gamma * rotationArray[piece.rotationIndex3]
+              alpha * rotationArray[piece.rotationIndex!],
+              beta * rotationArray[piece.rotationIndex2!],
+              gamma * rotationArray[piece.rotationIndex3!]
             ),
             (3 * Math.PI) / 500,
             BABYLON.Space.LOCAL
@@ -186,7 +199,7 @@ const calcRandomIndex = (length: number) => {
   return index;
 };
 
-const resetMesh = (piece: any) => {
+const resetMesh = (piece: DisplayMesh) => {
   const speed = Math.random() * 0.1;
   piece.speed = speed;
   piece.position.z = calcRandomZ();
