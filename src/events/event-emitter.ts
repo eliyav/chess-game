@@ -1,5 +1,5 @@
 class EventEmitter { 
-  listeners: any; //Correct this later
+  listeners: any;
 
   constructor() {
     this.listeners = {};
@@ -41,10 +41,10 @@ class EventEmitter {
     return this;
   }
 
-  emit(event: string, ...args: [number[], number[]]) {  /// Fix this emit is not always for player move
+  emit(event: string, ...args: any) {
     let fns = this.listeners[event];
     if (!fns) return false;
-    fns.forEach((f: (arg0: number[], arg1: number[]) => void) => {
+    fns.forEach((f: any) => {
       f(...args);
     });
     return true;

@@ -1,7 +1,13 @@
 * {
   margin: 0;
-  height: 100%;
-  width: 100%;
+}
+
+.app {
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  display: flex;
+  justify-content: center;
 }
 
 #renderCanvas {
@@ -9,103 +15,39 @@
   width: 100%;
 }
 
-/*
-.container {
-  display: grid;
-  height: 100vh;
-  margin: 0;
-  grid-template-columns: 10vw auto 15vw;
-  grid-template-rows: 50vh 50vh;
-}
-
-
-.navbar {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  background-color: #adb6b5;
-  align-items: center;
-  grid-column: 1/2;
-  grid-row: 1/3;
-  border-width: 5px;
-  border-style: outset;
-  border-color: #dfdee7;
-}
-
-.navbar > button {
-  width: 100%;
-  margin-top: 10%;
-  font-weight: 600;
-  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
-  background-color: lightskyblue;
-  color: black;
+#startOG {
+  position: absolute;
+  top: 70vh;
+  z-index: 1;
+  background-color: transparent;
+  width: 200px;
   height: 50px;
-  border-width: 5px;
-  border-style: inset;
-  border-color: #eea9cd;
-}
-
-.navbar > button:hover {
-  background-color: #22568f;
   color: white;
-  font-weight: 800;
+  font-size: larger;
+  font-weight: bolder;
+  border: 2mm ridge rgba(255, 250, 250, 0.938);
 }
 
-.navbar > img {
-  width: 100%;
-  border-width: 10px;
-  border-style: ridge;
-  border-color: rgb(221, 218, 214);
+#startOG:hover {
+  transform: scale(1.2);
 }
 
-.navbar > #home {
-  margin-top: 2px;
+#home {
+  position: absolute;
+  top: 10px;
+  left: 50px;
+  z-index: 1;
 }
 
-.game-settings {
-  display: none;
-  margin-top: 20%;
+#resetBoard {
+  position: absolute;
+  top: 10px;
+  left: 200px;
+  z-index: 1;
 }
 
-.middle-content {
-  background-image: url("/assets/chess-background.jfif");
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  grid-row: 1/3;
-  text-align: center;
+#camera {
+  position: absolute;
+  top: 10px;
+  z-index: 1;
 }
-
-#intro {
-  margin-top: 5%;
-  color: rgb(226, 16, 135);
-  font-size: 1.6rem;
-  text-shadow: -1px -1px 0px rgb(41, 143, 184);
-  text-shadow: 1px 1px 0px rgb(65, 187, 235);
-  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
-}
-
-#intro2 {
-  margin-top: 10%;
-}
-
-.game-history {
-  background-color: red;
-  grid-column: 3/4;
-  grid-row: 1/2;
-  border-width: 5px;
-  border-style: outset;
-  border-color: #dfdee7;
-}
-
-.ui-settings {
-  background-color: hotpink;
-  grid-row: 2/3;
-  grid-column: 3/4;
-  border-width: 5px;
-  border-style: outset;
-  border-color: #dfdee7;
-}
-
-*/

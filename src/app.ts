@@ -4,16 +4,32 @@ import chessData from "./data/chess-data-import";
 import startScreen from "./view/start-screen";
 import gameScreen from "./view/game-screen";
 import activateEmitter from "./events/emitter";
-import createGUI from "./view/gui-overlay";
+import setGUI from "./view/gui-overlay";
 import inputController from "./events/input-controller";
 import { Engine } from "babylonjs/Engines/engine";
 import { Scene } from "babylonjs/scene";
 import EventEmitter from "./events/event-emitter";
 import activateSocket from "./server/sockets";
 import { ChessPieceMesh } from "./view/asset-loader";
- 
+
+export interface App{
+  game: Game,
+  gameMode: {mode: string | undefined, player: string | undefined , room: number | undefined}
+  showScene: {index: number},
+  scenes: {
+   startScene: Scene,
+   gameScene: Scene,
+  }
+  emitter?: EventEmitter,
+  socket?: undefined,
+}
+
+if(window.visualViewport.width <= 768) {
+window.screen.orientation.lock("landscape")
+}
+
 const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
-  const app: app = {
+  const app: App = {
     game: new Game(chessData),
     gameMode: { mode: undefined, player: undefined, room: undefined },
     showScene: { index: 0 },
@@ -24,18 +40,6 @@ const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
     emitter: undefined,
   };
 
-  interface app{
-    game: Game,
-    gameMode: {mode: string | undefined, player: string | undefined , room: number | undefined}
-    showScene: {index: number},
-    scenes: {
-     startScene: Scene,
-     gameScene: Scene,
-    }
-    emitter?: EventEmitter,
-    socket?: undefined,
-  }
-
   const {
     game,
     gameMode,
@@ -45,7 +49,7 @@ const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
 
   app.emitter = activateEmitter(game, gameMode, gameScene);
   //appContext.socket = activateSocket(game, gameMode, gameScene);
-  createGUI(startScene, gameScene, showScene, gameMode, app.emitter, app.socket, game);
+  setGUI(app);
   renderScene(game, gameScene);
 
   gameScene.onPointerDown = async (e, pickResult) => {
