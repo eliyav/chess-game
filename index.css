@@ -19,9 +19,9 @@
   position: absolute;
   top: 70vh;
   z-index: 1;
-  background-color: transparent;
   width: 200px;
   height: 50px;
+  background-color: transparent;
   color: white;
   font-size: larger;
   font-weight: bolder;
@@ -32,22 +32,40 @@
   transform: scale(1.2);
 }
 
-#home {
+#gameButtons {
+  display: none;
+  width: 100%;
   position: absolute;
-  top: 10px;
-  left: 50px;
-  z-index: 1;
+  pointer-events: none;
 }
 
-#resetBoard {
-  position: absolute;
-  top: 10px;
-  left: 200px;
+#gameButtons > button {
+  background-color: transparent;
+  color: white;
+  font-size: large;
+  font-weight: bold;
+  border: 1mm ridge rgba(255, 250, 250, 0.938);
   z-index: 1;
+  width: fit-content;
+  display: inline-block;
+  pointer-events: auto;
 }
 
-#camera {
-  position: absolute;
-  top: 10px;
-  z-index: 1;
+#gameButtons > button:hover {
+  transform: scale(1.2);
+  color: red;
+}
+
+@media screen and (max-width: 425px) {
+  #gameButtons > button {
+    margin-right: 5%;
+    margin-top: 0.2%;
+  }
+}
+
+@media screen and (max-width: 2560px) {
+  #gameButtons > button {
+    margin-right: 2%;
+    margin-top: 0.2%;
+  }
 }

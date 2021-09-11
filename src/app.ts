@@ -24,10 +24,6 @@ export interface App{
   socket?: undefined,
 }
 
-if(window.visualViewport.width <= 768) {
-window.screen.orientation.lock("landscape")
-}
-
 const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
   const app: App = {
     game: new Game(chessData),

@@ -11,12 +11,15 @@ function setGUI(app: App) {
     scenes: { startScene, gameScene },
   } = app;
 
+const gameButtons = document.getElementById("gameButtons") as HTMLDivElement;
+
 const startOGButton = document.getElementById("startOG") as HTMLButtonElement
 startOGButton.addEventListener("click", () => {
   gameMode.mode = "offline";
   startScene.detachControl();
   showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);
   startOGButton.style.display = "none";
+  gameButtons.style.display = "unset"
 })
 
 const homeButton = document.getElementById("home") as HTMLButtonElement
@@ -27,7 +30,8 @@ homeButton.addEventListener("click", () => {
   camera.alpha = Math.PI;
   gameScene.detachControl();
   showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);
-  startOGButton.style.display = "unset"
+  startOGButton.style.display = "unset";
+  gameButtons.style.display = "none";
 })
 
 

@@ -5,13 +5,19 @@ import { Engine } from "babylonjs/Engines/engine";
  
 async function Main() {
   const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
-  const engine:Engine = new BABYLON.Engine(canvas, true);
+  let engine:Engine = new BABYLON.Engine(canvas, true);
   const app = await initializeApp(canvas, engine);
 
   const {
     showScene,
     scenes: { startScene, gameScene },
   } = app;
+
+const refreshCanvas = () => {
+  engine.resize();
+}
+
+  window.onresize = refreshCanvas;
 
   (() => {
     engine.runRenderLoop(function () {
