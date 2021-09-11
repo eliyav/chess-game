@@ -1,2 +1,0 @@
-*{margin:0}.app{height:100vh;width:100vw;position:fixed;display:flex;justify-content:center}#renderCanvas{height:100%;width:100%}#startOG{position:absolute;top:70vh;z-index:1;background-color:initial;width:200px;height:50px;color:#fff;font-size:larger;font-weight:bolder;border:2mm ridge hsla(0,100%,99%,.938)}#startOG:hover{transform:scale(1.2)}#home{left:50px}#home,#resetBoard{position:absolute;top:10px;z-index:1}#resetBoard{left:200px}#camera{position:absolute;top:10px;z-index:1}
-/*# sourceMappingURL=chess-game.6bfda2ec.css.map */
