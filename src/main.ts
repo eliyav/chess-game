@@ -15,9 +15,16 @@ async function Main() {
 
 const refreshCanvas = () => {
   engine.resize();
+  let camera: any = startScene.cameras[0]
+  if(canvas.width < 768) {
+    camera.radius = 33;
+  } else {
+    camera.radius = 30;
+  }
 }
 
   window.onresize = refreshCanvas;
+  window.onload = refreshCanvas;
 
   (() => {
     engine.runRenderLoop(function () {
