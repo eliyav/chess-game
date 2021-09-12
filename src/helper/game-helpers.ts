@@ -7,8 +7,10 @@ export interface TurnHistory {
   result: boolean;
   type?: string;
   direction?: number;
-  origin: number[];
-  target: number[];
+  enPassant?: EnPassantResult;
+  castling?: Square[];
+  origin: Point;
+  target: Point;
   originPiece: PieceType | undefined;
   targetPiece: PieceType | undefined;
   originSquare: Square;
@@ -31,11 +33,12 @@ const resolveMove = (originPoint: Point, targetPoint: Point, state:State, grid: 
       const b = getX(targetPoint);
       let c = a - b;
       c < 0 ? (c = 1) : (c = -1);
-      castlingMove(c, squaresandPieces, grid);
+      const castlingResult = castlingMove(c, squaresandPieces, grid);
       return {
         result: true,
         type: "castling",
         direction: c,
+        castling: castlingResult,
         origin: originPoint,
         target: targetPoint,
         originPiece: originPiece,
@@ -61,17 +64,19 @@ const resolveMove = (originPoint: Point, targetPoint: Point, state:State, grid: 
       let finalX = originPiece!.point[0] === x1 || originPiece!.point[0] === x2;
       //Then find a way to let the can valid move resolve function handle the fact en passant worked
       if (y && finalX) {
-        if (doMovesMatch(enPassant.enPassantSquare, targetPoint)) {
+        if (doMovesMatch(enPassant.enPassantPoint, targetPoint)) {
           if (canValidMoveResolve(squaresandPieces, targetPoint, state, grid, turnHistory)) {
+            const enPassantPiece = turnHistory.targetSquare.on;
             turnHistory.targetSquare.on = undefined;
             return {
               result: true,
+              enPassant: enPassant,
               origin: originPoint,
               target: targetPoint,
               originPiece: originPiece,
-              targetPiece: targetPiece,
+              targetPiece: enPassantPiece,
               originSquare: originSquare,
-              targetSquare: targetSquare,
+              targetSquare: turnHistory.targetSquare,
             };
           }
         }
@@ -92,6 +97,7 @@ const resolveMove = (originPoint: Point, targetPoint: Point, state:State, grid: 
         promotion = checkForPawnPromotion(squaresandPieces);
       }
       originPiece!.moved = true;
+      originPiece!.moveCounter++;
       console.log("Move is Valid! Board is updated.");
 
       return {
@@ -120,7 +126,7 @@ const resolveMove = (originPoint: Point, targetPoint: Point, state:State, grid: 
 
 type EnPassantResult = {
   result: boolean,
-  enPassantSquare: Point
+  enPassantPoint: Point,
 }
 
 const isEnPassantAvailable = (history: TurnHistory) : EnPassantResult => {
@@ -143,7 +149,7 @@ const isEnPassantAvailable = (history: TurnHistory) : EnPassantResult => {
       })();
   return {
     result: moved === 2 ? true : false,
-    enPassantSquare: [x, y],
+    enPassantPoint: [x, y],
   };
 };
 
@@ -307,6 +313,7 @@ const castlingMove = (direction: number, squaresandPieces: SquaresandPieces, gri
   const newRookSquare = grid[newRookX][y];
   newKingSquare.on = new pieceClasses[name](name, color, newKingPoint, movement);
   newRookSquare.on = new pieceClasses[name2](name2, color2, newRookPoint, movement2);
+  return [newKingSquare, newRookSquare]
 };
 
 //Checks for pawn promotion ---------------------------------Needs update to a "promotion scene" to with eventlistener

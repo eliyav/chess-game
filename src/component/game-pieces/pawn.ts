@@ -22,7 +22,7 @@ class Pawn extends GamePiece implements PieceInstance {
       if (turnHistory !== undefined) {
         result = isEnPassantAvailable(turnHistory);
         if (result.result) {
-          const targetSquare = result.enPassantSquare;
+          const targetSquare = result.enPassantPoint;
           if (availableMoves.length !== 0) {
             const [x, y] = currentPoint;
             const direction = this.color === "White" ? 1 : -1;

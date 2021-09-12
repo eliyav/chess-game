@@ -3,6 +3,7 @@ import { setPieces, createGrid } from "./helper/board-helpers";
 import Board from "./component/board";
 import {Data, State} from "./data/chess-data-import"
 import { TurnHistory } from "./helper/game-helpers";
+import { Console } from "console";
 
 class Game {
   state: State;
@@ -33,7 +34,6 @@ class Game {
       resolve.result
       ? (() => {
           resolve.turn = this.turnCounter;
-          this.turnCounter++;
           const annotation = annotate(resolve, this.state, this.board.grid, lastTurn);
           this.annotations.push(annotation);
           this.turnHistory.push(resolve);
@@ -51,8 +51,25 @@ class Game {
 
   switchTurn(state = this.state, grid = this.board.grid) {
     const lastTurn = this.turnHistory[this.turnHistory.length - 1];
+    this.turnCounter++;
     this.changePlayer();
     isCheckmate(state, grid, lastTurn) ? this.endGame() : null;
+  }
+
+  undoTurn() {
+    const lastTurn = this.turnHistory.at(-1);
+    if(lastTurn !== undefined){
+      lastTurn.originPiece!.moveCounter === 1 ? lastTurn.originPiece!.moved = false : null;
+      lastTurn.originPiece!.moveCounter--;
+      lastTurn.castling? lastTurn.castling.forEach(square => square.on = undefined) : null;
+      lastTurn.originSquare.on = lastTurn.originPiece;
+      lastTurn.originPiece!.point = lastTurn.origin
+      lastTurn.targetSquare.on = lastTurn.targetPiece;
+      this.turnHistory.length = this.turnHistory.length - 1;
+      this.annotations.length = this.annotations.length -1;
+      this.turnCounter--;
+      this.changePlayer();
+      }
   }
 
   endGame() {

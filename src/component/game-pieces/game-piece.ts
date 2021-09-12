@@ -4,6 +4,7 @@ class GamePiece {
   point: Point;
   movement: number[];
   moved: boolean;
+  moveCounter: number;
 
   constructor(name: string, color: string, point: Point, movement: number[]) {
     this.name = name;
@@ -11,6 +12,7 @@ class GamePiece {
     this.point = point;
     this.movement = movement;
     this.moved = false;
+    this.moveCounter = 0;
   }
 }
 

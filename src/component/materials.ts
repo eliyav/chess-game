@@ -1,9 +1,6 @@
 import * as BABYLON from "babylonjs";
 
-type Scene = BABYLON.Scene;
-type StandardMaterial = BABYLON.StandardMaterial;
-
-function createMovementMaterials(scene: Scene): void {
+function createMovementMaterials(scene: BABYLON.Scene): void {
   const greenMat = new BABYLON.StandardMaterial("greenMat", scene);
   greenMat.diffuseColor = new BABYLON.Color3(0, 1, 0.2);
   greenMat.specularColor = new BABYLON.Color3(0.15, 0.15, 0.15);
@@ -26,12 +23,12 @@ function createMovementMaterials(scene: Scene): void {
 }
 
 type Materials = {
-  white: StandardMaterial;
-  black: StandardMaterial;
-  board: StandardMaterial;
+  white: BABYLON.StandardMaterial;
+  black: BABYLON.StandardMaterial;
+  board: BABYLON.StandardMaterial;
 }
 
-function createMeshMaterials(scene: Scene) : Materials {
+function createMeshMaterials(scene: BABYLON.Scene) : Materials {
   const white = new BABYLON.StandardMaterial("white", scene);
   white.specularPower = 2;
   white.diffuseColor = new BABYLON.Color3(0, 0, 0);

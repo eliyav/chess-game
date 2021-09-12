@@ -55,6 +55,11 @@ resetCameraButton.addEventListener("click", () => {
   }
 })
 
+const undoMoveButton = document.getElementById("undo") as HTMLButtonElement;
+undoMoveButton.addEventListener("click", () => {
+  game.undoTurn();
+  renderScene(game, gameScene);
+})
 }
 
 export default setGUI;
