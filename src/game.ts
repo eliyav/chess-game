@@ -3,7 +3,7 @@ import { setPieces, createGrid } from "./helper/board-helpers";
 import Board from "./component/board";
 import {Data, State} from "./data/chess-data-import"
 import { TurnHistory } from "./helper/game-helpers";
-import { Console } from "console";
+import Timer from "./component/timer";
 
 class Game {
   state: State;
@@ -14,6 +14,7 @@ class Game {
   annotations: string[];
   turnHistory: TurnHistory[];
   player: undefined;
+  timer : Timer;
 
   constructor(chessData: Data) {
     this.state = chessData.initialState;
@@ -24,7 +25,12 @@ class Game {
     this.turnHistory = [];
     this.turnCounter = 1;
     this.player;
+    this.timer = new Timer(this.state, this.endGame.bind(this))
     this.setBoard();
+  }
+
+  startTimer(){
+    this.timer.startTimer();
   }
 
   playerMove(originPoint: Point, targetPoint: Point) : boolean {
@@ -74,20 +80,31 @@ class Game {
 
   endGame() {
     const winningTeam = this.state.currentPlayer === this.teams[0] ? this.teams[1] : this.teams[0];
-    alert(`Game is over, ${winningTeam} player wins!`);
+    this.timer.gameStarted = false;
+    let confirmation = confirm(`Game is over, ${winningTeam} player wins!, Would you like to start another game?`);
+    if(confirmation){
+      this.resetGame();
+    } else{
+      console.log("No")
+    }
   }
 
   setBoard() {
     setPieces(this.board.grid, this.board.pieceInitialPoints, this.board.movementArray);
   }
 
-  resetBoard() {
+  resetGame() {
     this.board.grid = createGrid(this.board.boardSize, this.board.columnNames);
     this.setBoard();
     this.state.currentPlayer = this.teams[0];
+    this.timer.resetTimers();
+    this.timer.gameStarted = false;
     this.annotations = [];
     this.turnHistory = [];
     this.turnCounter = 1;
+    setTimeout(() => {
+      this.timer.startTimer();
+    },1000)
     return console.log("Board Has Been Reset!");
   }
 }

@@ -1,54 +1,79 @@
-// class Timer {
-//   constructor(gameState) {
-//     this.gameState = gameState;
-//     this.timer1 = 600;
-//     this.timer2 = 600;
-//   }
+import {State} from "../data/chess-data-import";
 
-//   resetTimers = () => {
-//     this.timer1 = 600;
-//     this.timer2 = 600;
-//   };
+const timer1 = document.getElementById("timer1") as HTMLDivElement;
+const timer2 = document.getElementById("timer2") as HTMLDivElement;
 
-//   padZero = (number) => {
-//     if (number < 10) {
-//       return "0" + number;
-//     }
-//     return number;
-//   };
+interface Timer {
+    gameState: State,
+    timer1: number,
+    timer2: number,
+    gameStarted: boolean,
+    gamePaused: boolean,
+    pauseId: NodeJS.Timeout,
+    endGame: () => void,
+}
 
-//   swapPlayer = () => {
-//     if (this.gameState.currentPlayer === "White") {
-//       let timerId = setInterval(() => {
-//         this.timer1 = this.timer1 - 1;
-//         console.log(this.gameState.currentPlayer, this.timer1);
-//         if (this.gameState.currentPlayer !== "White") {
-//           clearInterval(timerId);
-//           this.swapPlayer();
-//         }
-//       }, 1000);
-//     } else {
-//       let timerId2 = setInterval(() => {
-//         this.timer2 = this.timer2 - 1;
-//         console.log(this.gameState.currentPlayer, this.timer2);
-//         if (this.gameState.currentPlayer !== "Black") {
-//           clearInterval(timerId2);
-//           this.swapPlayer();
-//         }
-//       }, 1000);
-//     }
-//   };
+class Timer {
+  constructor(gameState : State, endGame: () => void) {
+    this.gameState = gameState;
+    this.timer1 = 1200;
+    this.timer2 = 1200;
+    this.gameStarted = false;
+    this.gamePaused = false;
+    this.pauseId;
+    this.endGame = endGame;
+  }
 
-//   startTimer = () => {
-//     let timerId = setInterval(() => {
-//       if (this.gameState.currentPlayer !== "White") {
-//         clearInterval(timerId);
-//         this.swapPlayer();
-//       }
-//       this.timer1 = this.timer1 - 1;
-//       console.log(this.gameState.currentPlayer, this.timer1);
-//     }, 1000);
-//   };
-// }
+  resetTimers = () => {
+    setTimeout(() => {
+      this.timer1 = 1200;
+      this.timer2 = 1200;
+      timer1.innerText = this.timer1.toString();
+      timer2.innerText = this.timer2.toString();
+      this.gamePaused = false;
+    }, 1000)
 
-// export default Timer;
+  };
+
+  padZero = (number : number) => {
+    if (number < 10) {
+      return parseInt("0" + number)
+    }
+    return number;
+  };
+
+  pauseTimer = () => {
+    if(this.gamePaused === false){
+      this.gamePaused = true;
+    } else{
+      if(this.pauseId) {
+        clearTimeout(this.pauseId)
+      }
+      this.pauseId = setTimeout(() => {
+        this.gamePaused = false;
+        this.startTimer();
+      },1000)
+      }
+  }
+
+  startTimer = () => {
+    this.gameStarted = true;
+    let timerId = setInterval(() => {
+      if(this.gameState.currentPlayer === "White") {
+        this.timer1 = this.padZero(this.timer1 - 1)
+        timer1.innerText = this.timer1.toString();
+        this.timer1 === 0 ? this.endGame(): null;
+      }
+      if (this.gameState.currentPlayer !== "White") {
+        this.timer2 = this.padZero(this.timer2 - 1)
+        timer2.innerText = this.timer2.toString();
+        this.timer2 === 0 ? this.endGame(): null;
+      }
+      if(this.gameStarted === false || this.gamePaused === true){
+        clearInterval(timerId)
+      }
+    }, 1000);
+  };
+}
+
+export default Timer;

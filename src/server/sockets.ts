@@ -38,7 +38,7 @@ const activateSocket = (game:Game, gameMode:{mode: string | undefined, player: s
 
   socket.on("reset-board-resolve", (response) => {
     if (response === "Yes") {
-      game.resetBoard();
+      game.resetGame();
       renderScene(game, scene);
     }
   });
@@ -50,13 +50,13 @@ const activateSocket = (game:Game, gameMode:{mode: string | undefined, player: s
 
   socket.on("draw-resolve", (response) => {
     if (response === "Yes") {
-      game.resetBoard();
+      game.resetGame();
       renderScene(game, scene);
     }
   });
 
   socket.on("resign-request", () => {
-    game.resetBoard();
+    game.resetGame();
     renderScene(game, scene);
   });
 

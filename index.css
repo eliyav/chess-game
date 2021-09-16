@@ -2,12 +2,42 @@
   margin: 0;
 }
 
+#loading {
+  height: 100vh;
+  width: 100vw;
+  background-color: rgb(0, 0, 0);
+  z-index: 2;
+  position: relative;
+}
+
+#loading > p {
+  color: white;
+  text-align: center;
+  line-height: 100vh;
+  font-size: xx-large;
+  font-family: fantasy;
+  animation: loadingAnimation;
+  animation-duration: 0.75s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+@keyframes loadingAnimation {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 0.2;
+  }
+}
+
 .app {
   height: 100vh;
   width: 100vw;
   position: fixed;
   display: flex;
   justify-content: center;
+  z-index: 1;
 }
 
 #renderCanvas {
@@ -32,14 +62,14 @@
   transform: scale(1.2);
 }
 
-#gameButtons {
+#gameOverlay {
   display: none;
   width: 100%;
   position: absolute;
   pointer-events: none;
 }
 
-#gameButtons > button {
+#gameOverlay > button {
   background-color: transparent;
   color: white;
   font-size: large;
@@ -51,20 +81,63 @@
   pointer-events: auto;
 }
 
-#gameButtons > button:hover {
+#gameOverlay > button:hover {
   transform: scale(1.2);
   color: red;
 }
 
-@media screen and (max-width: 425px) {
-  #gameButtons > button {
-    margin-right: 5%;
+#timer {
+  display: inline-block;
+  background-color: rgba(83, 125, 160, 0.561);
+  position: absolute;
+  right: 1%;
+  z-index: 1;
+}
+
+#timer > div {
+  color: white;
+  text-align: center;
+  font-style: italic;
+  font-weight: bold;
+}
+
+#timer > div > img {
+  height: 30px;
+  display: inline-block;
+  object-fit: contain;
+}
+
+#timer > button {
+  pointer-events: initial;
+  background-color: transparent;
+  color: white;
+  border: 1mm ridge rgba(146, 143, 143, 0.938);
+}
+
+@media screen and (max-width: 320px) {
+  #gameOverlay > button {
+    margin-right: 1%;
+    margin-top: 0.2%;
+  }
+
+  #timer {
+    display: block;
+  }
+
+  #timer > div {
+    display: inline-block;
+  }
+}
+
+@media screen and (min-width: 375px) {
+  #gameOverlay > button {
+    margin-right: 1%;
     margin-top: 0.2%;
   }
 }
 
-@media screen and (max-width: 2560px) {
-  #gameButtons > button {
+@media screen and (min-width: 426px) {
+  #gameOverlay > button {
     margin-right: 2%;
     margin-top: 0.2%;
   }

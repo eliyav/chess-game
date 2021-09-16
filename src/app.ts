@@ -9,8 +9,8 @@ import inputController from "./events/input-controller";
 import { Engine } from "babylonjs/Engines/engine";
 import { Scene } from "babylonjs/scene";
 import EventEmitter from "./events/event-emitter";
-import activateSocket from "./server/sockets";
 import { ChessPieceMesh } from "./view/asset-loader";
+import activateSocket from "./server/sockets";
 
 export interface App{
   game: Game,

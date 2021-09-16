@@ -36,7 +36,7 @@ const activateEmitter = (game: Game, gameMode: GameMode, gameScene: CustomScene)
   emitter.on("reset-board", () => {
     const answer = confirm("Are you sure you want to reset the board?");
     if (answer) {
-      game.resetBoard();
+      game.resetGame();
       renderScene(game, gameScene);
       let camera:any = gameScene.cameras[0]
       camera.alpha = Math.PI;

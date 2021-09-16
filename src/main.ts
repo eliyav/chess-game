@@ -2,6 +2,7 @@ import "babylonjs-loaders";
 import * as BABYLON from "babylonjs";
 import initializeApp from "./app";
 import { Engine } from "babylonjs/Engines/engine";
+import { Console } from "console";
  
 async function Main() {
   const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
@@ -23,8 +24,16 @@ const refreshCanvas = () => {
   }
 }
 
+const loadingEnd = () => {
+  refreshCanvas();
+  const loadingDiv = document.getElementById("loading") as HTMLDivElement;
+  setTimeout(() => {
+    loadingDiv.style.display = "none"
+  }, 1000)
+}
+
   window.onresize = refreshCanvas;
-  window.onload = refreshCanvas;
+  window.onload = loadingEnd;
 
   (() => {
     engine.runRenderLoop(function () {

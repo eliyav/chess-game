@@ -7,12 +7,24 @@
     <link rel="stylesheet" type="text/css" href="./index.css"></link>
 </head>
 <body>
+  <div id="loading">
+    <p>Loading</p>
+  </div>
   <div class="app">
-    <div id="gameButtons">
+    <div id="gameOverlay">
       <button id="home">Home</button>
       <button id="resetBoard">Reset</button>
       <button id="camera">Camera</button>
       <button id="undo">Undo</button>
+      <div id="timer">
+      <div id="player1">
+        <img id="avatar1" src="assets/white-player.png"><div id="timer1">1200</div>
+      </div>
+      <button id="pause">Pause</button>
+      <div id="player2">
+        <img id="avatar2" src="assets/black-player.png"><div id="timer2">1200</div>
+      </div>
+    </div>
     </div>
     <canvas id='renderCanvas' touch-action="none"></canvas>
     <button id="startOG">Start Offline Game</button>
