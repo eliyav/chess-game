@@ -19,6 +19,7 @@ const startOGButton = document.getElementById("startOG") as HTMLButtonElement
 startOGButton.addEventListener("click", () => {
   gameMode.mode = "offline";
   game.resetGame();
+  renderScene(game, gameScene);
   startScene.detachControl();
   showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);
   startOGButton.style.display = "none";
@@ -28,7 +29,6 @@ startOGButton.addEventListener("click", () => {
 const homeButton = document.getElementById("home") as HTMLButtonElement
 homeButton.addEventListener("click", () => {
   let camera: any = gameScene.cameras[0];
-  renderScene(game, gameScene);
   camera.alpha = Math.PI;
   gameScene.detachControl();
   showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);
