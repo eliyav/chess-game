@@ -10,7 +10,7 @@ import { Engine } from "babylonjs/Engines/engine";
 import { Scene } from "babylonjs/scene";
 import EventEmitter from "./events/event-emitter";
 import { ChessPieceMesh } from "./view/asset-loader";
-//import activateSocket from "./server/sockets";
+import activateSocket from "../server/sockets.js"
 
 export interface App{
   game: Game,

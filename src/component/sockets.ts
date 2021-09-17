@@ -1,9 +1,13 @@
 import { io } from "socket.io-client";
-import Game from "../src/game";
-import { renderScene } from "../src/helper/canvas-helpers";
-import { CustomScene } from "../src/view/start-screen";
+import Game from "../game";
+import { renderScene } from "../helper/canvas-helpers";
+import { CustomScene } from "../view/start-screen";
 
-const activateSocket = (game:Game, gameMode:{mode: string | undefined, player: string | undefined , room: number | undefined}, scene: CustomScene) => {
+const activateSocket = (
+  game: Game,
+  gameMode: { mode: string | undefined, player: string | undefined, room: number | undefined },
+  scene: CustomScene
+) => {
   const socket = io("ws://localhost:3000");
 
   socket.on("stateChange", (newState) => {
