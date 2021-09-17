@@ -11,7 +11,6 @@ import { Scene } from "babylonjs";
 import EventEmitter from "./events/event-emitter";
 import { ChessPieceMesh } from "./view/asset-loader";
 import activateSocket from "./component/sockets"
-import { Socket } from "socket.io";
 
 export interface App{
   game: Game,
