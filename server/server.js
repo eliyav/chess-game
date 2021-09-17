@@ -1,6 +1,7 @@
-const app = require("express")();
+const express = require("express");
+const path = require("path");
 
-const httpServer = require("http").createServer(app);
+const httpServer = require("http").createServer(express);
 const options = {
   cors: {
     origin: "*",
@@ -8,10 +9,28 @@ const options = {
   },
 };
 
+const app = express();
+
+const port = process.env.PORT || 3000;
+
+app.use(express.static(path.join(__dirname, "../../dist")));
+
+app.get("*", (_req, res) => {
+  res.sendFile(path.join(__dirname, "../../dist/index.html"));
+});
+
+app.listen(port, (err) => {
+  if (err) {
+    console.log(err);
+  } else {
+    console.log(`server started port: ${port}`);
+  }
+});
+
 const io = require("socket.io")(httpServer, options);
 
-io.on("connection", (socket: any) => {
-  let room: number;
+io.on("connection", (socket) => {
+  let room;
   socket.on("request-room-id", () => {
     room = Math.random();
     socket.join(room);
@@ -22,7 +41,7 @@ io.on("connection", (socket: any) => {
     socket.emit("room-info", serializedSet);
     console.log(clients);
   });
-  socket.on("join-room", (roomNumber: number) => {
+  socket.on("join-room", (roomNumber) => {
     room = roomNumber;
     socket.join(room);
     socket.to(room).emit("message", "A new player has joined the room");
@@ -34,13 +53,7 @@ io.on("connection", (socket: any) => {
     console.log(clients);
   });
 
-interface StateChange {
-  originPoint: Point,
-  targetPoint: Point,
-  room: number,
-}
-
-  socket.on("stateChange", ({ originPoint, targetPoint, room }: StateChange) => {
+  socket.on("stateChange", ({ originPoint, targetPoint, room }) => {
     socket.to(room).emit("message", "Move has been entered");
     socket.to(room).emit("stateChange", { originPoint, targetPoint });
   });
@@ -50,7 +63,7 @@ interface StateChange {
     socket.to(room).emit("reset-board-request");
   });
 
-  socket.on("reset-board-response", (answer: string) => {
+  socket.on("reset-board-response", (answer) => {
     if (answer === "Yes") {
       socket.to(room).emit("message", "Opponent has agreed to reset the board!");
       socket.to(room).emit("reset-board-resolve", "Yes");
@@ -67,7 +80,7 @@ interface StateChange {
     socket.to(room).emit("draw-request");
   });
 
-  socket.on("draw-response", (answer: string) => {
+  socket.on("draw-response", (answer) => {
     if (answer === "Yes") {
       socket.to(room).emit("message", "Opponent has agreed for game Draw!");
       socket.to(room).emit("draw-resolve", "Yes");
@@ -85,4 +98,4 @@ interface StateChange {
   });
 });
 
-httpServer.listen(3000);
+httpServer.listen(8080);

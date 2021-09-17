@@ -23,7 +23,8 @@ const gameScreen = async (canvas: HTMLCanvasElement, engine: Engine): Promise<Cu
   light3.intensity = 0.8;
   light3.diffuse = new BABYLON.Color3(0, 0, 0);
 
-  const photoDome = new BABYLON.PhotoDome("spaceDome", space, { size: 1000 }, scene);
+  const photoDome = new BABYLON.PhotoDome("spaceDome", space, { size: 500 }, scene);
+  photoDome.rotation = new BABYLON.Vector3(0, 1, 1.5)
 
   createMovementMaterials(scene);
 
