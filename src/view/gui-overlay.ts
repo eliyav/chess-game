@@ -3,59 +3,79 @@ import Game from "../game";
 import { renderScene } from "../helper/canvas-helpers";
 import { CustomScene } from "./start-screen";
 
-function setGUI(app: App) {
+const gameOverlay = document.getElementById("gameOverlay") as HTMLDivElement;
+const homeButton = document.getElementById("home") as HTMLButtonElement
+const startOGButton = document.getElementById("startOG") as HTMLButtonElement;
+const createOnlineMatch = document.getElementById("createOnlineMatch") as HTMLButtonElement;
+const joinOnlineMatch = document.getElementById("joinOnlineMatch") as HTMLButtonElement;
+const resetBoardButton = document.getElementById("resetBoard") as HTMLButtonElement;
+const resetCameraButton = document.getElementById("camera") as HTMLButtonElement;
+const undoMoveButton = document.getElementById("undo") as HTMLButtonElement;
+const pauseButton = document.getElementById("pause") as HTMLButtonElement;
 
+function setGUI(app: App) {
   const {
     game,
     gameMode,
     showScene,
     emitter,
+    socket,
     scenes: { startScene, gameScene },
   } = app;
 
-const gameOverlay = document.getElementById("gameOverlay") as HTMLDivElement;
+  homeButton.addEventListener("click", () => {
+    let camera: any = gameScene.cameras[0];
+    camera.alpha = Math.PI;
+    gameScene.detachControl();
+    showDisplay();
+    showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);
+  })
 
-const startOGButton = document.getElementById("startOG") as HTMLButtonElement
 startOGButton.addEventListener("click", () => {
   gameMode.mode = "offline";
   game.resetGame();
   renderScene(game, gameScene);
+  hideDisplay();
   startScene.detachControl();
   showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);
-  startOGButton.style.display = "none";
-  gameOverlay.style.display = "unset";
 })
 
-const homeButton = document.getElementById("home") as HTMLButtonElement
-homeButton.addEventListener("click", () => {
-  let camera: any = gameScene.cameras[0];
-  camera.alpha = Math.PI;
-  gameScene.detachControl();
+createOnlineMatch.addEventListener("click", () => {
+  gameMode.mode = "online";
+  socket.emit("create-room");
+  game.resetGame();
+  renderScene(game, gameScene);
+  hideDisplay();
+  startScene.detachControl();
   showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);
-  startOGButton.style.display = "unset";
-  gameOverlay.style.display = "none";
+})
+joinOnlineMatch.addEventListener("click", () => {
+  gameMode.mode = "online";
+  //add logic to only emit if join room, replied true
+  let room = prompt("Please enter the room key");
+  socket.emit("join-room", room);
+  game.resetGame();
+  renderScene(game, gameScene);
+  hideDisplay();
+  startScene.detachControl();
+  showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);
 })
 
-
-const resetBoardButton = document.getElementById("resetBoard") as HTMLButtonElement
 resetBoardButton.addEventListener("click", () => {
   emitter!.emit("reset-board");
 })
 
 
-const resetCameraButton = document.getElementById("camera") as HTMLButtonElement
 resetCameraButton.addEventListener("click", () => {
   resetCamera(game, gameScene);
 })
 
-const undoMoveButton = document.getElementById("undo") as HTMLButtonElement;
 undoMoveButton.addEventListener("click", () => {
   game.undoTurn();
   renderScene(game, gameScene);
   resetCamera(game, gameScene);
 })
 
-const pauseButton = document.getElementById("pause") as HTMLButtonElement;
 pauseButton.addEventListener("click", () => {
   game.timer.pauseTimer();
 })
@@ -71,6 +91,20 @@ const resetCamera = (game: Game, gameScene: CustomScene) => {
     camera.beta = Math.PI / 4;
     camera.radius = 35;
   }
+}
+
+const hideDisplay = () => {
+  startOGButton.style.display = "none";
+  createOnlineMatch.style.display = "none";
+  joinOnlineMatch.style.display = "none";
+  gameOverlay.style.display = "unset";
+}
+
+const showDisplay = () => {
+  gameOverlay.style.display = "none";
+  startOGButton.style.display = "unset";
+  createOnlineMatch.style.display = "unset";
+  joinOnlineMatch.style.display = "unset";
 }
 
 }

@@ -6,11 +6,12 @@ import gameScreen from "./view/game-screen";
 import activateEmitter from "./events/emitter";
 import setGUI from "./view/gui-overlay";
 import inputController from "./events/input-controller";
-import { Engine } from "babylonjs/Engines/engine";
-import { Scene } from "babylonjs/scene";
+import {Engine} from "babylonjs"
+import { Scene } from "babylonjs";
 import EventEmitter from "./events/event-emitter";
 import { ChessPieceMesh } from "./view/asset-loader";
-import activateSocket from "./component/sockets.js"
+import activateSocket from "./component/sockets"
+import { Socket } from "socket.io";
 
 export interface App{
   game: Game,
@@ -21,7 +22,7 @@ export interface App{
    gameScene: Scene,
   }
   emitter?: EventEmitter,
-  socket?: undefined,
+  socket?: any,
 }
 
 const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
@@ -33,22 +34,22 @@ const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
       startScene: await startScreen(canvas, engine), 
       gameScene: await gameScreen(canvas, engine)
     },
+    socket: undefined,
     emitter: undefined,
   };
 
   const {
     game,
     gameMode,
-    showScene,
-    scenes: { startScene, gameScene },
+    scenes: { gameScene },
   } = app;
 
-  app.emitter = activateEmitter(game, gameMode, gameScene);
-  //appContext.socket = activateSocket(game, gameMode, gameScene);
+  app.socket = activateSocket(game, gameMode, gameScene);
+  app.emitter = activateEmitter(game, gameMode, gameScene, app.socket);
   setGUI(app);
   renderScene(game, gameScene);
 
-  gameScene.onPointerDown = async (e, pickResult) => {
+  gameScene.onPointerDown = async (e: any, pickResult: any) => {
     if(pickResult.pickedMesh !== null){
       const mesh: ChessPieceMesh = pickResult.pickedMesh;
       const isCompleteMove = inputController(mesh, game, gameScene);

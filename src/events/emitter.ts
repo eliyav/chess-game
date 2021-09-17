@@ -7,7 +7,7 @@ import {CustomScene} from "../view/start-screen"
 
 type GameMode = {mode: string | undefined, player: string | undefined , room: number | undefined}
 
-const activateEmitter = (game: Game, gameMode: GameMode, gameScene: CustomScene) : EventEmitter => {
+const activateEmitter = (game: Game, gameMode: GameMode, gameScene: CustomScene, socket: any) : EventEmitter => {
   const emitter = new EventEmitter();
 
   emitter.on("playerMove", (originPoint, targetPoint) => {
@@ -22,13 +22,15 @@ const activateEmitter = (game: Game, gameMode: GameMode, gameScene: CustomScene)
         }
       }
     } else if (gameMode.mode === "online") {
-      // const resolved = game.playerMove(originPoint, targetPoint);
-      // if (resolved) {
-      //   renderScene(game, gameScene);
-      //   game.switchTurn();
-      //   const room = gameMode.room;
-      //   sockets.emit("stateChange", { originPoint, targetPoint, room });
-      // }
+      if(typeof originPoint !== "undefined" && typeof targetPoint !== "undefined"){
+        const resolved = game.playerMove(originPoint, targetPoint);
+      if (resolved) {
+        const room = gameMode.room;
+        renderScene(game, gameScene);
+        game.switchTurn();
+        socket.emit("stateChange", { originPoint, targetPoint, room });
+      }
+    }
     }
     game.moves.length = 0;
   });

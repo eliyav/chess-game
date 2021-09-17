@@ -5,6 +5,8 @@ import { Engine } from "babylonjs/Engines/engine";
  
 async function Main() {
   const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
+  const loadingDiv = document.getElementById("loading") as HTMLDivElement;
+  
   let engine:Engine = new BABYLON.Engine(canvas, true);
   const app = await initializeApp(canvas, engine);
 
@@ -17,7 +19,7 @@ const refreshCanvas = () => {
   engine.resize();
   let camera: any = startScene.cameras[0]
   if(canvas.width < 768) {
-    camera.radius = 33;
+    camera.radius = 31;
   } else {
     camera.radius = 30;
   }
@@ -25,7 +27,6 @@ const refreshCanvas = () => {
 
 const loadingEnd = () => {
   refreshCanvas();
-  const loadingDiv = document.getElementById("loading") as HTMLDivElement;
   setTimeout(() => {
     loadingDiv.style.display = "none"
   }, 1000)

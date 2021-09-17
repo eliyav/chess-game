@@ -8,7 +8,8 @@ const activateSocket = (
   gameMode: { mode: string | undefined, player: string | undefined, room: number | undefined },
   scene: CustomScene
 ) => {
-  const socket = io("ws://localhost:3000");
+
+  const socket = io("ws://localhost:8080");
 
   socket.on("stateChange", (newState) => {
     const { originPoint, targetPoint } = newState;

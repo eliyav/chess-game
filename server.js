@@ -30,9 +30,8 @@ app.listen(port, (err) => {
 const io = require("socket.io")(httpServer, options);
 
 io.on("connection", (socket) => {
-  let room;
-  socket.on("request-room-id", () => {
-    room = Math.random();
+  socket.on("create-room", () => {
+    let room = "abcd";
     socket.join(room);
     socket.emit("message", "You have created a new Game Room!");
     socket.emit("reply-room-id", room);
@@ -41,8 +40,7 @@ io.on("connection", (socket) => {
     socket.emit("room-info", serializedSet);
     console.log(clients);
   });
-  socket.on("join-room", (roomNumber) => {
-    room = roomNumber;
+  socket.on("join-room", (room) => {
     socket.join(room);
     socket.to(room).emit("message", "A new player has joined the room");
     const clients = io.sockets.adapter.rooms.get(room);
