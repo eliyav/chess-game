@@ -9,7 +9,7 @@ const activateSocket = (
   scene: CustomScene
 ) => {
 
-  const socket = io(`ws://${window.location.host}:8080`);
+  const socket = io(`ws://${window.location.host}`);
 
   socket.on("stateChange", (newState) => {
     const { originPoint, targetPoint } = newState;

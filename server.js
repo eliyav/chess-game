@@ -1,14 +1,6 @@
 const express = require("express");
 const path = require("path");
 
-const httpServer = require("http").createServer(express);
-const options = {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
-  },
-};
-
 const app = express();
 
 const port = process.env.PORT || 3000;
@@ -19,7 +11,7 @@ app.get("*", (_req, res) => {
   res.sendFile(path.join(__dirname, "dist/index.html"));
 });
 
-app.listen(port, (err) => {
+const server = app.listen(port, (err) => {
   if (err) {
     console.log(err);
   } else {
@@ -27,7 +19,7 @@ app.listen(port, (err) => {
   }
 });
 
-const io = require("socket.io")(httpServer, options);
+const io = require("socket.io")(server);
 
 io.on("connection", (socket) => {
   socket.on("create-room", () => {
@@ -95,5 +87,3 @@ io.on("connection", (socket) => {
     socket.to(room).emit("resign-request");
   });
 });
-
-httpServer.listen(8080);
