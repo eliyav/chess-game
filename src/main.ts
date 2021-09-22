@@ -32,8 +32,9 @@ const loadingEnd = () => {
   }, 1000)
 }
 
-  window.onresize = refreshCanvas;
-  window.onload = loadingEnd;
+  globalThis.onresize = refreshCanvas;
+  globalThis.onload = loadingEnd;
+
 
   (() => {
     engine.runRenderLoop(function () {

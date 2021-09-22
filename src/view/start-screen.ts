@@ -1,6 +1,6 @@
 import * as BABYLON from "babylonjs";
 import { Engine } from "babylonjs/Engines/engine";
-import space from "../../assets/space.jpg";
+import space from "../../assets/space.webp";
 import assetsLoader from "./asset-loader";
 import { Scene } from "babylonjs/scene";
 import {ChessPieceMesh} from "../view/asset-loader"

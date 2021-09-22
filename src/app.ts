@@ -4,7 +4,7 @@ import chessData from "./data/chess-data-import";
 import startScreen from "./view/start-screen";
 import gameScreen from "./view/game-screen";
 import activateEmitter from "./events/emitter";
-import setGUI from "./view/gui-overlay";
+import {setGUI} from "./view/gui-overlay";
 import inputController from "./events/input-controller";
 import {Engine} from "babylonjs"
 import { Scene } from "babylonjs";
@@ -40,10 +40,11 @@ const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
   const {
     game,
     gameMode,
-    scenes: { gameScene },
+    showScene,
+    scenes: { startScene, gameScene },
   } = app;
 
-  app.socket = activateSocket(game, gameMode, gameScene);
+  app.socket = activateSocket(game, gameMode, gameScene, startScene, showScene);
   app.emitter = activateEmitter(game, gameMode, gameScene, app.socket);
   setGUI(app);
   renderScene(game, gameScene);

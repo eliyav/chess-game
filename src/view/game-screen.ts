@@ -1,6 +1,6 @@
 import * as BABYLON from "babylonjs";
 import assetsLoader from "./asset-loader"
-import space from "../../assets/space.jpg";
+import space from "../../assets/space.webp";
 import { createMovementMaterials } from "../component/materials";
 import { Engine } from "babylonjs/Engines/engine";
 import { CustomScene } from "./start-screen";

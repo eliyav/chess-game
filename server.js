@@ -1,16 +1,14 @@
 const express = require("express");
 const path = require("path");
-
 const app = express();
 
-const port = process.env.PORT || 3000;
-
+//Activate Server
+const port = 3000;
+// const port = process.env.PORT || 3000;
 app.use(express.static(path.join(__dirname, "dist")));
-
 app.get("*", (_req, res) => {
   res.sendFile(path.join(__dirname, "dist/index.html"));
 });
-
 const server = app.listen(port, (err) => {
   if (err) {
     console.log(err);
@@ -19,18 +17,15 @@ const server = app.listen(port, (err) => {
   }
 });
 
+//Activate Sockets
 const io = require("socket.io")(server);
 
 io.on("connection", (socket) => {
   socket.on("create-room", () => {
-    let room = "abcd";
+    let room = generateKey();
     socket.join(room);
     socket.emit("message", "You have created a new Game Room!");
     socket.emit("reply-room-id", room);
-    const clients = io.sockets.adapter.rooms.get(room);
-    const serializedSet = [...clients.keys()];
-    socket.emit("room-info", serializedSet);
-    console.log(clients);
   });
   socket.on("join-room", (room) => {
     socket.join(room);
@@ -87,3 +82,14 @@ io.on("connection", (socket) => {
     socket.to(room).emit("resign-request");
   });
 });
+
+const generateKey = () => {
+  let chars = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+  let key = [];
+  for (i = 0; i < 5; i++) {
+    let num = Math.floor(Math.random() * 10);
+    let char = chars[num];
+    key[i] = char;
+  }
+  return key.join("");
+};
