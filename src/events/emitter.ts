@@ -1,11 +1,11 @@
-import EventEmitter from "./event-emitter"; 
+import EventEmitter from "./event-emitter";
 import { renderScene, rotateCamera } from "../helper/canvas-helpers";
 import Game from "../game";
 import {CustomScene} from "../view/start-screen"
 
 //Fix Any on GameScene. Camera not showing up on Scene class
 
-type GameMode = {mode: string | undefined, player: string | undefined , room: number | undefined}
+type GameMode = {mode: string | undefined, player: string | undefined , room: string | undefined}
 
 const activateEmitter = (game: Game, gameMode: GameMode, gameScene: CustomScene, socket: any) : EventEmitter => {
   const emitter = new EventEmitter();

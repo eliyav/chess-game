@@ -1,4 +1,4 @@
-import { doMovesMatch } from "../helper/game-helpers"; 
+import { doMovesMatch } from "../helper/game-helpers";
 import { renderScene, calcIndexFromMeshPosition, displayPieceMoves } from "../helper/canvas-helpers";
 import Game from "../game";
 import { Scene } from "babylonjs/scene";

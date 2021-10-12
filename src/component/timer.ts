@@ -16,23 +16,22 @@ interface Timer {
 class Timer {
   constructor(gameState : State, endGame: () => void) {
     this.gameState = gameState;
-    this.timer1 = 1200;
-    this.timer2 = 1200;
+    this.timer1 = 0;
+    this.timer2 = 0;
     this.gameStarted = false;
     this.gamePaused = false;
     this.pauseId;
     this.endGame = endGame;
   }
 
-  resetTimers = () => {
+  resetTimers = (time = 0) => {
     setTimeout(() => {
-      this.timer1 = 1200;
-      this.timer2 = 1200;
+      this.timer1 = time / 2;
+      this.timer2 = time / 2;
       timer1.innerText = this.timer1.toString();
       timer2.innerText = this.timer2.toString();
       this.gamePaused = false;
     }, 1000)
-
   };
 
   padZero = (number : number) => {
@@ -56,8 +55,11 @@ class Timer {
       }
   }
 
-  startTimer = () => {
+  startTimer = (time = 0) => {
+    this.timer1 = time / 2;
+    this.timer2 = time / 2;
     this.gameStarted = true;
+    if(time > 0){
     let timerId = setInterval(() => {
       if(this.gameState.currentPlayer === "White") {
         this.timer1 = this.padZero(this.timer1 - 1)
@@ -73,6 +75,7 @@ class Timer {
         clearInterval(timerId)
       }
     }, 1000);
+    }
   };
 }
 

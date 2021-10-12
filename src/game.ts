@@ -13,7 +13,6 @@ class Game {
   moves: Point[];
   annotations: string[];
   turnHistory: TurnHistory[];
-  player: undefined;
   timer : Timer;
 
   constructor(chessData: Data) {
@@ -24,7 +23,6 @@ class Game {
     this.annotations = [];
     this.turnHistory = [];
     this.turnCounter = 1;
-    this.player;
     this.timer = new Timer(this.state, this.endGame.bind(this))
     this.setBoard();
   }
@@ -93,18 +91,18 @@ class Game {
     setPieces(this.board.grid, this.board.pieceInitialPoints, this.board.movementArray);
   }
 
-  resetGame() {
+  resetGame(time? : number) {
     this.board.grid = createGrid(this.board.boardSize, this.board.columnNames);
     this.setBoard();
     this.state.currentPlayer = this.teams[0];
-    this.timer.resetTimers();
+    this.timer.resetTimers(time);
     this.timer.gameStarted = false;
     this.annotations = [];
     this.turnHistory = [];
     this.turnCounter = 1;
     setTimeout(() => {
-      this.timer.startTimer();
-    },1000)
+       this.timer.startTimer(time)
+    },1000);
     return console.log("Board Has Been Reset!");
   }
 }

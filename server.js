@@ -21,66 +21,77 @@ const server = app.listen(port, (err) => {
 const io = require("socket.io")(server);
 
 io.on("connection", (socket) => {
-  socket.on("create-room", () => {
-    let room = generateKey();
-    socket.join(room);
+  //Create Room
+  socket.on("create-room", (gameMode) => {
+    gameMode.room = generateKey();
+    socket.join(gameMode.room);
     socket.emit("message", "You have created a new Game Room!");
-    socket.emit("reply-room-id", room);
+    socket.emit("reply-invite-code", gameMode.room);
+    socket.emit("assign-room-info", gameMode);
   });
-  socket.on("join-room", (room) => {
-    socket.join(room);
-    socket.to(room).emit("message", "A new player has joined the room");
-    const clients = io.sockets.adapter.rooms.get(room);
-    const serializedSet = [...clients.keys()];
-    socket.to(room).emit("room-info", serializedSet);
-    socket.emit("reply-room-id", room);
-    socket.emit("room-info", serializedSet);
-    console.log(clients);
+  //Join Room
+  socket.on("join-room", (roomCode) => {
+    socket.join(roomCode);
+    socket.to(roomCode).emit("message", "A new player has joined the room");
+    socket.to(roomCode).emit("request-room-info");
   });
+
+  socket.on("reply-room-info", (gameMode) => {
+    socket.to(gameMode.room).emit("assign-room-info", gameMode);
+  })
+
+  socket.on("check-match-start", (gameMode) => {
+      const clients = io.sockets.adapter.rooms.get(gameMode.room);
+      const serializedSet = [...clients.keys()];
+     if(serializedSet.length === 2){
+        socket.to(gameMode.room).emit("start-match");
+        socket.emit("start-match");
+     }
+  })
 
   socket.on("stateChange", ({ originPoint, targetPoint, room }) => {
     socket.to(room).emit("message", "Move has been entered");
     socket.to(room).emit("stateChange", { originPoint, targetPoint });
   });
 
-  socket.on("reset-board", () => {
-    socket.to(room).emit("message", "Opponent has requested a board reset!");
-    socket.to(room).emit("reset-board-request");
-  });
+  // socket.on("reset-board", () => {
+  //   socket.to(room).emit("message", "Opponent has requested a board reset!");
+  //   socket.to(room).emit("reset-board-request");
+  // });
 
-  socket.on("reset-board-response", (answer) => {
-    if (answer === "Yes") {
-      socket.to(room).emit("message", "Opponent has agreed to reset the board!");
-      socket.to(room).emit("reset-board-resolve", "Yes");
-      socket.emit("reset-board-resolve", "Yes");
-    } else {
-      socket.to(room).emit("message", "Opponent has declined to reset the board!");
-      socket.to(room).emit("reset-board-resolve", "No");
-      socket.emit("reset-board-resolve", "No");
-    }
-  });
+  // socket.on("reset-board-response", (answer) => {
+  //   if (answer === "Yes") {
+  //     socket.to(room).emit("message", "Opponent has agreed to reset the board!");
+  //     socket.to(room).emit("reset-board-resolve", "Yes");
+  //     socket.emit("reset-board-resolve", "Yes");
+  //   } else {
+  //     socket.to(room).emit("message", "Opponent has declined to reset the board!");
+  //     socket.to(room).emit("reset-board-resolve", "No");
+  //     socket.emit("reset-board-resolve", "No");
+  //   }
+  // });
 
-  socket.on("draw", () => {
-    socket.to(room).emit("message", "Opponent has requested a game Draw!");
-    socket.to(room).emit("draw-request");
-  });
+  // socket.on("draw", () => {
+  //   socket.to(room).emit("message", "Opponent has requested a game Draw!");
+  //   socket.to(room).emit("draw-request");
+  // });
 
-  socket.on("draw-response", (answer) => {
-    if (answer === "Yes") {
-      socket.to(room).emit("message", "Opponent has agreed for game Draw!");
-      socket.to(room).emit("draw-resolve", "Yes");
-      socket.emit("draw-resolve", "Yes");
-    } else {
-      socket.to(room).emit("message", "Opponent has declined for game Draw!");
-      socket.to(room).emit("draw-resolve", "No");
-      socket.emit("draw-resolve", "No");
-    }
-  });
+  // socket.on("draw-response", (answer) => {
+  //   if (answer === "Yes") {
+  //     socket.to(room).emit("message", "Opponent has agreed for game Draw!");
+  //     socket.to(room).emit("draw-resolve", "Yes");
+  //     socket.emit("draw-resolve", "Yes");
+  //   } else {
+  //     socket.to(room).emit("message", "Opponent has declined for game Draw!");
+  //     socket.to(room).emit("draw-resolve", "No");
+  //     socket.emit("draw-resolve", "No");
+  //   }
+  // });
 
-  socket.on("resign-game", () => {
-    socket.to(room).emit("message", "Opponent has resigned the game!");
-    socket.to(room).emit("resign-request");
-  });
+  // socket.on("resign-game", () => {
+  //   socket.to(room).emit("message", "Opponent has resigned the game!");
+  //   socket.to(room).emit("resign-request");
+  // });
 });
 
 const generateKey = () => {
