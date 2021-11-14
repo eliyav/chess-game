@@ -18,12 +18,12 @@
     "babylonjs": "^4.2.0",
     "babylonjs-loaders": "^4.2.0",
     "express": "^4.17.1",
-    "socket.io": "^4.2.0",
-    "socket.io-client": "^4.2.0"
+    "socket.io": "^4.3.1",
+    "socket.io-client": "^4.3.2"
   },
   "devDependencies": {
-    "@types/node": "^16.10.3",
-    "parcel-bundler": "^1.9.4",
-    "typescript": "^4.4.3"
+    "@types/node": "^16.11.4",
+    "parcel": "^2.0.0",
+    "typescript": "^4.4.4"
   }
 }
