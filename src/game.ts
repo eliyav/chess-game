@@ -1,9 +1,18 @@
 import { resolveMove, isCheckmate, annotate } from "./helper/game-helpers";
-import { setPieces, createGrid } from "./helper/board-helpers";
+import { setPieces, createGrid, PieceType } from "./helper/board-helpers";
 import Board from "./component/board";
 import { Data, State } from "./data/chess-data-import";
 import { TurnHistory } from "./helper/game-helpers";
 import Timer from "./component/timer";
+import {
+  calcBishopMoves,
+  calcKingMoves,
+  calcKnightMoves,
+  calcPawnMoves,
+  calcQueenMoves,
+  calcRookMoves,
+} from "./helper/movement-helpers";
+import { Move } from "./component/game-pieces/game-piece";
 
 class Game {
   state: State;
@@ -38,7 +47,8 @@ class Game {
       targetPoint,
       this.state,
       this.board.grid,
-      lastTurn
+      lastTurn,
+      this.calculateAvailableMoves
     );
     if (typeof resolve !== "boolean") {
       resolve.result
@@ -48,7 +58,8 @@ class Game {
               resolve,
               this.state,
               this.board.grid,
-              lastTurn
+              lastTurn,
+              this.calculateAvailableMoves
             );
             this.annotations.push(annotation);
             this.turnHistory.push(resolve);
@@ -57,6 +68,44 @@ class Game {
       return resolve.result;
     }
     return false;
+  }
+
+  calculateAvailableMoves(piece: PieceType, flag = false): Move[] {
+    let availableMoves: Move[] = [];
+    const lastTurnHistory = this.turnHistory[this.turnHistory.length - 1];
+    switch (piece.name) {
+      case "Pawn":
+        availableMoves = calcPawnMoves(
+          piece,
+          flag,
+          this.board.grid,
+          lastTurnHistory
+        );
+        break;
+      case "Rook":
+        availableMoves = calcRookMoves(piece, this.board.grid);
+        break;
+      case "Bishop":
+        availableMoves = calcBishopMoves(piece, this.board.grid);
+        break;
+      case "Knight":
+        availableMoves = calcKnightMoves(piece, this.board.grid);
+        break;
+      case "Queen":
+        availableMoves = calcQueenMoves(piece, this.board.grid);
+        break;
+      case "King":
+        availableMoves = calcKingMoves(
+          piece,
+          flag,
+          this.board.grid,
+          this.state,
+          lastTurnHistory,
+          this.calculateAvailableMoves
+        );
+        break;
+    }
+    return availableMoves;
   }
 
   changePlayer() {
@@ -71,7 +120,9 @@ class Game {
     const lastTurn = this.turnHistory[this.turnHistory.length - 1];
     this.turnCounter++;
     this.changePlayer();
-    isCheckmate(state, grid, lastTurn) ? this.endGame() : null;
+    isCheckmate(state, grid, lastTurn, this.calculateAvailableMoves)
+      ? this.endGame()
+      : null;
   }
 
   undoTurn() {

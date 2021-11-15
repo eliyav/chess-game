@@ -1,11 +1,15 @@
 import { Material } from "babylonjs/Materials/material";
 import { AbstractMesh } from "babylonjs/Meshes/abstractMesh";
 import { Nullable } from "babylonjs/types";
-import { Move } from "../component/game-pieces/bishop";
 import Game from "../game";
 import { CustomScene } from "../view/start-screen";
-import { getSquaresandPieces, canValidMoveResolve, switchSquaresBack } from "./game-helpers";
+import {
+  getSquaresandPieces,
+  canValidMoveResolve,
+  switchSquaresBack,
+} from "./game-helpers";
 import { ChessPieceMesh } from "../view/asset-loader";
+import { Move } from "../component/game-pieces/game-piece";
 
 const renderScene = (game: Game, gameScene: CustomScene) => {
   //Clears old meshes/memory usage
@@ -21,26 +25,40 @@ const renderScene = (game: Game, gameScene: CustomScene) => {
   //Final Piece Mesh List
   const meshesList = gameScene.finalMeshes!.piecesMeshes;
   //Filters Grid state for all active squares
-  
-  const filteredSquares = game.board.grid.flat().filter((square) => square.on !== undefined);
+
+  const filteredSquares = game.board.grid
+    .flat()
+    .filter((square) => square.on !== undefined);
   //For each active piece, creates a mesh clone and places on board
   filteredSquares.forEach((square) => {
     const { name, color, point } = square.on!;
-    const foundMesh = meshesList.find((mesh) => mesh.name === name && mesh.color === color);
-    const clone: AbstractMesh | Nullable<AbstractMesh> = foundMesh!.clone(name, null, false);
-    [clone!.position.z, clone!.position.x, clone!.isVisible = true] = calcMeshCanvasPosition(point);
+    const foundMesh = meshesList.find(
+      (mesh) => mesh.name === name && mesh.color === color
+    );
+    const clone: AbstractMesh | Nullable<AbstractMesh> = foundMesh!.clone(
+      name,
+      null,
+      false
+    );
+    [clone!.position.z, clone!.position.x, clone!.isVisible = true] =
+      calcMeshCanvasPosition(point);
     gameScene.meshesToRender!.push(clone!);
   });
 };
 
-const displayPieceMoves = (mesh: ChessPieceMesh, currentMove: Point[], game: Game, gameScene: CustomScene) => {
+const displayPieceMoves = (
+  mesh: ChessPieceMesh,
+  currentMove: Point[],
+  game: Game,
+  gameScene: CustomScene
+) => {
   const grid = game.board.grid;
   const state = game.state;
   const turnHistory = game.turnHistory[game.turnHistory.length - 1];
   const [x, y] = calcIndexFromMeshPosition([mesh.position.z, mesh.position.x]);
   const piece = grid[x][y].on;
   displayMovementSquares([[x, y], ""], gameScene, "piece");
-  let moves = piece!.calculateAvailableMoves(grid, state, turnHistory, true);
+  let moves = game.calculateAvailableMoves(piece!, true);
   currentMove.push(piece!.point);
   //Add filter to display only moves that can resolve
   const isValidMoveToDisplay = moves
@@ -48,7 +66,14 @@ const displayPieceMoves = (mesh: ChessPieceMesh, currentMove: Point[], game: Gam
       //Check for checkmate if move resolves
       const [pieceX, pieceY] = piece!.point;
       const squaresandPieces = getSquaresandPieces(piece!.point, move[0], grid);
-      const validMove = canValidMoveResolve(squaresandPieces, move[0], state, grid, turnHistory);
+      const validMove = canValidMoveResolve(
+        squaresandPieces,
+        move[0],
+        state,
+        grid,
+        turnHistory,
+        game.calculateAvailableMoves
+      );
       switchSquaresBack(squaresandPieces, [pieceX, pieceY]);
       return validMove ? move : null;
     })
@@ -58,33 +83,53 @@ const displayPieceMoves = (mesh: ChessPieceMesh, currentMove: Point[], game: Gam
     });
 };
 
-const displayMovementSquares = (move: Move, gameScene: CustomScene, desc:string) => {
+const displayMovementSquares = (
+  move: Move,
+  gameScene: CustomScene,
+  desc: string
+) => {
   if (desc === "target") {
-    const plane: any = BABYLON.MeshBuilder.CreatePlane(`plane`, { width: 2.8, height: 2.8 });
+    const plane: any = BABYLON.MeshBuilder.CreatePlane(`plane`, {
+      width: 2.8,
+      height: 2.8,
+    });
     [plane.position.z, plane.position.x] = calcBabylonCanvasPosition(move[0]); //Z is X ---- X is Y
     plane.point = move[0];
     plane.position.y += 0.51;
     plane.rotation = new BABYLON.Vector3(Math.PI / 2, 0, 0);
     if (move[1] === "capture") {
-      plane.material = gameScene.materials.find((material: Material) => material.id === "redMat");
+      plane.material = gameScene.materials.find(
+        (material: Material) => material.id === "redMat"
+      );
     } else if (move[1] === "movement") {
-      plane.material = gameScene.materials.find((material: Material) => material.id === "orangeMat");
+      plane.material = gameScene.materials.find(
+        (material: Material) => material.id === "orangeMat"
+      );
     } else if (move[1] === "enPassant") {
-      plane.material = gameScene.materials.find((material: Material) => material.id === "purpleMat");
+      plane.material = gameScene.materials.find(
+        (material: Material) => material.id === "purpleMat"
+      );
     } else if (move[1] === "castling") {
-      plane.material = gameScene.materials.find((material: Material) => material.id === "blueMat");
+      plane.material = gameScene.materials.find(
+        (material: Material) => material.id === "blueMat"
+      );
     }
     gameScene.meshesToRender!.push(plane);
   } else if (desc === "piece") {
-    const torus: any = BABYLON.MeshBuilder.CreateTorus("torus", { diameter: 2.6, thickness: 0.2, tessellation: 16 });
+    const torus: any = BABYLON.MeshBuilder.CreateTorus("torus", {
+      diameter: 2.6,
+      thickness: 0.2,
+      tessellation: 16,
+    });
     [torus.position.z, torus.position.x] = calcBabylonCanvasPosition(move[0]); //Z is X ---- X is Y
     torus.point = move[0];
     torus.position.y += 0.51;
-    torus.material = gameScene.materials.find((material: Material) => material.id === "greenMat");
+    torus.material = gameScene.materials.find(
+      (material: Material) => material.id === "greenMat"
+    );
     gameScene.meshesToRender!.push(torus);
   }
 };
-
 
 const rotateCamera = (currentPlayer: string, gameScene: CustomScene) => {
   let camera: any = gameScene.cameras[0];
@@ -100,13 +145,17 @@ const rotateCamera = (currentPlayer: string, gameScene: CustomScene) => {
       subtractedDivisible = a - divisible * Math.PI;
       piDistance = Math.abs(Math.PI + subtractedDivisible);
       remainder = divisible % 2;
-      remainder ? (remainingDistance = piDistance) : (remainingDistance = Math.PI - piDistance);
+      remainder
+        ? (remainingDistance = piDistance)
+        : (remainingDistance = Math.PI - piDistance);
     } else {
       divisible = Math.floor(a / Math.PI);
       subtractedDivisible = a - divisible * Math.PI;
       piDistance = Math.PI - subtractedDivisible;
       remainder = divisible % 2;
-      remainder ? (remainingDistance = piDistance) : (remainingDistance = Math.PI - piDistance);
+      remainder
+        ? (remainingDistance = piDistance)
+        : (remainingDistance = Math.PI - piDistance);
     }
   } else {
     if (a < 0) {
@@ -114,13 +163,17 @@ const rotateCamera = (currentPlayer: string, gameScene: CustomScene) => {
       subtractedDivisible = a - divisible * Math.PI;
       piDistance = Math.abs(Math.PI + subtractedDivisible);
       remainder = divisible % 2;
-      remainder ? (remainingDistance = Math.PI - piDistance) : (remainingDistance = piDistance);
+      remainder
+        ? (remainingDistance = Math.PI - piDistance)
+        : (remainingDistance = piDistance);
     } else {
       divisible = Math.floor(a / Math.PI);
       subtractedDivisible = a - divisible * Math.PI;
       piDistance = Math.PI - subtractedDivisible;
       remainder = divisible % 2;
-      remainder ? (remainingDistance = Math.PI - piDistance) : (remainingDistance = piDistance);
+      remainder
+        ? (remainingDistance = Math.PI - piDistance)
+        : (remainingDistance = piDistance);
     }
   }
 
@@ -243,14 +296,14 @@ const calcMeshCanvasPosition = (point: Point) => {
     gridY = -10.5;
   }
 
-const result: Point = [gridX, gridY]
-  return result
+  const result: Point = [gridX, gridY];
+  return result;
 };
 
 //For Babylon meshes, they have different x/y/z relation than loaded meshes
 const calcBabylonCanvasPosition = (point: Point) => {
   const [x, y] = point;
-  let gridX:number
+  let gridX: number;
   let gridY: number;
   //Calculate X
   if (x === 0) {
@@ -290,14 +343,14 @@ const calcBabylonCanvasPosition = (point: Point) => {
     gridY = 10.5;
   }
 
-  const result: Point = [gridX, gridY]
+  const result: Point = [gridX, gridY];
   return result;
 };
 
 //For game pieces calculation as their index is flipped from blender importing
 const calcIndexFromMeshPosition = (point: Point) => {
   const [x, y] = point;
-  let indexX: number
+  let indexX: number;
   let indexY: number;
   //Calculate X
   if (x === 10.5) {
@@ -335,8 +388,13 @@ const calcIndexFromMeshPosition = (point: Point) => {
   } else {
     indexY = 7;
   }
-  const result: Point = [indexX, indexY]
+  const result: Point = [indexX, indexY];
   return result;
 };
 
-export {renderScene, rotateCamera, displayPieceMoves, calcIndexFromMeshPosition};
+export {
+  renderScene,
+  rotateCamera,
+  displayPieceMoves,
+  calcIndexFromMeshPosition,
+};
