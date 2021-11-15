@@ -1,5 +1,5 @@
-import { pieceClasses, Square} from "./board-helpers";
-import {Move} from "../component/game-pieces/bishop"
+import { pieceClasses, Square } from "./board-helpers";
+import { Move } from "../component/game-pieces/bishop";
 import { PieceType } from "./board-helpers";
 import { State } from "../data/chess-data-import";
 
@@ -16,18 +16,27 @@ export interface TurnHistory {
   originSquare: Square;
   targetSquare: Square;
   promotion?: string | undefined;
-  turn? : number;
+  turn?: number;
 }
 
-const resolveMove = (originPoint: Point, targetPoint: Point, state:State, grid: Square[][], turnHistory: TurnHistory) : TurnHistory | boolean  => {
+const resolveMove = (
+  originPoint: Point,
+  targetPoint: Point,
+  state: State,
+  grid: Square[][],
+  turnHistory: TurnHistory
+): TurnHistory | boolean => {
   const squaresandPieces = getSquaresandPieces(originPoint, targetPoint, grid);
-  const { originSquare, originPiece, targetSquare, targetPiece } = squaresandPieces;
+  const { originSquare, originPiece, targetSquare, targetPiece } =
+    squaresandPieces;
 
   //Check for castling
-  const castling = originPiece!.name === "King" && originPiece!.color === state.currentPlayer;
+  const castling =
+    originPiece!.name === "King" && originPiece!.color === state.currentPlayer;
   let castling2 = false;
   if (targetPiece !== undefined) {
-    castling2 = targetPiece.name === "Rook" && targetPiece.color === state.currentPlayer;
+    castling2 =
+      targetPiece.name === "Rook" && targetPiece.color === state.currentPlayer;
     if (castling && castling2) {
       const a = getX(originPoint);
       const b = getX(targetPoint);
@@ -65,7 +74,15 @@ const resolveMove = (originPoint: Point, targetPoint: Point, state:State, grid: 
       //Then find a way to let the can valid move resolve function handle the fact en passant worked
       if (y && finalX) {
         if (doMovesMatch(enPassant.enPassantPoint, targetPoint)) {
-          if (canValidMoveResolve(squaresandPieces, targetPoint, state, grid, turnHistory)) {
+          if (
+            canValidMoveResolve(
+              squaresandPieces,
+              targetPoint,
+              state,
+              grid,
+              turnHistory
+            )
+          ) {
             const enPassantPiece = turnHistory.targetSquare.on;
             turnHistory.targetSquare.on = undefined;
             return {
@@ -84,16 +101,34 @@ const resolveMove = (originPoint: Point, targetPoint: Point, state:State, grid: 
     }
   }
   //Calculate the origin piece's all available moves
-  let availableMoves = originSquare.on!.calculateAvailableMoves(grid, state, turnHistory, false);
-
+  let availableMoves = originSquare.on!.calculateAvailableMoves(
+    grid,
+    state,
+    turnHistory,
+    false
+  );
+  console.log("calculated moves", availableMoves);
   //Check if the entered targetPoint is a match for an available moves
-  const validMove = availableMoves.find((possibleMove) => doMovesMatch(possibleMove[0], targetPoint));
+  const validMove = availableMoves.find((possibleMove) =>
+    doMovesMatch(possibleMove[0], targetPoint)
+  );
   if (validMove) {
     //Will resolving move be valid
-    if (canValidMoveResolve(squaresandPieces, targetPoint, state, grid, turnHistory)) {
+    if (
+      canValidMoveResolve(
+        squaresandPieces,
+        targetPoint,
+        state,
+        grid,
+        turnHistory
+      )
+    ) {
       //Checks for Pawn Promotion
       let promotion;
-      if (originPiece!.name === "Pawn" && (originPiece!.point[1] === 0 || originPiece!.point[1] === 7)) {
+      if (
+        originPiece!.name === "Pawn" &&
+        (originPiece!.point[1] === 0 || originPiece!.point[1] === 7)
+      ) {
         promotion = checkForPawnPromotion(squaresandPieces);
       }
       originPiece!.moved = true;
@@ -113,23 +148,25 @@ const resolveMove = (originPoint: Point, targetPoint: Point, state:State, grid: 
     } else {
       //Switch squares back after valid move resolve check --------Try and find a fix for this..
       switchSquaresBack(squaresandPieces, originPoint);
-      console.log(`${state.currentPlayer} King will be in check if move is resolved`);
+      console.log(
+        `${state.currentPlayer} King will be in check if move is resolved`
+      );
       return false;
     }
   } else {
-    console.log(`Target point ${targetPoint} is not a valid move for game piece!`);
-    return false
+    console.log(
+      `Target point ${targetPoint} is not a valid move for game piece!`
+    );
+    return false;
   }
 };
 
-
-
 type EnPassantResult = {
-  result: boolean,
-  enPassantPoint: Point,
-}
+  result: boolean;
+  enPassantPoint: Point;
+};
 
-const isEnPassantAvailable = (history: TurnHistory) : EnPassantResult => {
+const isEnPassantAvailable = (history: TurnHistory): EnPassantResult => {
   let moved;
   let direction;
   let noMove = -1;
@@ -153,7 +190,13 @@ const isEnPassantAvailable = (history: TurnHistory) : EnPassantResult => {
   };
 };
 
-const canValidMoveResolve = (squaresandPieces: SquaresandPieces, targetPoint: Point, state: State, grid: Square[][], turnHistory: TurnHistory) => {
+const canValidMoveResolve = (
+  squaresandPieces: SquaresandPieces,
+  targetPoint: Point,
+  state: State,
+  grid: Square[][],
+  turnHistory: TurnHistory
+) => {
   //Resolve switch of squares
   switchSquares(squaresandPieces, targetPoint);
   //Check if resolve causes current players king to be check
@@ -161,24 +204,48 @@ const canValidMoveResolve = (squaresandPieces: SquaresandPieces, targetPoint: Po
   return isChecked(state, grid, turnHistory, kingSquare) ? false : true;
 };
 
-const isChecked = (state: State , grid: Square[][], turnHistory: TurnHistory, kingSquare: Square | undefined) => {
+const isChecked = (
+  state: State,
+  grid: Square[][],
+  turnHistory: TurnHistory,
+  kingSquare: Square | undefined
+) => {
   const opponentsPieces = getOpponentsPieces(state, grid);
-  const opponentsAvailableMoves = getMoves(grid, state, turnHistory, opponentsPieces);
-  const kingIsChecked = opponentsAvailableMoves.find((move) => doMovesMatch(move[0], kingSquare!.on!.point));
+  const opponentsAvailableMoves = getMoves(
+    grid,
+    state,
+    turnHistory,
+    opponentsPieces
+  );
+  const kingIsChecked = opponentsAvailableMoves.find((move) =>
+    doMovesMatch(move[0], kingSquare!.on!.point)
+  );
   //Returns an array with the kings location if checked
   return kingIsChecked;
 };
 
-const isEnemyChecked = (state: State, grid: Square[][], turnHistory: TurnHistory) => {
+const isEnemyChecked = (
+  state: State,
+  grid: Square[][],
+  turnHistory: TurnHistory
+) => {
   const kingSquare = findEnemyKing(state, grid);
   const myPieces = getCurrentPlayerPieces(state, grid);
   const myAvailableMoves = getMoves(grid, state, turnHistory, myPieces);
-  const kingIsChecked = myAvailableMoves.find((move) => doMovesMatch(move[0], kingSquare!.on!.point));
+  const kingIsChecked = myAvailableMoves.find((move) =>
+    doMovesMatch(move[0], kingSquare!.on!.point)
+  );
   //Returns an array with the kings location if checked
   return kingIsChecked;
 };
 
-const calcCastling = (grid: Square[][], state: State, turnHistory: TurnHistory, currentPoint: Point, movesObj: Move[]) => {
+const calcCastling = (
+  grid: Square[][],
+  state: State,
+  turnHistory: TurnHistory,
+  currentPoint: Point,
+  movesObj: Move[]
+) => {
   const [x, y] = currentPoint;
   const piece = grid[x][y].on;
   let targetPiece;
@@ -196,7 +263,13 @@ const calcCastling = (grid: Square[][], state: State, turnHistory: TurnHistory, 
   if (targetPiece !== undefined) {
     const castling2 = targetPiece.name === "Rook" && !targetPiece.moved;
     if (castling1 && castling2) {
-      const resolve = checkForCastling(piece!.point, targetPiece.point, state, grid, turnHistory);
+      const resolve = checkForCastling(
+        piece!.point,
+        targetPiece.point,
+        state,
+        grid,
+        turnHistory
+      );
       if (resolve !== false) {
         resolve[0] ? movesObj.push(resolve[1]) : null;
       }
@@ -207,7 +280,13 @@ const calcCastling = (grid: Square[][], state: State, turnHistory: TurnHistory, 
   if (targetPiece2 !== undefined) {
     const castling4 = targetPiece2.name === "Rook" && !targetPiece2.moved;
     if (castling3 && castling4) {
-      const resolve = checkForCastling(piece!.point, targetPiece2.point, state, grid, turnHistory);
+      const resolve = checkForCastling(
+        piece!.point,
+        targetPiece2.point,
+        state,
+        grid,
+        turnHistory
+      );
       if (resolve !== false) {
         resolve[0] ? movesObj.push(resolve[1]) : null;
       }
@@ -216,14 +295,24 @@ const calcCastling = (grid: Square[][], state: State, turnHistory: TurnHistory, 
 };
 
 //Checks if castling is valid
-const checkForCastling = (originPoint: Point, targetPoint: Point, state: State , grid: Square[][], turnHistory: TurnHistory) => {
+const checkForCastling = (
+  originPoint: Point,
+  targetPoint: Point,
+  state: State,
+  grid: Square[][],
+  turnHistory: TurnHistory
+) => {
   const squaresandPieces = getSquaresandPieces(originPoint, targetPoint, grid);
-  const { originPiece, targetPiece, originSquare, targetSquare } = squaresandPieces;
+  const { originPiece, targetPiece, originSquare, targetSquare } =
+    squaresandPieces;
   //Check for valid castling pieces
   if (originPiece!.moved === false && targetPiece!.moved === false) {
     if (originPiece!.name === "King" && targetPiece!.name === "Rook") {
       //Check for valid team
-      if (originPiece!.color === state.currentPlayer && targetPiece!.color === state.currentPlayer) {
+      if (
+        originPiece!.color === state.currentPlayer &&
+        targetPiece!.color === state.currentPlayer
+      ) {
         //Check if king is currently in check
         const kingSquare = findKing(state, grid);
         const isKingChecked = isChecked(state, grid, turnHistory, kingSquare);
@@ -262,19 +351,32 @@ const checkForCastling = (originPoint: Point, targetPoint: Point, state: State ,
           } else {
             //Check if opponents pieces, threathen any of the spaces in between
             const opponentsPieces = getOpponentsPieces(state, grid);
-            const opponentsAvailableMoves = getMoves(grid, state, turnHistory, opponentsPieces);
+            const opponentsAvailableMoves = getMoves(
+              grid,
+              state,
+              turnHistory,
+              opponentsPieces
+            );
             const isThereOverlap = [];
             for (let i = 0; i < squaresInBetween.length; i++) {
               const square = squaresInBetween[i];
               for (let k = 0; k < opponentsAvailableMoves.length; k++) {
                 const availableMove = opponentsAvailableMoves[k];
-                const doesMoveMatchSquare = doMovesMatch(availableMove[0], square);
-                doesMoveMatchSquare ? isThereOverlap.push(doesMoveMatchSquare) : null;
+                const doesMoveMatchSquare = doMovesMatch(
+                  availableMove[0],
+                  square
+                );
+                doesMoveMatchSquare
+                  ? isThereOverlap.push(doesMoveMatchSquare)
+                  : null;
               }
             }
             if (isThereOverlap.length === 0) {
               //console.log("Castling Available!");
-              const returnResult: [boolean, Move] = [true, [targetPoint, "castling"]];
+              const returnResult: [boolean, Move] = [
+                true,
+                [targetPoint, "castling"],
+              ];
               return returnResult;
             } else {
               //console.log("Castling Not Available!, One of Squares is under Enemy Threat!");
@@ -296,8 +398,13 @@ const checkForCastling = (originPoint: Point, targetPoint: Point, state: State ,
   }
 };
 
-const castlingMove = (direction: number, squaresandPieces: SquaresandPieces, grid: Square[][]) => {
-  const { originSquare, originPiece, targetSquare, targetPiece } = squaresandPieces;
+const castlingMove = (
+  direction: number,
+  squaresandPieces: SquaresandPieces,
+  grid: Square[][]
+) => {
+  const { originSquare, originPiece, targetSquare, targetPiece } =
+    squaresandPieces;
   const { name, color, point, movement } = originPiece!;
   const { name: name2, color: color2, movement: movement2 } = targetPiece!;
   originSquare.on = undefined;
@@ -311,9 +418,19 @@ const castlingMove = (direction: number, squaresandPieces: SquaresandPieces, gri
   const newRookPoint: Point = [newRookX, y];
   const newKingSquare = grid[newKingX][y];
   const newRookSquare = grid[newRookX][y];
-  newKingSquare.on = new pieceClasses[name](name, color, newKingPoint, movement);
-  newRookSquare.on = new pieceClasses[name2](name2, color2, newRookPoint, movement2);
-  return [newKingSquare, newRookSquare]
+  newKingSquare.on = new pieceClasses[name](
+    name,
+    color,
+    newKingPoint,
+    movement
+  );
+  newRookSquare.on = new pieceClasses[name2](
+    name2,
+    color2,
+    newRookPoint,
+    movement2
+  );
+  return [newKingSquare, newRookSquare];
 };
 
 //Checks for pawn promotion ---------------------------------Needs update to a "promotion scene" to with eventlistener
@@ -340,7 +457,12 @@ const checkForPawnPromotion = (squaresandPieces: SquaresandPieces) => {
     const char = newClass.charAt(0).toUpperCase();
     const finalString = newClass.replace(newClass.charAt(0), char);
     const { color, point, movement } = originPiece!;
-    targetSquare.on = new pieceClasses[finalString](finalString, color, point, movement);
+    targetSquare.on = new pieceClasses[finalString](
+      finalString,
+      color,
+      point,
+      movement
+    );
     return finalString;
   }
 };
@@ -354,8 +476,12 @@ const switchSquares = (squaresandPieces: SquaresandPieces, point: Point) => {
   return true;
 };
 
-const switchSquaresBack = (squaresandPieces: SquaresandPieces, point: Point) => {
-  const { originSquare, targetSquare, originPiece, targetPiece } = squaresandPieces;
+const switchSquaresBack = (
+  squaresandPieces: SquaresandPieces,
+  point: Point
+) => {
+  const { originSquare, targetSquare, originPiece, targetPiece } =
+    squaresandPieces;
   originSquare.on = originPiece;
   originSquare.on!.point = [getX(point), getY(point)];
   targetSquare.on = targetPiece;
@@ -373,25 +499,41 @@ const getY = (point: Point) => {
   return y;
 };
 
-const doMovesMatch = (move: Point, move2:Point) => getX(move) == getX(move2) && getY(move) == getY(move2);
+const doMovesMatch = (move: Point, move2: Point) =>
+  getX(move) == getX(move2) && getY(move) == getY(move2);
 
-const getOpponentsPieces = (state: State, grid:Square[][]) => {
+const getOpponentsPieces = (state: State, grid: Square[][]) => {
   const piecesArray = grid.flat().filter((square) => {
-    return square.on !== undefined ? (square.on.color !== state.currentPlayer ? true : false) : null;
+    return square.on !== undefined
+      ? square.on.color !== state.currentPlayer
+        ? true
+        : false
+      : null;
   });
   return piecesArray;
 };
 
 const getCurrentPlayerPieces = (state: State, grid: Square[][]) => {
   const piecesArray = grid.flat().filter((square) => {
-    return square.on !== undefined ? (square.on.color === state.currentPlayer ? true : false) : null;
+    return square.on !== undefined
+      ? square.on.color === state.currentPlayer
+        ? true
+        : false
+      : null;
   });
   return piecesArray;
 };
 
-const getMoves = (grid:Square[][], state:State, turnHistory:TurnHistory, gamePieces: Square[]) => {
+const getMoves = (
+  grid: Square[][],
+  state: State,
+  turnHistory: TurnHistory,
+  gamePieces: Square[]
+) => {
   const availableMoves = gamePieces
-    .map((square) => square.on!.calculateAvailableMoves(grid, state, turnHistory, false))
+    .map((square) =>
+      square.on!.calculateAvailableMoves(grid, state, turnHistory, false)
+    )
     .flat()
     .filter((move) => (move[0] !== undefined ? true : false));
 
@@ -399,33 +541,43 @@ const getMoves = (grid:Square[][], state:State, turnHistory:TurnHistory, gamePie
 };
 
 const findKing = (state: State, grid: Square[][]) => {
-  const filterdSquare: Square[]  = grid
+  const filterdSquare: Square[] = grid
     .flat()
     .filter((square) => (square.on !== undefined ? true : false));
 
-    const findKing = filterdSquare.find((square)=> square.on!.name === "King" && square.on!.color === state.currentPlayer);
-      return findKing;
+  const findKing = filterdSquare.find(
+    (square) =>
+      square.on!.name === "King" && square.on!.color === state.currentPlayer
+  );
+  return findKing;
 };
 
 const findEnemyKing = (state: State, grid: Square[][]): Square | undefined => {
   const findKing = grid
     .flat()
     .filter((square) => (square.on !== undefined ? true : false))
-    .find((square) => square.on!.name === "King" && square.on!.color !== state.currentPlayer);
-    if(typeof findKing !== "undefined"){
-      return findKing;
-    }
+    .find(
+      (square) =>
+        square.on!.name === "King" && square.on!.color !== state.currentPlayer
+    );
+  if (typeof findKing !== "undefined") {
+    return findKing;
+  }
 };
 
-interface SquaresandPieces{
-  originSquare: Square,
-  targetSquare: Square,
-  originPiece: PieceType | undefined,
-  targetPiece: PieceType | undefined
+interface SquaresandPieces {
+  originSquare: Square;
+  targetSquare: Square;
+  originPiece: PieceType | undefined;
+  targetPiece: PieceType | undefined;
 }
 
 //Function that returns Squares and Pieces from designated move
-const getSquaresandPieces = (originPoint: Point, targetPoint: Point, grid: Square[][]): SquaresandPieces => {
+const getSquaresandPieces = (
+  originPoint: Point,
+  targetPoint: Point,
+  grid: Square[][]
+): SquaresandPieces => {
   const originSquare = grid[getX(originPoint)][getY(originPoint)];
   const targetSquare = grid[getX(targetPoint)][getY(targetPoint)];
   const originPiece = originSquare.on;
@@ -434,7 +586,11 @@ const getSquaresandPieces = (originPoint: Point, targetPoint: Point, grid: Squar
 };
 
 //Simulation For Checkmate Checks ---------Need to update with board clone later
-const isCheckmate = (state: State, grid: Square[][], turnHistory: TurnHistory) => {
+const isCheckmate = (
+  state: State,
+  grid: Square[][],
+  turnHistory: TurnHistory
+) => {
   const kingSquare = findKing(state, grid);
   return kingSquare
     ? (isChecked(state, grid, turnHistory, kingSquare) ? true : false)
@@ -445,7 +601,11 @@ const isCheckmate = (state: State, grid: Square[][], turnHistory: TurnHistory) =
     : null;
 };
 
-const simulateCheckmate = (state: State, grid: Square[][], turnHistory: TurnHistory) => {
+const simulateCheckmate = (
+  state: State,
+  grid: Square[][],
+  turnHistory: TurnHistory
+) => {
   //** Use grid clone to make this way more efficient
   const finalResults: boolean[] = [];
   //Find all current Pieces
@@ -453,7 +613,12 @@ const simulateCheckmate = (state: State, grid: Square[][], turnHistory: TurnHist
   const pieces = currentPlayerPieces.map((piece) => piece.on);
   //For each piece, iterate on its available moves
   pieces.forEach((piece) => {
-    let availableMoves = piece!.calculateAvailableMoves(grid, state, turnHistory, false);
+    let availableMoves = piece!.calculateAvailableMoves(
+      grid,
+      state,
+      turnHistory,
+      false
+    );
     const originPoint: Point = [...piece!.point];
     //For Each available move, check if after resolving it, the player is still in check.
     const isItCheckmate = availableMoves.map((move) => {
@@ -472,7 +637,13 @@ const simulateCheckmate = (state: State, grid: Square[][], turnHistory: TurnHist
   return isCheckmate.length ? false : true;
 };
 
-const simulateResolveMove = (originPoint: Point, targetPoint: Point, state: State, grid: Square[][], turnHistory: TurnHistory) => {
+const simulateResolveMove = (
+  originPoint: Point,
+  targetPoint: Point,
+  state: State,
+  grid: Square[][],
+  turnHistory: TurnHistory
+) => {
   const squaresandPieces = getSquaresandPieces(originPoint, targetPoint, grid);
   const { originPiece, originSquare } = squaresandPieces;
   //Check if origin square has game piece on it
@@ -481,12 +652,27 @@ const simulateResolveMove = (originPoint: Point, targetPoint: Point, state: Stat
     return false;
   } else if (originSquare.on.color === state.currentPlayer) {
     //Checks if the moving game piece belongs to current player
-    let availableMoves = originSquare.on.calculateAvailableMoves(grid, state, turnHistory, false);
+    let availableMoves = originSquare.on.calculateAvailableMoves(
+      grid,
+      state,
+      turnHistory,
+      false
+    );
     //Check if the entered targetPoint is a valid move for current game piece
-    const validMove = availableMoves.find((possibleMove) => doMovesMatch(possibleMove[0], targetPoint));
+    const validMove = availableMoves.find((possibleMove) =>
+      doMovesMatch(possibleMove[0], targetPoint)
+    );
     if (validMove) {
       //Will resolving move be valid
-      if (canValidMoveResolve(squaresandPieces, targetPoint, state, grid, turnHistory)) {
+      if (
+        canValidMoveResolve(
+          squaresandPieces,
+          targetPoint,
+          state,
+          grid,
+          turnHistory
+        )
+      ) {
         //console.log("Move is Valid! Board is updated.");
         return true;
       } else {
@@ -505,7 +691,12 @@ const simulateResolveMove = (originPoint: Point, targetPoint: Point, state: Stat
   }
 };
 
-const annotate = (result: TurnHistory, state: State, grid: Square[][], turnHistory: TurnHistory) => {
+const annotate = (
+  result: TurnHistory,
+  state: State,
+  grid: Square[][],
+  turnHistory: TurnHistory
+) => {
   let string;
   const type = result.type;
   const promotion = result.promotion;

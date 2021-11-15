@@ -2,12 +2,12 @@ import "babylonjs-loaders";
 import * as BABYLON from "babylonjs";
 import initializeApp from "./app";
 import { Engine } from "babylonjs/Engines/engine";
- 
+
 async function Main() {
   const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
   const loadingDiv = document.getElementById("loading") as HTMLDivElement;
-  
-  let engine:Engine = new BABYLON.Engine(canvas, true);
+
+  let engine: Engine = new BABYLON.Engine(canvas, true);
   const app = await initializeApp(canvas, engine);
 
   const {
@@ -15,26 +15,25 @@ async function Main() {
     scenes: { startScene, gameScene },
   } = app;
 
-const refreshCanvas = () => {
-  engine.resize();
-  let camera: any = startScene.cameras[0]
-  if(canvas.width < 768) {
-    camera.radius = 31;
-  } else {
-    camera.radius = 30;
-  }
-}
+  const refreshCanvas = () => {
+    engine.resize();
+    let camera: any = startScene.cameras[0];
+    if (canvas.width < 768) {
+      camera.radius = 31;
+    } else {
+      camera.radius = 30;
+    }
+  };
 
-const loadingEnd = () => {
-  refreshCanvas();
-  setTimeout(() => {
-    loadingDiv.style.display = "none"
-  }, 1000)
-}
+  const loadingEnd = () => {
+    refreshCanvas();
+    setTimeout(() => {
+      loadingDiv.style.display = "none";
+    }, 1000);
+  };
 
   globalThis.onresize = refreshCanvas;
   globalThis.onload = loadingEnd;
-
 
   (() => {
     engine.runRenderLoop(function () {
