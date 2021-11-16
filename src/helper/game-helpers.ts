@@ -2,6 +2,7 @@ import { pieceClasses, Square } from "./board-helpers";
 import { Move } from "../component/game-pieces/game-piece";
 import { PieceType } from "./board-helpers";
 import { State } from "../data/chess-data-import";
+import { Console } from "console";
 
 export interface TurnHistory {
   result: boolean;
@@ -81,7 +82,6 @@ const resolveMove = (
               targetPoint,
               state,
               grid,
-              turnHistory,
               calculateAvailableMoves
             )
           ) {
@@ -117,7 +117,6 @@ const resolveMove = (
         targetPoint,
         state,
         grid,
-        turnHistory,
         calculateAvailableMoves
       )
     ) {
@@ -193,20 +192,13 @@ const canValidMoveResolve = (
   targetPoint: Point,
   state: State,
   grid: Square[][],
-  turnHistory: TurnHistory,
   calculateAvailableMoves: (piece: PieceType) => Move[]
 ) => {
   //Resolve switch of squares
   switchSquares(squaresandPieces, targetPoint);
   //Check if resolve causes current players king to be check
   const kingSquare = findKing(state, grid);
-  return isChecked(
-    state,
-    grid,
-    turnHistory,
-    kingSquare,
-    calculateAvailableMoves
-  )
+  return isChecked(state, grid, kingSquare, calculateAvailableMoves)
     ? false
     : true;
 };
@@ -214,15 +206,11 @@ const canValidMoveResolve = (
 const isChecked = (
   state: State,
   grid: Square[][],
-  turnHistory: TurnHistory,
   kingSquare: Square | undefined,
   calculateAvailableMoves: (piece: PieceType) => Move[]
 ) => {
   const opponentsPieces = getOpponentsPieces(state, grid);
   const opponentsAvailableMoves = getMoves(
-    grid,
-    state,
-    turnHistory,
     opponentsPieces,
     calculateAvailableMoves
   );
@@ -236,18 +224,11 @@ const isChecked = (
 const isEnemyChecked = (
   state: State,
   grid: Square[][],
-  turnHistory: TurnHistory,
   calculateAvailableMoves: (piece: PieceType) => Move[]
 ) => {
   const kingSquare = findEnemyKing(state, grid);
   const myPieces = getCurrentPlayerPieces(state, grid);
-  const myAvailableMoves = getMoves(
-    grid,
-    state,
-    turnHistory,
-    myPieces,
-    calculateAvailableMoves
-  );
+  const myAvailableMoves = getMoves(myPieces, calculateAvailableMoves);
   const kingIsChecked = myAvailableMoves.find((move) =>
     doMovesMatch(move[0], kingSquare!.on!.point)
   );
@@ -258,7 +239,6 @@ const isEnemyChecked = (
 const calcCastling = (
   grid: Square[][],
   state: State,
-  turnHistory: TurnHistory,
   currentPoint: Point,
   movesObj: Move[],
   calculateAvailableMoves: (piece: PieceType) => Move[]
@@ -285,7 +265,6 @@ const calcCastling = (
         targetPiece.point,
         state,
         grid,
-        turnHistory,
         calculateAvailableMoves
       );
       if (resolve !== false) {
@@ -303,7 +282,6 @@ const calcCastling = (
         targetPiece2.point,
         state,
         grid,
-        turnHistory,
         calculateAvailableMoves
       );
       if (resolve !== false) {
@@ -319,7 +297,6 @@ const checkForCastling = (
   targetPoint: Point,
   state: State,
   grid: Square[][],
-  turnHistory: TurnHistory,
   calculateAvailableMoves: (piece: PieceType) => Move[]
 ) => {
   const squaresandPieces = getSquaresandPieces(originPoint, targetPoint, grid);
@@ -338,7 +315,6 @@ const checkForCastling = (
         const isKingChecked = isChecked(
           state,
           grid,
-          turnHistory,
           kingSquare,
           calculateAvailableMoves
         );
@@ -378,9 +354,6 @@ const checkForCastling = (
             //Check if opponents pieces, threathen any of the spaces in between
             const opponentsPieces = getOpponentsPieces(state, grid);
             const opponentsAvailableMoves = getMoves(
-              grid,
-              state,
-              turnHistory,
               opponentsPieces,
               calculateAvailableMoves
             );
@@ -552,9 +525,6 @@ const getCurrentPlayerPieces = (state: State, grid: Square[][]) => {
 };
 
 const getMoves = (
-  grid: Square[][],
-  state: State,
-  turnHistory: TurnHistory,
   gamePieces: Square[],
   calculateAvailableMoves: (piece: PieceType) => Move[]
 ) => {
@@ -615,17 +585,16 @@ const getSquaresandPieces = (
 const isCheckmate = (
   state: State,
   grid: Square[][],
-  turnHistory: TurnHistory,
   calculateAvailableMoves: (piece: PieceType) => Move[]
 ) => {
   const kingSquare = findKing(state, grid);
   return kingSquare
     ? (
-        isChecked(state, grid, turnHistory, kingSquare, calculateAvailableMoves)
+        isChecked(state, grid, kingSquare, calculateAvailableMoves)
           ? true
           : false
       )
-      ? simulateCheckmate(state, grid, turnHistory, calculateAvailableMoves)
+      ? simulateCheckmate(state, grid, calculateAvailableMoves)
         ? true
         : false
       : null
@@ -636,7 +605,6 @@ const simulateCheckmate = (
   //Check older code
   state: State,
   grid: Square[][],
-  turnHistory: TurnHistory,
   calculateAvailableMoves: (piece: PieceType) => Move[]
 ) => {
   //** Use grid clone to make this way more efficient
@@ -656,7 +624,6 @@ const simulateCheckmate = (
         move[0],
         state,
         grid,
-        turnHistory,
         calculateAvailableMoves
       )
         ? switchSquaresBack(squaresandPieces, originPoint)
@@ -677,7 +644,6 @@ const simulateResolveMove = (
   targetPoint: Point,
   state: State,
   grid: Square[][],
-  turnHistory: TurnHistory,
   calculateAvailableMoves: (piece: PieceType) => Move[]
 ) => {
   const squaresandPieces = getSquaresandPieces(originPoint, targetPoint, grid);
@@ -701,7 +667,6 @@ const simulateResolveMove = (
           targetPoint,
           state,
           grid,
-          turnHistory,
           calculateAvailableMoves
         )
       ) {
@@ -727,7 +692,6 @@ const annotate = (
   result: TurnHistory,
   state: State,
   grid: Square[][],
-  turnHistory: TurnHistory,
   calculateAvailableMoves: (piece: PieceType) => Move[]
 ) => {
   let string;
@@ -791,12 +755,7 @@ const annotate = (
     } else {
       string = movingPiece + activeSquare;
     }
-    const isCheck = isEnemyChecked(
-      state,
-      grid,
-      turnHistory,
-      calculateAvailableMoves
-    );
+    const isCheck = isEnemyChecked(state, grid, calculateAvailableMoves);
     isCheck ? (string = string + "+") : null;
   }
   return string;
@@ -809,7 +768,6 @@ export {
   getX,
   getY,
   annotate,
-  isEnemyChecked,
   doMovesMatch,
   getSquaresandPieces,
   isEnPassantAvailable,

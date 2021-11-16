@@ -54,7 +54,6 @@ const displayPieceMoves = (
 ) => {
   const grid = game.board.grid;
   const state = game.state;
-  const turnHistory = game.turnHistory[game.turnHistory.length - 1];
   const [x, y] = calcIndexFromMeshPosition([mesh.position.z, mesh.position.x]);
   const piece = grid[x][y].on;
   displayMovementSquares([[x, y], ""], gameScene, "piece");
@@ -71,8 +70,7 @@ const displayPieceMoves = (
         move[0],
         state,
         grid,
-        turnHistory,
-        game.calculateAvailableMoves
+        game.calculateAvailableMoves.bind(game)
       );
       switchSquaresBack(squaresandPieces, [pieceX, pieceY]);
       return validMove ? move : null;

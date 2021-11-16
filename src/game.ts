@@ -48,7 +48,7 @@ class Game {
       this.state,
       this.board.grid,
       lastTurn,
-      this.calculateAvailableMoves
+      this.calculateAvailableMoves.bind(this)
     );
     if (typeof resolve !== "boolean") {
       resolve.result
@@ -58,8 +58,7 @@ class Game {
               resolve,
               this.state,
               this.board.grid,
-              lastTurn,
-              this.calculateAvailableMoves
+              this.calculateAvailableMoves.bind(this)
             );
             this.annotations.push(annotation);
             this.turnHistory.push(resolve);
@@ -72,7 +71,7 @@ class Game {
 
   calculateAvailableMoves(piece: PieceType, flag = false): Move[] {
     let availableMoves: Move[] = [];
-    const lastTurnHistory = this.turnHistory[this.turnHistory.length - 1];
+    let lastTurnHistory = this.turnHistory[this.turnHistory.length - 1];
     switch (piece.name) {
       case "Pawn":
         availableMoves = calcPawnMoves(
@@ -100,8 +99,7 @@ class Game {
           flag,
           this.board.grid,
           this.state,
-          lastTurnHistory,
-          this.calculateAvailableMoves
+          this.calculateAvailableMoves.bind(this)
         );
         break;
     }
@@ -117,10 +115,9 @@ class Game {
   }
 
   switchTurn(state = this.state, grid = this.board.grid) {
-    const lastTurn = this.turnHistory[this.turnHistory.length - 1];
     this.turnCounter++;
     this.changePlayer();
-    isCheckmate(state, grid, lastTurn, this.calculateAvailableMoves)
+    isCheckmate(state, grid, this.calculateAvailableMoves.bind(this))
       ? this.endGame()
       : null;
   }

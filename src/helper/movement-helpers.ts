@@ -136,7 +136,6 @@ const calcKingMoves = (
   castling: boolean,
   grid: Square[][],
   state: State,
-  turnHistory: TurnHistory,
   calculateAvailableMoves: (piece: PieceType) => Move[]
 ) => {
   const kingMoves: Point[] = [
@@ -154,12 +153,11 @@ const calcKingMoves = (
 
   calcKingMovements(grid, piece.point, piece.color, kingMoves, availableMoves);
 
-  if (piece.moved) {
+  if (!piece.moved) {
     if (castling) {
       calcCastling(
         grid,
         state,
-        turnHistory,
         piece.point,
         availableMoves,
         calculateAvailableMoves
