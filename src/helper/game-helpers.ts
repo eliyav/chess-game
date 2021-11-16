@@ -1,8 +1,7 @@
-import { pieceClasses, Square } from "./board-helpers";
-import { Move } from "../component/game-pieces/game-piece";
-import { PieceType } from "./board-helpers";
+import { Square } from "./board-helpers";
+import GamePiece, { Move } from "../component/game-piece";
 import { State } from "../data/chess-data-import";
-import { Console } from "console";
+import Game from "../game";
 
 export interface TurnHistory {
   result: boolean;
@@ -12,8 +11,8 @@ export interface TurnHistory {
   castling?: Square[];
   origin: Point;
   target: Point;
-  originPiece: PieceType | undefined;
-  targetPiece: PieceType | undefined;
+  originPiece: GamePiece | undefined;
+  targetPiece: GamePiece | undefined;
   originSquare: Square;
   targetSquare: Square;
   promotion?: string | undefined;
@@ -26,7 +25,7 @@ const resolveMove = (
   state: State,
   grid: Square[][],
   turnHistory: TurnHistory,
-  calculateAvailableMoves: (piece: PieceType) => Move[]
+  calculateAvailableMoves: (piece: GamePiece) => Move[]
 ): TurnHistory | boolean => {
   const squaresandPieces = getSquaresandPieces(originPoint, targetPoint, grid);
   const { originSquare, originPiece, targetSquare, targetPiece } =
@@ -192,7 +191,7 @@ const canValidMoveResolve = (
   targetPoint: Point,
   state: State,
   grid: Square[][],
-  calculateAvailableMoves: (piece: PieceType) => Move[]
+  calculateAvailableMoves: (piece: GamePiece) => Move[]
 ) => {
   //Resolve switch of squares
   switchSquares(squaresandPieces, targetPoint);
@@ -207,7 +206,7 @@ const isChecked = (
   state: State,
   grid: Square[][],
   kingSquare: Square | undefined,
-  calculateAvailableMoves: (piece: PieceType) => Move[]
+  calculateAvailableMoves: (piece: GamePiece) => Move[]
 ) => {
   const opponentsPieces = getOpponentsPieces(state, grid);
   const opponentsAvailableMoves = getMoves(
@@ -224,7 +223,7 @@ const isChecked = (
 const isEnemyChecked = (
   state: State,
   grid: Square[][],
-  calculateAvailableMoves: (piece: PieceType) => Move[]
+  calculateAvailableMoves: (piece: GamePiece) => Move[]
 ) => {
   const kingSquare = findEnemyKing(state, grid);
   const myPieces = getCurrentPlayerPieces(state, grid);
@@ -241,7 +240,7 @@ const calcCastling = (
   state: State,
   currentPoint: Point,
   movesObj: Move[],
-  calculateAvailableMoves: (piece: PieceType) => Move[]
+  calculateAvailableMoves: (piece: GamePiece) => Move[]
 ) => {
   const [x, y] = currentPoint;
   const piece = grid[x][y].on;
@@ -297,7 +296,7 @@ const checkForCastling = (
   targetPoint: Point,
   state: State,
   grid: Square[][],
-  calculateAvailableMoves: (piece: PieceType) => Move[]
+  calculateAvailableMoves: (piece: GamePiece) => Move[]
 ) => {
   const squaresandPieces = getSquaresandPieces(originPoint, targetPoint, grid);
   const { originPiece, targetPiece, originSquare, targetSquare } =
@@ -418,18 +417,8 @@ const castlingMove = (
   const newRookPoint: Point = [newRookX, y];
   const newKingSquare = grid[newKingX][y];
   const newRookSquare = grid[newRookX][y];
-  newKingSquare.on = new pieceClasses[name](
-    name,
-    color,
-    newKingPoint,
-    movement
-  );
-  newRookSquare.on = new pieceClasses[name2](
-    name2,
-    color2,
-    newRookPoint,
-    movement2
-  );
+  newKingSquare.on = new GamePiece(name, color, newKingPoint, movement);
+  newRookSquare.on = new GamePiece(name2, color2, newRookPoint, movement2);
   return [newKingSquare, newRookSquare];
 };
 
@@ -457,12 +446,7 @@ const checkForPawnPromotion = (squaresandPieces: SquaresandPieces) => {
     const char = newClass.charAt(0).toUpperCase();
     const finalString = newClass.replace(newClass.charAt(0), char);
     const { color, point, movement } = originPiece!;
-    targetSquare.on = new pieceClasses[finalString](
-      finalString,
-      color,
-      point,
-      movement
-    );
+    targetSquare.on = new GamePiece(finalString, color, point, movement);
     return finalString;
   }
 };
@@ -526,7 +510,7 @@ const getCurrentPlayerPieces = (state: State, grid: Square[][]) => {
 
 const getMoves = (
   gamePieces: Square[],
-  calculateAvailableMoves: (piece: PieceType) => Move[]
+  calculateAvailableMoves: (piece: GamePiece) => Move[]
 ) => {
   const availableMoves = gamePieces
     .map((square) => calculateAvailableMoves(square.on!))
@@ -564,8 +548,8 @@ const findEnemyKing = (state: State, grid: Square[][]): Square | undefined => {
 interface SquaresandPieces {
   originSquare: Square;
   targetSquare: Square;
-  originPiece: PieceType | undefined;
-  targetPiece: PieceType | undefined;
+  originPiece: GamePiece | undefined;
+  targetPiece: GamePiece | undefined;
 }
 
 //Function that returns Squares and Pieces from designated move
@@ -585,7 +569,7 @@ const getSquaresandPieces = (
 const isCheckmate = (
   state: State,
   grid: Square[][],
-  calculateAvailableMoves: (piece: PieceType) => Move[]
+  calculateAvailableMoves: (piece: GamePiece) => Move[]
 ) => {
   const kingSquare = findKing(state, grid);
   return kingSquare
@@ -605,7 +589,7 @@ const simulateCheckmate = (
   //Check older code
   state: State,
   grid: Square[][],
-  calculateAvailableMoves: (piece: PieceType) => Move[]
+  calculateAvailableMoves: (piece: GamePiece) => Move[]
 ) => {
   //** Use grid clone to make this way more efficient
   const finalResults: boolean[] = [];
@@ -644,7 +628,7 @@ const simulateResolveMove = (
   targetPoint: Point,
   state: State,
   grid: Square[][],
-  calculateAvailableMoves: (piece: PieceType) => Move[]
+  calculateAvailableMoves: (piece: GamePiece) => Move[]
 ) => {
   const squaresandPieces = getSquaresandPieces(originPoint, targetPoint, grid);
   const { originPiece, originSquare } = squaresandPieces;
@@ -692,7 +676,7 @@ const annotate = (
   result: TurnHistory,
   state: State,
   grid: Square[][],
-  calculateAvailableMoves: (piece: PieceType) => Move[]
+  calculateAvailableMoves: (piece: GamePiece) => Move[]
 ) => {
   let string;
   const type = result.type;

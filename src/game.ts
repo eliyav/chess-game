@@ -1,5 +1,5 @@
 import { resolveMove, isCheckmate, annotate } from "./helper/game-helpers";
-import { setPieces, createGrid, PieceType } from "./helper/board-helpers";
+import { setPieces, createGrid } from "./helper/board-helpers";
 import Board from "./component/board";
 import { Data, State } from "./data/chess-data-import";
 import { TurnHistory } from "./helper/game-helpers";
@@ -12,7 +12,7 @@ import {
   calcQueenMoves,
   calcRookMoves,
 } from "./helper/movement-helpers";
-import { Move } from "./component/game-pieces/game-piece";
+import GamePiece, { Move } from "./component/game-piece";
 
 class Game {
   state: State;
@@ -69,7 +69,7 @@ class Game {
     return false;
   }
 
-  calculateAvailableMoves(piece: PieceType, flag = false): Move[] {
+  calculateAvailableMoves(piece: GamePiece, flag = false): Move[] {
     let availableMoves: Move[] = [];
     let lastTurnHistory = this.turnHistory[this.turnHistory.length - 1];
     switch (piece.name) {

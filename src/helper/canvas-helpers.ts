@@ -9,7 +9,7 @@ import {
   switchSquaresBack,
 } from "./game-helpers";
 import { ChessPieceMesh } from "../view/asset-loader";
-import { Move } from "../component/game-pieces/game-piece";
+import { Move } from "../component/game-piece";
 
 const renderScene = (game: Game, gameScene: CustomScene) => {
   //Clears old meshes/memory usage

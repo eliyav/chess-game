@@ -4,8 +4,8 @@ import {
   isEnPassantAvailable,
   doMovesMatch,
 } from "./game-helpers";
-import { PieceType, Square } from "./board-helpers";
-import { Move } from "../component/game-pieces/game-piece";
+import { Square } from "./board-helpers";
+import GamePiece, { Move } from "../component/game-piece";
 import { State } from "../data/chess-data-import";
 
 type MovesObj = {
@@ -19,7 +19,7 @@ type MovesObj = {
   downLeft?: Point[];
 };
 
-const calcRookMoves = (piece: PieceType, grid: Square[][]) => {
+const calcRookMoves = (piece: GamePiece, grid: Square[][]) => {
   const availableMoves: Move[] = [];
   const verticalMovements = {
     up: [],
@@ -37,7 +37,7 @@ const calcRookMoves = (piece: PieceType, grid: Square[][]) => {
   return availableMoves;
 };
 
-const calcQueenMoves = (piece: PieceType, grid: Square[][]) => {
+const calcQueenMoves = (piece: GamePiece, grid: Square[][]) => {
   const availableMoves: Move[] = [];
   const verticalMovements = {
     up: [],
@@ -64,7 +64,7 @@ const calcQueenMoves = (piece: PieceType, grid: Square[][]) => {
 };
 
 const calcPawnMoves = (
-  piece: PieceType,
+  piece: GamePiece,
   boolean: boolean,
   grid: Square[][],
   turnHistory: TurnHistory
@@ -106,7 +106,7 @@ const calcPawnMoves = (
   return availableMoves;
 };
 
-const calcKnightMoves = (piece: PieceType, grid: Square[][]) => {
+const calcKnightMoves = (piece: GamePiece, grid: Square[][]) => {
   const knightMoves: Point[] = [
     [1, 2],
     [2, 1],
@@ -132,11 +132,11 @@ const calcKnightMoves = (piece: PieceType, grid: Square[][]) => {
 };
 
 const calcKingMoves = (
-  piece: PieceType,
+  piece: GamePiece,
   castling: boolean,
   grid: Square[][],
   state: State,
-  calculateAvailableMoves: (piece: PieceType) => Move[]
+  calculateAvailableMoves: (piece: GamePiece) => Move[]
 ) => {
   const kingMoves: Point[] = [
     [0, 1],
@@ -168,7 +168,7 @@ const calcKingMoves = (
   return availableMoves;
 };
 
-const calcBishopMoves = (piece: PieceType, grid: Square[][]) => {
+const calcBishopMoves = (piece: GamePiece, grid: Square[][]) => {
   const availableMoves: Move[] = [];
   const horizantalMovements = {
     upRight: [],

@@ -20,19 +20,19 @@ import { ISceneLoaderAsyncResult } from "babylonjs/Loading/sceneLoader";
 import { AbstractMesh } from "babylonjs/Meshes/abstractMesh";
 
 export interface ChessPieceMesh extends AbstractMesh {
-  name: string,
-  color?: string,
-  point?: Point,
+  name: string;
+  color?: string;
+  point?: Point;
 }
 
 interface DisplayMesh extends AbstractMesh {
-  name: string,
-  color?: string,
-  point?: Point,
-  speed?: number,
-  rotationIndex?: number,
-  rotationIndex2?: number,
-  rotationIndex3?: number,
+  name: string;
+  color?: string;
+  point?: Point;
+  speed?: number;
+  rotationIndex?: number;
+  rotationIndex2?: number;
+  rotationIndex3?: number;
 }
 
 const assetsLoader = async (scene: Scene, description: string) => {
@@ -55,7 +55,11 @@ const assetsLoader = async (scene: Scene, description: string) => {
       queenBlack,
     ];
 
-    const loadedMeshes: ISceneLoaderAsyncResult[] = await Promise.all(meshesToLoad.map((mesh) => BABYLON.SceneLoader.ImportMeshAsync("", mesh, "")));
+    const loadedMeshes: ISceneLoaderAsyncResult[] = await Promise.all(
+      meshesToLoad.map((mesh) =>
+        BABYLON.SceneLoader.ImportMeshAsync("", mesh, "")
+      )
+    );
     const piecesMeshes: ChessPieceMesh[] = [];
     const boardMeshes: ISceneLoaderAsyncResult[] = [];
 
@@ -64,12 +68,16 @@ const assetsLoader = async (scene: Scene, description: string) => {
       if (mesh.meshes[1].id.includes("-")) {
         let finalMesh: ChessPieceMesh = mesh.meshes[1];
         [finalMesh.name, finalMesh.color] = finalMesh.id.split("-");
-        finalMesh.isPickable = true,
-        finalMesh.isVisible = false,
-        finalMesh.scalingDeterminant = 50,
-        finalMesh.position.y = 0.5,
-        finalMesh.id === "Knight-White" ? (finalMesh.rotation = new BABYLON.Vector3(0, Math.PI, 0)) : null;
-        finalMesh.color === "White" ? (finalMesh.material = materials.white) : (finalMesh.material = materials.black);
+        (finalMesh.isPickable = true),
+          (finalMesh.isVisible = false),
+          (finalMesh.scalingDeterminant = 50),
+          (finalMesh.position.y = 0.5),
+          finalMesh.id === "Knight-White"
+            ? (finalMesh.rotation = new BABYLON.Vector3(0, Math.PI, 0))
+            : null;
+        finalMesh.color === "White"
+          ? (finalMesh.material = materials.white)
+          : (finalMesh.material = materials.black);
         return piecesMeshes.push(finalMesh);
       } else {
         mesh.meshes.forEach((mesh) => {
@@ -105,9 +113,22 @@ const assetsLoader = async (scene: Scene, description: string) => {
       queenBlack,
     ];
 
-    const loadedBoardMeshes = await BABYLON.SceneLoader.ImportMeshAsync("", boardMesh, "", scene);
-    const loadedPiecesMeshes = await Promise.all(boardPieces.map((mesh) => BABYLON.SceneLoader.ImportMeshAsync("", mesh, "", scene)));
-    const loadedTextMeshes = await Promise.all(textMeshes.map((mesh) => BABYLON.SceneLoader.ImportMeshAsync("", mesh, "")));
+    const loadedBoardMeshes = await BABYLON.SceneLoader.ImportMeshAsync(
+      "",
+      boardMesh,
+      "",
+      scene
+    );
+    const loadedPiecesMeshes = await Promise.all(
+      boardPieces.map((mesh) =>
+        BABYLON.SceneLoader.ImportMeshAsync("", mesh, "", scene)
+      )
+    );
+    const loadedTextMeshes = await Promise.all(
+      textMeshes.map((mesh) =>
+        BABYLON.SceneLoader.ImportMeshAsync("", mesh, "")
+      )
+    );
 
     const titleText = loadedTextMeshes[0].meshes[0];
     titleText.position.x = -20;
@@ -125,10 +146,12 @@ const assetsLoader = async (scene: Scene, description: string) => {
     loadedPiecesMeshes.forEach((mesh) => {
       const finalMesh: DisplayMesh = mesh.meshes[1];
       [finalMesh.name, finalMesh.color] = finalMesh.id.split("-");
-      finalMesh.scalingDeterminant = 40, 
-      finalMesh.position.y = 17, 
-      finalMesh.position.x = 10,
-      finalMesh.color === "White" ? (finalMesh.material = materials.white) : (finalMesh.material = materials.black);
+      (finalMesh.scalingDeterminant = 40),
+        (finalMesh.position.y = 17),
+        (finalMesh.position.x = 10),
+        finalMesh.color === "White"
+          ? (finalMesh.material = materials.white)
+          : (finalMesh.material = materials.black);
       finalMesh.speed = Math.random() * 0.6;
       finalMesh.position.z = calcRandomZ();
       finalMesh.rotationIndex = calcRandomIndex(rotationArray.length);
@@ -140,9 +163,13 @@ const assetsLoader = async (scene: Scene, description: string) => {
     loadedBoardMeshes.meshes[2].material = materials.board;
     loadedBoardMeshes.meshes[3].material = materials.board;
 
-    const boardClone = loadedBoardMeshes.meshes[0].clone("Board", null , false);
-    const boardClone2 = loadedBoardMeshes.meshes[0].clone("Board2", null, false);
-    loadedBoardMeshes.meshes.forEach((mesh: { isVisible: boolean; }) => {
+    const boardClone = loadedBoardMeshes.meshes[0].clone("Board", null, false);
+    const boardClone2 = loadedBoardMeshes.meshes[0].clone(
+      "Board2",
+      null,
+      false
+    );
+    loadedBoardMeshes.meshes.forEach((mesh: { isVisible: boolean }) => {
       mesh.isVisible = false;
     });
 
@@ -161,8 +188,16 @@ const assetsLoader = async (scene: Scene, description: string) => {
         alpha += 0.02;
         beta += 0.02;
         gamma += 0.02;
-        boardClone!.rotate(new BABYLON.Vector3(0, beta, 0), Math.PI / 500, BABYLON.Space.LOCAL);
-        boardClone2!.rotate(new BABYLON.Vector3(0, -beta * 2, 0), Math.PI / 500, BABYLON.Space.LOCAL);
+        boardClone!.rotate(
+          new BABYLON.Vector3(0, beta, 0),
+          Math.PI / 500,
+          BABYLON.Space.LOCAL
+        );
+        boardClone2!.rotate(
+          new BABYLON.Vector3(0, -beta * 2, 0),
+          Math.PI / 500,
+          BABYLON.Space.LOCAL
+        );
         loadedPiecesMeshes.forEach((mesh) => {
           const piece: DisplayMesh = mesh.meshes[1];
           piece.position.y -= piece.speed!;
