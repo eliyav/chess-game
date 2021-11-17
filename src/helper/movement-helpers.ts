@@ -74,7 +74,6 @@ const calcPawnMoves = (
     let result;
     if (turnHistory !== undefined) {
       result = isEnPassantAvailable(turnHistory);
-      console.log("result", result);
       if (result.result) {
         const targetSquare = result.enPassantPoint;
         const [x, y] = piece.point;

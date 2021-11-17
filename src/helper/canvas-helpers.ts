@@ -53,7 +53,6 @@ const displayPieceMoves = (
   displayMovementSquares([[x, y], ""], gameScene, "piece");
   let moves = game.calculateAvailableMoves(piece!, true);
   currentMove.push(piece!.point);
-  console.log(moves);
   //Add filter to display only moves that can resolve
   const movesToDisplay = moves.map((move) => {
     //Check for checkmate if move resolves
@@ -63,7 +62,6 @@ const displayPieceMoves = (
     switchSquaresBack(squaresandPieces, [pieceX, pieceY]);
     return validMove ? move : null;
   });
-  console.log(movesToDisplay);
   movesToDisplay
     .filter((move) => move !== null)
     .forEach((point) => {
