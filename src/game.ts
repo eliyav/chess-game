@@ -45,6 +45,87 @@ class Game {
     return false;
   }
 
+  resolveMove(originPoint: Point, targetPoint: Point): TurnHistory | boolean {
+    const squaresandPieces = this.getSquaresandPieces(originPoint, targetPoint);
+
+    //Resolve a castling Move
+    const castlingResult = this.resolveCastling(
+      originPoint,
+      targetPoint,
+      squaresandPieces
+    );
+    if (castlingResult) {
+      return castlingResult;
+    }
+
+    //Resolve a EnPassant Move
+    const enPassantResult = this.resolveEnPassant(
+      originPoint,
+      targetPoint,
+      squaresandPieces
+    );
+    if (enPassantResult) {
+      return enPassantResult;
+    }
+
+    //Resolve a standard movement/capture move
+    const standardResult = this.resolveStandard(
+      originPoint,
+      targetPoint,
+      squaresandPieces
+    );
+
+    if (standardResult) {
+      return standardResult;
+    }
+
+    console.log("Not able to resolve Move!");
+    return false;
+  }
+
+  resolveStandard(
+    originPoint: Point,
+    targetPoint: Point,
+    squaresandPieces: SquaresandPieces
+  ) {
+    const { originSquare, originPiece, targetSquare, targetPiece } =
+      squaresandPieces;
+    //Calculate the origin piece's all available moves
+    let availableMoves = this.calculateAvailableMoves(originSquare.on!);
+
+    //Check if the entered targetPoint is a match for an available moves
+    const validMove = availableMoves.find((possibleMove) =>
+      gameHelpers.doMovesMatch(possibleMove[0], targetPoint)
+    );
+    if (validMove) {
+      //Will resolving move be valid
+      if (this.canValidMoveResolve(squaresandPieces, targetPoint)) {
+        //Checks for Pawn Promotion
+        let promotion;
+        if (
+          originPiece!.name === "Pawn" &&
+          (originPiece!.point[1] === 0 || originPiece!.point[1] === 7)
+        ) {
+          promotion = gameHelpers.checkForPawnPromotion(squaresandPieces);
+        }
+        originPiece!.moved = true;
+        originPiece!.moveCounter++;
+        console.log("Move is Valid! Board is updated.");
+
+        return {
+          result: true,
+          origin: originPoint,
+          target: targetPoint,
+          originPiece: originPiece,
+          targetPiece: targetPiece,
+          originSquare: originSquare,
+          targetSquare: targetSquare,
+          promotion: promotion,
+        };
+      }
+    }
+  }
+
   resolveEnPassant(
     originPoint: Point,
     targetPoint: Point,
@@ -86,66 +167,6 @@ class Game {
             }
           }
         }
-      }
-    }
-  }
-  resolveMove(originPoint: Point, targetPoint: Point): TurnHistory | undefined {
-    const squaresandPieces = this.getSquaresandPieces(originPoint, targetPoint);
-    const { originSquare, originPiece, targetSquare, targetPiece } =
-      squaresandPieces;
-
-    //Resolve a castling Move
-    const castlingResult = this.resolveCastling(
-      originPoint,
-      targetPoint,
-      squaresandPieces
-    );
-    if (castlingResult) {
-      return castlingResult;
-    }
-
-    //Resolve a EnPassant Move
-    const enPassantResult = this.resolveEnPassant(
-      originPoint,
-      targetPoint,
-      squaresandPieces
-    );
-    if (enPassantResult) {
-      return enPassantResult;
-    }
-
-    //Calculate the origin piece's all available moves
-    let availableMoves = this.calculateAvailableMoves(originSquare.on!);
-
-    //Check if the entered targetPoint is a match for an available moves
-    const validMove = availableMoves.find((possibleMove) =>
-      gameHelpers.doMovesMatch(possibleMove[0], targetPoint)
-    );
-    if (validMove) {
-      //Will resolving move be valid
-      if (this.canValidMoveResolve(squaresandPieces, targetPoint)) {
-        //Checks for Pawn Promotion
-        let promotion;
-        if (
-          originPiece!.name === "Pawn" &&
-          (originPiece!.point[1] === 0 || originPiece!.point[1] === 7)
-        ) {
-          promotion = gameHelpers.checkForPawnPromotion(squaresandPieces);
-        }
-        originPiece!.moved = true;
-        originPiece!.moveCounter++;
-        console.log("Move is Valid! Board is updated.");
-
-        return {
-          result: true,
-          origin: originPoint,
-          target: targetPoint,
-          originPiece: originPiece,
-          targetPiece: targetPiece,
-          originSquare: originSquare,
-          targetSquare: targetSquare,
-          promotion: promotion,
-        };
       }
     }
   }

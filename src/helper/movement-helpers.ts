@@ -5,7 +5,6 @@ import {
 } from "./game-helpers";
 import { Square } from "./board-helpers";
 import GamePiece, { Move } from "../component/game-piece";
-import { State } from "../data/chess-data-import";
 
 type MovesObj = {
   up?: Point[];
@@ -70,34 +69,26 @@ const calcPawnMoves = (
 ) => {
   const availableMoves: Move[] = [];
 
-  calcPawnMovement(
-    grid,
-    piece.point,
-    piece.direction,
-    piece.moved,
-    piece.color,
-    availableMoves
-  );
+  calcPawnMovement(grid, piece, availableMoves);
   if (boolean) {
     let result;
     if (turnHistory !== undefined) {
       result = isEnPassantAvailable(turnHistory);
+      console.log("result", result);
       if (result.result) {
         const targetSquare = result.enPassantPoint;
-        if (availableMoves.length !== 0) {
-          const [x, y] = piece.point;
-          const direction = piece.color === "White" ? 1 : -1;
-          const x1 = x - 1;
-          const x2 = x + 1;
-          const newY = y + direction;
-          const potential1: Point = [x1, newY];
-          const potential2: Point = [x2, newY];
-          if (
-            doMovesMatch(potential1, targetSquare) ||
-            doMovesMatch(potential2, targetSquare)
-          ) {
-            availableMoves.push([targetSquare, "enPassant"]);
-          }
+        const [x, y] = piece.point;
+        const direction = piece.color === "White" ? 1 : -1;
+        const x1 = x - 1;
+        const x2 = x + 1;
+        const newY = y + direction;
+        const potential1: Point = [x1, newY];
+        const potential2: Point = [x2, newY];
+        if (
+          doMovesMatch(potential1, targetSquare) ||
+          doMovesMatch(potential2, targetSquare)
+        ) {
+          availableMoves.push([targetSquare, "enPassant"]);
         }
       }
     }
@@ -266,15 +257,13 @@ const calcVerticalMovements = (
 
 const calcPawnMovement = (
   grid: Square[][],
-  currentPoint: Point,
-  direction: number,
-  moved: boolean,
-  color: string,
+  piece: GamePiece,
   finalObj: Move[]
 ) => {
+  const { point, direction, moved, color } = piece;
   //Calculate Pawn Movement based on current point
   let range = 1;
-  const [x, y] = currentPoint;
+  const [x, y] = point;
   const movePoint1: Point = [x, y + range * direction];
   const [moveX, moveY] = movePoint1;
   if (grid[moveX][moveY].on === undefined) {

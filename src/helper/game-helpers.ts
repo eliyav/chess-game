@@ -38,6 +38,7 @@ const isEnPassantAvailable = (turnHistory: TurnHistory): EnPassantResult => {
           direction = turnHistory.originPiece!.color === "White" ? 1 : -1;
           x = turnHistory.target[0];
           y = turnHistory.origin[1] + direction;
+          console.log("EnPassant Point", [x, y]);
         }
       })();
   return {
