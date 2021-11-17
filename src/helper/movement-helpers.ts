@@ -1,5 +1,4 @@
 import {
-  calcCastling,
   TurnHistory,
   isEnPassantAvailable,
   doMovesMatch,
@@ -135,8 +134,7 @@ const calcKingMoves = (
   piece: GamePiece,
   castling: boolean,
   grid: Square[][],
-  state: State,
-  calculateAvailableMoves: (piece: GamePiece) => Move[]
+  calcCastling: (currentPoint: Point, movesObj: Move[]) => void
 ) => {
   const kingMoves: Point[] = [
     [0, 1],
@@ -155,13 +153,7 @@ const calcKingMoves = (
 
   if (!piece.moved) {
     if (castling) {
-      calcCastling(
-        grid,
-        state,
-        piece.point,
-        availableMoves,
-        calculateAvailableMoves
-      );
+      calcCastling(piece.point, availableMoves);
     }
   }
 
