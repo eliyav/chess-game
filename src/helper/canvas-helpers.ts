@@ -1,13 +1,9 @@
+import Game from "../game";
 import { Material } from "babylonjs/Materials/material";
 import { AbstractMesh } from "babylonjs/Meshes/abstractMesh";
 import { Nullable } from "babylonjs/types";
-import Game from "../game";
 import { CustomScene } from "../view/start-screen";
-import {
-  getSquaresandPieces,
-  canValidMoveResolve,
-  switchSquaresBack,
-} from "./game-helpers";
+import { switchSquaresBack } from "./game-helpers";
 import { ChessPieceMesh } from "../view/asset-loader";
 import { Move } from "../component/game-piece";
 
@@ -52,29 +48,21 @@ const displayPieceMoves = (
   game: Game,
   gameScene: CustomScene
 ) => {
-  const grid = game.board.grid;
-  const state = game.state;
   const [x, y] = calcIndexFromMeshPosition([mesh.position.z, mesh.position.x]);
-  const piece = grid[x][y].on;
+  const piece = game.board.grid[x][y].on;
   displayMovementSquares([[x, y], ""], gameScene, "piece");
   let moves = game.calculateAvailableMoves(piece!, true);
   currentMove.push(piece!.point);
   //Add filter to display only moves that can resolve
-  const isValidMoveToDisplay = moves
-    .map((move) => {
-      //Check for checkmate if move resolves
-      const [pieceX, pieceY] = piece!.point;
-      const squaresandPieces = getSquaresandPieces(piece!.point, move[0], grid);
-      const validMove = canValidMoveResolve(
-        squaresandPieces,
-        move[0],
-        state,
-        grid,
-        game.calculateAvailableMoves.bind(game)
-      );
-      switchSquaresBack(squaresandPieces, [pieceX, pieceY]);
-      return validMove ? move : null;
-    })
+  const movesToDisplay = moves.map((move) => {
+    //Check for checkmate if move resolves
+    const [pieceX, pieceY] = piece!.point;
+    const squaresandPieces = game.getSquaresandPieces(piece!.point, move[0]);
+    const validMove = game.canValidMoveResolve(squaresandPieces, move[0]);
+    switchSquaresBack(squaresandPieces, [pieceX, pieceY]);
+    return validMove ? move : null;
+  });
+  movesToDisplay
     .filter((move) => move !== null)
     .forEach((point) => {
       displayMovementSquares(point!, gameScene, "target");
