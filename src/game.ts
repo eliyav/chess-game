@@ -76,7 +76,7 @@ class Game {
     );
     if (validMove) {
       //Will resolving move be valid
-      if (this.canValidMoveResolve(locationsInfo, targetPoint)) {
+      if (this.canValidMoveResolve(locationsInfo)) {
         //Checks for Pawn Promotion
         let promotion;
         if (
@@ -114,7 +114,7 @@ class Game {
         //Then find a way to let the can valid move resolve function handle the fact en passant worked
         if (y && finalX) {
           if (gameHelpers.doMovesMatch(enPassant.enPassantPoint, targetPoint)) {
-            if (this.canValidMoveResolve(locationsInfo, targetPoint)) {
+            if (this.canValidMoveResolve(locationsInfo)) {
               const enPassantPiece = lastTurnHistory.targetSquare.on;
               lastTurnHistory.targetSquare.on = undefined;
               return gameHelpers.generateTurnHistory(
@@ -221,9 +221,9 @@ class Game {
     return availableMoves;
   }
 
-  canValidMoveResolve(locationsInfo: LocationsInfo, targetPoint: Point) {
+  canValidMoveResolve(locationsInfo: LocationsInfo) {
     //Switch piece between squares
-    gameHelpers.switchSquares(locationsInfo, targetPoint);
+    gameHelpers.updateLocation(locationsInfo);
     //Check if resolving above switch would put player in check
     return this.isChecked(true) ? false : true;
   }
@@ -317,61 +317,21 @@ class Game {
     const finalResults: boolean[] = [];
     //Find all current Pieces
     const currentPlayerPieces = this.getPieces(true);
-    const pieces = currentPlayerPieces.map((piece) => piece.on);
     //For each piece, iterate on its available moves
-    pieces.forEach((piece) => {
-      let availableMoves = this.calculateAvailableMoves(piece!);
-      const originPoint: Point = [...piece!.point];
-      //For Each available move, check if after resolving it, the player is still in check.
+    currentPlayerPieces.forEach((piece) => {
+      const availableMoves = this.calculateAvailableMoves(piece.on!);
+      //For each available move, check if resolving it results in player still being in check
       const isItCheckmate = availableMoves.map((move) => {
-        const locationsInfo = this.getLocationsInfo(originPoint, move[0]);
-        return this.simulateResolveMove(originPoint, move[0])
-          ? gameHelpers.switchSquaresBack(locationsInfo, originPoint)
-            ? false
-            : true
-          : true;
+        const locationsInfo = this.getLocationsInfo(piece.on!.point, move[0]);
+        const result = this.canValidMoveResolve(locationsInfo);
+        gameHelpers.undoUpdateLocation(locationsInfo);
+        return result ? false : true;
       });
       finalResults.push.apply(finalResults, isItCheckmate);
     });
-
     const isCheckmate = finalResults.filter((result) => result === false);
     //If any return true, you are not in checkmate
     return isCheckmate.length ? false : true;
-  }
-
-  simulateResolveMove(originPoint: Point, targetPoint: Point) {
-    const locationsInfo = this.getLocationsInfo(originPoint, targetPoint);
-    const { originPiece, originSquare } = locationsInfo;
-    //Check if origin square has game piece on it
-    if (originSquare.on === undefined) {
-      //console.log("No Piece Exists at source point!");
-      return false;
-    } else if (originSquare.on.color === this.state.currentPlayer) {
-      //Checks if the moving game piece belongs to current player
-      let availableMoves = this.calculateAvailableMoves(originSquare.on);
-      //Check if the entered targetPoint is a valid move for current game piece
-      const validMove = availableMoves.find((possibleMove) =>
-        gameHelpers.doMovesMatch(possibleMove[0], targetPoint)
-      );
-      if (validMove) {
-        //Will resolving move be valid
-        if (this.canValidMoveResolve(locationsInfo, targetPoint)) {
-          //console.log("Move is Valid! Board is updated.");
-          return true;
-        } else {
-          //Switch squares back after valid move resolve check --------Try and find a fix for this..
-          gameHelpers.switchSquaresBack(locationsInfo, originPoint);
-          //console.log(`${state.currentPlayer} King will be in check if move is resolved`);
-          return false;
-        }
-      } else {
-        //console.log(`Target point ${targetPoint} is not a valid move for game piece!`);
-        return false;
-      }
-    } else {
-      //console.log(`Piece doesn't belong to the ${state.currentPlayer} team!`);
-      return false;
-    }
   }
 
   calcCastling(currentPoint: Point, movesObj: Move[]) {

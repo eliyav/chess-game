@@ -33,7 +33,7 @@ export interface LocationsInfo {
 
 const generateTurnHistory = (
   type: string,
-  squaresandPieces: LocationsInfo,
+  LocationsInfo: LocationsInfo,
   options: {
     promotion?: string;
     enPassant?: EnPassantResult;
@@ -47,12 +47,12 @@ const generateTurnHistory = (
     return {
       result: true,
       type: type,
-      origin: squaresandPieces.originPoint,
-      target: squaresandPieces.targetPoint,
-      originPiece: squaresandPieces.originPiece,
-      targetPiece: squaresandPieces.targetPiece,
-      originSquare: squaresandPieces.originSquare,
-      targetSquare: squaresandPieces.targetSquare,
+      origin: LocationsInfo.originPoint,
+      target: LocationsInfo.targetPoint,
+      originPiece: LocationsInfo.originPiece,
+      targetPiece: LocationsInfo.targetPiece,
+      originSquare: LocationsInfo.originSquare,
+      targetSquare: LocationsInfo.targetSquare,
       promotion: options.promotion,
     };
   } else if (type === "enPassant") {
@@ -60,11 +60,11 @@ const generateTurnHistory = (
       result: true,
       type: "enPassant",
       enPassant: options.enPassant,
-      origin: squaresandPieces.originPoint,
-      target: squaresandPieces.targetPoint,
-      originPiece: squaresandPieces.originPiece,
+      origin: LocationsInfo.originPoint,
+      target: LocationsInfo.targetPoint,
+      originPiece: LocationsInfo.originPiece,
       targetPiece: options.enPassantPiece,
-      originSquare: squaresandPieces.originSquare,
+      originSquare: LocationsInfo.originSquare,
       targetSquare: options.lastTurnHistorySquare!,
     };
   } else if (type === "castling") {
@@ -73,12 +73,12 @@ const generateTurnHistory = (
       type: "castling",
       direction: options.direction,
       castling: options.castlingResult,
-      origin: squaresandPieces.originPoint,
-      target: squaresandPieces.targetPoint,
-      originPiece: squaresandPieces.originPiece,
-      targetPiece: squaresandPieces.targetPiece,
-      originSquare: squaresandPieces.originSquare,
-      targetSquare: squaresandPieces.targetSquare,
+      origin: LocationsInfo.originPoint,
+      target: LocationsInfo.targetPoint,
+      originPiece: LocationsInfo.originPiece,
+      targetPiece: LocationsInfo.targetPiece,
+      originSquare: LocationsInfo.originSquare,
+      targetSquare: LocationsInfo.targetSquare,
     };
   }
 };
@@ -109,8 +109,8 @@ const isEnPassantAvailable = (turnHistory: TurnHistory): EnPassantResult => {
 };
 
 //Checks for pawn promotion
-const checkForPawnPromotion = (squaresandPieces: LocationsInfo) => {
-  const { targetSquare, originPiece } = squaresandPieces;
+const checkForPawnPromotion = (LocationsInfo: LocationsInfo) => {
+  const { targetSquare, originPiece } = LocationsInfo;
   const y = getY(originPiece!.point);
   if (y === 7 || y === 0) {
     let newClass;
@@ -138,19 +138,20 @@ const checkForPawnPromotion = (squaresandPieces: LocationsInfo) => {
 };
 
 //Functions to switch game pieces back and forth between squares once move is entered
-const switchSquares = (squaresandPieces: LocationsInfo, point: Point) => {
-  const { originSquare, targetSquare, originPiece } = squaresandPieces;
+const updateLocation = (LocationsInfo: LocationsInfo) => {
+  const { originSquare, targetSquare, originPiece, targetPoint } =
+    LocationsInfo;
   targetSquare.on = originPiece;
-  targetSquare.on!.point = [getX(point), getY(point)];
+  targetSquare.on!.point = [getX(targetPoint), getY(targetPoint)];
   originSquare.on = undefined;
   return true;
 };
 
-const switchSquaresBack = (squaresandPieces: LocationsInfo, point: Point) => {
-  const { originSquare, targetSquare, originPiece, targetPiece } =
-    squaresandPieces;
+const undoUpdateLocation = (LocationsInfo: LocationsInfo) => {
+  const { originSquare, targetSquare, originPiece, targetPiece, originPoint } =
+    LocationsInfo;
   originSquare.on = originPiece;
-  originSquare.on!.point = [getX(point), getY(point)];
+  originSquare.on!.point = [getX(originPoint), getY(originPoint)];
   targetSquare.on = targetPiece;
   return true;
 };
@@ -173,8 +174,8 @@ export {
   getX,
   getY,
   doMovesMatch,
-  switchSquaresBack,
-  switchSquares,
+  updateLocation,
+  undoUpdateLocation,
   checkForPawnPromotion,
   isEnPassantAvailable,
   generateTurnHistory,

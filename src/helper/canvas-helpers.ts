@@ -3,7 +3,7 @@ import { Material } from "babylonjs/Materials/material";
 import { AbstractMesh } from "babylonjs/Meshes/abstractMesh";
 import { Nullable } from "babylonjs/types";
 import { CustomScene } from "../view/start-screen";
-import { switchSquaresBack } from "./game-helpers";
+import { undoUpdateLocation } from "./game-helpers";
 import { ChessPieceMesh } from "../view/asset-loader";
 import { Move } from "../component/game-piece";
 
@@ -56,10 +56,9 @@ const displayPieceMoves = (
   //Add filter to display only moves that can resolve
   const movesToDisplay = moves.map((move) => {
     //Check for checkmate if move resolves
-    const [pieceX, pieceY] = piece!.point;
-    const squaresandPieces = game.getLocationsInfo(piece!.point, move[0]);
-    const validMove = game.canValidMoveResolve(squaresandPieces, move[0]);
-    switchSquaresBack(squaresandPieces, [pieceX, pieceY]);
+    const locationsInfo = game.getLocationsInfo(piece!.point, move[0]);
+    const validMove = game.canValidMoveResolve(locationsInfo);
+    undoUpdateLocation(locationsInfo);
     return validMove ? move : null;
   });
   movesToDisplay
