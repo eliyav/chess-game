@@ -3,7 +3,7 @@ import GamePiece from "../component/game-piece";
 
 export interface TurnHistory {
   result: boolean;
-  type?: string;
+  type: string;
   direction?: number;
   enPassant?: EnPassantResult;
   castling?: Square[];
@@ -20,6 +20,67 @@ export interface TurnHistory {
 type EnPassantResult = {
   result: boolean;
   enPassantPoint: Point;
+};
+
+export interface LocationsInfo {
+  originSquare: Square;
+  targetSquare: Square;
+  originPiece: GamePiece | undefined;
+  targetPiece: GamePiece | undefined;
+  originPoint: Point;
+  targetPoint: Point;
+}
+
+const generateTurnHistory = (
+  type: string,
+  squaresandPieces: LocationsInfo,
+  options: {
+    promotion?: string;
+    enPassant?: EnPassantResult;
+    enPassantPiece?: GamePiece | undefined;
+    lastTurnHistorySquare?: Square;
+    direction?: number;
+    castlingResult?: Square[];
+  }
+): TurnHistory | undefined => {
+  if (type === "standard") {
+    return {
+      result: true,
+      type: type,
+      origin: squaresandPieces.originPoint,
+      target: squaresandPieces.targetPoint,
+      originPiece: squaresandPieces.originPiece,
+      targetPiece: squaresandPieces.targetPiece,
+      originSquare: squaresandPieces.originSquare,
+      targetSquare: squaresandPieces.targetSquare,
+      promotion: options.promotion,
+    };
+  } else if (type === "enPassant") {
+    return {
+      result: true,
+      type: "enPassant",
+      enPassant: options.enPassant,
+      origin: squaresandPieces.originPoint,
+      target: squaresandPieces.targetPoint,
+      originPiece: squaresandPieces.originPiece,
+      targetPiece: options.enPassantPiece,
+      originSquare: squaresandPieces.originSquare,
+      targetSquare: options.lastTurnHistorySquare!,
+    };
+  } else if (type === "castling") {
+    return {
+      result: true,
+      type: "castling",
+      direction: options.direction,
+      castling: options.castlingResult,
+      origin: squaresandPieces.originPoint,
+      target: squaresandPieces.targetPoint,
+      originPiece: squaresandPieces.originPiece,
+      targetPiece: squaresandPieces.targetPiece,
+      originSquare: squaresandPieces.originSquare,
+      targetSquare: squaresandPieces.targetSquare,
+    };
+  }
 };
 
 const isEnPassantAvailable = (turnHistory: TurnHistory): EnPassantResult => {
@@ -48,7 +109,7 @@ const isEnPassantAvailable = (turnHistory: TurnHistory): EnPassantResult => {
 };
 
 //Checks for pawn promotion
-const checkForPawnPromotion = (squaresandPieces: SquaresandPieces) => {
+const checkForPawnPromotion = (squaresandPieces: LocationsInfo) => {
   const { targetSquare, originPiece } = squaresandPieces;
   const y = getY(originPiece!.point);
   if (y === 7 || y === 0) {
@@ -77,7 +138,7 @@ const checkForPawnPromotion = (squaresandPieces: SquaresandPieces) => {
 };
 
 //Functions to switch game pieces back and forth between squares once move is entered
-const switchSquares = (squaresandPieces: SquaresandPieces, point: Point) => {
+const switchSquares = (squaresandPieces: LocationsInfo, point: Point) => {
   const { originSquare, targetSquare, originPiece } = squaresandPieces;
   targetSquare.on = originPiece;
   targetSquare.on!.point = [getX(point), getY(point)];
@@ -85,10 +146,7 @@ const switchSquares = (squaresandPieces: SquaresandPieces, point: Point) => {
   return true;
 };
 
-const switchSquaresBack = (
-  squaresandPieces: SquaresandPieces,
-  point: Point
-) => {
+const switchSquaresBack = (squaresandPieces: LocationsInfo, point: Point) => {
   const { originSquare, targetSquare, originPiece, targetPiece } =
     squaresandPieces;
   originSquare.on = originPiece;
@@ -111,13 +169,6 @@ const getY = (point: Point) => {
 const doMovesMatch = (move: Point, move2: Point) =>
   getX(move) == getX(move2) && getY(move) == getY(move2);
 
-export interface SquaresandPieces {
-  originSquare: Square;
-  targetSquare: Square;
-  originPiece: GamePiece | undefined;
-  targetPiece: GamePiece | undefined;
-}
-
 export {
   getX,
   getY,
@@ -126,4 +177,5 @@ export {
   switchSquares,
   checkForPawnPromotion,
   isEnPassantAvailable,
+  generateTurnHistory,
 };

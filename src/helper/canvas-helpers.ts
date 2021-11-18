@@ -57,7 +57,7 @@ const displayPieceMoves = (
   const movesToDisplay = moves.map((move) => {
     //Check for checkmate if move resolves
     const [pieceX, pieceY] = piece!.point;
-    const squaresandPieces = game.getSquaresandPieces(piece!.point, move[0]);
+    const squaresandPieces = game.getLocationsInfo(piece!.point, move[0]);
     const validMove = game.canValidMoveResolve(squaresandPieces, move[0]);
     switchSquaresBack(squaresandPieces, [pieceX, pieceY]);
     return validMove ? move : null;
