@@ -124,7 +124,7 @@ const calcKingMoves = (
   piece: GamePiece,
   castling: boolean,
   grid: Square[][],
-  calcCastling: (currentPoint: Point, movesObj: Move[]) => void
+  calcCastling: (piece: GamePiece, movesObj: Move[]) => void
 ) => {
   const kingMoves: Point[] = [
     [0, 1],
@@ -142,9 +142,7 @@ const calcKingMoves = (
   calcKingMovements(grid, piece.point, piece.color, kingMoves, availableMoves);
 
   if (!piece.moved) {
-    if (castling) {
-      calcCastling(piece.point, availableMoves);
-    }
+    castling ? calcCastling(piece, availableMoves) : null;
   }
 
   return availableMoves;

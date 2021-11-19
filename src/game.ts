@@ -296,51 +296,34 @@ class Game {
       });
       finalResults.push.apply(finalResults, isItCheckmate);
     });
-    const isCheckmate = finalResults.filter((result) => result === false);
-    //If any return true, you are not in checkmate
-    return isCheckmate.length ? false : true;
+    const validMoves = finalResults.filter((result) => result === false);
+    //If any valid moves, you are not in checkmate
+    return validMoves.length ? false : true;
   }
 
-  calcCastling(currentPoint: Point, movesObj: Move[]) {
-    const [x, y] = currentPoint;
-    const piece = this.board.grid[x][y].on;
-    let targetPiece;
-    let targetPiece2;
-
-    if (piece!.color === "White") {
-      targetPiece = this.board.grid[0][0].on;
-      targetPiece2 = this.board.grid[7][0].on;
-    } else {
-      targetPiece = this.board.grid[0][7].on;
-      targetPiece2 = this.board.grid[7][7].on;
-    }
-    //Check for castling move
-    const castling1 = piece!.name === "King" && !piece!.moved;
-    if (targetPiece !== undefined) {
-      const castling2 = targetPiece.name === "Rook" && !targetPiece.moved;
-      if (castling1 && castling2) {
-        const resolve = this.canCastlingResolve(
-          piece!.point,
-          targetPiece.point
-        );
-        if (resolve !== false) {
-          resolve[0] ? movesObj.push(resolve[1]) : null;
-        }
+  findPieces = (name: string, color: string) => {
+    const foundPieces = this.board.grid.flat().filter((square) => {
+      if (square.on !== undefined) {
+        return square.on.name === name && square.on.color === color;
       }
-    }
-    //Check for second castling move
-    const castling3 = piece!.name === "King" && !piece!.moved;
-    if (targetPiece2 !== undefined) {
-      const castling4 = targetPiece2.name === "Rook" && !targetPiece2.moved;
-      if (castling3 && castling4) {
-        const resolve = this.canCastlingResolve(
-          piece!.point,
-          targetPiece2.point
-        );
-        if (resolve !== false) {
-          resolve[0] ? movesObj.push(resolve[1]) : null;
-        }
+      return false;
+    });
+    return foundPieces;
+  };
+  calcCastling(piece: GamePiece, movesObj: Move[]) {
+    const checkCastlingMove = (piece: GamePiece, targetPiece: GamePiece) => {
+      //Check for castling move
+      if (!targetPiece.moved) {
+        const resolve = this.canCastlingResolve(piece.point, targetPiece.point);
+        //If castling resolve returns true, push the move into available moves
+        resolve[0] ? movesObj.push(resolve[1]) : null;
       }
+    };
+    const playersRooks = this.findPieces("Rook", this.state.currentPlayer);
+    if (playersRooks) {
+      playersRooks.forEach((square) => {
+        checkCastlingMove(piece!, square.on!);
+      });
     }
   }
 
@@ -358,10 +341,7 @@ class Game {
         ) {
           //Check if king is currently in check
           const isKingChecked = this.isChecked(true);
-          if (isKingChecked) {
-            //console.log("King is checked!");
-            return false;
-          } else {
+          if (!isKingChecked) {
             //Check squares between king and rook are unoccupied.
             const a = gameHelpers.getX(originPoint);
             const b = gameHelpers.getX(targetPoint);
@@ -390,10 +370,7 @@ class Game {
               })
               .filter((result) => result === true);
 
-            if (squaresInUse.length) {
-              //console.log("Squares in between are in use by other game pieces, Castling not available!");
-              return false;
-            } else {
+            if (!squaresInUse.length) {
               //Check if opponents pieces, threathen any of the spaces in between
               const opponentsPieces = this.getPieces(false);
               const opponentsAvailableMoves = this.getMoves(opponentsPieces);
@@ -418,28 +395,15 @@ class Game {
                   [targetPoint, "castling"],
                 ];
                 return returnResult;
-              } else {
-                console.log(
-                  "Castling Not Available!, One of Squares is under Enemy Threat!"
-                );
-                return false;
               }
             }
           }
-        } else {
-          console.log("Pieces must belong to currentPlayer!");
-          return false;
         }
-      } else {
-        console.log(
-          "Moving piece must be King, target piece needs to be Rook!"
-        );
-        return false;
       }
-    } else {
-      console.log("Both King and Rook need to have not moved!");
-      return false;
     }
+    //console.log("Castling Not Available!");
+    const returnResult: [boolean, Move] = [false, [targetPoint, "castling"]];
+    return returnResult;
   }
 
   changePlayer() {
