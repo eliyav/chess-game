@@ -67,67 +67,33 @@ class Game {
   }
 
   resolveStandard(locationsInfo: LocationsInfo) {
-    const { originSquare, originPiece, targetPoint } = locationsInfo;
-    //Calculate the origin piece available moves
-    let availableMoves = this.calculateAvailableMoves(originSquare.on!);
-    //Check if the entered targetPoint is a match for available moves
-    const validMove = availableMoves.find((possibleMove) =>
-      gameHelpers.doMovesMatch(possibleMove[0], targetPoint)
-    );
-    if (validMove) {
-      //Will resolving move be valid
-      if (this.canValidMoveResolve(locationsInfo)) {
-        //Checks for Pawn Promotion
-        let promotion;
-        if (
-          originPiece!.name === "Pawn" &&
-          (originPiece!.point[1] === 0 || originPiece!.point[1] === 7)
-        ) {
-          promotion = gameHelpers.checkForPawnPromotion(locationsInfo);
-        }
-        originPiece!.moved = true;
-        originPiece!.moveCounter++;
-        console.log("Move is Valid! Board is updated.");
-        return gameHelpers.generateTurnHistory("standard", locationsInfo, {
-          promotion,
-        });
-      }
+    const { originPiece } = locationsInfo;
+    //Check if valid move can be resolved
+    if (this.canValidMoveResolve(locationsInfo)) {
+      originPiece!.update();
+      //Once move resolved check if pawn promotion is relevant
+      const promotion = originPiece!.checkPromotion(locationsInfo);
+      console.log("Move is Valid! Board is updated.");
+      return gameHelpers.generateTurnHistory("standard", locationsInfo, {
+        promotion,
+      });
     }
   }
 
   resolveEnPassant(locationsInfo: LocationsInfo) {
-    const { originPiece, targetPoint } = locationsInfo;
+    const { targetPoint } = locationsInfo;
     const lastTurnHistory = this.turnHistory[this.turnHistory.length - 1];
     const enPassant = gameHelpers.isEnPassantAvailable(lastTurnHistory);
     if (enPassant.result) {
-      //If moving piece is a pawn
-      if (originPiece!.name === "Pawn") {
-        let rank;
-        //Moving piece needs to be on its 5th rank
-        originPiece!.color === "White" ? (rank = 4) : (rank = 3);
-        let y = originPiece!.point[1] === rank;
-        let x = lastTurnHistory.origin[0];
-        let x1 = x - 1;
-        let x2 = x + 1;
-        let finalX =
-          originPiece!.point[0] === x1 || originPiece!.point[0] === x2;
-        //Then find a way to let the can valid move resolve function handle the fact en passant worked
-        if (y && finalX) {
-          if (gameHelpers.doMovesMatch(enPassant.enPassantPoint, targetPoint)) {
-            if (this.canValidMoveResolve(locationsInfo)) {
-              const enPassantPiece = lastTurnHistory.targetSquare.on;
-              lastTurnHistory.targetSquare.on = undefined;
-              return gameHelpers.generateTurnHistory(
-                "enPassant",
-                locationsInfo,
-                {
-                  enPassant,
-                  enPassantPiece,
-                  lastTurnHistorySquare: lastTurnHistory.targetSquare,
-                }
-              );
-            }
-          }
+      if (gameHelpers.doMovesMatch(enPassant.enPassantPoint, targetPoint)) {
+        if (this.canValidMoveResolve(locationsInfo)) {
+          const enPassantPiece = lastTurnHistory.targetSquare.on;
+          lastTurnHistory.targetSquare.on = undefined;
+          return gameHelpers.generateTurnHistory("enPassant", locationsInfo, {
+            enPassant,
+            enPassantPiece,
+            lastTurnHistorySquare: lastTurnHistory.targetSquare,
+          });
         }
       }
     }
@@ -149,34 +115,38 @@ class Game {
         const b = gameHelpers.getX(targetPoint);
         let c = a - b;
         c < 0 ? (c = 1) : (c = -1);
-        const castlingResult = this.castlingMove(c, locationsInfo);
+        const castlingResult = castlingMove(c, locationsInfo, this.board.grid);
         return gameHelpers.generateTurnHistory("castling", locationsInfo, {
           direction: c,
           castlingResult,
         });
       }
     }
-  }
 
-  castlingMove(direction: number, locationsInfo: LocationsInfo) {
-    const { originSquare, originPiece, targetSquare, targetPiece } =
-      locationsInfo;
-    const { name, color, point, movement } = originPiece!;
-    const { name: name2, color: color2, movement: movement2 } = targetPiece!;
-    originSquare.on = undefined;
-    targetSquare.on = undefined;
-    //Move King 2 Spaces from current location in the direction of rook
-    //Move the Rook 1 space in that same direction from the kings original location
-    const [x, y] = point;
-    const newKingX = x + direction * 2;
-    const newRookX = x + direction;
-    const newKingPoint: Point = [newKingX, y];
-    const newRookPoint: Point = [newRookX, y];
-    const newKingSquare = this.board.grid[newKingX][y];
-    const newRookSquare = this.board.grid[newRookX][y];
-    newKingSquare.on = new GamePiece(name, color, newKingPoint, movement);
-    newRookSquare.on = new GamePiece(name2, color2, newRookPoint, movement2);
-    return [newKingSquare, newRookSquare];
+    function castlingMove(
+      direction: number,
+      locationsInfo: LocationsInfo,
+      grid: Square[][]
+    ) {
+      const { originSquare, originPiece, targetSquare, targetPiece } =
+        locationsInfo;
+      const { name, color, point, movement } = originPiece!;
+      const { name: name2, color: color2, movement: movement2 } = targetPiece!;
+      originSquare.on = undefined;
+      targetSquare.on = undefined;
+      //Move King 2 Spaces from current location in the direction of rook
+      //Move the Rook 1 space in that same direction from the kings original location
+      const [x, y] = point;
+      const newKingX = x + direction * 2;
+      const newRookX = x + direction;
+      const newKingPoint: Point = [newKingX, y];
+      const newRookPoint: Point = [newRookX, y];
+      const newKingSquare = grid[newKingX][y];
+      const newRookSquare = grid[newRookX][y];
+      newKingSquare.on = new GamePiece(name, color, newKingPoint, movement);
+      newRookSquare.on = new GamePiece(name2, color2, newRookPoint, movement2);
+      return [newKingSquare, newRookSquare];
+    }
   }
 
   calculateAvailableMoves(piece: GamePiece, flag = false): Move[] {
@@ -284,7 +254,6 @@ class Game {
     return piecesArray;
   }
 
-  //Function that returns Squares and Pieces from designated move
   getLocationsInfo(originPoint: Point, targetPoint: Point): LocationsInfo {
     const originSquare =
       this.board.grid[gameHelpers.getX(originPoint)][
@@ -294,13 +263,11 @@ class Game {
       this.board.grid[gameHelpers.getX(targetPoint)][
         gameHelpers.getY(targetPoint)
       ];
-    const originPiece = originSquare.on;
-    const targetPiece = targetSquare.on;
     return {
       originSquare,
       targetSquare,
-      originPiece,
-      targetPiece,
+      originPiece: originSquare.on,
+      targetPiece: targetSquare.on,
       originPoint,
       targetPoint,
     };
