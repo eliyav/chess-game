@@ -62,7 +62,7 @@ class Game {
     if (standardResult) {
       return standardResult;
     }
-    console.log("Not able to resolve Move!");
+
     return false;
   }
 
@@ -73,7 +73,6 @@ class Game {
       originPiece!.update();
       //Once move resolved check if pawn promotion is relevant
       const promotion = originPiece!.checkPromotion(locationsInfo);
-      console.log("Move is Valid! Board is updated.");
       return gameHelpers.generateTurnHistory("standard", locationsInfo, {
         promotion,
       });
@@ -273,6 +272,16 @@ class Game {
     };
   }
 
+  findPieces = (name: string, color: string) => {
+    const foundPieces = this.board.grid.flat().filter((square) => {
+      if (square.on !== undefined) {
+        return square.on.name === name && square.on.color === color;
+      }
+      return false;
+    });
+    return foundPieces;
+  };
+
   isCheckmate() {
     //Is called after turn switch, checks if player is even in check before testing for checkmate
     if (this.isChecked(true)) {
@@ -301,15 +310,6 @@ class Game {
     return validMoves.length ? false : true;
   }
 
-  findPieces = (name: string, color: string) => {
-    const foundPieces = this.board.grid.flat().filter((square) => {
-      if (square.on !== undefined) {
-        return square.on.name === name && square.on.color === color;
-      }
-      return false;
-    });
-    return foundPieces;
-  };
   calcCastling(piece: GamePiece, movesObj: Move[]) {
     const checkCastlingMove = (piece: GamePiece, targetPiece: GamePiece) => {
       //Check for castling move
@@ -327,81 +327,64 @@ class Game {
     }
   }
 
-  //Checks if castling is valid
   canCastlingResolve(originPoint: Point, targetPoint: Point) {
-    const locationsInfo = this.getLocationsInfo(originPoint, targetPoint);
-    const { originPiece, targetPiece } = locationsInfo;
-    //Check for valid castling pieces
-    if (originPiece!.moved === false && targetPiece!.moved === false) {
-      if (originPiece!.name === "King" && targetPiece!.name === "Rook") {
-        //Check for valid team
-        if (
-          originPiece!.color === this.state.currentPlayer &&
-          targetPiece!.color === this.state.currentPlayer
-        ) {
-          //Check if king is currently in check
-          const isKingChecked = this.isChecked(true);
-          if (!isKingChecked) {
-            //Check squares between king and rook are unoccupied.
-            const a = gameHelpers.getX(originPoint);
-            const b = gameHelpers.getX(targetPoint);
-            const y = gameHelpers.getY(originPoint);
-            let c = a - b;
-            let d;
-            c < 0 ? (d = c * -1 - 1) : (d = c - 1);
+    const isKingChecked = this.isChecked(true);
+    if (!isKingChecked) {
+      const [kingX, kingY] = originPoint;
+      const rookX = gameHelpers.getX(targetPoint);
+      const spaceBetween = kingX - rookX;
+      let distance;
+      spaceBetween < 0
+        ? (distance = spaceBetween * -1 - 1)
+        : (distance = spaceBetween - 1);
 
-            const squaresInBetween: Point[] = [];
-            for (let i = 1; i <= d; i++) {
-              if (a - b > 0) {
-                const point: Point = [a - i, y];
-                squaresInBetween.push(point);
-              } else {
-                const point: Point = [a + i, y];
-                squaresInBetween.push(point);
-              }
-            }
-            const squaresInUse = squaresInBetween
-              .map((point) => {
-                const square =
-                  this.board.grid[gameHelpers.getX(point)][
-                    gameHelpers.getY(point)
-                  ];
-                return square.on === undefined ? false : true;
-              })
-              .filter((result) => result === true);
-
-            if (!squaresInUse.length) {
-              //Check if opponents pieces, threathen any of the spaces in between
-              const opponentsPieces = this.getPieces(false);
-              const opponentsAvailableMoves = this.getMoves(opponentsPieces);
-              const isThereOverlap = [];
-              for (let i = 0; i < squaresInBetween.length; i++) {
-                const square = squaresInBetween[i];
-                for (let k = 0; k < opponentsAvailableMoves.length; k++) {
-                  const availableMove = opponentsAvailableMoves[k];
-                  const doesMoveMatchSquare = gameHelpers.doMovesMatch(
-                    availableMove[0],
-                    square
-                  );
-                  doesMoveMatchSquare
-                    ? isThereOverlap.push(doesMoveMatchSquare)
-                    : null;
-                }
-              }
-              if (isThereOverlap.length === 0) {
-                console.log("Castling Available!");
-                const returnResult: [boolean, Move] = [
-                  true,
-                  [targetPoint, "castling"],
-                ];
-                return returnResult;
-              }
-            }
+      //Calculate the squares in between King and Rook
+      const squaresInBetween: Point[] = [];
+      for (let step = 1; step <= distance; step++) {
+        let stepDirection;
+        spaceBetween < 0
+          ? (stepDirection = step * 1)
+          : (stepDirection = step * -1);
+        const point: Point = [kingX + stepDirection, kingY];
+        squaresInBetween.push(point);
+      }
+      //Check if squares in between are used by any pieces
+      const squaresInUse = squaresInBetween
+        .map((point) => {
+          const square =
+            this.board.grid[gameHelpers.getX(point)][gameHelpers.getY(point)];
+          return square.on === undefined ? false : true;
+        })
+        .filter((result) => result === true);
+      if (!squaresInUse.length) {
+        //Check if opponents pieces, threathen any of the spaces in between
+        const opponentsPieces = this.getPieces(false);
+        const opponentsAvailableMoves = this.getMoves(opponentsPieces);
+        const isThereOverlap = [];
+        for (let i = 0; i < squaresInBetween.length; i++) {
+          const square = squaresInBetween[i];
+          for (let k = 0; k < opponentsAvailableMoves.length; k++) {
+            const availableMove = opponentsAvailableMoves[k];
+            const doesMoveMatchSquare = gameHelpers.doMovesMatch(
+              availableMove[0],
+              square
+            );
+            doesMoveMatchSquare
+              ? isThereOverlap.push(doesMoveMatchSquare)
+              : null;
           }
+        }
+        if (!isThereOverlap.length) {
+          //If there is no overlap, return the possible castling move
+          const returnResult: [boolean, Move] = [
+            true,
+            [targetPoint, "castling"],
+          ];
+          return returnResult;
         }
       }
     }
-    //console.log("Castling Not Available!");
+    //If overlap, return false for possible castling move
     const returnResult: [boolean, Move] = [false, [targetPoint, "castling"]];
     return returnResult;
   }
@@ -411,7 +394,6 @@ class Game {
       this.state.currentPlayer === this.teams[0]
         ? this.teams[1]
         : this.teams[0];
-    console.log(`${this.state.currentPlayer} team's turn!`);
   }
 
   switchTurn() {
@@ -449,11 +431,7 @@ class Game {
     let confirmation = confirm(
       `Game is over, ${winningTeam} player wins!, Would you like to start another game?`
     );
-    if (confirmation) {
-      this.resetGame();
-    } else {
-      console.log("No");
-    }
+    confirmation ? this.resetGame() : null;
   }
 
   setBoard() {
@@ -476,74 +454,53 @@ class Game {
     setTimeout(() => {
       this.timer.startTimer(time);
     }, 1000);
-    return console.log("Board Has Been Reset!");
   }
 
   annotate(result: TurnHistory) {
-    let string;
+    let finalString;
+    let symbol;
     const type = result.type;
     const promotion = result.promotion;
+    const pieceName = result.originPiece!.name;
+    const square = result.targetSquare.square;
+    const isCapturing = result.targetPiece !== undefined ? true : false;
+    switch (pieceName) {
+      case "King":
+        symbol = "K";
+        break;
+      case "Queen":
+        symbol = "Q";
+        break;
+      case "Knight":
+        symbol = "N";
+        break;
+      case "Bishop":
+        symbol = "B";
+        break;
+      case "Rook":
+        symbol = "R";
+        break;
+      default:
+        symbol = "";
+    }
     if (type === "castling") {
-      string = result.direction === 1 ? "O-O" : "O-O-O";
+      finalString = result.direction === 1 ? "O-O" : "O-O-O";
     } else if (promotion) {
-      let finalString;
-      switch (promotion) {
-        case "King":
-          finalString = "K";
-          break;
-        case "Queen":
-          finalString = "Q";
-          break;
-        case "Knight":
-          finalString = "N";
-          break;
-        case "Bishop":
-          finalString = "B";
-          break;
-        case "Rook":
-          finalString = "R";
-          break;
-        default:
-          finalString = "";
-      }
-      string = result.targetSquare.square + "=" + finalString;
+      finalString = `${square}=${symbol}`;
     } else {
-      let name = result.originPiece!.name;
-      let movingPiece;
-      let isCapturing = result.targetPiece !== undefined ? true : false;
-      let activeSquare = result.targetSquare.square;
-      switch (name) {
-        case "King":
-          movingPiece = "K";
-          break;
-        case "Queen":
-          movingPiece = "Q";
-          break;
-        case "Knight":
-          movingPiece = "N";
-          break;
-        case "Bishop":
-          movingPiece = "B";
-          break;
-        case "Rook":
-          movingPiece = "R";
-          break;
-        default:
-          movingPiece = "";
-      }
       if (isCapturing) {
-        if (name === "Pawn") {
-          string = result.originSquare.square.charAt(0) + "x" + activeSquare;
+        if (pieceName === "Pawn") {
+          finalString = `${result.originSquare.square.charAt(0)}x${square}`;
         } else {
-          string = movingPiece + "x" + activeSquare;
+          finalString = `${symbol}x${square}`;
         }
       } else {
-        string = movingPiece + activeSquare;
+        finalString = `${symbol}${square}`;
       }
       const isCheck = this.isChecked(false);
-      isCheck ? (string = string + "+") : null;
+      isCheck ? (finalString = `${finalString}+`) : null;
     }
-    return string;
+    return finalString;
   }
 
   startTimer() {
