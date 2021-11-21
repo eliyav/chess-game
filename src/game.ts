@@ -272,7 +272,7 @@ class Game {
     };
   }
 
-  findPieces = (name: string, color: string) => {
+  findPieces(name: string, color: string) {
     const foundPieces = this.board.grid.flat().filter((square) => {
       if (square.on !== undefined) {
         return square.on.name === name && square.on.color === color;
@@ -280,7 +280,15 @@ class Game {
       return false;
     });
     return foundPieces;
-  };
+  }
+
+  lookupPiece(location: [x: number, y: number]) {
+    const [x, y] = location;
+    const piece = this.board.grid[x][y].on;
+    if (piece !== undefined) {
+      return piece!;
+    }
+  }
 
   isCheckmate() {
     //Is called after turn switch, checks if player is even in check before testing for checkmate

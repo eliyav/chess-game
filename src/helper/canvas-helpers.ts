@@ -48,7 +48,7 @@ const displayPieceMoves = (
   game: Game,
   gameScene: CustomScene
 ) => {
-  const [x, y] = calcIndexFromMeshPosition([mesh.position.z, mesh.position.x]);
+  const [x, y] = findIndex([mesh.position.z, mesh.position.x]);
   const piece = game.board.grid[x][y].on;
   displayMovementSquares([[x, y], ""], gameScene, "piece");
   let moves = game.calculateAvailableMoves(piece!, true);
@@ -333,8 +333,8 @@ const calcBabylonCanvasPosition = (point: Point) => {
 };
 
 //For game pieces calculation as their index is flipped from blender importing
-const calcIndexFromMeshPosition = (point: Point) => {
-  const [x, y] = point;
+const findIndex = (position: Point) => {
+  const [x, y] = position;
   let indexX: number;
   let indexY: number;
   //Calculate X
@@ -377,9 +377,4 @@ const calcIndexFromMeshPosition = (point: Point) => {
   return result;
 };
 
-export {
-  renderScene,
-  rotateCamera,
-  displayPieceMoves,
-  calcIndexFromMeshPosition,
-};
+export { renderScene, rotateCamera, displayPieceMoves, findIndex };
