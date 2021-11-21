@@ -39,7 +39,7 @@ const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
     },
     showScene: { index: 0 },
     scenes: {
-      startScene: await startScreen(canvas, engine),
+      startScene: await startScreen(engine),
       gameScene: await gameScreen(canvas, engine),
     },
     socket: undefined,

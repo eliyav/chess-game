@@ -5,13 +5,13 @@ import {
   displayPieceMoves,
 } from "../helper/canvas-helpers";
 import Game from "../game";
-import { Scene } from "babylonjs/scene";
+import { CustomScene } from "../view/start-screen";
 import { ChessPieceMesh } from "../view/asset-loader";
 
 const inputController = (
   mesh: ChessPieceMesh,
   game: Game,
-  gameScene: Scene
+  gameScene: CustomScene
 ) => {
   const currentMove = game.moves;
   //If mesh
@@ -23,7 +23,7 @@ const inputController = (
       //If there is already a mesh selected, and you select another of your own meshes
       const originalPiece = game.lookupPiece(currentMove[0])!;
       const newPiece = game.lookupPiece(
-        findIndex([mesh.position.z, mesh.position.x])
+        findIndex([mesh.position.z, mesh.position.x], true)
       )!;
       if (originalPiece === newPiece) {
         //If both selected pieces are the same, reset current move
@@ -53,7 +53,7 @@ const inputController = (
     } else if (mesh.color && mesh.color !== game.state.currentPlayer) {
       //If second selection is an enemy mesh, calculate move of original piece and push move if matches
       const opponentsPiece = game.lookupPiece(
-        findIndex([mesh.position.z, mesh.position.x])
+        findIndex([mesh.position.z, mesh.position.x], true)
       )!;
       const originalPiece = game.lookupPiece(currentMove[0])!;
       const isValidMove = game
@@ -62,7 +62,8 @@ const inputController = (
       isValidMove ? currentMove.push(opponentsPiece.point) : null;
     } else if (mesh.id === "plane") {
       //If the second mesh selected is one of the movement squares
-      typeof mesh.point !== "undefined" ? currentMove.push(mesh.point) : null;
+      const point = findIndex([mesh.position.z, mesh.position.x], false);
+      currentMove.push(point);
     }
     //If complete move return true
     return currentMove.length === 2 ? true : false;

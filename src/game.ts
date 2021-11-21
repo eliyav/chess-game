@@ -1,7 +1,11 @@
 import * as gameHelpers from "./helper/game-helpers";
 import * as movementHelpers from "./helper/movement-helpers";
 import { setPieces, createGrid, Square } from "./helper/board-helpers";
-import { TurnHistory, LocationsInfo } from "./helper/game-helpers";
+import {
+  TurnHistory,
+  LocationsInfo,
+  undoUpdateLocation,
+} from "./helper/game-helpers";
 import Board from "./component/board";
 import { Data, State } from "./data/chess-data-import";
 import Timer from "./component/timer";
@@ -217,6 +221,21 @@ class Game {
     return availableMoves;
   }
 
+  getValidMoves(piece: GamePiece) {
+    const moves = this.calculateAvailableMoves(piece, true);
+    //Add filter to display only moves that can resolve
+    const validMoves = moves
+      .map((move) => {
+        //Check for checkmate if move resolves
+        const locationsInfo = this.getLocationsInfo(piece.point, move[0]);
+        const validMove = this.canValidMoveResolve(locationsInfo);
+        undoUpdateLocation(locationsInfo);
+        return validMove ? move : null;
+      })
+      .filter((move) => move !== null);
+    return validMoves;
+  }
+
   findKing(currentPlayer: boolean) {
     const currentKing = this.board.grid
       .flat()
@@ -280,6 +299,14 @@ class Game {
       return false;
     });
     return foundPieces;
+  }
+
+  allPieces() {
+    const allPieces = this.board.grid
+      .flat()
+      .filter((square) => square.on !== undefined);
+
+    return allPieces;
   }
 
   lookupPiece(location: [x: number, y: number]) {
