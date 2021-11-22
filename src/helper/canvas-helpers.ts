@@ -3,15 +3,6 @@ import { Material } from "babylonjs/Materials/material";
 import { CustomScene } from "../view/start-screen";
 import { ChessPieceMesh } from "../view/asset-loader";
 import { Move } from "../component/game-piece";
-import { lookup } from "dns";
-
-const matLookupTable = {
-  capture: "redMat",
-  movement: "orangeMat",
-  enPassant: "purpleMat",
-  castling: "blueMat",
-  piece: "greenMat",
-};
 
 const renderScene = (game: Game, gameScene: CustomScene) => {
   //Clears old meshes/memory usage
@@ -72,7 +63,7 @@ const displayMovementSquares = (move: Move, gameScene: CustomScene) => {
 };
 
 const displayPieceMarker = (move: Point, gameScene: CustomScene) => {
-  const type = "piece";
+  let type = "piece";
   const torus: any = BABYLON.MeshBuilder.CreateTorus("torus", {
     diameter: 2.6,
     thickness: 0.2,
@@ -84,8 +75,15 @@ const displayPieceMarker = (move: Point, gameScene: CustomScene) => {
   gameScene.meshesToRender!.push(torus);
 };
 
+const matLookupTable: { [key: string]: string } = {
+  capture: "redMat",
+  movement: "orangeMat",
+  enPassant: "purpleMat",
+  castling: "blueMat",
+  piece: "greenMat",
+};
+
 const findMaterial = (moveType: string, gameScene: CustomScene) => {
-  //@ts-ignore
   const lookupValue = matLookupTable[moveType];
   const material = gameScene.materials.find(
     (mat: Material) => mat.id === lookupValue
@@ -95,128 +93,74 @@ const findMaterial = (moveType: string, gameScene: CustomScene) => {
 
 const rotateCamera = (currentPlayer: string, gameScene: CustomScene) => {
   let camera: any = gameScene.cameras[0];
-  let a = camera.alpha;
-  let divisible;
-  let subtractedDivisible;
+  let alpha = camera.alpha;
+  let ratio;
+  let subtractedRatio;
   let piDistance;
   let remainingDistance: number;
   let remainder: number;
-  if (currentPlayer === "Black") {
-    if (a < 0) {
-      divisible = Math.ceil(a / Math.PI);
-      subtractedDivisible = a - divisible * Math.PI;
-      piDistance = Math.abs(Math.PI + subtractedDivisible);
-      remainder = divisible % 2;
-      remainder
-        ? (remainingDistance = piDistance)
-        : (remainingDistance = Math.PI - piDistance);
-    } else {
-      divisible = Math.floor(a / Math.PI);
-      subtractedDivisible = a - divisible * Math.PI;
-      piDistance = Math.PI - subtractedDivisible;
-      remainder = divisible % 2;
-      remainder
-        ? (remainingDistance = piDistance)
-        : (remainingDistance = Math.PI - piDistance);
-    }
+
+  if (alpha < 0) {
+    ratio = Math.ceil(alpha / Math.PI);
+    subtractedRatio = alpha - ratio * Math.PI;
+    piDistance = Math.abs(Math.PI + subtractedRatio);
   } else {
-    if (a < 0) {
-      divisible = Math.ceil(a / Math.PI);
-      subtractedDivisible = a - divisible * Math.PI;
-      piDistance = Math.abs(Math.PI + subtractedDivisible);
-      remainder = divisible % 2;
-      remainder
-        ? (remainingDistance = Math.PI - piDistance)
-        : (remainingDistance = piDistance);
-    } else {
-      divisible = Math.floor(a / Math.PI);
-      subtractedDivisible = a - divisible * Math.PI;
-      piDistance = Math.PI - subtractedDivisible;
-      remainder = divisible % 2;
-      remainder
-        ? (remainingDistance = Math.PI - piDistance)
-        : (remainingDistance = piDistance);
-    }
+    ratio = Math.floor(alpha / Math.PI);
+    subtractedRatio = alpha - ratio * Math.PI;
+    piDistance = Math.PI - subtractedRatio;
   }
 
-  const animateTurnSwitch = (currentPlayer: string = "") => {
+  remainder = ratio % 2;
+
+  if (currentPlayer === "Black") {
+    remainder
+      ? (remainingDistance = piDistance)
+      : (remainingDistance = Math.PI - piDistance);
+  } else {
+    remainder
+      ? (remainingDistance = Math.PI - piDistance)
+      : (remainingDistance = piDistance);
+  }
+
+  const animateCameraRotation = (currentPlayer: string) => {
     requestAnimationFrame(() => {
-      if (currentPlayer === "Black") {
-        if (remainingDistance > 0.05) {
-          if (remainder) {
-            if (remainder < 0) {
-              camera.alpha -= 0.05;
-            } else {
-              camera.alpha += 0.05;
-            }
-          } else {
-            if (a > 0) {
-              camera.alpha -= 0.05;
-            } else {
-              camera.alpha += 0.05;
-            }
-          }
-          remainingDistance -= 0.05;
-          animateTurnSwitch(currentPlayer);
-        } else if (remainingDistance > 0) {
-          if (remainder) {
-            if (remainder < 0) {
-              camera.alpha -= 0.01;
-            } else {
-              camera.alpha += 0.01;
-            }
-          } else {
-            if (a > 0) {
-              camera.alpha -= 0.01;
-            } else {
-              camera.alpha += 0.01;
-            }
-          }
-          remainingDistance -= 0.01;
-          animateTurnSwitch(currentPlayer);
+      const playerFlag = currentPlayer === "Black" ? true : false;
+      const rotateAmount = remainingDistance > 0.05 ? 0.05 : 0.01;
+      rotateCam(playerFlag, rotateAmount);
+    });
+
+    const rotateCam = (playerFlag: boolean, rotateAmount: number) => {
+      if (remainder) {
+        if (alpha < 0) {
+          playerFlag
+            ? (camera.alpha -= rotateAmount)
+            : (camera.alpha += rotateAmount);
+        } else {
+          playerFlag
+            ? (camera.alpha += rotateAmount)
+            : (camera.alpha -= rotateAmount);
         }
       } else {
-        //If other player
-        if (remainingDistance > 0.05) {
-          if (remainder) {
-            if (remainder < 0) {
-              camera.alpha += 0.05;
-            } else {
-              camera.alpha -= 0.05;
-            }
-          } else {
-            if (a > 0) {
-              camera.alpha += 0.05;
-            } else {
-              camera.alpha -= 0.05;
-            }
-          }
-          remainingDistance -= 0.05;
-          animateTurnSwitch(currentPlayer);
-        } else if (remainingDistance > 0) {
-          if (remainder) {
-            if (remainder < 0) {
-              camera.alpha += 0.01;
-            } else {
-              camera.alpha -= 0.01;
-            }
-          } else {
-            if (a > 0) {
-              camera.alpha += 0.01;
-            } else {
-              camera.alpha -= 0.01;
-            }
-          }
-          remainingDistance -= 0.01;
-          animateTurnSwitch(currentPlayer);
+        if (alpha > 0) {
+          playerFlag
+            ? (camera.alpha -= rotateAmount)
+            : (camera.alpha += rotateAmount);
+        } else {
+          playerFlag
+            ? (camera.alpha += rotateAmount)
+            : (camera.alpha -= rotateAmount);
         }
       }
-    });
+      remainingDistance -= rotateAmount;
+      if (remainingDistance > 0.01) {
+        animateCameraRotation(currentPlayer);
+      }
+    };
   };
-  animateTurnSwitch(currentPlayer);
+  animateCameraRotation(currentPlayer);
 };
 
-//Calculate canvas position for external meshes
+//External Meshes have flipped Y coordinates on canvas from blender import
 const findPosition = (point: Point, externalMesh: boolean) => {
   const [x, y] = point;
   let gridX: number;
@@ -282,7 +226,7 @@ const findPosition = (point: Point, externalMesh: boolean) => {
   return result;
 };
 
-//For game pieces calculation as their index is flipped from blender importing
+//External Meshes have flipped Y coordinates on canvas from blender import
 const findIndex = (position: Point, externalMesh: boolean) => {
   const [x, y] = position;
   let indexX: number;
@@ -344,7 +288,6 @@ const findIndex = (position: Point, externalMesh: boolean) => {
       indexY = 7;
     }
   }
-
   const result: Point = [indexX, indexY];
   return result;
 };

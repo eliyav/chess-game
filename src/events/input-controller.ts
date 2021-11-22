@@ -16,9 +16,11 @@ const inputController = (
   const currentMove = game.moves;
   //If mesh
   if (mesh) {
-    if (currentMove.length === 0 && mesh.color === game.state.currentPlayer) {
-      //If no current move has been selected, and mesh belongs to current player
-      displayPieceMoves(mesh, currentMove, game, gameScene);
+    if (currentMove.length === 0) {
+      if (mesh.color === game.state.currentPlayer) {
+        //If no current move has been selected, and mesh belongs to current player
+        displayPieceMoves(mesh, currentMove, game, gameScene);
+      }
     } else if (mesh.color === game.state.currentPlayer) {
       //If there is already a mesh selected, and you select another of your own meshes
       const originalPiece = game.lookupPiece(currentMove[0])!;
