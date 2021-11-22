@@ -116,10 +116,13 @@ const assetsLoader = async (scene: Scene, description: string) => {
 
     const rotationArray = [-5, -4, -3, -2, -1, 1, 2, 3, 4, 5];
 
-    loadedPiecesMeshes.forEach((mesh) => {
-      const finalMesh: DisplayMesh = mesh.meshes[1];
-      finalMesh.name = finalMesh.id;
-      finalMesh.color = "White";
+    const piecesMeshes: DisplayMesh[] = [];
+
+    const loadMeshSettings = (mesh: any, color: string) => {
+      const name: string = mesh.meshes[1].id;
+      let finalMesh: DisplayMesh = mesh.meshes[1].clone(name, null)!;
+      finalMesh.name = name;
+      finalMesh.color = color;
       (finalMesh.scalingDeterminant = 40),
         (finalMesh.position.y = 17),
         (finalMesh.position.x = 10),
@@ -131,19 +134,24 @@ const assetsLoader = async (scene: Scene, description: string) => {
       finalMesh.rotationIndex = calcRandomIndex(rotationArray.length);
       finalMesh.rotationIndex2 = calcRandomIndex(rotationArray.length);
       finalMesh.rotationIndex3 = calcRandomIndex(rotationArray.length);
+      piecesMeshes.push(finalMesh);
+    };
+
+    loadedPiecesMeshes.forEach((mesh) => {
+      loadMeshSettings(mesh, "White");
+      loadMeshSettings(mesh, "Black");
     });
 
-    loadedBoardMeshes.meshes[0].material = materials.board;
-    loadedBoardMeshes.meshes[2].material = materials.board;
-    loadedBoardMeshes.meshes[3].material = materials.board;
-
-    const boardClone = loadedBoardMeshes.meshes[0].clone("Board", null, false);
-    const boardClone2 = loadedBoardMeshes.meshes[0].clone(
-      "Board2",
-      null,
-      false
-    );
     loadedBoardMeshes.meshes.forEach((mesh, idx) => {
+      if (idx !== 1) {
+        mesh.material = materials.board;
+      }
+    });
+
+    const boardClone = loadedBoardMeshes.meshes[0].clone("Board", null);
+    const boardClone2 = loadedBoardMeshes.meshes[0].clone("Board2", null);
+
+    loadedBoardMeshes.meshes.forEach((mesh) => {
       mesh.isVisible = false;
     });
 
@@ -172,17 +180,16 @@ const assetsLoader = async (scene: Scene, description: string) => {
           Math.PI / 500,
           BABYLON.Space.LOCAL
         );
-        loadedPiecesMeshes.forEach((mesh) => {
-          const piece: DisplayMesh = mesh.meshes[1];
-          piece.position.y -= piece.speed!;
-          if (piece.position.y < -15) {
-            resetMesh(piece);
+        piecesMeshes.forEach((mesh) => {
+          mesh.position.y -= mesh.speed!;
+          if (mesh.position.y < -15) {
+            resetMesh(mesh);
           }
-          piece.rotate(
+          mesh.rotate(
             new BABYLON.Vector3(
-              alpha * rotationArray[piece.rotationIndex!],
-              beta * rotationArray[piece.rotationIndex2!],
-              gamma * rotationArray[piece.rotationIndex3!]
+              alpha * rotationArray[mesh.rotationIndex!],
+              beta * rotationArray[mesh.rotationIndex2!],
+              gamma * rotationArray[mesh.rotationIndex3!]
             ),
             (3 * Math.PI) / 500,
             BABYLON.Space.LOCAL
