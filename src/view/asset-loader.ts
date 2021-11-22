@@ -1,18 +1,12 @@
 import * as BABYLON from "babylonjs";
 import board from "../../assets/board.gltf";
 import chessText from "../../assets/chess.gltf";
-import pawnWhite from "../../assets/white-pieces/pawn-white.gltf";
-import rookWhite from "../../assets/white-pieces/rook-whitev3.gltf";
-import bishopWhite from "../../assets/white-pieces/bishop-whitev2.gltf";
-import knightWhite from "../../assets/white-pieces/knight-whitev2.gltf";
-import kingWhite from "../../assets/white-pieces/king-whitev2.gltf";
-import queenWhite from "../../assets/white-pieces/queen-whitev2.gltf";
-import pawnBlack from "../../assets/black-pieces/pawn-black.gltf";
-import rookBlack from "../../assets/black-pieces/rook-blackv3.gltf";
-import bishopBlack from "../../assets/black-pieces/bishop-blackv2.gltf";
-import knightBlack from "../../assets/black-pieces/knight-blackv2.gltf";
-import kingBlack from "../../assets/black-pieces/king-blackv2.gltf";
-import queenBlack from "../../assets/black-pieces/queen-blackv2.gltf";
+import king from "../../assets/pieces/king.gltf";
+import queen from "../../assets/pieces/queen.gltf";
+import bishop from "../../assets/pieces/bishop.gltf";
+import knight from "../../assets/pieces/knight.gltf";
+import rook from "../../assets/pieces/rook.gltf";
+import pawn from "../../assets/pieces/pawn.gltf";
 import moon from "../../assets/moon.jpg";
 import { createMeshMaterials } from "../component/materials";
 import { Scene } from "babylonjs/scene";
@@ -22,13 +16,11 @@ import { AbstractMesh } from "babylonjs/Meshes/abstractMesh";
 export interface ChessPieceMesh extends AbstractMesh {
   name: string;
   color?: string;
-  point?: Point;
 }
 
 interface DisplayMesh extends AbstractMesh {
   name: string;
   color?: string;
-  point?: Point;
   speed?: number;
   rotationIndex?: number;
   rotationIndex2?: number;
@@ -39,21 +31,10 @@ const assetsLoader = async (scene: Scene, description: string) => {
   const materials = createMeshMaterials(scene);
   if (description === "gameScreen") {
     //Game Scene
-    let meshesToLoad = [
-      board,
-      pawnWhite,
-      rookWhite,
-      bishopWhite,
-      knightWhite,
-      kingWhite,
-      queenWhite,
-      pawnBlack,
-      rookBlack,
-      bishopBlack,
-      knightBlack,
-      kingBlack,
-      queenBlack,
-    ];
+    let meshesToLoad = [king, queen, knight, bishop, rook, pawn];
+
+    const loadedBoardMesh: ISceneLoaderAsyncResult =
+      await BABYLON.SceneLoader.ImportMeshAsync("", board, "");
 
     const loadedMeshes: ISceneLoaderAsyncResult[] = await Promise.all(
       meshesToLoad.map((mesh) =>
@@ -61,35 +42,39 @@ const assetsLoader = async (scene: Scene, description: string) => {
       )
     );
     const piecesMeshes: ChessPieceMesh[] = [];
-    const boardMeshes: ISceneLoaderAsyncResult[] = [];
+    const boardMeshes: AbstractMesh[] = [];
+
+    const loadMeshSettings = (mesh: any, color: string) => {
+      const name: string = mesh.meshes[1].id;
+      let finalMesh: ChessPieceMesh = mesh.meshes[1].clone(name, null)!;
+      finalMesh.name = name;
+      finalMesh.color = color;
+      finalMesh.isPickable = true;
+      (finalMesh.isVisible = false), (finalMesh.scalingDeterminant = 50);
+      finalMesh.position.y = 0.5;
+      finalMesh.name === "Knight" && finalMesh.color === "White"
+        ? (finalMesh.rotation = new BABYLON.Vector3(0, Math.PI, 0))
+        : null;
+      finalMesh.color === "White"
+        ? (finalMesh.material = materials.white)
+        : (finalMesh.material = materials.black);
+
+      return piecesMeshes.push(finalMesh);
+    };
 
     //Sort the loaded meshes
     loadedMeshes.forEach((mesh) => {
-      if (mesh.meshes[1].id.includes("-")) {
-        let finalMesh: ChessPieceMesh = mesh.meshes[1];
-        [finalMesh.name, finalMesh.color] = finalMesh.id.split("-");
-        (finalMesh.isPickable = true),
-          (finalMesh.isVisible = false),
-          (finalMesh.scalingDeterminant = 50),
-          (finalMesh.position.y = 0.5),
-          finalMesh.id === "Knight-White"
-            ? (finalMesh.rotation = new BABYLON.Vector3(0, Math.PI, 0))
-            : null;
-        finalMesh.color === "White"
-          ? (finalMesh.material = materials.white)
-          : (finalMesh.material = materials.black);
-        return piecesMeshes.push(finalMesh);
-      } else {
-        mesh.meshes.forEach((mesh) => {
-          mesh.isPickable = false;
-        });
-        boardMeshes.push(mesh);
-      }
+      loadMeshSettings(mesh, "White");
+      loadMeshSettings(mesh, "Black");
     });
 
-    boardMeshes[0].meshes[0].material = materials.board;
-    boardMeshes[0].meshes[2].material = materials.board;
-    boardMeshes[0].meshes[3].material = materials.board;
+    loadedBoardMesh.meshes.forEach((mesh, idx) => {
+      mesh.isPickable = false;
+      if (idx !== 1) {
+        mesh.material = materials.board;
+      }
+      boardMeshes.push(mesh);
+    });
 
     return { piecesMeshes, boardMeshes };
   } else if (description === "startScreen") {
@@ -98,20 +83,7 @@ const assetsLoader = async (scene: Scene, description: string) => {
 
     let textMeshes = [chessText];
 
-    let boardPieces = [
-      pawnWhite,
-      rookWhite,
-      bishopWhite,
-      knightWhite,
-      kingWhite,
-      queenWhite,
-      pawnBlack,
-      rookBlack,
-      bishopBlack,
-      knightBlack,
-      kingBlack,
-      queenBlack,
-    ];
+    let boardPieces = [king, queen, knight, bishop, rook, pawn];
 
     const loadedBoardMeshes = await BABYLON.SceneLoader.ImportMeshAsync(
       "",
@@ -130,6 +102,7 @@ const assetsLoader = async (scene: Scene, description: string) => {
       )
     );
 
+    //Title Mesh
     const titleText = loadedTextMeshes[0].meshes[0];
     titleText.position.x = -20;
     titleText.position.z = 0.2;
@@ -145,7 +118,8 @@ const assetsLoader = async (scene: Scene, description: string) => {
 
     loadedPiecesMeshes.forEach((mesh) => {
       const finalMesh: DisplayMesh = mesh.meshes[1];
-      [finalMesh.name, finalMesh.color] = finalMesh.id.split("-");
+      finalMesh.name = finalMesh.id;
+      finalMesh.color = "White";
       (finalMesh.scalingDeterminant = 40),
         (finalMesh.position.y = 17),
         (finalMesh.position.x = 10),
@@ -169,7 +143,7 @@ const assetsLoader = async (scene: Scene, description: string) => {
       null,
       false
     );
-    loadedBoardMeshes.meshes.forEach((mesh: { isVisible: boolean }) => {
+    loadedBoardMeshes.meshes.forEach((mesh, idx) => {
       mesh.isVisible = false;
     });
 
