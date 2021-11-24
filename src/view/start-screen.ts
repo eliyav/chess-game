@@ -4,7 +4,6 @@ import space from "../../assets/space.webp";
 import assetsLoader from "./asset-loader";
 import { Scene } from "babylonjs/scene";
 import { ChessPieceMesh } from "../view/asset-loader";
-import { ISceneLoaderAsyncResult } from "babylonjs/Loading/sceneLoader";
 import { AbstractMesh } from "babylonjs/Meshes/abstractMesh";
 
 const startScreen = async (engine: Engine): Promise<CustomScene> => {
@@ -40,7 +39,7 @@ const startScreen = async (engine: Engine): Promise<CustomScene> => {
 export interface CustomScene extends Scene {
   finalMeshes?: {
     piecesMeshes: ChessPieceMesh[];
-    boardMeshes: ISceneLoaderAsyncResult[];
+    boardMeshes: AbstractMesh[];
   };
   meshesToRender?: AbstractMesh[];
 }
