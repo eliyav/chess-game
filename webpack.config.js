@@ -1,25 +1,28 @@
 const path = require("path");
+//const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   mode: "development", // "production" | "development" | "none"
-  // Chosen mode tells webpack to use its built-in optimizations accordingly.
   entry: "./src/main.ts", // string | object | array
-  // defaults to ./src
-  // Here the application starts executing
-  // and webpack starts bundling
   output: {
+    filename: "bundle.js",
     path: path.resolve(__dirname, "dist"),
-    filename: "main.js",
+    clean: true,
+    //publicPath: "/",
   },
   resolve: {
     extensions: [".ts", ".js", ".css", ".gltf", ".webp", ".png"],
   },
   devServer: {
     static: {
-      directory: path.join(__dirname, "public"),
+      publicPath: "/dist",
     },
-    historyApiFallback: true,
   },
+  // plugins: [
+  //   new HtmlWebpackPlugin({
+  //     title: "Development",
+  //   }),
+  // ],
   module: {
     rules: [
       {

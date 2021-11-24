@@ -2,12 +2,13 @@
   "name": "chess",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/main.js",
+  "main": "dist/bundle.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "webpack --watch",
     "build": "webpack",
-    "start": "webpack serve --static"
+    "watch": "webpack --watch",
+    "start": "webpack serve --static --open",
+    "server": "node server.js"
   },
   "browserslist": [
     "last 1 Chrome version"
@@ -24,10 +25,12 @@
   "devDependencies": {
     "@types/node": "^16.11.7",
     "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.5.0",
     "ts-loader": "^9.2.6",
     "typescript": "^4.4.4",
     "webpack": "^5.64.2",
     "webpack-cli": "^4.9.1",
+    "webpack-dev-middleware": "^5.2.2",
     "webpack-dev-server": "^4.5.0"
   }
 }
