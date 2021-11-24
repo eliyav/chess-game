@@ -1,42 +1,37 @@
-const path = require("path");
-//const HtmlWebpackPlugin = require("html-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
+/** @type {import("webpack").Configuration} */
 module.exports = {
-  mode: "development", // "production" | "development" | "none"
-  entry: "./src/main.ts", // string | object | array
-  output: {
-    filename: "bundle.js",
-    path: path.resolve(__dirname, "dist"),
-    clean: true,
-    //publicPath: "/",
-  },
+  mode: "development",
+  entry: "./src/main.ts",
   resolve: {
-    extensions: [".ts", ".js", ".css", ".gltf", ".webp", ".png"],
+    extensions: [".ts", ".tsx", ".js", ".json"],
   },
-  devServer: {
-    static: {
-      publicPath: "/dist",
-    },
-  },
-  // plugins: [
-  //   new HtmlWebpackPlugin({
-  //     title: "Development",
-  //   }),
-  // ],
+  plugins: [
+    new HtmlWebpackPlugin({
+      title: "Development",
+    }),
+    new MiniCssExtractPlugin({
+      filename: "[name].css",
+      chunkFilename: "[name].css",
+    }),
+  ],
   module: {
     rules: [
       {
-        test: /\.tsx?/,
+        test: /\.tsx?$/,
         use: "ts-loader",
         exclude: /node_modules/,
       },
       {
+        test: /\.css$/,
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
+        exclude: /node_modules/,
+      },
+      {
         test: /\.(png|jpe?g|gif|gltf|webp)$/i,
-        use: [
-          {
-            loader: "file-loader",
-          },
-        ],
+        type: "asset",
       },
     ],
   },
