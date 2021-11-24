@@ -40,7 +40,7 @@ const startScreen = async (engine: Engine): Promise<CustomScene> => {
 export interface CustomScene extends Scene {
   finalMeshes?: {
     piecesMeshes: ChessPieceMesh[];
-    boardMeshes: AbstractMesh[];
+    boardMeshes: ISceneLoaderAsyncResult[];
   };
   meshesToRender?: AbstractMesh[];
 }

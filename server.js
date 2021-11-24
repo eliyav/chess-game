@@ -1,25 +1,15 @@
 const express = require("express");
 const path = require("path");
-
-const httpServer = require("http").createServer(express);
-const options = {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
-  },
-};
-
 const app = express();
 
-const port = process.env.PORT || 3000;
-
+//Activate Server
+const port = 3000;
+// const port = process.env.PORT || 3000;
 app.use(express.static(path.join(__dirname, "dist")));
-
 app.get("*", (_req, res) => {
   res.sendFile(path.join(__dirname, "dist/index.html"));
 });
-
-app.listen(port, (err) => {
+const server = app.listen(port, (err) => {
   if (err) {
     console.log(err);
   } else {
@@ -27,13 +17,13 @@ app.listen(port, (err) => {
   }
 });
 
-const io = require("socket.io")(httpServer, options);
-console.log(io);
+//Activate Sockets
+const io = require("socket.io")(server);
+
 io.on("connection", (socket) => {
   //Create Room
   socket.on("create-room", (gameMode) => {
     gameMode.room = generateKey();
-    console.log(gameMode.room);
     socket.join(gameMode.room);
     socket.emit("message", "You have created a new Game Room!");
     socket.emit("reply-invite-code", gameMode.room);
@@ -48,16 +38,16 @@ io.on("connection", (socket) => {
 
   socket.on("reply-room-info", (gameMode) => {
     socket.to(gameMode.room).emit("assign-room-info", gameMode);
-  });
+  })
 
   socket.on("check-match-start", (gameMode) => {
-    const clients = io.sockets.adapter.rooms.get(gameMode.room);
-    const serializedSet = [...clients.keys()];
-    if (serializedSet.length === 2) {
-      socket.to(gameMode.room).emit("start-match");
-      socket.emit("start-match");
-    }
-  });
+      const clients = io.sockets.adapter.rooms.get(gameMode.room);
+      const serializedSet = [...clients.keys()];
+     if(serializedSet.length === 2){
+        socket.to(gameMode.room).emit("start-match");
+        socket.emit("start-match");
+     }
+  })
 
   socket.on("stateChange", ({ originPoint, targetPoint, room }) => {
     socket.to(room).emit("message", "Move has been entered");

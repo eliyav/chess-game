@@ -13,7 +13,12 @@ import activateSocket from "./component/sockets";
 
 export interface App {
   game: Game;
-  gameMode: GameMode;
+  gameMode: {
+    mode: string | undefined;
+    player: string | undefined;
+    room: string | undefined;
+    time: number | undefined;
+  };
   showScene: { index: number };
   scenes: {
     startScene: Scene;
@@ -21,13 +26,6 @@ export interface App {
   };
   emitter?: EventEmitter;
   socket?: any;
-}
-
-export interface GameMode {
-  mode: string | undefined;
-  player: string | undefined;
-  room: string | undefined;
-  time: number | undefined;
 }
 
 const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
