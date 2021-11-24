@@ -1,30 +1,20 @@
-import { io, Socket } from "socket.io-client";
+import { io } from "socket.io-client";
 import Game from "../game";
 import { renderScene } from "../helper/canvas-helpers";
 import { CustomScene } from "../view/start-screen";
 import { hideDisplay } from "../view/gui-overlay";
-
-interface gameModeClone {
-  mode: string | undefined;
-  player: string | undefined;
-  room: string | undefined;
-  time: number | undefined;
-}
+import { GameMode } from "../app";
 
 const activateSocket = (
   game: Game,
-  gameMode: {
-    mode: string | undefined;
-    player: string | undefined;
-    room: string | undefined;
-    time: number | undefined;
-  },
+  gameMode: GameMode,
   gameScene: CustomScene,
   startScene: CustomScene,
   showScene: { index: number }
 ) => {
-  //const socket = io(`ws://localhost:3000`);
-  const socket = io(`ws://${window.location.host}`);
+  //const socket = io();
+  const socket = io(`ws://localhost:3000`);
+  // //const socket = io(`ws://${window.location.host}`);
 
   socket.on("message", (message) => {
     console.log(message);
