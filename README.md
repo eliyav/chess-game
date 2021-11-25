@@ -10,7 +10,7 @@
 - [Express.js](https://expressjs.com)
 - [Socket.io](https://socket.io)
 - [TypeScript](https://www.typescriptlang.org)
-- [Parcel](https://parceljs.org)
+- [Webpack](https://webpack.js.org/)
 - [Node.js](https://nodejs.org/en)
 
 <!-- GETTING STARTED -->
@@ -38,25 +38,14 @@ Install the latest node package manager before installing dependencies
    ```sh
    npm install
    ```
-3. Build project with webpack
-   ```js
-   npm run build
-   ```
-4. **Optional:** If you want sockets to work, run in seperate terminal **WIP! SOME BUG FIXES LEFT**
-   ```js
-   npm run server
-   ```
-5. Serve using webpack dev server
+3. Serve app on http://localhost:3000/ **If you would like to use a different port, change at server.js file**
    ```js
    npm start
    ```
-   <!-- USAGE EXAMPLES -->
 
 ## Usage
 
 This project is meant to be played. If you are having fun playing chess it is being used right!
-
-<!-- ROADMAP -->
 
 ## Roadmap
 
@@ -70,13 +59,9 @@ This project is meant to be played. If you are having fun playing chess it is be
 
 See the [Projects tasks](https://github.com/eliyav/chess-game/projects/1) for a full list of tasks.
 
-<!-- LICENSE -->
-
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
-
-<!-- CONTACT -->
 
 ## Contact
 
