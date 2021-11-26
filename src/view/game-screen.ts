@@ -18,20 +18,29 @@ const gameScreen = async (
     new BABYLON.Vector3(0, 0, 0),
     scene
   );
+  // camera.lowerRadiusLimit = 25;
+  // camera.upperRadiusLimit = 200;
   camera.attachControl(canvas, true);
-  camera.lowerRadiusLimit = 25;
-  camera.upperRadiusLimit = 200;
+
+  //Orthogrpahic Camera for later
+  camera.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA;
+  camera.orthoLeft = -15;
+  camera.orthoRight = 15;
+  camera.orthoBottom = -15;
+  camera.orthoTop = 15;
+  camera.beta = -Math.PI;
+  camera.alpha = Math.PI;
 
   const light = new BABYLON.HemisphericLight(
     "light",
     new BABYLON.Vector3(0, 100, 0),
     scene
   );
-  light.intensity = 0.6;
+  light.intensity = 0.8;
 
   const light2 = new BABYLON.SpotLight(
     "spotLight",
-    new BABYLON.Vector3(0, 0, 30),
+    new BABYLON.Vector3(0, 20, 30),
     new BABYLON.Vector3(0, 0, -30),
     90,
     1,
@@ -42,7 +51,7 @@ const gameScreen = async (
 
   const light3 = new BABYLON.SpotLight(
     "spotLight2",
-    new BABYLON.Vector3(0, 0, -30),
+    new BABYLON.Vector3(0, 20, -30),
     new BABYLON.Vector3(0, 0, 30),
     90,
     1,
@@ -62,6 +71,15 @@ const gameScreen = async (
   createMovementMaterials(scene);
 
   scene.finalMeshes = await assetsLoader(scene, "gameScreen");
+
+  scene.finalMeshes?.boardMeshes.forEach((mesh, idx) => {
+    if (idx === 2) {
+      const material = new BABYLON.StandardMaterial("light", scene);
+      material.diffuseColor = new BABYLON.Color3(0.01, 0.01, 0.01);
+      material.specularColor = new BABYLON.Color3(0.01, 0.01, 0.01);
+      mesh.material = material;
+    }
+  });
 
   return scene;
 };

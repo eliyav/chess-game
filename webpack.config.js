@@ -36,6 +36,7 @@ module.exports = {
     ],
   },
   devtool: "source-map",
+  //cache: { type: "filesystem" },
   //   devServer: {
   //     proxy: {
   //       // proxy URLs to backend development server
