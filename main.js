@@ -758,6 +758,36 @@ function createMeshMaterials(scene) {
     board.diffuseFresnelParameters = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.FresnelParameters();
     board.diffuseFresnelParameters.leftColor = babylonjs__WEBPACK_IMPORTED_MODULE_0__.Color3.Black();
     board.diffuseFresnelParameters.rightColor = babylonjs__WEBPACK_IMPORTED_MODULE_0__.Color3.Black();
+    // const white = new BABYLON.StandardMaterial("white", scene);
+    // white.specularPower = 2;
+    // white.diffuseColor = new BABYLON.Color3(1, 1, 1);
+    // white.emissiveColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+    // // Fresnel
+    // white.diffuseFresnelParameters = new BABYLON.FresnelParameters();
+    // white.diffuseFresnelParameters.leftColor = BABYLON.Color3.Black();
+    // white.diffuseFresnelParameters.rightColor = BABYLON.Color3.Black();
+    // white.diffuseFresnelParameters.power = 1;
+    // white.diffuseFresnelParameters.bias = 0.1;
+    // white.emissiveFresnelParameters = new BABYLON.FresnelParameters();
+    // white.emissiveFresnelParameters.bias = 0.1;
+    // white.emissiveFresnelParameters.power = 1;
+    // white.emissiveFresnelParameters.leftColor = BABYLON.Color3.Black();
+    // white.emissiveFresnelParameters.rightColor = BABYLON.Color3.Black();
+    // const black = new BABYLON.StandardMaterial("black", scene);
+    // black.specularPower = 8;
+    // black.diffuseColor = new BABYLON.Color3(0, 0, 0);
+    // black.emissiveColor = new BABYLON.Color3(255, 0, 0);
+    // // Fresnel
+    // black.diffuseFresnelParameters = new BABYLON.FresnelParameters();
+    // black.diffuseFresnelParameters.leftColor = BABYLON.Color3.White();
+    // black.diffuseFresnelParameters.rightColor = BABYLON.Color3.Black();
+    // black.diffuseFresnelParameters.power = 1;
+    // black.diffuseFresnelParameters.bias = 0.8;
+    // black.emissiveFresnelParameters = new BABYLON.FresnelParameters();
+    // black.emissiveFresnelParameters.bias = 0.8;
+    // black.emissiveFresnelParameters.power = 1;
+    // black.emissiveFresnelParameters.leftColor = BABYLON.Color3.White();
+    // black.emissiveFresnelParameters.rightColor = BABYLON.Color3.Black();
     return { white, black, board };
 }
 
@@ -875,8 +905,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* harmony import */ var _assets_white_player_png__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../assets/white-player.png */ "./assets/white-player.png");
+/* harmony import */ var _assets_black_player_png__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../assets/black-player.png */ "./assets/black-player.png");
+
+
 const timer1 = document.getElementById("timer1");
 const timer2 = document.getElementById("timer2");
+const avatar1 = document.getElementById("avatar1");
+avatar1.src = _assets_white_player_png__WEBPACK_IMPORTED_MODULE_0__;
+const avatar2 = document.getElementById("avatar2");
+avatar2.src = _assets_black_player_png__WEBPACK_IMPORTED_MODULE_1__;
 class Timer {
     constructor(gameState, endGame) {
         this.resetTimers = (time = 0) => {
@@ -2885,23 +2923,40 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const gameScreen = async (canvas, engine) => {
+    var _a;
     const scene = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Scene(engine);
     const camera = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.ArcRotateCamera("camera", Math.PI, Math.PI / 4, 35, new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Vector3(0, 0, 0), scene);
+    // camera.lowerRadiusLimit = 25;
+    // camera.upperRadiusLimit = 200;
     camera.attachControl(canvas, true);
-    camera.lowerRadiusLimit = 25;
-    camera.upperRadiusLimit = 200;
+    //Orthogrpahic Camera for later
+    camera.mode = babylonjs__WEBPACK_IMPORTED_MODULE_0__.Camera.ORTHOGRAPHIC_CAMERA;
+    camera.orthoLeft = -15;
+    camera.orthoRight = 15;
+    camera.orthoBottom = -15;
+    camera.orthoTop = 15;
+    camera.beta = -Math.PI;
+    camera.alpha = Math.PI;
     const light = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.HemisphericLight("light", new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Vector3(0, 100, 0), scene);
-    light.intensity = 0.6;
-    const light2 = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.SpotLight("spotLight", new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Vector3(0, 0, 30), new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Vector3(0, 0, -30), 90, 1, scene);
+    light.intensity = 0.8;
+    const light2 = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.SpotLight("spotLight", new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Vector3(0, 20, 30), new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Vector3(0, 0, -30), 90, 1, scene);
     light2.intensity = 0.8;
     light2.diffuse = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Color3(0, 0, 0);
-    const light3 = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.SpotLight("spotLight2", new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Vector3(0, 0, -30), new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Vector3(0, 0, 30), 90, 1, scene);
+    const light3 = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.SpotLight("spotLight2", new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Vector3(0, 20, -30), new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Vector3(0, 0, 30), 90, 1, scene);
     light3.intensity = 0.8;
     light3.diffuse = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Color3(0, 0, 0);
     const photoDome = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.PhotoDome("spaceDome", _assets_space_webp__WEBPACK_IMPORTED_MODULE_2__, { size: 500 }, scene);
     photoDome.rotation = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Vector3(0, 1, 1.5);
     (0,_component_materials__WEBPACK_IMPORTED_MODULE_3__.createMovementMaterials)(scene);
     scene.finalMeshes = await (0,_asset_loader__WEBPACK_IMPORTED_MODULE_1__["default"])(scene, "gameScreen");
+    (_a = scene.finalMeshes) === null || _a === void 0 ? void 0 : _a.boardMeshes.forEach((mesh, idx) => {
+        if (idx === 2) {
+            const material = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.StandardMaterial("light", scene);
+            material.diffuseColor = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Color3(0.01, 0.01, 0.01);
+            material.specularColor = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Color3(0.01, 0.01, 0.01);
+            mesh.material = material;
+        }
+    });
     return scene;
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (gameScreen);
@@ -3235,6 +3290,17 @@ module.exports = yeast;
 
 /***/ }),
 
+/***/ "./assets/black-player.png":
+/*!*********************************!*\
+  !*** ./assets/black-player.png ***!
+  \*********************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+module.exports = __webpack_require__.p + "08b9a29ca5fbd00233ea.png";
+
+/***/ }),
+
 /***/ "./assets/board.gltf":
 /*!***************************!*\
   !*** ./assets/board.gltf ***!
@@ -3342,6 +3408,17 @@ module.exports = __webpack_require__.p + "059bd852bfabe985933c.gltf";
 
 "use strict";
 module.exports = __webpack_require__.p + "059565005391e3c17f56.webp";
+
+/***/ }),
+
+/***/ "./assets/white-player.png":
+/*!*********************************!*\
+  !*** ./assets/white-player.png ***!
+  \*********************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+module.exports = __webpack_require__.p + "7e7b408b6a459b4a8e0a.png";
 
 /***/ }),
 
