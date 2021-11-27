@@ -1,5 +1,6 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CompressionPlugin = require("compression-webpack-plugin");
 
 /** @type {import("webpack").Configuration} */
 module.exports = {
@@ -15,6 +16,9 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: "[name].css",
       chunkFilename: "[name].css",
+    }),
+    new CompressionPlugin({
+      algorithm: "gzip",
     }),
   ],
   module: {

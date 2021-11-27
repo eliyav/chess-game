@@ -1,12 +1,12 @@
 import * as BABYLON from "babylonjs";
 import board from "../../assets/board.gltf";
 import chessText from "../../assets/chess.gltf";
-import king from "../../assets/pieces/king.gltf";
-import queen from "../../assets/pieces/queen.gltf";
-import bishop from "../../assets/pieces/bishop.gltf";
-import knight from "../../assets/pieces/knight.gltf";
-import rook from "../../assets/pieces/rook.gltf";
-import pawn from "../../assets/pieces/pawn.gltf";
+import king from "../../assets/pieces/kingv3.gltf";
+import queen from "../../assets/pieces/queenv3.gltf";
+import bishop from "../../assets/pieces/bishopv3.gltf";
+import knight from "../../assets/pieces/knightv3.gltf";
+import rook from "../../assets/pieces/rookv3.gltf";
+import pawn from "../../assets/pieces/pawnv3.gltf";
 import moon from "../../assets/moon.jpg";
 import { createMeshMaterials } from "../component/materials";
 import { Scene } from "babylonjs/scene";

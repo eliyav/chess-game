@@ -31,9 +31,9 @@ type Materials = {
 function createMeshMaterials(scene: BABYLON.Scene): Materials {
   const white = new BABYLON.StandardMaterial("white", scene);
   white.specularPower = 1.1;
-  white.diffuseColor = new BABYLON.Color3(0.95, 0.95, 0.95);
-  white.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-  white.emissiveColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+  white.diffuseColor = new BABYLON.Color3(0.85, 0.63, 0.42);
+  white.specularColor = new BABYLON.Color3(0, 0, 0);
+  white.emissiveColor = new BABYLON.Color3(0, 0, 0);
   white.useEmissiveAsIllumination = true;
 
   const black = new BABYLON.StandardMaterial("black", scene);

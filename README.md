@@ -38,9 +38,13 @@ Install the latest node package manager before installing dependencies
    ```sh
    npm install
    ```
-3. Serve app on http://localhost:3000/ **If you would like to use a different port, change at server.js file**
+3. Serve app **Does not currently support sockets**
    ```js
    npm start
+   ```
+4. **Optional: Instead of #3** Serve app on http://localhost:3000/ **Supports sockets, but does not support compression**
+   ```js
+   npm start server
    ```
 
 ## Usage

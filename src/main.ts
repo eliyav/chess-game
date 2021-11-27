@@ -17,13 +17,16 @@ async function Main() {
   } = app;
 
   const refreshCanvas = () => {
-    engine.resize();
-    let camera: any = startScene.cameras[0];
+    let startSceneCamera: any = startScene.cameras[0];
+    let gameSceneCamera: any = gameScene.cameras[0];
     if (canvas.width < 768) {
-      camera.radius = 31;
+      startSceneCamera.radius = 32;
+      gameSceneCamera.radius = 65;
     } else {
-      camera.radius = 30;
+      startSceneCamera.radius = 30;
+      gameSceneCamera.radius = 45;
     }
+    engine.resize();
   };
 
   const loadingEnd = () => {
@@ -33,8 +36,9 @@ async function Main() {
     }, 1000);
   };
 
-  globalThis.onresize = refreshCanvas;
-  globalThis.onload = loadingEnd;
+  loadingEnd();
+
+  window.onresize = refreshCanvas;
 
   (() => {
     engine.runRenderLoop(function () {

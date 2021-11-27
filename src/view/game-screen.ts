@@ -14,22 +14,22 @@ const gameScreen = async (
     "camera",
     Math.PI,
     Math.PI / 4,
-    35,
+    60,
     new BABYLON.Vector3(0, 0, 0),
     scene
   );
-  // camera.lowerRadiusLimit = 25;
-  // camera.upperRadiusLimit = 200;
+  camera.lowerRadiusLimit = 25;
+  camera.upperRadiusLimit = 200;
   camera.attachControl(canvas, true);
 
   //Orthogrpahic Camera for later
-  camera.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA;
-  camera.orthoLeft = -15;
-  camera.orthoRight = 15;
-  camera.orthoBottom = -15;
-  camera.orthoTop = 15;
-  camera.beta = -Math.PI;
-  camera.alpha = Math.PI;
+  // camera.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA;
+  // camera.orthoLeft = -15;
+  // camera.orthoRight = 15;
+  // camera.orthoBottom = -15;
+  // camera.orthoTop = 15;
+  // camera.beta = -Math.PI;
+  // camera.alpha = Math.PI;
 
   const light = new BABYLON.HemisphericLight(
     "light",
