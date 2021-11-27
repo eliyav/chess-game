@@ -744,9 +744,9 @@ function createMovementMaterials(scene) {
 function createMeshMaterials(scene) {
     const white = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.StandardMaterial("white", scene);
     white.specularPower = 1.1;
-    white.diffuseColor = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Color3(0.95, 0.95, 0.95);
-    white.specularColor = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Color3(0.2, 0.2, 0.2);
-    white.emissiveColor = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Color3(0.1, 0.1, 0.1);
+    white.diffuseColor = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Color3(0.85, 0.63, 0.42);
+    white.specularColor = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Color3(0, 0, 0);
+    white.emissiveColor = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Color3(0, 0, 0);
     white.useEmissiveAsIllumination = true;
     const black = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.StandardMaterial("black", scene);
     black.specularPower = 1;
@@ -2741,12 +2741,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var babylonjs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(babylonjs__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _assets_board_gltf__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../assets/board.gltf */ "./assets/board.gltf");
 /* harmony import */ var _assets_chess_gltf__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../assets/chess.gltf */ "./assets/chess.gltf");
-/* harmony import */ var _assets_pieces_king_gltf__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../assets/pieces/king.gltf */ "./assets/pieces/king.gltf");
-/* harmony import */ var _assets_pieces_queen_gltf__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../assets/pieces/queen.gltf */ "./assets/pieces/queen.gltf");
-/* harmony import */ var _assets_pieces_bishop_gltf__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../assets/pieces/bishop.gltf */ "./assets/pieces/bishop.gltf");
-/* harmony import */ var _assets_pieces_knight_gltf__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../assets/pieces/knight.gltf */ "./assets/pieces/knight.gltf");
-/* harmony import */ var _assets_pieces_rook_gltf__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../assets/pieces/rook.gltf */ "./assets/pieces/rook.gltf");
-/* harmony import */ var _assets_pieces_pawn_gltf__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../assets/pieces/pawn.gltf */ "./assets/pieces/pawn.gltf");
+/* harmony import */ var _assets_pieces_kingv3_gltf__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../assets/pieces/kingv3.gltf */ "./assets/pieces/kingv3.gltf");
+/* harmony import */ var _assets_pieces_queenv3_gltf__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../assets/pieces/queenv3.gltf */ "./assets/pieces/queenv3.gltf");
+/* harmony import */ var _assets_pieces_bishopv3_gltf__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../assets/pieces/bishopv3.gltf */ "./assets/pieces/bishopv3.gltf");
+/* harmony import */ var _assets_pieces_knightv3_gltf__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../assets/pieces/knightv3.gltf */ "./assets/pieces/knightv3.gltf");
+/* harmony import */ var _assets_pieces_rookv3_gltf__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../assets/pieces/rookv3.gltf */ "./assets/pieces/rookv3.gltf");
+/* harmony import */ var _assets_pieces_pawnv3_gltf__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../assets/pieces/pawnv3.gltf */ "./assets/pieces/pawnv3.gltf");
 /* harmony import */ var _assets_moon_jpg__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../assets/moon.jpg */ "./assets/moon.jpg");
 /* harmony import */ var _component_materials__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../component/materials */ "./src/component/materials.ts");
 
@@ -2764,7 +2764,7 @@ const assetsLoader = async (scene, description) => {
     const materials = (0,_component_materials__WEBPACK_IMPORTED_MODULE_10__.createMeshMaterials)(scene);
     if (description === "gameScreen") {
         //Game Scene
-        let meshesToLoad = [_assets_pieces_king_gltf__WEBPACK_IMPORTED_MODULE_3__, _assets_pieces_queen_gltf__WEBPACK_IMPORTED_MODULE_4__, _assets_pieces_knight_gltf__WEBPACK_IMPORTED_MODULE_6__, _assets_pieces_bishop_gltf__WEBPACK_IMPORTED_MODULE_5__, _assets_pieces_rook_gltf__WEBPACK_IMPORTED_MODULE_7__, _assets_pieces_pawn_gltf__WEBPACK_IMPORTED_MODULE_8__];
+        let meshesToLoad = [_assets_pieces_kingv3_gltf__WEBPACK_IMPORTED_MODULE_3__, _assets_pieces_queenv3_gltf__WEBPACK_IMPORTED_MODULE_4__, _assets_pieces_knightv3_gltf__WEBPACK_IMPORTED_MODULE_6__, _assets_pieces_bishopv3_gltf__WEBPACK_IMPORTED_MODULE_5__, _assets_pieces_rookv3_gltf__WEBPACK_IMPORTED_MODULE_7__, _assets_pieces_pawnv3_gltf__WEBPACK_IMPORTED_MODULE_8__];
         const loadedBoardMesh = await babylonjs__WEBPACK_IMPORTED_MODULE_0__.SceneLoader.ImportMeshAsync("", _assets_board_gltf__WEBPACK_IMPORTED_MODULE_1__, "");
         const loadedMeshes = await Promise.all(meshesToLoad.map((mesh) => babylonjs__WEBPACK_IMPORTED_MODULE_0__.SceneLoader.ImportMeshAsync("", mesh, "")));
         const piecesMeshes = [];
@@ -2803,7 +2803,7 @@ const assetsLoader = async (scene, description) => {
         //Start Scene
         let boardMesh = _assets_board_gltf__WEBPACK_IMPORTED_MODULE_1__;
         let textMeshes = [_assets_chess_gltf__WEBPACK_IMPORTED_MODULE_2__];
-        let boardPieces = [_assets_pieces_king_gltf__WEBPACK_IMPORTED_MODULE_3__, _assets_pieces_queen_gltf__WEBPACK_IMPORTED_MODULE_4__, _assets_pieces_knight_gltf__WEBPACK_IMPORTED_MODULE_6__, _assets_pieces_bishop_gltf__WEBPACK_IMPORTED_MODULE_5__, _assets_pieces_rook_gltf__WEBPACK_IMPORTED_MODULE_7__, _assets_pieces_pawn_gltf__WEBPACK_IMPORTED_MODULE_8__];
+        let boardPieces = [_assets_pieces_kingv3_gltf__WEBPACK_IMPORTED_MODULE_3__, _assets_pieces_queenv3_gltf__WEBPACK_IMPORTED_MODULE_4__, _assets_pieces_knightv3_gltf__WEBPACK_IMPORTED_MODULE_6__, _assets_pieces_bishopv3_gltf__WEBPACK_IMPORTED_MODULE_5__, _assets_pieces_rookv3_gltf__WEBPACK_IMPORTED_MODULE_7__, _assets_pieces_pawnv3_gltf__WEBPACK_IMPORTED_MODULE_8__];
         const loadedBoardMeshes = await babylonjs__WEBPACK_IMPORTED_MODULE_0__.SceneLoader.ImportMeshAsync("", boardMesh, "", scene);
         const loadedPiecesMeshes = await Promise.all(boardPieces.map((mesh) => babylonjs__WEBPACK_IMPORTED_MODULE_0__.SceneLoader.ImportMeshAsync("", mesh, "", scene)));
         const loadedTextMeshes = await Promise.all(textMeshes.map((mesh) => babylonjs__WEBPACK_IMPORTED_MODULE_0__.SceneLoader.ImportMeshAsync("", mesh, "")));
@@ -2925,18 +2925,18 @@ __webpack_require__.r(__webpack_exports__);
 const gameScreen = async (canvas, engine) => {
     var _a;
     const scene = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Scene(engine);
-    const camera = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.ArcRotateCamera("camera", Math.PI, Math.PI / 4, 35, new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Vector3(0, 0, 0), scene);
-    // camera.lowerRadiusLimit = 25;
-    // camera.upperRadiusLimit = 200;
+    const camera = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.ArcRotateCamera("camera", Math.PI, Math.PI / 4, 60, new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Vector3(0, 0, 0), scene);
+    camera.lowerRadiusLimit = 25;
+    camera.upperRadiusLimit = 200;
     camera.attachControl(canvas, true);
     //Orthogrpahic Camera for later
-    camera.mode = babylonjs__WEBPACK_IMPORTED_MODULE_0__.Camera.ORTHOGRAPHIC_CAMERA;
-    camera.orthoLeft = -15;
-    camera.orthoRight = 15;
-    camera.orthoBottom = -15;
-    camera.orthoTop = 15;
-    camera.beta = -Math.PI;
-    camera.alpha = Math.PI;
+    // camera.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA;
+    // camera.orthoLeft = -15;
+    // camera.orthoRight = 15;
+    // camera.orthoBottom = -15;
+    // camera.orthoTop = 15;
+    // camera.beta = -Math.PI;
+    // camera.alpha = Math.PI;
     const light = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.HemisphericLight("light", new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Vector3(0, 100, 0), scene);
     light.intensity = 0.8;
     const light2 = new babylonjs__WEBPACK_IMPORTED_MODULE_0__.SpotLight("spotLight", new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Vector3(0, 20, 30), new babylonjs__WEBPACK_IMPORTED_MODULE_0__.Vector3(0, 0, -30), 90, 1, scene);
@@ -3334,69 +3334,69 @@ module.exports = __webpack_require__.p + "9f4e32e2e3bdaa4030ad.jpg";
 
 /***/ }),
 
-/***/ "./assets/pieces/bishop.gltf":
+/***/ "./assets/pieces/bishopv3.gltf":
+/*!*************************************!*\
+  !*** ./assets/pieces/bishopv3.gltf ***!
+  \*************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+"use strict";
+module.exports = __webpack_require__.p + "5731233140adbb497b2b.gltf";
+
+/***/ }),
+
+/***/ "./assets/pieces/kingv3.gltf":
 /*!***********************************!*\
-  !*** ./assets/pieces/bishop.gltf ***!
+  !*** ./assets/pieces/kingv3.gltf ***!
   \***********************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
-module.exports = __webpack_require__.p + "4ecbe6a11b14653d3bc4.gltf";
+module.exports = __webpack_require__.p + "5294209ab53c9d629f8b.gltf";
 
 /***/ }),
 
-/***/ "./assets/pieces/king.gltf":
-/*!*********************************!*\
-  !*** ./assets/pieces/king.gltf ***!
-  \*********************************/
+/***/ "./assets/pieces/knightv3.gltf":
+/*!*************************************!*\
+  !*** ./assets/pieces/knightv3.gltf ***!
+  \*************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
-module.exports = __webpack_require__.p + "84ca924e2c043f876c1d.gltf";
+module.exports = __webpack_require__.p + "672aba3cbc64dee8738a.gltf";
 
 /***/ }),
 
-/***/ "./assets/pieces/knight.gltf":
+/***/ "./assets/pieces/pawnv3.gltf":
 /*!***********************************!*\
-  !*** ./assets/pieces/knight.gltf ***!
+  !*** ./assets/pieces/pawnv3.gltf ***!
   \***********************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
-module.exports = __webpack_require__.p + "2baea72be21fcaaddbcd.gltf";
+module.exports = __webpack_require__.p + "8c50acb9c93bb02ec588.gltf";
 
 /***/ }),
 
-/***/ "./assets/pieces/pawn.gltf":
-/*!*********************************!*\
-  !*** ./assets/pieces/pawn.gltf ***!
-  \*********************************/
+/***/ "./assets/pieces/queenv3.gltf":
+/*!************************************!*\
+  !*** ./assets/pieces/queenv3.gltf ***!
+  \************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
-module.exports = __webpack_require__.p + "fd1fe98b54f6540f9a94.gltf";
+module.exports = __webpack_require__.p + "a9212110859ad8f7bdbc.gltf";
 
 /***/ }),
 
-/***/ "./assets/pieces/queen.gltf":
-/*!**********************************!*\
-  !*** ./assets/pieces/queen.gltf ***!
-  \**********************************/
+/***/ "./assets/pieces/rookv3.gltf":
+/*!***********************************!*\
+  !*** ./assets/pieces/rookv3.gltf ***!
+  \***********************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
-module.exports = __webpack_require__.p + "f59d5d15027d2480b404.gltf";
-
-/***/ }),
-
-/***/ "./assets/pieces/rook.gltf":
-/*!*********************************!*\
-  !*** ./assets/pieces/rook.gltf ***!
-  \*********************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-"use strict";
-module.exports = __webpack_require__.p + "059bd852bfabe985933c.gltf";
+module.exports = __webpack_require__.p + "1792363b3b303295ef83.gltf";
 
 /***/ }),
 
@@ -6835,14 +6835,17 @@ async function Main() {
     const app = await (0,_app__WEBPACK_IMPORTED_MODULE_2__["default"])(canvas, engine);
     const { showScene, scenes: { startScene, gameScene }, } = app;
     const refreshCanvas = () => {
-        engine.resize();
-        let camera = startScene.cameras[0];
+        let startSceneCamera = startScene.cameras[0];
+        let gameSceneCamera = gameScene.cameras[0];
         if (canvas.width < 768) {
-            camera.radius = 31;
+            startSceneCamera.radius = 32;
+            gameSceneCamera.radius = 65;
         }
         else {
-            camera.radius = 30;
+            startSceneCamera.radius = 30;
+            gameSceneCamera.radius = 45;
         }
+        engine.resize();
     };
     const loadingEnd = () => {
         refreshCanvas();
@@ -6850,8 +6853,8 @@ async function Main() {
             loadingDiv.style.display = "none";
         }, 1000);
     };
-    globalThis.onresize = refreshCanvas;
-    globalThis.onload = loadingEnd;
+    loadingEnd();
+    window.onresize = refreshCanvas;
     (() => {
         engine.runRenderLoop(function () {
             switch (showScene.index) {
