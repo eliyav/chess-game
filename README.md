@@ -2,7 +2,7 @@
 
 ## About The Project
 
-![Capture](https://user-images.githubusercontent.com/70218822/137228522-74a7b0f0-1b42-40c0-bf0b-e414747cb3f5.PNG)
+![Capture](https://user-images.githubusercontent.com/70218822/143668339-43ec93f4-490f-409f-80fe-117fc5365def.png)
 
 ### Built With
 
