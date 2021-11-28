@@ -1,6 +1,7 @@
 const express = require("express");
 const webpack = require("webpack");
 const webpackDevMiddleware = require("webpack-dev-middleware");
+const compression = require("compression");
 
 const app = express();
 const config = require("./webpack.config.js");
@@ -10,6 +11,7 @@ const port = process.env.PORT || 3000;
 
 // Tell express to use the webpack-dev-middleware and use the webpack.config.js
 // configuration file as a base.
+app.use(compression());
 app.use(webpackDevMiddleware(compiler));
 
 // Serve the files on port 3000.
