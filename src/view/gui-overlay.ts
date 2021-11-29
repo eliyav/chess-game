@@ -203,7 +203,17 @@ function setGUI(app: App) {
   });
 
   pauseButton.addEventListener("click", () => {
-    game.timer.pauseTimer();
+    pauseButton.innerHTML === "Pause"
+      ? (pauseButton.innerHTML = "Paused")
+      : (pauseButton.innerHTML = "Pause");
+    if (gameMode.mode === "online") {
+      if (gameMode.player === game.state.currentPlayer) {
+        game.timer.pauseTimer();
+        emitter!.emit("pause-game", game.state.currentPlayer);
+      }
+    } else {
+      game.timer.pauseTimer();
+    }
   });
 
   const resetCamera = (game: Game, gameScene: CustomScene) => {

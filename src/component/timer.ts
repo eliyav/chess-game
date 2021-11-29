@@ -56,15 +56,17 @@ class Timer {
       }
       this.pauseId = setTimeout(() => {
         this.gamePaused = false;
-        this.startTimer();
+        this.startTimer(this.timer1 + this.timer2);
       }, 1000);
     }
   };
 
   startTimer = (time = 0) => {
-    this.timer1 = time / 2;
-    this.timer2 = time / 2;
-    this.gameStarted = true;
+    if (!this.gameStarted) {
+      this.timer1 = time / 2;
+      this.timer2 = time / 2;
+      this.gameStarted = true;
+    }
     if (time > 0) {
       let timerId = setInterval(() => {
         if (this.gameState.currentPlayer === "White") {

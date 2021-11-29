@@ -1,4 +1,4 @@
-class EventEmitter { 
+class EventEmitter {
   listeners: any;
 
   constructor() {
@@ -50,7 +50,7 @@ class EventEmitter {
     return true;
   }
 
-  listenerCount(event:string) {
+  listenerCount(event: string) {
     let fns = this.listeners[event] || [];
     return fns.length;
   }

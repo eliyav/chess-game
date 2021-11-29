@@ -1,29 +1,17 @@
-import { io, Socket } from "socket.io-client";
+import { io } from "socket.io-client";
 import Game from "../game";
 import { renderScene } from "../helper/canvas-helpers";
 import { CustomScene } from "../view/start-screen";
 import { hideDisplay } from "../view/gui-overlay";
-
-interface gameModeClone {
-  mode: string | undefined;
-  player: string | undefined;
-  room: string | undefined;
-  time: number | undefined;
-}
+import { GameMode } from "../events/emitter";
 
 const activateSocket = (
   game: Game,
-  gameMode: {
-    mode: string | undefined;
-    player: string | undefined;
-    room: string | undefined;
-    time: number | undefined;
-  },
+  gameMode: GameMode,
   gameScene: CustomScene,
   startScene: CustomScene,
   showScene: { index: number }
 ) => {
-  //const socket = io(`ws://localhost:3000`);
   const socket = io(`ws://${window.location.host}`);
 
   socket.on("message", (message) => {
@@ -84,6 +72,16 @@ const activateSocket = (
     startScene.detachControl();
     showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);
     console.log("game has been activated");
+  });
+
+  socket.on("pause-game", ({ currentPlayer, time }) => {
+    console.log(currentPlayer, time);
+    game.timer.pauseTimer();
+    if (currentPlayer === "White") {
+      game.timer.timer1 = time;
+    } else {
+      game.timer.timer2 = time;
+    }
   });
   // socket.on("reset-board-request", () => {
   //   const answer = confirm("Opponent has requested to reset the board, do you agree?");

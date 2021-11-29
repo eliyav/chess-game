@@ -3,10 +3,11 @@ import { renderScene, rotateCamera } from "../helper/canvas-helpers";
 import Game from "../game";
 import { CustomScene } from "../view/start-screen";
 
-type GameMode = {
+export type GameMode = {
   mode: string | undefined;
   player: string | undefined;
   room: string | undefined;
+  time: number | undefined;
 };
 
 const activateEmitter = (
@@ -19,30 +20,17 @@ const activateEmitter = (
 
   emitter.on("playerMove", (originPoint, targetPoint) => {
     renderScene(game, gameScene);
-    if (gameMode.mode === "offline") {
-      if (
-        typeof originPoint !== "undefined" &&
-        typeof targetPoint !== "undefined"
-      ) {
-        const resolved = game.playerMove(originPoint, targetPoint);
-        if (resolved) {
-          game.switchTurn();
-          renderScene(game, gameScene);
-          rotateCamera(game.state.currentPlayer, gameScene);
-        }
-      }
-    } else if (gameMode.mode === "online") {
-      if (
-        typeof originPoint !== "undefined" &&
-        typeof targetPoint !== "undefined"
-      ) {
-        const resolved = game.playerMove(originPoint, targetPoint);
-        if (resolved) {
-          const room = gameMode.room;
-          renderScene(game, gameScene);
-          game.switchTurn();
-          socket.emit("stateChange", { originPoint, targetPoint, room });
-        }
+    const resolved = game.playerMove(originPoint!, targetPoint!);
+    if (resolved) {
+      if (gameMode.mode === "offline") {
+        game.switchTurn();
+        renderScene(game, gameScene);
+        rotateCamera(game.state.currentPlayer, gameScene);
+      } else if (gameMode.mode === "online") {
+        const room = gameMode.room;
+        renderScene(game, gameScene);
+        game.switchTurn();
+        socket.emit("stateChange", { originPoint, targetPoint, room });
       }
     }
     game.moves.length = 0;
@@ -56,6 +44,18 @@ const activateEmitter = (
       let camera: any = gameScene.cameras[0];
       camera.alpha = Math.PI;
     }
+  });
+
+  //@ts-ignore
+  emitter.on("pause-game", (currentPlayer: string) => {
+    console.log("online pause game");
+    let time;
+    if (currentPlayer === "White") {
+      time = game.timer.timer1;
+    } else {
+      time = game.timer.timer2;
+    }
+    socket.emit("pause-game", { gameMode, currentPlayer, time });
   });
 
   return emitter;

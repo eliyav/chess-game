@@ -4,7 +4,7 @@ import Game from "./game";
 import chessData from "./data/chess-data-import";
 import startScreen from "./view/start-screen";
 import gameScreen from "./view/game-screen";
-import activateEmitter from "./events/emitter";
+import activateEmitter, { GameMode } from "./events/emitter";
 import { setGUI } from "./view/gui-overlay";
 import inputController from "./events/input-controller";
 import EventEmitter from "./events/event-emitter";
@@ -13,12 +13,7 @@ import activateSocket from "./component/sockets";
 
 export interface App {
   game: Game;
-  gameMode: {
-    mode: string | undefined;
-    player: string | undefined;
-    room: string | undefined;
-    time: number | undefined;
-  };
+  gameMode: GameMode;
   showScene: { index: number };
   scenes: {
     startScene: Scene;
@@ -62,7 +57,7 @@ const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
     function onClickEvent() {
       if (pickResult.pickedMesh !== null) {
         const mesh: ChessPieceMesh = pickResult.pickedMesh;
-        const isCompleteMove = inputController(mesh, game, gameScene);
+        const isCompleteMove = inputController(mesh, game, gameScene, gameMode);
         isCompleteMove
           ? (() => {
               const [originPoint, targetPoint] = game.moves;
