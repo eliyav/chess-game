@@ -75,7 +75,6 @@ const activateSocket = (
   });
 
   socket.on("pause-game", ({ currentPlayer, time }) => {
-    console.log(currentPlayer, time);
     game.timer.pauseTimer();
     if (currentPlayer === "White") {
       game.timer.timer1 = time;
@@ -83,17 +82,22 @@ const activateSocket = (
       game.timer.timer2 = time;
     }
   });
-  // socket.on("reset-board-request", () => {
-  //   const answer = confirm("Opponent has requested to reset the board, do you agree?");
-  //   answer && socket.emit("reset-board-response", "Yes");
-  // });
+  socket.on("reset-board-request", () => {
+    const answer = confirm(
+      "Opponent has requested to reset the board, do you agree?"
+    );
+    let string = answer ? "Yes" : "No";
+    socket.emit("reset-board-response", { string, gameMode });
+  });
 
-  // socket.on("reset-board-resolve", (response) => {
-  //   if (response === "Yes") {
-  //     game.resetGame();
-  //     renderScene(game, gameScene);
-  //   }
-  // });
+  socket.on("reset-board-resolve", (response) => {
+    if (response === "Yes") {
+      game.resetGame(gameMode.time);
+      renderScene(game, gameScene);
+    } else {
+      console.log("Request Denied");
+    }
+  });
 
   // socket.on("draw-request", () => {
   //   const answer = confirm("Opponent has offered a game Draw, do you accept?");

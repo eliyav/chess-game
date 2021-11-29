@@ -60,26 +60,29 @@ io.on("connection", (socket) => {
     socket.to(gameMode.room).emit("pause-game", { currentPlayer, time });
   });
 
-  // socket.on("reset-board", () => {
-  //   socket.to(room).emit("message", "Opponent has requested a board reset!");
-  //   socket.to(room).emit("reset-board-request");
-  // });
+  socket.on("reset-board", (gameMode) => {
+    socket
+      .to(gameMode.room)
+      .emit("message", "Opponent has requested a board reset!");
+    socket.to(gameMode.room).emit("reset-board-request");
+  });
 
-  // socket.on("reset-board-response", (answer) => {
-  //   if (answer === "Yes") {
-  //     socket
-  //       .to(room)
-  //       .emit("message", "Opponent has agreed to reset the board!");
-  //     socket.to(room).emit("reset-board-resolve", "Yes");
-  //     socket.emit("reset-board-resolve", "Yes");
-  //   } else {
-  //     socket
-  //       .to(room)
-  //       .emit("message", "Opponent has declined to reset the board!");
-  //     socket.to(room).emit("reset-board-resolve", "No");
-  //     socket.emit("reset-board-resolve", "No");
-  //   }
-  // });
+  socket.on("reset-board-response", ({ string, gameMode }) => {
+    console.log(string);
+    if (string === "Yes") {
+      socket
+        .to(gameMode.room)
+        .emit("message", "Opponent has agreed to reset the board!");
+      socket.to(gameMode.room).emit("reset-board-resolve", "Yes");
+      socket.emit("reset-board-resolve", "Yes");
+    } else {
+      socket
+        .to(gameMode.room)
+        .emit("message", "Opponent has declined to reset the board!");
+      socket.to(gameMode.room).emit("reset-board-resolve", "No");
+      socket.emit("reset-board-resolve", "No");
+    }
+  });
 
   // socket.on("draw", () => {
   //   socket.to(room).emit("message", "Opponent has requested a game Draw!");

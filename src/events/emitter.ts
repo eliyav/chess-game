@@ -39,16 +39,19 @@ const activateEmitter = (
   emitter.on("reset-board", () => {
     const answer = confirm("Are you sure you want to reset the board?");
     if (answer) {
-      game.resetGame();
-      renderScene(game, gameScene);
-      let camera: any = gameScene.cameras[0];
-      camera.alpha = Math.PI;
+      if (gameMode.mode === "online") {
+        socket.emit("reset-board", gameMode);
+      } else {
+        game.resetGame();
+        renderScene(game, gameScene);
+        let camera: any = gameScene.cameras[0];
+        camera.alpha = Math.PI;
+      }
     }
   });
 
   //@ts-ignore
   emitter.on("pause-game", (currentPlayer: string) => {
-    console.log("online pause game");
     let time;
     if (currentPlayer === "White") {
       time = game.timer.timer1;
