@@ -863,7 +863,6 @@ const activateSocket = (game, gameMode, gameScene, startScene, showScene) => {
         console.log("game has been activated");
     });
     socket.on("pause-game", ({ currentPlayer, time }) => {
-        console.log(currentPlayer, time);
         game.timer.pauseTimer();
         if (currentPlayer === "White") {
             game.timer.timer1 = time;
@@ -872,16 +871,20 @@ const activateSocket = (game, gameMode, gameScene, startScene, showScene) => {
             game.timer.timer2 = time;
         }
     });
-    // socket.on("reset-board-request", () => {
-    //   const answer = confirm("Opponent has requested to reset the board, do you agree?");
-    //   answer && socket.emit("reset-board-response", "Yes");
-    // });
-    // socket.on("reset-board-resolve", (response) => {
-    //   if (response === "Yes") {
-    //     game.resetGame();
-    //     renderScene(game, gameScene);
-    //   }
-    // });
+    socket.on("reset-board-request", () => {
+        const answer = confirm("Opponent has requested to reset the board, do you agree?");
+        let string = answer ? "Yes" : "No";
+        socket.emit("reset-board-response", { string, gameMode });
+    });
+    socket.on("reset-board-resolve", (response) => {
+        if (response === "Yes") {
+            game.resetGame(gameMode.time);
+            (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.renderScene)(game, gameScene);
+        }
+        else {
+            console.log("Request Denied");
+        }
+    });
     // socket.on("draw-request", () => {
     //   const answer = confirm("Opponent has offered a game Draw, do you accept?");
     //   answer && socket.emit("draw-response", "Yes");
@@ -1261,15 +1264,19 @@ const activateEmitter = (game, gameMode, gameScene, socket) => {
     emitter.on("reset-board", () => {
         const answer = confirm("Are you sure you want to reset the board?");
         if (answer) {
-            game.resetGame();
-            (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.renderScene)(game, gameScene);
-            let camera = gameScene.cameras[0];
-            camera.alpha = Math.PI;
+            if (gameMode.mode === "online") {
+                socket.emit("reset-board", gameMode);
+            }
+            else {
+                game.resetGame();
+                (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.renderScene)(game, gameScene);
+                let camera = gameScene.cameras[0];
+                camera.alpha = Math.PI;
+            }
         }
     });
     //@ts-ignore
     emitter.on("pause-game", (currentPlayer) => {
-        console.log("online pause game");
         let time;
         if (currentPlayer === "White") {
             time = game.timer.timer1;
