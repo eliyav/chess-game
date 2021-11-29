@@ -2,6 +2,7 @@ import EventEmitter from "./event-emitter";
 import { renderScene, rotateCamera } from "../helper/canvas-helpers";
 import Game from "../game";
 import { CustomScene } from "../view/start-screen";
+import { resetCamera } from "../view/gui-overlay";
 
 export type GameMode = {
   mode: string | undefined;
@@ -59,6 +60,21 @@ const activateEmitter = (
       time = game.timer.timer2;
     }
     socket.emit("pause-game", { gameMode, currentPlayer, time });
+  });
+
+  emitter.on("undo-move", () => {
+    if (gameMode.mode === "online") {
+      if (gameMode.player !== game.state.currentPlayer) {
+        const lastTurn = game.turnHistory.at(-1);
+        if (lastTurn !== undefined) {
+          socket.emit("undo-move", gameMode);
+        }
+      }
+    } else {
+      game.undoTurn();
+      renderScene(game, gameScene);
+      resetCamera(game, gameScene, gameMode);
+    }
   });
 
   return emitter;

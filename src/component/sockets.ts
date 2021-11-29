@@ -1,9 +1,10 @@
-import { io } from "socket.io-client";
 import Game from "../game";
+import { io } from "socket.io-client";
 import { renderScene } from "../helper/canvas-helpers";
 import { CustomScene } from "../view/start-screen";
-import { hideDisplay } from "../view/gui-overlay";
+import { hideDisplay, resetCamera } from "../view/gui-overlay";
 import { GameMode } from "../events/emitter";
+import { SubEmitter } from "babylonjs/Particles/subEmitter";
 
 const activateSocket = (
   game: Game,
@@ -70,6 +71,7 @@ const activateSocket = (
     renderScene(game, gameScene);
     hideDisplay();
     startScene.detachControl();
+    resetCamera(game, gameScene, gameMode);
     showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);
     console.log("game has been activated");
   });
@@ -86,7 +88,7 @@ const activateSocket = (
     const answer = confirm(
       "Opponent has requested to reset the board, do you agree?"
     );
-    let string = answer ? "Yes" : "No";
+    const string = answer ? "Yes" : "No";
     socket.emit("reset-board-response", { string, gameMode });
   });
 
@@ -99,22 +101,22 @@ const activateSocket = (
     }
   });
 
-  // socket.on("draw-request", () => {
-  //   const answer = confirm("Opponent has offered a game Draw, do you accept?");
-  //   answer && socket.emit("draw-response", "Yes");
-  // });
+  socket.on("undo-move-request", () => {
+    const answer = confirm(
+      "Opponent has requested to undo their last move, do you agree?"
+    );
+    const string = answer ? "Yes" : "No";
+    socket.emit("undo-move-response", { string, gameMode });
+  });
 
-  // socket.on("draw-resolve", (response) => {
-  //   if (response === "Yes") {
-  //     game.resetGame();
-  //     renderScene(game, gameScene);
-  //   }
-  // });
-
-  // socket.on("resign-request", () => {
-  //   game.resetGame();
-  //   renderScene(game, gameScene);
-  // });
+  socket.on("undo-move-resolve", (response) => {
+    if (response === "Yes") {
+      game.undoTurn();
+      renderScene(game, gameScene);
+    } else {
+      console.log("Request Denied");
+    }
+  });
 
   return socket;
 };

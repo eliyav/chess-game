@@ -3,6 +3,7 @@ import Game from "../game";
 import { renderScene } from "../helper/canvas-helpers";
 import { CustomScene } from "./start-screen";
 import x from "../../assets/x.png";
+import { GameMode } from "../events/emitter";
 
 const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
 const gameOverlay = document.getElementById("gameOverlay") as HTMLDivElement;
@@ -193,13 +194,11 @@ function setGUI(app: App) {
   });
 
   resetCameraButton.addEventListener("click", () => {
-    resetCamera(game, gameScene);
+    resetCamera(game, gameScene, gameMode);
   });
 
   undoMoveButton.addEventListener("click", () => {
-    game.undoTurn();
-    renderScene(game, gameScene);
-    resetCamera(game, gameScene);
+    emitter?.emit("undo-move");
   });
 
   pauseButton.addEventListener("click", () => {
@@ -215,20 +214,34 @@ function setGUI(app: App) {
       game.timer.pauseTimer();
     }
   });
-
-  const resetCamera = (game: Game, gameScene: CustomScene) => {
-    let camera: any = gameScene.cameras[0];
-    if (game.state.currentPlayer === "Black") {
-      camera.alpha = 0;
-      camera.beta = Math.PI / 4;
-      camera.radius = 35;
-    } else {
-      camera.alpha = Math.PI;
-      camera.beta = Math.PI / 4;
-      camera.radius = 35;
-    }
-  };
 }
+
+const resetCamera = (
+  game: Game,
+  gameScene: CustomScene,
+  gameMode: GameMode
+) => {
+  let camera: any = gameScene.cameras[0];
+  if (gameMode.mode === "online") {
+    gameMode.player === "White" ? setToWhitePlayer() : setToBlackPlayer();
+  } else {
+    game.state.currentPlayer === "White"
+      ? setToWhitePlayer()
+      : setToBlackPlayer();
+  }
+
+  function setToWhitePlayer() {
+    camera.alpha = Math.PI;
+    camera.beta = Math.PI / 4;
+    camera.radius = 40;
+  }
+
+  function setToBlackPlayer() {
+    camera.alpha = 0;
+    camera.beta = Math.PI / 4;
+    camera.radius = 60;
+  }
+};
 
 const hideDisplay = () => {
   startOGButton.style.display = "none";
@@ -244,4 +257,4 @@ const showDisplay = () => {
   joinOnlineMatch.style.display = "unset";
 };
 
-export { setGUI, hideDisplay, showDisplay };
+export { setGUI, hideDisplay, showDisplay, resetCamera };

@@ -493,31 +493,12 @@ class Game {
 
   annotate(result: TurnHistory) {
     let finalString;
-    let symbol;
     const type = result.type;
     const promotion = result.promotion;
     const pieceName = result.originPiece!.name;
     const square = result.targetSquare.square;
     const isCapturing = result.targetPiece !== undefined ? true : false;
-    switch (pieceName) {
-      case "King":
-        symbol = "K";
-        break;
-      case "Queen":
-        symbol = "Q";
-        break;
-      case "Knight":
-        symbol = "N";
-        break;
-      case "Bishop":
-        symbol = "B";
-        break;
-      case "Rook":
-        symbol = "R";
-        break;
-      default:
-        symbol = "";
-    }
+    const symbol = result.originPiece?.getSymbol();
     if (type === "castling") {
       finalString = result.direction === 1 ? "O-O" : "O-O-O";
     } else if (promotion) {

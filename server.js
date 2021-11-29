@@ -84,27 +84,33 @@ io.on("connection", (socket) => {
     }
   });
 
-  // socket.on("draw", () => {
-  //   socket.to(room).emit("message", "Opponent has requested a game Draw!");
-  //   socket.to(room).emit("draw-request");
-  // });
+  socket.on("undo-move", (gameMode) => {
+    socket
+      .to(gameMode.room)
+      .emit("message", "Opponent has requested to undo their last turn!");
+    socket.to(gameMode.room).emit("undo-move-request");
+  });
 
-  // socket.on("draw-response", (answer) => {
-  //   if (answer === "Yes") {
-  //     socket.to(room).emit("message", "Opponent has agreed for game Draw!");
-  //     socket.to(room).emit("draw-resolve", "Yes");
-  //     socket.emit("draw-resolve", "Yes");
-  //   } else {
-  //     socket.to(room).emit("message", "Opponent has declined for game Draw!");
-  //     socket.to(room).emit("draw-resolve", "No");
-  //     socket.emit("draw-resolve", "No");
-  //   }
-  // });
+  socket.on("undo-move-response", ({ string, gameMode }) => {
+    if (string === "Yes") {
+      socket
+        .to(gameMode.room)
+        .emit("message", "Opponent has agreed for game Draw!");
+      socket.to(gameMode.room).emit("undo-move-resolve", "Yes");
+      socket.emit("undo-move-resolve", "Yes");
+    } else {
+      socket
+        .to(gameMode.room)
+        .emit("message", "Opponent has declined for game Draw!");
+      socket.to(gameMode.room).emit("undo-move-resolve", "No");
+      socket.emit("undo-move-resolve", "No");
+    }
+  });
 
-  // socket.on("resign-game", () => {
-  //   socket.to(room).emit("message", "Opponent has resigned the game!");
-  //   socket.to(room).emit("resign-request");
-  // });
+  socket.on("resign-game", () => {
+    socket.to(room).emit("message", "Opponent has resigned the game!");
+    socket.to(room).emit("resign-request");
+  });
 });
 
 const generateKey = () => {

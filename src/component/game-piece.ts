@@ -29,6 +29,28 @@ class GamePiece {
       return checkForPawnPromotion(locationsInfo);
     }
   }
+
+  getSymbol() {
+    switch (this.name) {
+      case "King":
+        return "K";
+        break;
+      case "Queen":
+        return "Q";
+        break;
+      case "Knight":
+        return "N";
+        break;
+      case "Bishop":
+        return "B";
+        break;
+      case "Rook":
+        return "R";
+        break;
+      default:
+        return "";
+    }
+  }
 }
 
 export type Move = [Point, string];
