@@ -618,7 +618,7 @@ const initializeApp = async (canvas, engine) => {
         function onClickEvent() {
             if (pickResult.pickedMesh !== null) {
                 const mesh = pickResult.pickedMesh;
-                const isCompleteMove = (0,_events_input_controller__WEBPACK_IMPORTED_MODULE_7__["default"])(mesh, game, gameScene);
+                const isCompleteMove = (0,_events_input_controller__WEBPACK_IMPORTED_MODULE_7__["default"])(mesh, game, gameScene, gameMode);
                 isCompleteMove
                     ? (() => {
                         const [originPoint, targetPoint] = game.moves;
@@ -813,7 +813,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const activateSocket = (game, gameMode, gameScene, startScene, showScene) => {
-    //const socket = io(`ws://localhost:3000`);
     const socket = (0,socket_io_client__WEBPACK_IMPORTED_MODULE_0__.io)(`ws://${window.location.host}`);
     socket.on("message", (message) => {
         console.log(message);
@@ -862,6 +861,16 @@ const activateSocket = (game, gameMode, gameScene, startScene, showScene) => {
         startScene.detachControl();
         showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);
         console.log("game has been activated");
+    });
+    socket.on("pause-game", ({ currentPlayer, time }) => {
+        console.log(currentPlayer, time);
+        game.timer.pauseTimer();
+        if (currentPlayer === "White") {
+            game.timer.timer1 = time;
+        }
+        else {
+            game.timer.timer2 = time;
+        }
     });
     // socket.on("reset-board-request", () => {
     //   const answer = confirm("Opponent has requested to reset the board, do you agree?");
@@ -942,14 +951,16 @@ class Timer {
                 }
                 this.pauseId = setTimeout(() => {
                     this.gamePaused = false;
-                    this.startTimer();
+                    this.startTimer(this.timer1 + this.timer2);
                 }, 1000);
             }
         };
         this.startTimer = (time = 0) => {
-            this.timer1 = time / 2;
-            this.timer2 = time / 2;
-            this.gameStarted = true;
+            if (!this.gameStarted) {
+                this.timer1 = time / 2;
+                this.timer2 = time / 2;
+                this.gameStarted = true;
+            }
             if (time > 0) {
                 let timerId = setInterval(() => {
                     if (this.gameState.currentPlayer === "White") {
@@ -1231,27 +1242,18 @@ const activateEmitter = (game, gameMode, gameScene, socket) => {
     const emitter = new _event_emitter__WEBPACK_IMPORTED_MODULE_0__["default"]();
     emitter.on("playerMove", (originPoint, targetPoint) => {
         (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.renderScene)(game, gameScene);
-        if (gameMode.mode === "offline") {
-            if (typeof originPoint !== "undefined" &&
-                typeof targetPoint !== "undefined") {
-                const resolved = game.playerMove(originPoint, targetPoint);
-                if (resolved) {
-                    game.switchTurn();
-                    (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.renderScene)(game, gameScene);
-                    (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.rotateCamera)(game.state.currentPlayer, gameScene);
-                }
+        const resolved = game.playerMove(originPoint, targetPoint);
+        if (resolved) {
+            if (gameMode.mode === "offline") {
+                game.switchTurn();
+                (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.renderScene)(game, gameScene);
+                (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.rotateCamera)(game.state.currentPlayer, gameScene);
             }
-        }
-        else if (gameMode.mode === "online") {
-            if (typeof originPoint !== "undefined" &&
-                typeof targetPoint !== "undefined") {
-                const resolved = game.playerMove(originPoint, targetPoint);
-                if (resolved) {
-                    const room = gameMode.room;
-                    (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.renderScene)(game, gameScene);
-                    game.switchTurn();
-                    socket.emit("stateChange", { originPoint, targetPoint, room });
-                }
+            else if (gameMode.mode === "online") {
+                const room = gameMode.room;
+                (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.renderScene)(game, gameScene);
+                game.switchTurn();
+                socket.emit("stateChange", { originPoint, targetPoint, room });
             }
         }
         game.moves.length = 0;
@@ -1264,6 +1266,18 @@ const activateEmitter = (game, gameMode, gameScene, socket) => {
             let camera = gameScene.cameras[0];
             camera.alpha = Math.PI;
         }
+    });
+    //@ts-ignore
+    emitter.on("pause-game", (currentPlayer) => {
+        console.log("online pause game");
+        let time;
+        if (currentPlayer === "White") {
+            time = game.timer.timer1;
+        }
+        else {
+            time = game.timer.timer2;
+        }
+        socket.emit("pause-game", { gameMode, currentPlayer, time });
     });
     return emitter;
 };
@@ -1356,65 +1370,77 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../helper/canvas-helpers */ "./src/helper/canvas-helpers.ts");
 
 
-const inputController = (mesh, game, gameScene) => {
-    const currentMove = game.moves;
-    //If mesh
-    if (mesh) {
-        if (currentMove.length === 0) {
-            if (mesh.color === game.state.currentPlayer) {
-                //If no current move has been selected, and mesh belongs to current player
-                (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.displayPieceMoves)(mesh, currentMove, game, gameScene);
+const inputController = (mesh, game, gameScene, gameMode) => {
+    if (!game.timer.gamePaused) {
+        if (gameMode.mode === "online") {
+            if (gameMode.player === game.state.currentPlayer) {
+                return processMove();
             }
         }
-        else if (mesh.color === game.state.currentPlayer) {
-            //If there is already a mesh selected, and you select another of your own meshes
-            const originalPiece = game.lookupPiece(currentMove[0]);
-            const newPiece = game.lookupPiece((0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.findIndex)([mesh.position.z, mesh.position.x], true));
-            if (originalPiece === newPiece) {
-                //If both selected pieces are the same, reset current move
-                currentMove.length = 0;
-                (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.renderScene)(game, gameScene);
+        else {
+            return processMove();
+        }
+    }
+    function processMove() {
+        const currentMove = game.moves;
+        //If mesh
+        if (mesh) {
+            if (currentMove.length === 0) {
+                if (mesh.color === game.state.currentPlayer) {
+                    //If no current move has been selected, and mesh belongs to current player
+                    (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.displayPieceMoves)(mesh, currentMove, game, gameScene);
+                }
             }
-            else {
-                if (newPiece.name === "Rook" && originalPiece.name === "King") {
-                    //Checks for castling
-                    const isItCastling = game
-                        .calculateAvailableMoves(originalPiece, true)
-                        .filter((move) => (0,_helper_game_helpers__WEBPACK_IMPORTED_MODULE_0__.doMovesMatch)(move[0], newPiece.point));
-                    if (isItCastling.length > 0) {
-                        currentMove.push(newPiece.point);
+            else if (mesh.color === game.state.currentPlayer) {
+                //If there is already a mesh selected, and you select another of your own meshes
+                const originalPiece = game.lookupPiece(currentMove[0]);
+                const newPiece = game.lookupPiece((0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.findIndex)([mesh.position.z, mesh.position.x], true));
+                if (originalPiece === newPiece) {
+                    //If both selected pieces are the same, reset current move
+                    currentMove.length = 0;
+                    (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.renderScene)(game, gameScene);
+                }
+                else {
+                    if (newPiece.name === "Rook" && originalPiece.name === "King") {
+                        //Checks for castling
+                        const isItCastling = game
+                            .calculateAvailableMoves(originalPiece, true)
+                            .filter((move) => (0,_helper_game_helpers__WEBPACK_IMPORTED_MODULE_0__.doMovesMatch)(move[0], newPiece.point));
+                        if (isItCastling.length > 0) {
+                            currentMove.push(newPiece.point);
+                        }
+                        else {
+                            //If rook is selected second and not castling, show rooks moves
+                            currentMove.length = 0;
+                            (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.renderScene)(game, gameScene);
+                            (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.displayPieceMoves)(mesh, currentMove, game, gameScene);
+                        }
                     }
                     else {
-                        //If rook is selected second and not castling, show rooks moves
+                        //If second selected piece is not a castling piece
                         currentMove.length = 0;
                         (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.renderScene)(game, gameScene);
                         (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.displayPieceMoves)(mesh, currentMove, game, gameScene);
                     }
                 }
-                else {
-                    //If second selected piece is not a castling piece
-                    currentMove.length = 0;
-                    (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.renderScene)(game, gameScene);
-                    (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.displayPieceMoves)(mesh, currentMove, game, gameScene);
-                }
             }
+            else if (mesh.color && mesh.color !== game.state.currentPlayer) {
+                //If second selection is an enemy mesh, calculate move of original piece and push move if matches
+                const opponentsPiece = game.lookupPiece((0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.findIndex)([mesh.position.z, mesh.position.x], true));
+                const originalPiece = game.lookupPiece(currentMove[0]);
+                const isValidMove = game
+                    .calculateAvailableMoves(originalPiece, false)
+                    .find((move) => (0,_helper_game_helpers__WEBPACK_IMPORTED_MODULE_0__.doMovesMatch)(move[0], opponentsPiece.point));
+                isValidMove ? currentMove.push(opponentsPiece.point) : null;
+            }
+            else if (mesh.id === "plane") {
+                //If the second mesh selected is one of the movement squares
+                const point = (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.findIndex)([mesh.position.z, mesh.position.x], false);
+                currentMove.push(point);
+            }
+            //If complete move return true
+            return currentMove.length === 2 ? true : false;
         }
-        else if (mesh.color && mesh.color !== game.state.currentPlayer) {
-            //If second selection is an enemy mesh, calculate move of original piece and push move if matches
-            const opponentsPiece = game.lookupPiece((0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.findIndex)([mesh.position.z, mesh.position.x], true));
-            const originalPiece = game.lookupPiece(currentMove[0]);
-            const isValidMove = game
-                .calculateAvailableMoves(originalPiece, false)
-                .find((move) => (0,_helper_game_helpers__WEBPACK_IMPORTED_MODULE_0__.doMovesMatch)(move[0], opponentsPiece.point));
-            isValidMove ? currentMove.push(opponentsPiece.point) : null;
-        }
-        else if (mesh.id === "plane") {
-            //If the second mesh selected is one of the movement squares
-            const point = (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.findIndex)([mesh.position.z, mesh.position.x], false);
-            currentMove.push(point);
-        }
-        //If complete move return true
-        return currentMove.length === 2 ? true : false;
     }
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (inputController);
@@ -3146,7 +3172,18 @@ function setGUI(app) {
         resetCamera(game, gameScene);
     });
     pauseButton.addEventListener("click", () => {
-        game.timer.pauseTimer();
+        pauseButton.innerHTML === "Pause"
+            ? (pauseButton.innerHTML = "Paused")
+            : (pauseButton.innerHTML = "Pause");
+        if (gameMode.mode === "online") {
+            if (gameMode.player === game.state.currentPlayer) {
+                game.timer.pauseTimer();
+                emitter.emit("pause-game", game.state.currentPlayer);
+            }
+        }
+        else {
+            game.timer.pauseTimer();
+        }
     });
     const resetCamera = (game, gameScene) => {
         let camera = gameScene.cameras[0];
