@@ -703,6 +703,27 @@ class GamePiece {
             return (0,_helper_game_helpers__WEBPACK_IMPORTED_MODULE_0__.checkForPawnPromotion)(locationsInfo);
         }
     }
+    getSymbol() {
+        switch (this.name) {
+            case "King":
+                return "K";
+                break;
+            case "Queen":
+                return "Q";
+                break;
+            case "Knight":
+                return "N";
+                break;
+            case "Bishop":
+                return "B";
+                break;
+            case "Rook":
+                return "R";
+                break;
+            default:
+                return "";
+        }
+    }
 }
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (GamePiece);
 
@@ -859,6 +880,7 @@ const activateSocket = (game, gameMode, gameScene, startScene, showScene) => {
         (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.renderScene)(game, gameScene);
         (0,_view_gui_overlay__WEBPACK_IMPORTED_MODULE_2__.hideDisplay)();
         startScene.detachControl();
+        (0,_view_gui_overlay__WEBPACK_IMPORTED_MODULE_2__.resetCamera)(game, gameScene, gameMode);
         showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);
         console.log("game has been activated");
     });
@@ -873,7 +895,7 @@ const activateSocket = (game, gameMode, gameScene, startScene, showScene) => {
     });
     socket.on("reset-board-request", () => {
         const answer = confirm("Opponent has requested to reset the board, do you agree?");
-        let string = answer ? "Yes" : "No";
+        const string = answer ? "Yes" : "No";
         socket.emit("reset-board-response", { string, gameMode });
     });
     socket.on("reset-board-resolve", (response) => {
@@ -885,20 +907,20 @@ const activateSocket = (game, gameMode, gameScene, startScene, showScene) => {
             console.log("Request Denied");
         }
     });
-    // socket.on("draw-request", () => {
-    //   const answer = confirm("Opponent has offered a game Draw, do you accept?");
-    //   answer && socket.emit("draw-response", "Yes");
-    // });
-    // socket.on("draw-resolve", (response) => {
-    //   if (response === "Yes") {
-    //     game.resetGame();
-    //     renderScene(game, gameScene);
-    //   }
-    // });
-    // socket.on("resign-request", () => {
-    //   game.resetGame();
-    //   renderScene(game, gameScene);
-    // });
+    socket.on("undo-move-request", () => {
+        const answer = confirm("Opponent has requested to undo their last move, do you agree?");
+        const string = answer ? "Yes" : "No";
+        socket.emit("undo-move-response", { string, gameMode });
+    });
+    socket.on("undo-move-resolve", (response) => {
+        if (response === "Yes") {
+            game.undoTurn();
+            (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.renderScene)(game, gameScene);
+        }
+        else {
+            console.log("Request Denied");
+        }
+    });
     return socket;
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (activateSocket);
@@ -1239,6 +1261,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _event_emitter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./event-emitter */ "./src/events/event-emitter.ts");
 /* harmony import */ var _helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../helper/canvas-helpers */ "./src/helper/canvas-helpers.ts");
+/* harmony import */ var _view_gui_overlay__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../view/gui-overlay */ "./src/view/gui-overlay.ts");
+
 
 
 const activateEmitter = (game, gameMode, gameScene, socket) => {
@@ -1285,6 +1309,21 @@ const activateEmitter = (game, gameMode, gameScene, socket) => {
             time = game.timer.timer2;
         }
         socket.emit("pause-game", { gameMode, currentPlayer, time });
+    });
+    emitter.on("undo-move", () => {
+        if (gameMode.mode === "online") {
+            if (gameMode.player !== game.state.currentPlayer) {
+                const lastTurn = game.turnHistory.at(-1);
+                if (lastTurn !== undefined) {
+                    socket.emit("undo-move", gameMode);
+                }
+            }
+        }
+        else {
+            game.undoTurn();
+            (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_1__.renderScene)(game, gameScene);
+            (0,_view_gui_overlay__WEBPACK_IMPORTED_MODULE_2__.resetCamera)(game, gameScene, gameMode);
+        }
     });
     return emitter;
 };
@@ -1875,32 +1914,14 @@ class Game {
         }, 1000);
     }
     annotate(result) {
+        var _a;
         let finalString;
-        let symbol;
         const type = result.type;
         const promotion = result.promotion;
         const pieceName = result.originPiece.name;
         const square = result.targetSquare.square;
         const isCapturing = result.targetPiece !== undefined ? true : false;
-        switch (pieceName) {
-            case "King":
-                symbol = "K";
-                break;
-            case "Queen":
-                symbol = "Q";
-                break;
-            case "Knight":
-                symbol = "N";
-                break;
-            case "Bishop":
-                symbol = "B";
-                break;
-            case "Rook":
-                symbol = "R";
-                break;
-            default:
-                symbol = "";
-        }
+        const symbol = (_a = result.originPiece) === null || _a === void 0 ? void 0 : _a.getSymbol();
         if (type === "castling") {
             finalString = result.direction === 1 ? "O-O" : "O-O-O";
         }
@@ -3008,7 +3029,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "setGUI": () => (/* binding */ setGUI),
 /* harmony export */   "hideDisplay": () => (/* binding */ hideDisplay),
-/* harmony export */   "showDisplay": () => (/* binding */ showDisplay)
+/* harmony export */   "showDisplay": () => (/* binding */ showDisplay),
+/* harmony export */   "resetCamera": () => (/* binding */ resetCamera)
 /* harmony export */ });
 /* harmony import */ var _helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../helper/canvas-helpers */ "./src/helper/canvas-helpers.ts");
 /* harmony import */ var _assets_x_png__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../assets/x.png */ "./assets/x.png");
@@ -3171,12 +3193,10 @@ function setGUI(app) {
         emitter.emit("reset-board");
     });
     resetCameraButton.addEventListener("click", () => {
-        resetCamera(game, gameScene);
+        resetCamera(game, gameScene, gameMode);
     });
     undoMoveButton.addEventListener("click", () => {
-        game.undoTurn();
-        (0,_helper_canvas_helpers__WEBPACK_IMPORTED_MODULE_0__.renderScene)(game, gameScene);
-        resetCamera(game, gameScene);
+        emitter === null || emitter === void 0 ? void 0 : emitter.emit("undo-move");
     });
     pauseButton.addEventListener("click", () => {
         pauseButton.innerHTML === "Pause"
@@ -3192,20 +3212,28 @@ function setGUI(app) {
             game.timer.pauseTimer();
         }
     });
-    const resetCamera = (game, gameScene) => {
-        let camera = gameScene.cameras[0];
-        if (game.state.currentPlayer === "Black") {
-            camera.alpha = 0;
-            camera.beta = Math.PI / 4;
-            camera.radius = 35;
-        }
-        else {
-            camera.alpha = Math.PI;
-            camera.beta = Math.PI / 4;
-            camera.radius = 35;
-        }
-    };
 }
+const resetCamera = (game, gameScene, gameMode) => {
+    let camera = gameScene.cameras[0];
+    if (gameMode.mode === "online") {
+        gameMode.player === "White" ? setToWhitePlayer() : setToBlackPlayer();
+    }
+    else {
+        game.state.currentPlayer === "White"
+            ? setToWhitePlayer()
+            : setToBlackPlayer();
+    }
+    function setToWhitePlayer() {
+        camera.alpha = Math.PI;
+        camera.beta = Math.PI / 4;
+        camera.radius = 40;
+    }
+    function setToBlackPlayer() {
+        camera.alpha = 0;
+        camera.beta = Math.PI / 4;
+        camera.radius = 60;
+    }
+};
 const hideDisplay = () => {
     startOGButton.style.display = "none";
     createOnlineMatch.style.display = "none";
