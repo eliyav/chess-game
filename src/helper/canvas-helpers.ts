@@ -1,8 +1,8 @@
-import Game from "../game";
+import Game from "../component/game/game";
 import { Material } from "babylonjs/Materials/material";
 import { CustomScene } from "../view/start-screen";
 import { ChessPieceMesh } from "../view/asset-loader";
-import { Move } from "../component/game-piece";
+import { Move } from "../component/game/game-piece";
 
 const renderScene = (game: Game, gameScene: CustomScene) => {
   //Clears old meshes/memory usage

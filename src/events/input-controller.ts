@@ -4,10 +4,10 @@ import {
   findIndex,
   displayPieceMoves,
 } from "../helper/canvas-helpers";
-import Game from "../game";
+import Game from "../component/game/game";
 import { CustomScene } from "../view/start-screen";
 import { ChessPieceMesh } from "../view/asset-loader";
-import { GameMode } from "./emitter";
+import { GameMode } from "../app";
 
 const inputController = (
   mesh: ChessPieceMesh,

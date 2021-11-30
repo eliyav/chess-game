@@ -1,25 +1,20 @@
 import EventEmitter from "./event-emitter";
 import { renderScene, rotateCamera } from "../helper/canvas-helpers";
-import Game from "../game";
-import { CustomScene } from "../view/start-screen";
 import { resetCamera } from "../view/gui-overlay";
+import { App } from "../app";
 
-export type GameMode = {
-  mode: string | undefined;
-  player: string | undefined;
-  room: string | undefined;
-  time: number | undefined;
-};
+const activateEmitter = (app: App): EventEmitter => {
+  const {
+    game,
+    gameMode,
+    showScene,
+    socket,
+    scenes: { startScene, gameScene },
+  } = app;
 
-const activateEmitter = (
-  game: Game,
-  gameMode: GameMode,
-  gameScene: CustomScene,
-  socket: any
-): EventEmitter => {
   const emitter = new EventEmitter();
 
-  emitter.on("playerMove", (originPoint, targetPoint) => {
+  emitter.on("playerMove", (originPoint: Point, targetPoint: Point) => {
     renderScene(game, gameScene);
     const resolved = game.playerMove(originPoint!, targetPoint!);
     if (resolved) {
@@ -75,6 +70,14 @@ const activateEmitter = (
       renderScene(game, gameScene);
       resetCamera(game, gameScene, gameMode);
     }
+  });
+
+  emitter.on("start-match", (mode: string) => {
+    gameMode.mode = mode;
+    game.resetGame(gameMode.time);
+    renderScene(game, gameScene);
+    startScene.detachControl();
+    showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);
   });
 
   return emitter;

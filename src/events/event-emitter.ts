@@ -1,3 +1,4 @@
+//@ts-nocheck
 class EventEmitter {
   listeners: any;
 
@@ -5,17 +6,17 @@ class EventEmitter {
     this.listeners = {};
   }
 
-  addListener(event: string, fn: () => void) {
+  addListener(event, fn) {
     this.listeners[event] = this.listeners[event] || [];
     this.listeners[event].push(fn);
     return this;
   }
 
-  on(event: string, fn: (originPoint?: Point, targetPoint?: Point) => void) {
+  on(event, fn) {
     return this.addListener(event, fn);
   }
 
-  removeListener(event: string, fn: () => void) {
+  removeListener(event, fn) {
     let lis = this.listeners[event];
     if (!lis) return this;
     for (let i = lis.length; i > 0; i--) {
@@ -27,11 +28,11 @@ class EventEmitter {
     return this;
   }
 
-  off(event: string, fn: () => void) {
+  off(event, fn) {
     return this.removeListener(event, fn);
   }
 
-  once(event: string, fn: () => void) {
+  once(event, fn) {
     this.listeners[event] = this.listeners[event] || [];
     const onceWrapper = () => {
       fn();
@@ -41,21 +42,21 @@ class EventEmitter {
     return this;
   }
 
-  emit(event: string, ...args: any) {
+  emit(event, ...args) {
     let fns = this.listeners[event];
     if (!fns) return false;
-    fns.forEach((f: any) => {
+    fns.forEach((f) => {
       f(...args);
     });
     return true;
   }
 
-  listenerCount(event: string) {
+  listenerCount(event) {
     let fns = this.listeners[event] || [];
     return fns.length;
   }
 
-  rawListeners(event: string) {
+  rawListeners(event) {
     return this.listeners[event];
   }
 }

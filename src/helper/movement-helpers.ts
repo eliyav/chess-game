@@ -4,7 +4,7 @@ import {
   doMovesMatch,
 } from "./game-helpers";
 import { Square } from "./board-helpers";
-import GamePiece, { Move } from "../component/game-piece";
+import GamePiece, { Move } from "../component/game/game-piece";
 
 type MovesObj = {
   up?: Point[];

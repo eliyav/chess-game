@@ -2,8 +2,11 @@ import "babylonjs-loaders";
 import * as BABYLON from "babylonjs";
 import initializeApp from "./app";
 import { Engine } from "babylonjs/Engines/engine";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./index.css";
+import Button from "./component/button";
+import SideNAV from "./component/side-nav";
+import EventEmitter from "./events/event-emitter";
 
 interface Props {}
 
@@ -21,7 +24,10 @@ const Main: React.FC<Props> = () => {
       const {
         showScene,
         scenes: { startScene, gameScene },
+        emitter,
       } = app;
+
+      setEmitter(() => emitter);
 
       (() => {
         engine.runRenderLoop(function () {
@@ -43,11 +49,20 @@ const Main: React.FC<Props> = () => {
     }
 
     Load();
-  });
+  }, []);
+
+  const [emitter, setEmitter] = useState<EventEmitter>();
+
+  const buttonHandler = () => {
+    const sidebar = document.getElementById("mySidenav") as HTMLDivElement;
+    sidebar.style.width = "250px";
+  };
 
   return (
     <div className="app">
       <canvas id="renderCanvas" touch-action="none"></canvas>
+      <Button text="Play" handler={buttonHandler} />
+      <SideNAV emitter={emitter} />;
     </div>
   );
 };

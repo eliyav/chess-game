@@ -1,10 +1,9 @@
-import Game from "../game";
+import Game from "../component/game/game";
 import { io } from "socket.io-client";
 import { renderScene } from "../helper/canvas-helpers";
 import { CustomScene } from "../view/start-screen";
-import { hideDisplay, resetCamera } from "../view/gui-overlay";
-import { GameMode } from "../events/emitter";
-import { SubEmitter } from "babylonjs/Particles/subEmitter";
+import { resetCamera } from "../view/gui-overlay";
+import { GameMode } from "../app";
 
 const activateSocket = (
   game: Game,
@@ -69,7 +68,6 @@ const activateSocket = (
     // Activate Game Settings
     game.resetGame(gameMode.time);
     renderScene(game, gameScene);
-    hideDisplay();
     startScene.detachControl();
     resetCamera(game, gameScene, gameMode);
     showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);

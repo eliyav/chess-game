@@ -1,12 +1,9 @@
 import { App } from "../app";
-import Game from "../game";
-import { renderScene } from "../helper/canvas-helpers";
+import Game from "../component/game/game";
 import { CustomScene } from "./start-screen";
 import x from "../../assets/x.png";
-import { GameMode } from "../events/emitter";
+import { GameMode } from "../app";
 
-const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
-const gameOverlay = document.getElementById("gameOverlay") as HTMLDivElement;
 const homeButton = document.getElementById("home") as HTMLButtonElement;
 const startOGButton = document.getElementById("startOG") as HTMLButtonElement;
 const createOnlineMatch = document.getElementById(
@@ -38,18 +35,10 @@ function setGUI(app: App) {
   homeButton.addEventListener("click", () => {
     camera.alpha = Math.PI;
     gameScene.detachControl();
-    showDisplay();
     showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);
   });
 
-  startOGButton.addEventListener("click", () => {
-    gameMode.mode = "offline";
-    game.resetGame();
-    renderScene(game, gameScene);
-    hideDisplay();
-    startScene.detachControl();
-    showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);
-  });
+  startOGButton.addEventListener("click", () => {});
 
   createOnlineMatch.addEventListener("click", () => {
     createGameOptionsScreen();
@@ -243,18 +232,4 @@ const resetCamera = (
   }
 };
 
-const hideDisplay = () => {
-  startOGButton.style.display = "none";
-  createOnlineMatch.style.display = "none";
-  joinOnlineMatch.style.display = "none";
-  gameOverlay.style.display = "unset";
-};
-
-const showDisplay = () => {
-  gameOverlay.style.display = "none";
-  startOGButton.style.display = "unset";
-  createOnlineMatch.style.display = "unset";
-  joinOnlineMatch.style.display = "unset";
-};
-
-export { setGUI, hideDisplay, showDisplay, resetCamera };
+export { setGUI, resetCamera };

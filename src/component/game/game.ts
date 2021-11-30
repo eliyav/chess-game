@@ -1,15 +1,15 @@
-import * as gameHelpers from "./helper/game-helpers";
-import * as movementHelpers from "./helper/movement-helpers";
-import { setPieces, createGrid, Square } from "./helper/board-helpers";
+import * as gameHelpers from "../../helper/game-helpers";
+import * as movementHelpers from "../../helper/movement-helpers";
+import { setPieces, createGrid, Square } from "../../helper/board-helpers";
 import {
   TurnHistory,
   LocationsInfo,
   undoUpdateLocation,
-} from "./helper/game-helpers";
-import Board from "./component/board";
-import { Data, State } from "./data/chess-data-import";
-import Timer from "./component/timer";
-import GamePiece, { Move } from "./component/game-piece";
+} from "../../helper/game-helpers";
+import Board from "./board";
+import { Data, State } from "../../data/chess-data-import";
+import Timer from "./timer";
+import GamePiece, { Move } from "./game-piece";
 
 class Game {
   state: State;

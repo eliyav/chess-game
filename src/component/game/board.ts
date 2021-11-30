@@ -1,5 +1,5 @@
-import { createGrid, Square } from "../helper/board-helpers";
-import {Data, PieceInitialPoints} from "../data/chess-data-import"
+import { createGrid, Square } from "../../helper/board-helpers";
+import {Data, PieceInitialPoints} from "../../data/chess-data-import"
 
 class Board {
   movementArray: number[];

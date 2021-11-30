@@ -8,7 +8,7 @@ import knight from "../../assets/pieces/knightv3.gltf";
 import rook from "../../assets/pieces/rookv3.gltf";
 import pawn from "../../assets/pieces/pawnv3.gltf";
 import moon from "../../assets/moon.jpg";
-import { createMeshMaterials } from "../component/materials";
+import { createMeshMaterials } from "./materials";
 import { Scene } from "babylonjs/scene";
 import { ISceneLoaderAsyncResult } from "babylonjs/Loading/sceneLoader";
 import { AbstractMesh } from "babylonjs/Meshes/abstractMesh";

@@ -1,27 +1,13 @@
 import { Engine, Scene } from "babylonjs";
 import { renderScene } from "./helper/canvas-helpers";
-import Game from "./game";
+import Game from "./component/game/game";
 import chessData from "./data/chess-data-import";
 import startScreen from "./view/start-screen";
 import gameScreen from "./view/game-screen";
-import activateEmitter, { GameMode } from "./events/emitter";
-import { setGUI } from "./view/gui-overlay";
+import activateEmitter from "./events/emitter";
 import inputController from "./events/input-controller";
 import EventEmitter from "./events/event-emitter";
 import { ChessPieceMesh } from "./view/asset-loader";
-import activateSocket from "./component/sockets";
-
-export interface App {
-  game: Game;
-  gameMode: GameMode;
-  showScene: { index: number };
-  scenes: {
-    startScene: Scene;
-    gameScene: Scene;
-  };
-  emitter?: EventEmitter;
-  socket?: any;
-}
 
 const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
   const app: App = {
@@ -48,9 +34,8 @@ const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
     scenes: { startScene, gameScene },
   } = app;
 
-  app.socket = activateSocket(game, gameMode, gameScene, startScene, showScene);
-  app.emitter = activateEmitter(game, gameMode, gameScene, app.socket);
-  // setGUI(app);
+  // app.socket = activateSocket(game, gameMode, gameScene, startScene, showScene);
+  app.emitter = activateEmitter(app);
   renderScene(game, gameScene);
 
   gameScene.onPointerDown = async (e: any, pickResult: any) => {
@@ -68,11 +53,10 @@ const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
           : null;
       }
     }
-    if (
-      gameMode.mode === "online" &&
-      gameMode.player === game.state.currentPlayer
-    ) {
-      onClickEvent();
+    if (gameMode.mode === "online") {
+      if (gameMode.player === game.state.currentPlayer) {
+        onClickEvent();
+      }
     } else {
       onClickEvent();
     }
@@ -82,3 +66,22 @@ const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
 };
 
 export default initializeApp;
+
+export interface App {
+  game: Game;
+  gameMode: GameMode;
+  showScene: { index: number };
+  scenes: {
+    startScene: Scene;
+    gameScene: Scene;
+  };
+  emitter?: EventEmitter;
+  socket?: any;
+}
+
+export type GameMode = {
+  mode: string | undefined;
+  player: string | undefined;
+  room: string | undefined;
+  time: number | undefined;
+};

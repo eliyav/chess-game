@@ -1,4 +1,4 @@
-import { State } from "../data/chess-data-import";
+import { State } from "../../data/chess-data-import";
 import whiteAvatar from "../../assets/white-player.png";
 import blackAvatar from "../../assets/black-player.png";
 
@@ -34,8 +34,8 @@ class Timer {
     setTimeout(() => {
       this.timer1 = time / 2;
       this.timer2 = time / 2;
-      timer1.innerText = this.timer1.toString();
-      timer2.innerText = this.timer2.toString();
+      // timer1.innerText = this.timer1.toString();
+      // timer2.innerText = this.timer2.toString();
       this.gamePaused = false;
     }, 1000);
   };
