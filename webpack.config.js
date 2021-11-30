@@ -5,7 +5,7 @@ const CompressionPlugin = require("compression-webpack-plugin");
 /** @type {import("webpack").Configuration} */
 module.exports = {
   mode: "development",
-  entry: "./src/main.ts",
+  entry: "./src/index.tsx",
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".json"],
   },
@@ -40,6 +40,9 @@ module.exports = {
     ],
   },
   devtool: "source-map",
+  output: {
+    clean: true,
+  },
   //cache: { type: "filesystem" },
   //   devServer: {
   //     proxy: {

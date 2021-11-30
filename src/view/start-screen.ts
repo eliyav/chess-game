@@ -12,7 +12,7 @@ const startScreen = async (engine: Engine): Promise<CustomScene> => {
     "camera",
     Math.PI / 1,
     Math.PI / 3.5,
-    30,
+    33,
     new BABYLON.Vector3(0, 0, 0),
     scene
   );

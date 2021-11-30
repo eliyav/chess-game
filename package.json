@@ -19,11 +19,15 @@
     "babylonjs": "^4.2.0",
     "babylonjs-loaders": "^4.2.0",
     "express": "^4.17.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "socket.io": "^4.4.0",
     "socket.io-client": "^4.4.0"
   },
   "devDependencies": {
     "@types/node": "^16.11.10",
+    "@types/react": "^17.0.37",
+    "@types/react-dom": "^17.0.11",
     "@types/webpack": "^5.28.0",
     "compression": "^1.7.4",
     "compression-webpack-plugin": "^9.0.1",

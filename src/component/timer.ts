@@ -4,10 +4,10 @@ import blackAvatar from "../../assets/black-player.png";
 
 const timer1 = document.getElementById("timer1") as HTMLDivElement;
 const timer2 = document.getElementById("timer2") as HTMLDivElement;
-const avatar1 = document.getElementById("avatar1") as HTMLImageElement;
-avatar1.src = whiteAvatar;
-const avatar2 = document.getElementById("avatar2") as HTMLImageElement;
-avatar2.src = blackAvatar;
+// const avatar1 = document.getElementById("avatar1") as HTMLImageElement;
+// avatar1.src = whiteAvatar;
+// const avatar2 = document.getElementById("avatar2") as HTMLImageElement;
+// avatar2.src = blackAvatar;
 
 interface Timer {
   gameState: State;

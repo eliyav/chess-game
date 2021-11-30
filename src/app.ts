@@ -50,7 +50,7 @@ const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
 
   app.socket = activateSocket(game, gameMode, gameScene, startScene, showScene);
   app.emitter = activateEmitter(game, gameMode, gameScene, app.socket);
-  setGUI(app);
+  // setGUI(app);
   renderScene(game, gameScene);
 
   gameScene.onPointerDown = async (e: any, pickResult: any) => {
