@@ -5,23 +5,53 @@ import { App } from "./component/app";
 import SideNAV from "./component/side-nav";
 import Chess from "./component/chess";
 import LoadingScreen from "./component/loading-screen";
+import GameOverlay from "./component/game-overlay";
 
 interface Props {}
 
 const Main: React.FC<Props> = () => {
   const playBtnRef = useRef<HTMLButtonElement>(null);
-  const [chessLoaded, setChessLoaded] = useState(false);
+  const [isChessLoaded, setIsChessLoaded] = useState(false);
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
+  const [isGameScreen, setIsGameScreen] = useState(false);
 
   const chessRef = useRef<App>();
 
-  const handlerTest = (e: any) => {
-    console.log(e);
-    console.log(e.target.classList.value);
-    console.log(e.currentTarget);
+  const navbarSelection = (e: any) => {
+    const choice = e.target.innerText;
+    setIsNavbarOpen(false);
+    if (choice === "Start Offline") {
+      playBtnRef.current?.classList.add("hide");
+      chessRef.current?.emitter!.emit("start-match", "offline");
+      setIsGameScreen(true);
+    }
   };
-  const intro = (
+
+  const overlaySelection = (e: any) => {
+    const choice = e.target.innerText;
+    if (choice === "Restart") {
+      chessRef.current?.emitter!.emit("reset-board");
+    } else if (choice === "Undo") {
+      chessRef.current?.emitter!.emit("undo-move");
+    } else if (choice === "Camera") {
+      chessRef.current?.emitter!.emit("reset-camera");
+    } else if (choice === "Home") {
+      const confirm = window.confirm(
+        "Are you sure you would like to abandon the game?"
+      );
+      if (confirm) {
+        setIsGameScreen(false);
+        chessRef.current?.emitter!.emit("home-screen");
+        playBtnRef.current?.classList.remove("hide");
+      }
+    }
+  };
+
+  const display = (
     <>
+      {isGameScreen ? (
+        <GameOverlay selectionHandler={overlaySelection} />
+      ) : null}
       <button
         id="playButton"
         ref={playBtnRef}
@@ -36,15 +66,15 @@ const Main: React.FC<Props> = () => {
       <SideNAV
         isOpen={isNavbarOpen}
         setIsOpen={setIsNavbarOpen}
-        handler={handlerTest}
+        selectionHandler={navbarSelection}
       />
     </>
   );
-  console.log(playBtnRef);
+
   return (
     <div className="app">
-      {chessLoaded ? intro : <LoadingScreen />}
-      <Chess ref={chessRef} setLoaded={setChessLoaded} />
+      {isChessLoaded ? display : <LoadingScreen />}
+      <Chess ref={chessRef} setLoaded={setIsChessLoaded} />
     </div>
   );
 };

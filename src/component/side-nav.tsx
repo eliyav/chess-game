@@ -1,25 +1,20 @@
-import React from "react";
+import React, { useRef } from "react";
 import "./side-nav.css";
 
 interface Props {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  handler: (e: any) => void;
+  selectionHandler: (e: any) => void;
 }
 
-const SideNAV: React.FC<Props> = ({ isOpen, setIsOpen, handler }) => {
-  const navbarClassName = isOpen === false ? "closed" : "open";
-
-  function startOfflineHandler() {
-    // emitter!.emit("start-match", "offline");
-  }
+const SideNAV: React.FC<Props> = ({ isOpen, setIsOpen, selectionHandler }) => {
+  const navbarRef = useRef<HTMLDivElement>(null);
+  isOpen === true
+    ? navbarRef.current?.classList.add("open")
+    : navbarRef.current?.classList.remove("open");
 
   return (
-    <div
-      id="mySidenav"
-      className={"sidenav " + navbarClassName}
-      onClick={handler}
-    >
+    <div ref={navbarRef} className={"sidenav"} onClick={selectionHandler}>
       <a
         className="closebtn"
         onClick={() => {
@@ -29,7 +24,7 @@ const SideNAV: React.FC<Props> = ({ isOpen, setIsOpen, handler }) => {
         &times;
       </a>
       <div className="category">Matches</div>
-      <a className={"test"}>Start Offline</a>
+      <a>Start Offline</a>
       <a>Create Online</a>
       <a>Join Online</a>
     </div>

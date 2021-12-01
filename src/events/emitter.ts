@@ -1,6 +1,5 @@
 import EventEmitter from "./event-emitter";
 import { renderScene, rotateCamera } from "../helper/canvas-helpers";
-import { resetCamera } from "../view/gui-overlay";
 import { App } from "../component/app";
 
 const activateEmitter = (app: App): EventEmitter => {
@@ -38,7 +37,7 @@ const activateEmitter = (app: App): EventEmitter => {
       if (gameMode.mode === "online") {
         socket.emit("reset-board", gameMode);
       } else {
-        game.resetGame();
+        game.resetGame(gameMode.time);
         renderScene(game, gameScene);
         let camera: any = gameScene.cameras[0];
         camera.alpha = Math.PI;
@@ -46,7 +45,6 @@ const activateEmitter = (app: App): EventEmitter => {
     }
   });
 
-  //@ts-ignore
   emitter.on("pause-game", (currentPlayer: string) => {
     let time;
     if (currentPlayer === "White") {
@@ -68,7 +66,7 @@ const activateEmitter = (app: App): EventEmitter => {
     } else {
       game.undoTurn();
       renderScene(game, gameScene);
-      resetCamera(game, gameScene, gameMode);
+      emitter.emit("reset-camera");
     }
   });
 
@@ -77,8 +75,58 @@ const activateEmitter = (app: App): EventEmitter => {
     game.resetGame(gameMode.time);
     renderScene(game, gameScene);
     startScene.detachControl();
-    showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);
+    showScene.index = 1;
   });
+
+  emitter.on("reset-camera", () => {
+    let camera: any = gameScene.cameras[0];
+    if (gameMode.mode === "online") {
+      gameMode.player === "White" ? setToWhitePlayer() : setToBlackPlayer();
+    } else {
+      game.state.currentPlayer === "White"
+        ? setToWhitePlayer()
+        : setToBlackPlayer();
+    }
+
+    function setToWhitePlayer() {
+      camera.alpha = Math.PI;
+      camera.beta = Math.PI / 4;
+      camera.radius = 40;
+    }
+
+    function setToBlackPlayer() {
+      camera.alpha = 0;
+      camera.beta = Math.PI / 4;
+      camera.radius = 60;
+    }
+  });
+
+  emitter.on("home-screen", () => {
+    let camera: any = gameScene.cameras[0];
+    camera.alpha = Math.PI;
+    gameScene.detachControl();
+    showScene.index = 0;
+  });
+
+  // joinOnlineMatch.addEventListener("click", () => {
+  //   gameMode.mode = "online";
+  //   let room = prompt("Please enter the room key");
+  //   socket.emit("join-room", room);
+  // });
+
+  // pauseButton.addEventListener("click", () => {
+  //   pauseButton.innerHTML === "Pause"
+  //     ? (pauseButton.innerHTML = "Paused")
+  //     : (pauseButton.innerHTML = "Pause");
+  //   if (gameMode.mode === "online") {
+  //     if (gameMode.player === game.state.currentPlayer) {
+  //       game.timer.pauseTimer();
+  //       emitter!.emit("pause-game", game.state.currentPlayer);
+  //     }
+  //   } else {
+  //     game.timer.pauseTimer();
+  //   }
+  // });
 
   return emitter;
 };
