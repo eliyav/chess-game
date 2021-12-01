@@ -7,7 +7,7 @@ import {
 import Game from "../component/game/game";
 import { CustomScene } from "../view/start-screen";
 import { ChessPieceMesh } from "../view/asset-loader";
-import { GameMode } from "../app";
+import { GameMode } from "../component/app";
 
 const inputController = (
   mesh: ChessPieceMesh,

@@ -1,13 +1,13 @@
 import { Engine, Scene } from "babylonjs";
-import { renderScene } from "./helper/canvas-helpers";
-import Game from "./component/game/game";
-import chessData from "./data/chess-data-import";
-import startScreen from "./view/start-screen";
-import gameScreen from "./view/game-screen";
-import activateEmitter from "./events/emitter";
-import inputController from "./events/input-controller";
-import EventEmitter from "./events/event-emitter";
-import { ChessPieceMesh } from "./view/asset-loader";
+import { renderScene } from "../helper/canvas-helpers";
+import Game from "./game/game";
+import chessData from "../data/chess-data-import";
+import startScreen from "../view/start-screen";
+import gameScreen from "../view/game-screen";
+import activateEmitter from "../events/emitter";
+import inputController from "../events/input-controller";
+import EventEmitter from "../events/event-emitter";
+import { ChessPieceMesh } from "../view/asset-loader";
 
 const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
   const app: App = {

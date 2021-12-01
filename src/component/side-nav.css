@@ -33,3 +33,7 @@ div.category {
   border-bottom: 1mm outset whitesmoke;
   text-align: center;
 }
+
+.open {
+  width: 250px;
+}

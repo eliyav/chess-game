@@ -1,94 +1,52 @@
 import "babylonjs-loaders";
-import * as BABYLON from "babylonjs";
-import initializeApp from "./app";
-import { Engine } from "babylonjs/Engines/engine";
-import React, { useEffect, useState } from "react";
 import "./index.css";
-import Button from "./component/button";
+import React, { useState, useEffect, useRef } from "react";
+import { App } from "./component/app";
 import SideNAV from "./component/side-nav";
-import EventEmitter from "./events/event-emitter";
+import Chess from "./component/chess";
+import LoadingScreen from "./component/loading-screen";
 
 interface Props {}
 
 const Main: React.FC<Props> = () => {
-  useEffect(() => {
-    async function Load() {
-      const canvas = document.getElementById(
-        "renderCanvas"
-      ) as HTMLCanvasElement;
-      // const loadingDiv = document.getElementById("loading") as HTMLDivElement;
+  const playBtnRef = useRef<HTMLButtonElement>(null);
+  const [chessLoaded, setChessLoaded] = useState(false);
+  const [isNavbarOpen, setIsNavbarOpen] = useState(false);
 
-      let engine: Engine = new BABYLON.Engine(canvas, true);
-      const app = await initializeApp(canvas, engine);
+  const chessRef = useRef<App>();
 
-      const {
-        showScene,
-        scenes: { startScene, gameScene },
-        emitter,
-      } = app;
-
-      setEmitter(() => emitter);
-
-      (() => {
-        engine.runRenderLoop(function () {
-          switch (showScene.index) {
-            case 0:
-              gameScene.detachControl();
-              startScene.attachControl();
-              startScene.render();
-              break;
-            case 1:
-              gameScene.attachControl();
-              gameScene.render();
-              break;
-            default:
-              break;
-          }
-        });
-      })();
-    }
-
-    Load();
-  }, []);
-
-  const [emitter, setEmitter] = useState<EventEmitter>();
-
-  const buttonHandler = () => {
-    const sidebar = document.getElementById("mySidenav") as HTMLDivElement;
-    sidebar.style.width = "250px";
+  const handlerTest = (e: any) => {
+    console.log(e);
+    console.log(e.target.classList.value);
+    console.log(e.currentTarget);
   };
-
+  const intro = (
+    <>
+      <button
+        id="playButton"
+        ref={playBtnRef}
+        onClick={() => {
+          isNavbarOpen === false
+            ? setIsNavbarOpen(true)
+            : setIsNavbarOpen(false);
+        }}
+      >
+        Play
+      </button>
+      <SideNAV
+        isOpen={isNavbarOpen}
+        setIsOpen={setIsNavbarOpen}
+        handler={handlerTest}
+      />
+    </>
+  );
+  console.log(playBtnRef);
   return (
     <div className="app">
-      <canvas id="renderCanvas" touch-action="none"></canvas>
-      <Button text="Play" handler={buttonHandler} />
-      <SideNAV emitter={emitter} />;
+      {chessLoaded ? intro : <LoadingScreen />}
+      <Chess ref={chessRef} setLoaded={setChessLoaded} />
     </div>
   );
 };
 
 export default Main;
-
-// const refreshCanvas = () => {
-//   let startSceneCamera: any = startScene.cameras[0];
-//   let gameSceneCamera: any = gameScene.cameras[0];
-//   if (canvas.width < 768) {
-//     startSceneCamera.radius = 32;
-//     gameSceneCamera.radius = 65;
-//   } else {
-//     startSceneCamera.radius = 30;
-//     gameSceneCamera.radius = 45;
-//   }
-//   engine.resize();
-// };
-
-// const loadingEnd = () => {
-//   refreshCanvas();
-//   setTimeout(() => {
-//     loadingDiv.style.display = "none";
-//   }, 1000);
-// };
-
-// loadingEnd();
-
-// window.onresize = refreshCanvas;

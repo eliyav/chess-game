@@ -1,7 +1,7 @@
 import EventEmitter from "./event-emitter";
 import { renderScene, rotateCamera } from "../helper/canvas-helpers";
 import { resetCamera } from "../view/gui-overlay";
-import { App } from "../app";
+import { App } from "../component/app";
 
 const activateEmitter = (app: App): EventEmitter => {
   const {

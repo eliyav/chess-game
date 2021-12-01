@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 import { renderScene } from "../helper/canvas-helpers";
 import { CustomScene } from "../view/start-screen";
 import { resetCamera } from "../view/gui-overlay";
-import { GameMode } from "../app";
+import { GameMode } from "../component/app";
 
 const activateSocket = (
   game: Game,
