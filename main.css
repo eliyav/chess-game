@@ -5,6 +5,123 @@
   margin: 0;
 }
 
+.app {
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  z-index: 1;
+}
+
+canvas {
+  height: 100%;
+  width: 100%;
+}
+
+.hide {
+  display: none;
+}
+
+#playButton {
+  position: absolute;
+  z-index: 1;
+  top: 64vh;
+  left: 50vw;
+  width: 200px;
+  height: 50px;
+  background-color: transparent;
+  color: white;
+  font-size: larger;
+  font-weight: bolder;
+  border: 1mm ridge whitesmoke;
+  transform: translateX(-50%);
+}
+
+#playButton:hover {
+  color: blue;
+  background-color: whitesmoke;
+}
+
+/* Game Options Modal */
+#gameOptionsScreen {
+  position: absolute;
+  display: inline;
+  height: 100px;
+  width: 100px;
+  z-index: 3;
+  background-image: url(12a515cf977bfbfdac69.png);
+  background-position: center;
+  background-size: cover;
+  text-align: center;
+  font-family: fantasy;
+}
+
+#gameOptionsTitle {
+  font-size: larger;
+  background-color: red;
+}
+
+#gameOptionsTeamsText {
+  background-color: rgba(255, 0, 0, 0.5);
+}
+
+#gameOptionsTimerText {
+  background-color: rgba(255, 0, 0, 0.5);
+}
+
+#gameOptionsInviteCode {
+  background-color: rgba(255, 0, 0, 0.5);
+}
+
+#gameOptionsInviteCode > p {
+  background-color: rgba(251, 255, 0, 0.835);
+}
+
+/*!******************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./src/component/side-nav.css ***!
+  \******************************************************************************/
+.sidenav {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 2;
+  left: 0;
+  background-color: #111;
+  overflow-x: hidden;
+  transition: 0.5s;
+}
+
+.sidenav a {
+  display: block;
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 1.5rem;
+  color: #818181;
+}
+
+.sidenav a:hover {
+  color: #f1f1f1;
+}
+
+.sidenav .closebtn {
+  display: block;
+  top: 0;
+  font-size: 2.25rem;
+  margin-left: 65%;
+}
+
+div.category {
+  color: white;
+  border-bottom: 1mm outset whitesmoke;
+  text-align: center;
+}
+
+.open {
+  width: 250px;
+}
+
+/*!************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./src/component/loading-screen.css ***!
+  \************************************************************************************/
 #loading {
   height: 100vh;
   width: 100vw;
@@ -34,211 +151,42 @@
   }
 }
 
-.app {
-  height: 100vh;
-  width: 100vw;
-  position: fixed;
+/*!**********************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./src/component/game-overlay.css ***!
+  \**********************************************************************************/
+.gameOverlay {
+  position: absolute;
   display: flex;
   justify-content: center;
-  z-index: 1;
-}
-
-#renderCanvas {
-  height: 100%;
+  z-index: 2;
   width: 100%;
-}
-
-#startOG {
-  position: absolute;
-  top: 64vh;
-  z-index: 1;
-  width: 250px;
   height: 50px;
   background-color: transparent;
-  color: white;
-  font-size: larger;
-  font-weight: bolder;
-  border: 2mm ridge rgba(255, 250, 250, 0.938);
-  text-shadow: -1px -1px 0 rgb(0, 0, 0), 1px 1px 0 rgb(0, 0, 0);
-}
-
-#createOnlineMatch {
-  position: absolute;
-  top: 76vh;
-  z-index: 1;
-  width: 250px;
-  background-color: transparent;
-  color: rgba(28, 128, 194, 0.938);
-  font-size: larger;
-  font-weight: bolder;
-  border: 2mm ridge rgba(28, 128, 194, 0.938);
-  text-shadow: -1px -1px 0 rgb(0, 0, 0), 1px 1px 0 rgb(0, 0, 0);
-}
-
-#joinOnlineMatch {
-  position: absolute;
-  top: 85vh;
-  z-index: 1;
-  width: 250px;
-  background-color: transparent;
-  color: rgba(187, 66, 66, 0.938);
-  font-size: larger;
-  font-weight: bolder;
-  border: 2mm ridge rgba(187, 66, 66, 0.938);
-  text-shadow: -1px -1px 0 rgb(0, 0, 0), 1px 1px 0 rgb(0, 0, 0);
-}
-
-#startOG:hover {
-  transform: scale(1.2);
-}
-
-#createOnlineMatch:hover {
-  transform: scale(1.2);
-}
-
-#joinOnlineMatch:hover {
-  transform: scale(1.2);
-}
-
-#gameOverlay {
-  display: none;
-  width: 100%;
-  position: absolute;
+  text-align: center;
   pointer-events: none;
 }
 
-#gameOverlay > button {
-  background-color: transparent;
-  color: white;
-  font-size: large;
+.gameOverlay > .item {
+  color: black;
+  background-color: rgba(245, 245, 245, 0.5);
   font-weight: bold;
-  border: 1mm ridge rgba(255, 250, 250, 0.938);
-  z-index: 1;
-  width: fit-content;
-  display: inline-block;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  border: 0.1rem white solid;
+  padding: 0.4rem;
   pointer-events: auto;
 }
 
-#gameOverlay > button:hover {
-  transform: scale(1.2);
-  color: red;
-}
-
-#timer {
-  display: flex;
-  background-color: rgba(83, 125, 160, 0.561);
-  position: absolute;
-  right: 1%;
-  z-index: 1;
-}
-
-#timer > div {
-  color: white;
-  text-align: center;
-  font-style: italic;
-  font-weight: bold;
-}
-
-#timer > div > img {
-  height: 30px;
-  display: inline-block;
+.gameOverlay > .item > img {
+  display: block;
+  height: 60%;
   object-fit: contain;
+  margin: auto;
+  pointer-events: none;
 }
 
-#timer > button {
-  pointer-events: initial;
-  background-color: transparent;
-  color: white;
-  border: 1mm ridge rgba(146, 143, 143, 0.938);
-}
-
-/* Game Options Modal */
-#gameOptionsScreen {
-  height: 100vh;
-  width: 100vw;
-  z-index: 3;
-  position: absolute;
-  background-image: url(12a515cf977bfbfdac69.png);
-  background-position: center;
-  background-size: cover;
-  text-align: center;
-  font-family: fantasy;
-}
-
-#gameOptionsTitle {
-  font-size: larger;
-  background-color: red;
-}
-
-#gameOptionsTeamsText {
-  background-color: rgba(255, 0, 0, 0.5);
-  margin-left: 15%;
-  margin-right: 15%;
-}
-
-#gameOptionsTeamsBlack {
-  margin-left: 5%;
-}
-
-#gameOptionsConfirmation {
-}
-
-#gameOptionsTimerText {
-  background-color: rgba(255, 0, 0, 0.5);
-  margin-left: 15%;
-  margin-right: 15%;
-}
-
-#gameOptionsTimer > input {
-  margin-left: 5%;
-}
-
-#gameOptionsInviteCode {
-  background-color: rgba(255, 0, 0, 0.5);
-}
-
-#gameOptionsInviteCode > p {
-  background-color: rgba(251, 255, 0, 0.835);
-  margin-left: 20%;
-  margin-right: 20%;
-}
-
-#exitButton {
-  position: fixed;
-  right: 1%;
-  top: 1%;
-  width: 20px;
-  height: 20px;
-  background-color: red;
-}
-
-@media screen and (max-width: 320px) {
-  #gameOverlay > button {
-    margin-right: 1%;
-    margin-top: 0.2%;
-  }
-
-  #timer {
-    display: block;
-  }
-
-  #timer > div {
-    display: inline-block;
-  }
-}
-
-@media screen and (min-width: 375px) {
-  #gameOverlay > button {
-    margin-right: 1%;
-    margin-top: 0.2%;
-  }
-}
-
-@media screen and (min-width: 426px) {
-  #gameOverlay > button {
-    margin-right: 2%;
-    margin-top: 0.2%;
-  }
+.gameOverlay > .item:hover {
+  transform: scale(0.9);
 }
 
 
