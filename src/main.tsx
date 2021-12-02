@@ -6,6 +6,7 @@ import SideNAV from "./component/side-nav";
 import Chess from "./component/chess";
 import LoadingScreen from "./component/loading-screen";
 import GameOverlay from "./component/game-overlay";
+import CreateMatchModal from "./component/create-match-modal";
 
 interface Props {}
 
@@ -15,6 +16,7 @@ const Main: React.FC<Props> = () => {
   const [isChessLoaded, setIsChessLoaded] = useState(false);
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const [isGameScreen, setIsGameScreen] = useState(false);
+  const [isMatchModal, setIsMatchModal] = useState(false);
 
   const display = (
     <>
@@ -44,6 +46,7 @@ const Main: React.FC<Props> = () => {
         setIsOpen={setIsNavbarOpen}
         playBtn={playBtnRef}
         setIsGameScreen={setIsGameScreen}
+        setMatchModal={setIsMatchModal}
       />
     </>
   );
@@ -51,6 +54,7 @@ const Main: React.FC<Props> = () => {
   return (
     <div className="app">
       {isChessLoaded ? display : <LoadingScreen />}
+      {isMatchModal ? <CreateMatchModal chessRef={chessRef} /> : null}
       <Chess chessRef={chessRef} setLoaded={setIsChessLoaded} />
     </div>
   );

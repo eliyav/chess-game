@@ -8,6 +8,7 @@ interface Props {
   chessRef: React.MutableRefObject<App | undefined>;
   playBtn: React.RefObject<HTMLButtonElement>;
   setIsGameScreen: React.Dispatch<React.SetStateAction<boolean>>;
+  setMatchModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const SideNAV: React.FC<Props> = ({
@@ -16,6 +17,7 @@ const SideNAV: React.FC<Props> = ({
   chessRef,
   playBtn,
   setIsGameScreen,
+  setMatchModal,
 }) => {
   const navbarRef = useRef<HTMLDivElement>(null);
 
@@ -31,6 +33,13 @@ const SideNAV: React.FC<Props> = ({
       chessRef!.current!.emitter!.emit("start-match", "offline");
       setIsGameScreen(true);
     } else if (choice === "Create Online") {
+      setMatchModal(true);
+      playBtn.current?.classList.add("hide");
+      setIsGameScreen(true);
+    } else if (choice === "Join Online") {
+      chessRef!.current!.emitter!.emit("join-online-match");
+      playBtn.current?.classList.add("hide");
+      setIsGameScreen(true);
     }
   };
 

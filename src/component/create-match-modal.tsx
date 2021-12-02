@@ -1,27 +1,32 @@
-import React from "react";
+import React, { useRef } from "react";
+import { App } from "./app";
 
-interface Props {}
+interface Props {
+  chessRef: React.MutableRefObject<App | undefined>;
+}
 //Update to react function in progress
-const CreateMatchModal: React.FC<Props> = () => {
+const CreateMatchModal: React.FC<Props> = ({ chessRef }) => {
+  const formRef = useRef<HTMLFormElement>(null);
   return (
     <form
       id="gameOptionsScreen"
+      ref={formRef}
       onSubmit={(e) => {
-        // e.preventDefault();
-        // let form = new FormData(formEle);
-        // const team = form.get("team")?.toString();
-        // const time = form.get("time")?.toString();
-        // let clockTime;
-        // if (time) {
-        //   clockTime = 60 * parseInt(time);
-        // }
-        // chessRef!.current!.gameMode.mode = "online";
-        // chessRef!.current!.gameMode.time = clockTime;
-        // chessRef!.current!.gameMode.player = team;
-        // chessRef!.current!.socket.emit(
-        //   "create-room",
-        //   chessRef!.current!.gameMode
-        // );
+        e.preventDefault();
+        let form = new FormData(formRef.current!);
+        const team = form.get("team")?.toString();
+        const time = form.get("time")?.toString();
+        let clockTime;
+        if (time) {
+          clockTime = 60 * parseInt(time);
+        }
+        chessRef!.current!.gameMode.mode = "online";
+        chessRef!.current!.gameMode.time = clockTime;
+        chessRef!.current!.gameMode.player = team;
+        chessRef!.current!.socket.emit(
+          "create-room",
+          chessRef!.current!.gameMode
+        );
       }}
     >
       <a id="exitButton"></a>
@@ -56,7 +61,7 @@ const CreateMatchModal: React.FC<Props> = () => {
         <button type="submit">Create Room!</button>
       </div>
       <div id="gameOptionsInviteCode">
-        Your Invite Code:<p id="gameOptionsInviteCodeText">HCCJD</p>
+        <p id="gameOptionsInviteCodeText"></p>
       </div>
     </form>
   );
