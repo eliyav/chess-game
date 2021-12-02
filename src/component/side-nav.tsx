@@ -32,15 +32,16 @@ const SideNAV: React.FC<Props> = ({
       playBtn.current?.classList.add("hide");
       chessRef!.current!.emitter!.emit("start-match", "offline");
       setIsGameScreen(true);
-    } else if (choice === "Create Online") {
-      setMatchModal(true);
-      playBtn.current?.classList.add("hide");
-      setIsGameScreen(true);
-    } else if (choice === "Join Online") {
-      chessRef!.current!.emitter!.emit("join-online-match");
-      playBtn.current?.classList.add("hide");
-      setIsGameScreen(true);
     }
+    // } else if (choice === "Create Online") {
+    //   setMatchModal(true);
+    //   playBtn.current?.classList.add("hide");
+    //   setIsGameScreen(true);
+    // } else if (choice === "Join Online") {
+    //   chessRef!.current!.emitter!.emit("join-online-match");
+    //   playBtn.current?.classList.add("hide");
+    //   setIsGameScreen(true);
+    // }
   };
 
   return (
