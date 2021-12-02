@@ -20,6 +20,7 @@ class Game {
   annotations: string[];
   turnHistory: TurnHistory[];
   timer: Timer;
+  gameStarted: boolean;
 
   constructor(chessData: Data) {
     this.state = chessData.initialState;
@@ -31,6 +32,7 @@ class Game {
     this.turnCounter = 1;
     this.timer = new Timer(this.state, this.endGame.bind(this));
     this.setBoard();
+    this.gameStarted = false;
   }
 
   playerMove(originPoint: Point, targetPoint: Point): boolean {
@@ -486,6 +488,7 @@ class Game {
     this.annotations = [];
     this.turnHistory = [];
     this.turnCounter = 1;
+    this.gameStarted = true;
     setTimeout(() => {
       this.timer.startTimer(time);
     }, 1000);

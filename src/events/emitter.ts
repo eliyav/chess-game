@@ -97,13 +97,14 @@ const activateEmitter = (app: App): EventEmitter => {
     function setToBlackPlayer() {
       camera.alpha = 0;
       camera.beta = Math.PI / 4;
-      camera.radius = 60;
+      camera.radius = 40;
     }
   });
 
   emitter.on("home-screen", () => {
     let camera: any = gameScene.cameras[0];
     camera.alpha = Math.PI;
+    game.gameStarted = false;
     gameScene.detachControl();
     showScene.index = 0;
   });

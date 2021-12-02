@@ -1,22 +1,18 @@
 import React, { useRef } from "react";
-import { App } from "./app";
+import EventEmitter from "../events/event-emitter";
 import "./side-nav.css";
 
 interface Props {
   isOpen: boolean;
+  emitter: EventEmitter | undefined;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  chessRef: React.MutableRefObject<App | undefined>;
-  playBtn: React.RefObject<HTMLButtonElement>;
-  setIsGameScreen: React.Dispatch<React.SetStateAction<boolean>>;
   setMatchModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const SideNAV: React.FC<Props> = ({
   isOpen,
+  emitter,
   setIsOpen,
-  chessRef,
-  playBtn,
-  setIsGameScreen,
   setMatchModal,
 }) => {
   const navbarRef = useRef<HTMLDivElement>(null);
@@ -27,20 +23,22 @@ const SideNAV: React.FC<Props> = ({
 
   const navbarSelection = (e: any) => {
     const choice = e.target.innerText;
-    setIsOpen(false);
-    if (choice === "Start Offline") {
-      playBtn.current?.classList.add("hide");
-      chessRef!.current!.emitter!.emit("start-match", "offline");
-      setIsGameScreen(true);
+    if (choice === "Home") {
+      const confirm = window.confirm(
+        "Are you sure you would like to abandon the game?"
+      );
+      if (confirm) {
+        emitter!.emit("home-screen");
+        setIsOpen(false);
+      }
+    } else if (choice === "Start Offline") {
+      emitter!.emit("start-match", "offline");
+      setIsOpen(false);
     }
     // } else if (choice === "Create Online") {
     //   setMatchModal(true);
-    //   playBtn.current?.classList.add("hide");
-    //   setIsGameScreen(true);
     // } else if (choice === "Join Online") {
-    //   chessRef!.current!.emitter!.emit("join-online-match");
-    //   playBtn.current?.classList.add("hide");
-    //   setIsGameScreen(true);
+    //   emitter!.emit("join-online-match");
     // }
   };
 
@@ -54,6 +52,7 @@ const SideNAV: React.FC<Props> = ({
       >
         &times;
       </a>
+      <a>Home</a>
       <div className="category">Matches</div>
       <a>Start Offline</a>
       <a>Create Online</a>

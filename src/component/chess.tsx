@@ -1,13 +1,17 @@
 import * as BABYLON from "babylonjs";
 import React, { useEffect, useRef } from "react";
+import EventEmitter from "../events/event-emitter";
+import inputController from "../events/input-controller";
+import { ChessPieceMesh } from "../view/asset-loader";
 import initializeApp, { App } from "./app";
 
 interface Props {
   chessRef: React.MutableRefObject<App | undefined>;
   setLoaded: React.Dispatch<React.SetStateAction<boolean>>;
+  emitter: EventEmitter | undefined;
 }
 
-const Chess: React.FC<Props> = ({ setLoaded, chessRef }) => {
+const Chess: React.FC<Props> = ({ setLoaded, chessRef, emitter }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const init = async () => {
@@ -21,6 +25,46 @@ const Chess: React.FC<Props> = ({ setLoaded, chessRef }) => {
   useEffect(() => {
     init();
   }, [canvasRef]);
+
+  useEffect(() => {
+    if (emitter !== undefined) {
+      chessRef.current!.scenes.gameScene.onPointerDown = async (
+        e: any,
+        pickResult: any
+      ) => {
+        if (chessRef.current!.gameMode.mode === "online") {
+          if (
+            chessRef.current!.gameMode.player ===
+            chessRef.current!.game.state.currentPlayer
+          ) {
+            onClickEvent();
+          }
+        } else {
+          onClickEvent();
+        }
+
+        function onClickEvent() {
+          if (pickResult.pickedMesh !== null) {
+            const mesh: ChessPieceMesh = pickResult.pickedMesh;
+            const isCompleteMove = inputController(
+              mesh,
+              chessRef.current!.game,
+              chessRef.current!.scenes.gameScene,
+              chessRef.current!.gameMode
+            );
+            isCompleteMove
+              ? (() => {
+                  const [originPoint, targetPoint] =
+                    chessRef.current!.game.moves;
+                  emitter!.emit("playerMove", originPoint, targetPoint);
+                })()
+              : null;
+          }
+        }
+      };
+    }
+  }, [emitter]);
+
   return <canvas ref={canvasRef} touch-action="none"></canvas>;
 };
 
@@ -59,7 +103,7 @@ const initApp = async (canvas: HTMLCanvasElement) => {
       gameSceneCamera.radius = 65;
     } else {
       startSceneCamera.radius = 30;
-      gameSceneCamera.radius = 45;
+      gameSceneCamera.radius = 40;
     }
     engine.resize();
   };
