@@ -8,6 +8,7 @@ import activateEmitter from "../events/emitter";
 import inputController from "../events/input-controller";
 import EventEmitter from "../events/event-emitter";
 import { ChessPieceMesh } from "../view/asset-loader";
+import activateSocket from "../events/sockets";
 
 const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
   const app: App = {
@@ -34,7 +35,7 @@ const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
     scenes: { startScene, gameScene },
   } = app;
 
-  // app.socket = activateSocket(game, gameMode, gameScene, startScene, showScene);
+  app.socket = activateSocket(game, gameMode, gameScene, startScene, showScene);
   app.emitter = activateEmitter(app);
   renderScene(game, gameScene);
 

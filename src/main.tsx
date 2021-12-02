@@ -1,6 +1,6 @@
 import "babylonjs-loaders";
 import "./index.css";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { App } from "./component/app";
 import SideNAV from "./component/side-nav";
 import Chess from "./component/chess";
@@ -10,47 +10,22 @@ import GameOverlay from "./component/game-overlay";
 interface Props {}
 
 const Main: React.FC<Props> = () => {
+  const chessRef = useRef<App | undefined>();
   const playBtnRef = useRef<HTMLButtonElement>(null);
   const [isChessLoaded, setIsChessLoaded] = useState(false);
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const [isGameScreen, setIsGameScreen] = useState(false);
 
-  const chessRef = useRef<App>();
-
-  const navbarSelection = (e: any) => {
-    const choice = e.target.innerText;
-    setIsNavbarOpen(false);
-    if (choice === "Start Offline") {
-      playBtnRef.current?.classList.add("hide");
-      chessRef.current?.emitter!.emit("start-match", "offline");
-      setIsGameScreen(true);
-    }
-  };
-
-  const overlaySelection = (e: any) => {
-    const choice = e.target.innerText;
-    if (choice === "Restart") {
-      chessRef.current?.emitter!.emit("reset-board");
-    } else if (choice === "Undo") {
-      chessRef.current?.emitter!.emit("undo-move");
-    } else if (choice === "Camera") {
-      chessRef.current?.emitter!.emit("reset-camera");
-    } else if (choice === "Home") {
-      const confirm = window.confirm(
-        "Are you sure you would like to abandon the game?"
-      );
-      if (confirm) {
-        setIsGameScreen(false);
-        chessRef.current?.emitter!.emit("home-screen");
-        playBtnRef.current?.classList.remove("hide");
-      }
-    }
-  };
-
   const display = (
     <>
       {isGameScreen ? (
-        <GameOverlay selectionHandler={overlaySelection} />
+        <GameOverlay
+          chessRef={chessRef}
+          playBtn={playBtnRef}
+          setIsGameScreen={setIsGameScreen}
+          setIsNavbarOpen={setIsNavbarOpen}
+          isNavbarOpen={isNavbarOpen}
+        />
       ) : null}
       <button
         id="playButton"
@@ -64,9 +39,11 @@ const Main: React.FC<Props> = () => {
         Play
       </button>
       <SideNAV
+        chessRef={chessRef}
         isOpen={isNavbarOpen}
         setIsOpen={setIsNavbarOpen}
-        selectionHandler={navbarSelection}
+        playBtn={playBtnRef}
+        setIsGameScreen={setIsGameScreen}
       />
     </>
   );
@@ -74,7 +51,7 @@ const Main: React.FC<Props> = () => {
   return (
     <div className="app">
       {isChessLoaded ? display : <LoadingScreen />}
-      <Chess ref={chessRef} setLoaded={setIsChessLoaded} />
+      <Chess chessRef={chessRef} setLoaded={setIsChessLoaded} />
     </div>
   );
 };

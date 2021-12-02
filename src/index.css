@@ -38,64 +38,13 @@ canvas {
   background-color: whitesmoke;
 }
 
-/* #gameOverlay {
-  display: none;
-  width: 100%;
-  position: absolute;
-  pointer-events: none;
-}
-
-#gameOverlay > button {
-  background-color: transparent;
-  color: white;
-  font-size: large;
-  font-weight: bold;
-  border: 1mm ridge rgba(255, 250, 250, 0.938);
-  z-index: 1;
-  width: fit-content;
-  display: inline-block;
-  pointer-events: auto;
-}
-
-#gameOverlay > button:hover {
-  transform: scale(1.2);
-  color: red;
-}
-
-#timer {
-  display: flex;
-  background-color: rgba(83, 125, 160, 0.561);
-  position: absolute;
-  right: 1%;
-  z-index: 1;
-}
-
-#timer > div {
-  color: white;
-  text-align: center;
-  font-style: italic;
-  font-weight: bold;
-}
-
-#timer > div > img {
-  height: 30px;
-  display: inline-block;
-  object-fit: contain;
-}
-
-#timer > button {
-  pointer-events: initial;
-  background-color: transparent;
-  color: white;
-  border: 1mm ridge rgba(146, 143, 143, 0.938);
-}
-
 /* Game Options Modal */
-/* #gameOptionsScreen {
-  height: 100vh;
-  width: 100vw;
-  z-index: 3;
+#gameOptionsScreen {
   position: absolute;
+  display: inline;
+  height: 100px;
+  width: 100px;
+  z-index: 3;
   background-image: url("/assets/options-background.png");
   background-position: center;
   background-size: cover;
@@ -110,25 +59,10 @@ canvas {
 
 #gameOptionsTeamsText {
   background-color: rgba(255, 0, 0, 0.5);
-  margin-left: 15%;
-  margin-right: 15%;
-}
-
-#gameOptionsTeamsBlack {
-  margin-left: 5%;
-}
-
-#gameOptionsConfirmation {
 }
 
 #gameOptionsTimerText {
   background-color: rgba(255, 0, 0, 0.5);
-  margin-left: 15%;
-  margin-right: 15%;
-}
-
-#gameOptionsTimer > input {
-  margin-left: 5%;
 }
 
 #gameOptionsInviteCode {
@@ -137,44 +71,4 @@ canvas {
 
 #gameOptionsInviteCode > p {
   background-color: rgba(251, 255, 0, 0.835);
-  margin-left: 20%;
-  margin-right: 20%;
 }
-
-#exitButton {
-  position: fixed;
-  right: 1%;
-  top: 1%;
-  width: 20px;
-  height: 20px;
-  background-color: red;
-}
-
-@media screen and (max-width: 320px) {
-  #gameOverlay > button {
-    margin-right: 1%;
-    margin-top: 0.2%;
-  }
-
-  #timer {
-    display: block;
-  }
-
-  #timer > div {
-    display: inline-block;
-  }
-}
-
-@media screen and (min-width: 375px) {
-  #gameOverlay > button {
-    margin-right: 1%;
-    margin-top: 0.2%;
-  }
-}
-
-@media screen and (min-width: 426px) {
-  #gameOverlay > button {
-    margin-right: 2%;
-    margin-top: 0.2%;
-  }
-} */

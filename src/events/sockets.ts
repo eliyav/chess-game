@@ -2,7 +2,6 @@ import Game from "../component/game/game";
 import { io } from "socket.io-client";
 import { renderScene } from "../helper/canvas-helpers";
 import { CustomScene } from "../view/start-screen";
-import { resetCamera } from "../view/gui-overlay";
 import { GameMode } from "../component/app";
 
 const activateSocket = (
@@ -69,7 +68,7 @@ const activateSocket = (
     game.resetGame(gameMode.time);
     renderScene(game, gameScene);
     startScene.detachControl();
-    resetCamera(game, gameScene, gameMode);
+    // resetCamera(game, gameScene, gameMode);
     showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);
     console.log("game has been activated");
   });

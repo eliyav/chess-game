@@ -1,18 +1,19 @@
 import * as BABYLON from "babylonjs";
 import React, { useEffect, useRef } from "react";
-import initializeApp from "./app";
+import initializeApp, { App } from "./app";
 
 interface Props {
+  chessRef: React.MutableRefObject<App | undefined>;
   setLoaded: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Chess = React.forwardRef(({ setLoaded }: Props, ref: any) => {
+const Chess: React.FC<Props> = ({ setLoaded, chessRef }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const init = async () => {
     if (canvasRef.current) {
       const app = await initApp(canvasRef.current);
-      ref.current = app;
+      chessRef.current = app;
       setLoaded(true);
     }
   };
@@ -20,9 +21,8 @@ const Chess = React.forwardRef(({ setLoaded }: Props, ref: any) => {
   useEffect(() => {
     init();
   }, [canvasRef]);
-
   return <canvas ref={canvasRef} touch-action="none"></canvas>;
-});
+};
 
 export default Chess;
 
