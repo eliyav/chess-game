@@ -1,81 +1,3 @@
-/*!*****************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js!./src/index.css ***!
-  \*****************************************************************/
-* {
-  margin: 0;
-}
-
-.app {
-  height: 100vh;
-  width: 100vw;
-  position: fixed;
-  z-index: 1;
-}
-
-canvas {
-  height: 100%;
-  width: 100%;
-}
-
-.hide {
-  display: none;
-}
-
-#playButton {
-  position: absolute;
-  z-index: 1;
-  top: 64vh;
-  left: 50vw;
-  width: 200px;
-  height: 50px;
-  background-color: transparent;
-  color: white;
-  font-size: larger;
-  font-weight: bolder;
-  border: 1mm ridge whitesmoke;
-  transform: translateX(-50%);
-}
-
-#playButton:hover {
-  color: blue;
-  background-color: whitesmoke;
-}
-
-/* Game Options Modal */
-#gameOptionsScreen {
-  position: absolute;
-  display: inline;
-  height: 100px;
-  width: 100px;
-  z-index: 3;
-  background-image: url(12a515cf977bfbfdac69.png);
-  background-position: center;
-  background-size: cover;
-  text-align: center;
-  font-family: fantasy;
-}
-
-#gameOptionsTitle {
-  font-size: larger;
-  background-color: red;
-}
-
-#gameOptionsTeamsText {
-  background-color: rgba(255, 0, 0, 0.5);
-}
-
-#gameOptionsTimerText {
-  background-color: rgba(255, 0, 0, 0.5);
-}
-
-#gameOptionsInviteCode {
-  background-color: rgba(255, 0, 0, 0.5);
-}
-
-#gameOptionsInviteCode > p {
-  background-color: rgba(251, 255, 0, 0.835);
-}
-
 /*!******************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js!./src/component/side-nav.css ***!
   \******************************************************************************/
@@ -187,6 +109,84 @@ div.category {
 
 .gameOverlay > .item:hover {
   transform: scale(0.9);
+}
+
+/*!*****************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./src/index.css ***!
+  \*****************************************************************/
+* {
+  margin: 0;
+}
+
+.app {
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  z-index: 1;
+}
+
+canvas {
+  height: 100%;
+  width: 100%;
+}
+
+.hide {
+  display: none;
+}
+
+#playButton {
+  position: absolute;
+  z-index: 1;
+  top: 64vh;
+  left: 50vw;
+  width: 200px;
+  height: 50px;
+  background-color: transparent;
+  color: white;
+  font-size: larger;
+  font-weight: bolder;
+  border: 1mm ridge whitesmoke;
+  transform: translateX(-50%);
+}
+
+#playButton:hover {
+  color: blue;
+  background-color: whitesmoke;
+}
+
+/* Game Options Modal */
+#gameOptionsScreen {
+  position: absolute;
+  display: inline;
+  height: 100px;
+  width: 100px;
+  z-index: 3;
+  background-image: url(12a515cf977bfbfdac69.png);
+  background-position: center;
+  background-size: cover;
+  text-align: center;
+  font-family: fantasy;
+}
+
+#gameOptionsTitle {
+  font-size: larger;
+  background-color: red;
+}
+
+#gameOptionsTeamsText {
+  background-color: rgba(255, 0, 0, 0.5);
+}
+
+#gameOptionsTimerText {
+  background-color: rgba(255, 0, 0, 0.5);
+}
+
+#gameOptionsInviteCode {
+  background-color: rgba(255, 0, 0, 0.5);
+}
+
+#gameOptionsInviteCode > p {
+  background-color: rgba(251, 255, 0, 0.835);
 }
 
 
