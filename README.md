@@ -52,11 +52,17 @@ This project is meant to be played. If you are having fun playing chess it is be
 - [x] Create working offline mode
 - [x] Implement back-end to enable websockets
 - [x] Create online matches
-  - [x] create player to player communication via buttons (ex. reset board, undo move)
-  - [] fix game time sync
-- [x] update game mesh models
-- [] add animations
-- [In progress] Implement React.js
+  - [x] Create p2p interaction
+  - [] Fix game time sync
+- [x] Update game mesh models
+- [x] Implement React.js
+- [] Save & Load games
+- [] Add Game start options
+- [] Add Authorization/Login
+- [] Add Friends List
+- [] Add Chat
+- [] Add Ranking Algorithim and search
+- [] More will be added.
 
 See the [Projects tasks](https://github.com/eliyav/chess-game/projects/1) for a full list of tasks.
 
