@@ -1,24 +1,23 @@
-import "babylonjs-loaders";
-import React, { useState, useRef, useEffect } from "react";
-import { App } from "./component/app";
+import React, { useState } from "react";
+import { App } from "./component/chess-app";
 import SideNAV from "./component/side-nav";
-import Chess from "./component/chess";
-import LoadingScreen from "./component/loading-screen";
-import GameOverlay from "./component/game-overlay";
-import CreateMatchModal from "./component/create-match-modal";
-import activateEmitter from "./events/emitter";
 import EventEmitter from "./events/event-emitter";
+import GameOverlay from "./component/game-overlay";
+// import CreateMatchModal from "./component/create-match-modal";
 
-const Main: React.FC = () => {
-  const chessRef = useRef<App | undefined>();
-  const [isChessLoaded, setIsChessLoaded] = useState(false);
+interface Props {
+  chessApp: App;
+  emitter: EventEmitter;
+  socket: any;
+}
+
+const Main: React.FC<Props> = ({ chessApp, emitter, socket }) => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
-  const [isMatchModal, setIsMatchModal] = useState(false);
-  const [emitter, setEmitter] = useState<EventEmitter>();
+  // const [isMatchModal, setIsMatchModal] = useState(false);
 
   const display = (
     <>
-      {!chessRef.current?.game.gameStarted ? (
+      {!chessApp.game.gameStarted ? (
         <button
           id="playButton"
           onClick={() => {
@@ -34,34 +33,22 @@ const Main: React.FC = () => {
         emitter={emitter}
         isOpen={isNavbarOpen}
         setIsOpen={setIsNavbarOpen}
-        setMatchModal={setIsMatchModal}
+        // setMatchModal={setIsMatchModal}
       />
     </>
   );
 
-  useEffect(() => {
-    if (chessRef.current !== undefined) {
-      const emitter = activateEmitter(chessRef.current);
-      setEmitter(emitter);
-    }
-  }, [chessRef.current]);
-
   return (
     <div className="app">
-      {isChessLoaded ? display : <LoadingScreen />}
-      {chessRef.current?.game.gameStarted ? (
+      {display}
+      {chessApp.game.gameStarted ? (
         <GameOverlay
           emitter={emitter}
           isNavbarOpen={isNavbarOpen}
           setIsNavbarOpen={setIsNavbarOpen}
         />
       ) : null}
-      <Chess
-        chessRef={chessRef}
-        emitter={emitter}
-        setLoaded={setIsChessLoaded}
-      />
-      {isMatchModal ? <CreateMatchModal chessRef={chessRef} /> : null}
+      {/* {isMatchModal ? <CreateMatchModal chessRef={chessRef} /> : null} */}
     </div>
   );
 };

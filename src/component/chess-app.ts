@@ -1,12 +1,13 @@
 import { Engine, Scene } from "babylonjs";
-import { renderScene } from "../helper/canvas-helpers";
 import Game from "./game/game";
 import chessData from "../data/chess-data-import";
 import startScreen from "../view/start-screen";
 import gameScreen from "../view/game-screen";
-import activateSocket from "../events/sockets";
 
-const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
+const initializeChessApp = async (
+  canvas: HTMLCanvasElement,
+  engine: Engine
+) => {
   const app: App = {
     game: new Game(chessData),
     gameMode: {
@@ -20,23 +21,48 @@ const initializeApp = async (canvas: HTMLCanvasElement, engine: Engine) => {
       startScene: await startScreen(engine),
       gameScene: await gameScreen(canvas, engine),
     },
-    socket: undefined,
   };
 
   const {
-    game,
-    gameMode,
     showScene,
     scenes: { startScene, gameScene },
   } = app;
 
-  app.socket = activateSocket(game, gameMode, gameScene, startScene, showScene);
-  renderScene(game, gameScene);
+  engine.runRenderLoop(function () {
+    switch (showScene.index) {
+      case 0:
+        gameScene.detachControl();
+        startScene.attachControl();
+        startScene.render();
+        break;
+      case 1:
+        gameScene.attachControl();
+        gameScene.render();
+        break;
+      default:
+        break;
+    }
+  });
+
+  const refreshCanvas = () => {
+    let startSceneCamera: any = startScene.cameras[0];
+    let gameSceneCamera: any = gameScene.cameras[0];
+    if (canvas.width < 768) {
+      startSceneCamera.radius = 32;
+      gameSceneCamera.radius = 65;
+    } else {
+      startSceneCamera.radius = 30;
+      gameSceneCamera.radius = 40;
+    }
+    engine.resize();
+  };
+
+  window.onresize = refreshCanvas;
 
   return app;
 };
 
-export default initializeApp;
+export default initializeChessApp;
 
 export interface App {
   game: Game;
@@ -46,7 +72,6 @@ export interface App {
     startScene: Scene;
     gameScene: Scene;
   };
-  socket?: any;
 }
 
 export type GameMode = {

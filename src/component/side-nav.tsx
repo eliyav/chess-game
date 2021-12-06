@@ -6,14 +6,14 @@ interface Props {
   isOpen: boolean;
   emitter: EventEmitter | undefined;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setMatchModal: React.Dispatch<React.SetStateAction<boolean>>;
+  // setMatchModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const SideNAV: React.FC<Props> = ({
   isOpen,
   emitter,
   setIsOpen,
-  setMatchModal,
+  // setMatchModal,
 }) => {
   const navbarRef = useRef<HTMLDivElement>(null);
 

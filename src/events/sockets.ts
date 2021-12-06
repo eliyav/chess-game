@@ -1,16 +1,15 @@
-import Game from "../component/game/game";
 import { io } from "socket.io-client";
 import { renderScene } from "../helper/canvas-helpers";
-import { CustomScene } from "../view/start-screen";
-import { GameMode } from "../component/app";
+import { App } from "../component/chess-app";
 
-const activateSocket = (
-  game: Game,
-  gameMode: GameMode,
-  gameScene: CustomScene,
-  startScene: CustomScene,
-  showScene: { index: number }
-) => {
+const activateSocket = (app: App) => {
+  const {
+    game,
+    gameMode,
+    scenes: { gameScene, startScene },
+    showScene,
+  } = app;
+
   const socket = io(`ws://${window.location.host}`);
 
   socket.on("message", (message) => {

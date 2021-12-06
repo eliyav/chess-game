@@ -3,13 +3,18 @@
 }
 
 .app {
+  position: absolute;
   height: 100vh;
   width: 100vw;
-  position: fixed;
-  z-index: 1;
+  pointer-events: none;
+}
+
+.app > * {
+  pointer-events: all;
 }
 
 canvas {
+  position: absolute;
   height: 100%;
   width: 100%;
 }

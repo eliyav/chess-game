@@ -1,11 +1,12 @@
 import React, { useRef } from "react";
-import { App } from "./app";
+import { App } from "./chess-app";
 
 interface Props {
   chessRef: React.MutableRefObject<App | undefined>;
+  socket: any;
 }
 //Update to react function in progress
-const CreateMatchModal: React.FC<Props> = ({ chessRef }) => {
+const CreateMatchModal: React.FC<Props> = ({ chessRef, socket }) => {
   const formRef = useRef<HTMLFormElement>(null);
   return (
     <form
@@ -23,10 +24,7 @@ const CreateMatchModal: React.FC<Props> = ({ chessRef }) => {
         chessRef!.current!.gameMode.mode = "online";
         chessRef!.current!.gameMode.time = clockTime;
         chessRef!.current!.gameMode.player = team;
-        chessRef!.current!.socket.emit(
-          "create-room",
-          chessRef!.current!.gameMode
-        );
+        socket.emit("create-room", chessRef!.current!.gameMode);
       }}
     >
       <a id="exitButton"></a>
