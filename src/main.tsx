@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { App } from "./component/chess-app";
 import SideNAV from "./component/side-nav";
 import EventEmitter from "./events/event-emitter";
 import GameOverlay from "./component/game-overlay";
 import MatchSettingsModal from "./component/match-settings-modal/match-settings-modal";
+import InviteCode from "./component/match-settings-modal/invite-code";
 
 interface Props {
   chessApp: App;
@@ -14,6 +15,8 @@ interface Props {
 const Main: React.FC<Props> = ({ chessApp, emitter, socket }) => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const [matchSettingsOpen, setMatchSettingsOpen] = useState(false);
+  const [updateReact, setUpdateReact] = useState(true);
+  const [inviteCode, setInviteCode] = useState("");
 
   const display = (
     <>
@@ -39,9 +42,21 @@ const Main: React.FC<Props> = ({ chessApp, emitter, socket }) => {
     </>
   );
 
+  useEffect(() => {
+    socket.on("updateReact", () => {
+      updateReact ? setUpdateReact(false) : setUpdateReact(true);
+      setInviteCode("");
+    });
+
+    socket.on("reply-invite-code", (roomCode: string) => {
+      setInviteCode(roomCode);
+    });
+  }, []);
+
   return (
     <div className="app">
       {display}
+      {inviteCode !== "" ? <InviteCode code={inviteCode} /> : null}
       {chessApp.game.gameStarted ? (
         <GameOverlay
           emitter={emitter}

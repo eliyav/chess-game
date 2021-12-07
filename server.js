@@ -51,6 +51,10 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("updateReactRequest", () => {
+    socket.emit("updateReact");
+  });
+
   socket.on("stateChange", ({ originPoint, targetPoint, room }) => {
     socket.to(room).emit("message", "Move has been entered");
     socket.to(room).emit("stateChange", { originPoint, targetPoint });

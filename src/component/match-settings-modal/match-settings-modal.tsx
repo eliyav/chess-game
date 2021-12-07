@@ -28,7 +28,7 @@ const MatchSettingsModal: React.FC<Props> = ({ emitter, setMatchSettings }) => {
       team,
     };
     emitter.emit("create-match", options);
-    isOnlineGame ? null : setMatchSettings(false);
+    setMatchSettings(false);
   };
 
   return (
@@ -46,9 +46,6 @@ const MatchSettingsModal: React.FC<Props> = ({ emitter, setMatchSettings }) => {
         <SettingsMode setGameMode={setIsOnlineMode} />
         {isOnlineGame ? <SettingsTeams /> : null}
         <SettingsTime />
-        <div id="gameOptionsInviteCode">
-          <p id="gameOptionsInviteCodeText"></p>
-        </div>
         <button
           id="gameOptionsConfirmation"
           onClick={(e) => {

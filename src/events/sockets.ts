@@ -35,21 +35,7 @@ const activateSocket = (app: App) => {
 
   socket.on("assign-room-number", (room) => {
     gameMode.room = room;
-    console.log(room);
     socket.emit("check-match-start", room);
-  });
-
-  socket.on("reply-invite-code", (roomCode) => {
-    if (document.getElementById("gameOptionsScreen") !== null) {
-      const inviteCodeText = document.getElementById(
-        "gameOptionsInviteCodeText"
-      ) as HTMLParagraphElement;
-      inviteCodeText.innerText = `Invite Code: ${roomCode}`;
-      const inviteCodeEle = document.getElementById(
-        "gameOptionsInviteCode"
-      ) as HTMLDivElement;
-      inviteCodeEle.style.display = "unset";
-    }
   });
 
   socket.on("request-room-info", () => {
@@ -62,19 +48,13 @@ const activateSocket = (app: App) => {
   });
 
   socket.on("start-match", () => {
-    const gameOptionsScreen = document.getElementById(
-      "match-settings-modal"
-    ) as HTMLDivElement;
-    const domApp = document.getElementsByClassName("app");
-    gameOptionsScreen !== null
-      ? domApp[0].removeChild(gameOptionsScreen)
-      : null;
     // Activate Game Settings
     game.resetGame(gameMode.time);
     renderScene(game, gameScene);
     startScene.detachControl();
     showScene.index = 1;
     console.log("game has been activated");
+    socket.emit("updateReactRequest");
   });
 
   socket.on("pause-game", ({ currentPlayer, time }) => {
