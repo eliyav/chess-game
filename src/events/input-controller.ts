@@ -16,7 +16,7 @@ const inputController = (
   gameMode: GameMode
 ) => {
   if (!game.timer.gamePaused) {
-    if (gameMode.mode === "online") {
+    if (gameMode.mode === "Online") {
       if (gameMode.player === game.state.currentPlayer) {
         return processMove();
       }

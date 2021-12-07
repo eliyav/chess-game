@@ -3,7 +3,7 @@ import { App } from "./component/chess-app";
 import SideNAV from "./component/side-nav";
 import EventEmitter from "./events/event-emitter";
 import GameOverlay from "./component/game-overlay";
-import MatchSettingsModal from "./component/match-settings-modal";
+import MatchSettingsModal from "./component/match-settings-modal/match-settings-modal";
 
 interface Props {
   chessApp: App;
@@ -51,7 +51,6 @@ const Main: React.FC<Props> = ({ chessApp, emitter, socket }) => {
       ) : null}
       {matchSettingsOpen ? (
         <MatchSettingsModal
-          chessApp={chessApp}
           emitter={emitter}
           setMatchSettings={setMatchSettingsOpen}
         />

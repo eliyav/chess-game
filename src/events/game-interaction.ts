@@ -5,9 +5,7 @@ import inputController from "./input-controller";
 
 const activateGameInteraction = (chessApp: App, emitter: EventEmitter) => {
   chessApp.scenes.gameScene.onPointerDown = async (e: any, pickResult: any) => {
-    console.log("clicked");
-
-    if (chessApp.gameMode.mode === "online") {
+    if (chessApp.gameMode.mode === "Online") {
       if (chessApp.gameMode.player === chessApp.game.state.currentPlayer) {
         onClickEvent();
       }

@@ -16,11 +16,11 @@ const activateEmitter = (app: App, socket: any): EventEmitter => {
     renderScene(game, gameScene);
     const resolved = game.playerMove(originPoint!, targetPoint!);
     if (resolved) {
-      if (gameMode.mode === "offline") {
+      if (gameMode.mode === "Offline") {
         game.switchTurn();
         renderScene(game, gameScene);
         rotateCamera(game.state.currentPlayer, gameScene);
-      } else if (gameMode.mode === "online") {
+      } else if (gameMode.mode === "Online") {
         const room = gameMode.room;
         renderScene(game, gameScene);
         game.switchTurn();
@@ -69,12 +69,18 @@ const activateEmitter = (app: App, socket: any): EventEmitter => {
     }
   });
 
-  emitter.on("start-match", (mode: string) => {
+  emitter.on("create-match", ({ mode, clockTime, team }: any) => {
     gameMode.mode = mode;
-    game.resetGame(gameMode.time);
-    renderScene(game, gameScene);
-    startScene.detachControl();
-    showScene.index = 1;
+    gameMode.time = clockTime;
+    gameMode.player = team;
+    if (mode === "Offline") {
+      game.resetGame(clockTime);
+      renderScene(game, gameScene);
+      startScene.detachControl();
+      showScene.index = 1;
+    } else {
+      socket.emit("create-room");
+    }
   });
 
   emitter.on("reset-camera", () => {

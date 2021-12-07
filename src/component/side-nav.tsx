@@ -25,16 +25,13 @@ const SideNAV: React.FC<Props> = ({
         emitter!.emit("home-screen");
         setIsNavbarOpen(false);
       }
-    } else if (choice === "Start Offline") {
-      // emitter!.emit("start-match", "offline");
+    } else if (choice === "Create Match") {
       setMatchSettings(true);
       setIsNavbarOpen(false);
+    } else if (choice === "Join Online") {
+      emitter!.emit("join-online-match");
+      setIsNavbarOpen(false);
     }
-    // } else if (choice === "Create Online") {
-    //   setMatchModal(true);
-    // } else if (choice === "Join Online") {
-    //   emitter!.emit("join-online-match");
-    // }
   };
 
   return (
@@ -49,8 +46,7 @@ const SideNAV: React.FC<Props> = ({
       </a>
       <a>Home</a>
       <div className="category">Matches</div>
-      <a>Start Offline</a>
-      <a>Create Online</a>
+      <a>Create Match</a>
       <a>Join Online</a>
     </div>
   );

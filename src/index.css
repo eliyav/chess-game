@@ -36,6 +36,7 @@ canvas {
   font-weight: bolder;
   border: 1mm ridge whitesmoke;
   transform: translateX(-50%);
+  border-radius: 2rem;
 }
 
 #playButton:hover {
@@ -44,7 +45,7 @@ canvas {
 }
 
 /* Game Options Modal */
-.match-settings-modal {
+#match-settings-modal {
   height: 100%;
   width: 100%;
   display: flex;
@@ -72,6 +73,11 @@ canvas {
   margin-bottom: 1rem;
   margin-top: 1rem;
   font-weight: bold;
+  border: 0.35rem solid rgba(0, 0, 0, 0.8);
+}
+
+#gameOptionsScreen > div {
+  background-color: rgba(255, 255, 255, 0.7);
 }
 
 #gameOptionsScreen > div > p {
@@ -93,15 +99,22 @@ canvas {
   margin: 0.2rem;
 }
 
-#gameOptionsConfirmation {
-  margin: 1rem;
-}
-#gameOptionsTeams {
-  background-color: rgba(255, 255, 255, 0.7);
+#gameOptionsScreen > div > input {
+  font-weight: bold;
 }
 
-#gameOptionsTimer {
+#gameOptionsConfirmation {
+  margin: 1rem;
   background-color: rgba(255, 255, 255, 0.7);
+  color: black;
+  font-size: larger;
+  font-weight: bolder;
+  border: 1mm ridge whitesmoke;
+  border-radius: 5rem;
+}
+
+#gameOptionsConfirmation:hover {
+  color: red;
 }
 
 @media only screen and (min-width: 768px) {

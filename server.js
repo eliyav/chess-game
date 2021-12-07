@@ -24,12 +24,12 @@ const io = require("socket.io")(server);
 
 io.on("connection", (socket) => {
   //Create Room
-  socket.on("create-room", (gameMode) => {
-    gameMode.room = generateKey();
-    socket.join(gameMode.room);
+  socket.on("create-room", () => {
+    const room = generateKey();
+    socket.join(room);
     socket.emit("message", "You have created a new Game Room!");
-    socket.emit("reply-invite-code", gameMode.room);
-    socket.emit("assign-room-info", gameMode);
+    socket.emit("reply-invite-code", room);
+    socket.emit("assign-room-number", room);
   });
   //Join Room
   socket.on("join-room", (roomCode) => {
@@ -42,11 +42,11 @@ io.on("connection", (socket) => {
     socket.to(gameMode.room).emit("assign-room-info", gameMode);
   });
 
-  socket.on("check-match-start", (gameMode) => {
-    const clients = io.sockets.adapter.rooms.get(gameMode.room);
+  socket.on("check-match-start", (room) => {
+    const clients = io.sockets.adapter.rooms.get(room);
     const serializedSet = [...clients.keys()];
     if (serializedSet.length === 2) {
-      socket.to(gameMode.room).emit("start-match");
+      socket.to(room).emit("start-match");
       socket.emit("start-match");
     }
   });
@@ -68,7 +68,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("reset-board-response", ({ string, gameMode }) => {
-    console.log(string);
     if (string === "Yes") {
       socket
         .to(gameMode.room)

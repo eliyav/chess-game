@@ -30,7 +30,13 @@ const activateSocket = (app: App) => {
       time: gameMode.time,
       room: gameMode.room,
     } = matchInfo);
-    socket.emit("check-match-start", gameMode);
+    socket.emit("check-match-start", gameMode.room);
+  });
+
+  socket.on("assign-room-number", (room) => {
+    gameMode.room = room;
+    console.log(room);
+    socket.emit("check-match-start", room);
   });
 
   socket.on("reply-invite-code", (roomCode) => {
@@ -57,7 +63,7 @@ const activateSocket = (app: App) => {
 
   socket.on("start-match", () => {
     const gameOptionsScreen = document.getElementById(
-      "gameOptionsScreen"
+      "match-settings-modal"
     ) as HTMLDivElement;
     const domApp = document.getElementsByClassName("app");
     gameOptionsScreen !== null
@@ -67,8 +73,7 @@ const activateSocket = (app: App) => {
     game.resetGame(gameMode.time);
     renderScene(game, gameScene);
     startScene.detachControl();
-    // resetCamera(game, gameScene, gameMode);
-    showScene.index === 0 ? (showScene.index = 1) : (showScene.index = 0);
+    showScene.index = 1;
     console.log("game has been activated");
   });
 
