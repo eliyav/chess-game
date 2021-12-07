@@ -3,23 +3,17 @@ import EventEmitter from "../events/event-emitter";
 import "./side-nav.css";
 
 interface Props {
-  isOpen: boolean;
   emitter: EventEmitter | undefined;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  // setMatchModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsNavbarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setMatchSettings: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const SideNAV: React.FC<Props> = ({
-  isOpen,
   emitter,
-  setIsOpen,
-  // setMatchModal,
+  setIsNavbarOpen,
+  setMatchSettings,
 }) => {
   const navbarRef = useRef<HTMLDivElement>(null);
-
-  isOpen === true
-    ? navbarRef.current?.classList.add("open")
-    : navbarRef.current?.classList.remove("open");
 
   const navbarSelection = (e: any) => {
     const choice = e.target.innerText;
@@ -29,11 +23,12 @@ const SideNAV: React.FC<Props> = ({
       );
       if (confirm) {
         emitter!.emit("home-screen");
-        setIsOpen(false);
+        setIsNavbarOpen(false);
       }
     } else if (choice === "Start Offline") {
-      emitter!.emit("start-match", "offline");
-      setIsOpen(false);
+      // emitter!.emit("start-match", "offline");
+      setMatchSettings(true);
+      setIsNavbarOpen(false);
     }
     // } else if (choice === "Create Online") {
     //   setMatchModal(true);
@@ -47,7 +42,7 @@ const SideNAV: React.FC<Props> = ({
       <a
         className="closebtn"
         onClick={() => {
-          isOpen === false ? setIsOpen(true) : setIsOpen(false);
+          setIsNavbarOpen(false);
         }}
       >
         &times;

@@ -38,7 +38,7 @@ const activateSocket = (app: App) => {
       const inviteCodeText = document.getElementById(
         "gameOptionsInviteCodeText"
       ) as HTMLParagraphElement;
-      inviteCodeText.innerText = roomCode;
+      inviteCodeText.innerText = `Invite Code: ${roomCode}`;
       const inviteCodeEle = document.getElementById(
         "gameOptionsInviteCode"
       ) as HTMLDivElement;

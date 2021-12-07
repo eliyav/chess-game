@@ -3,7 +3,7 @@ import { App } from "./component/chess-app";
 import SideNAV from "./component/side-nav";
 import EventEmitter from "./events/event-emitter";
 import GameOverlay from "./component/game-overlay";
-// import CreateMatchModal from "./component/create-match-modal";
+import MatchSettingsModal from "./component/match-settings-modal";
 
 interface Props {
   chessApp: App;
@@ -13,7 +13,7 @@ interface Props {
 
 const Main: React.FC<Props> = ({ chessApp, emitter, socket }) => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
-  // const [isMatchModal, setIsMatchModal] = useState(false);
+  const [matchSettingsOpen, setMatchSettingsOpen] = useState(false);
 
   const display = (
     <>
@@ -29,12 +29,13 @@ const Main: React.FC<Props> = ({ chessApp, emitter, socket }) => {
           Play
         </button>
       ) : null}
-      <SideNAV
-        emitter={emitter}
-        isOpen={isNavbarOpen}
-        setIsOpen={setIsNavbarOpen}
-        // setMatchModal={setIsMatchModal}
-      />
+      {isNavbarOpen ? (
+        <SideNAV
+          emitter={emitter}
+          setIsNavbarOpen={setIsNavbarOpen}
+          setMatchSettings={setMatchSettingsOpen}
+        />
+      ) : null}
     </>
   );
 
@@ -48,7 +49,13 @@ const Main: React.FC<Props> = ({ chessApp, emitter, socket }) => {
           setIsNavbarOpen={setIsNavbarOpen}
         />
       ) : null}
-      {/* {isMatchModal ? <CreateMatchModal chessRef={chessRef} /> : null} */}
+      {matchSettingsOpen ? (
+        <MatchSettingsModal
+          chessApp={chessApp}
+          emitter={emitter}
+          setMatchSettings={setMatchSettingsOpen}
+        />
+      ) : null}
     </div>
   );
 };
