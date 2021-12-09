@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { App } from "./component/chess-app";
 import SideNAV from "./component/side-nav";
 import EventEmitter from "./events/event-emitter";
@@ -17,6 +17,7 @@ const Main: React.FC<Props> = ({ chessApp, emitter, socket }) => {
   const [matchSettingsOpen, setMatchSettingsOpen] = useState(false);
   const [updateReact, setUpdateReact] = useState(true);
   const [inviteCode, setInviteCode] = useState("");
+  const timerRef = useRef(chessApp.game.timer);
 
   const display = (
     <>
@@ -43,7 +44,9 @@ const Main: React.FC<Props> = ({ chessApp, emitter, socket }) => {
   );
 
   useEffect(() => {
-    socket.on("updateReact", () => {
+    socket.on("prepare-game-scene", () => {
+      emitter.emit("prepare-game-scene");
+      emitter.emit("reset-camera");
       updateReact ? setUpdateReact(false) : setUpdateReact(true);
       setInviteCode("");
     });
@@ -59,6 +62,7 @@ const Main: React.FC<Props> = ({ chessApp, emitter, socket }) => {
       {inviteCode !== "" ? <InviteCode code={inviteCode} /> : null}
       {chessApp.game.gameStarted ? (
         <GameOverlay
+          timerRef={timerRef}
           emitter={emitter}
           isNavbarOpen={isNavbarOpen}
           setIsNavbarOpen={setIsNavbarOpen}

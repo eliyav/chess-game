@@ -16,16 +16,16 @@ const MatchSettingsModal: React.FC<Props> = ({ emitter, setMatchSettings }) => {
   const formSubmitEvent = () => {
     let form = new FormData(formRef.current!);
     const mode = form.get("mode")?.toString();
-    const team = form.get("team")?.toString();
-    const time = form.get("time")?.toString();
-    let clockTime;
-    if (time) {
-      clockTime = 60 * parseInt(time);
+    const player = form.get("team")?.toString();
+    const clockTime = form.get("time")?.toString();
+    let time;
+    if (clockTime) {
+      time = 60 * parseInt(clockTime);
     }
     const options = {
       mode,
-      clockTime,
-      team,
+      time,
+      player,
     };
     emitter.emit("create-match", options);
     setMatchSettings(false);

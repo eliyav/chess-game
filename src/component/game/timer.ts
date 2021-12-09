@@ -25,8 +25,6 @@ class Timer {
     setTimeout(() => {
       this.timer1 = time / 2;
       this.timer2 = time / 2;
-      // timer1.innerText = this.timer1.toString();
-      // timer2.innerText = this.timer2.toString();
       this.gamePaused = false;
     }, 1000);
   };
@@ -62,12 +60,10 @@ class Timer {
       let timerId = setInterval(() => {
         if (this.gameState.currentPlayer === "White") {
           this.timer1 = this.padZero(this.timer1 - 1);
-          // timer1.innerText = this.timer1.toString();
           this.timer1 === 0 ? this.endGame() : null;
         }
         if (this.gameState.currentPlayer !== "White") {
           this.timer2 = this.padZero(this.timer2 - 1);
-          // timer2.innerText = this.timer2.toString();
           this.timer2 === 0 ? this.endGame() : null;
         }
         if (this.gameStarted === false || this.gamePaused === true) {
