@@ -1,10 +1,18 @@
+.overlayWrapper {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  height: 100%;
+  align-content: space-between;
+  pointer-events: none;
+}
+
 .gameOverlay {
-  position: absolute;
   display: flex;
   justify-content: center;
   z-index: 2;
   width: 100%;
-  height: 50px;
+  height: 3.5rem;
   background-color: transparent;
   text-align: center;
   pointer-events: none;
@@ -31,4 +39,27 @@
 
 .gameOverlay > .item:hover {
   transform: scale(0.9);
+}
+
+.timer {
+  display: flex;
+  height: 2rem;
+  background-color: rgba(255, 255, 255, 0.5);
+  justify-content: space-between;
+  text-align: center;
+}
+
+.timer > .playerTimer > img {
+  height: 1.8rem;
+  object-fit: contain;
+  display: inline;
+  padding: 0 0.2rem;
+}
+
+.timer > .playerTimer > div {
+  display: inline;
+  padding: 0.1rem;
+  font-weight: bold;
+  font-style: oblique;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 }
