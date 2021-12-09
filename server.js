@@ -51,8 +51,8 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("updateReactRequest", () => {
-    socket.emit("updateReact");
+  socket.on("prepare-game-scene-request", () => {
+    socket.emit("prepare-game-scene");
   });
 
   socket.on("stateChange", ({ originPoint, targetPoint, room }) => {

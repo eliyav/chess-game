@@ -41,6 +41,7 @@ const assetsLoader = async (scene: Scene, description: string) => {
         BABYLON.SceneLoader.ImportMeshAsync("", mesh, "")
       )
     );
+
     const piecesMeshes: ChessPieceMesh[] = [];
     const boardMeshes: AbstractMesh[] = [];
 

@@ -1,6 +1,6 @@
 import EventEmitter from "./event-emitter";
 import { renderScene, rotateCamera } from "../helper/canvas-helpers";
-import { App } from "../component/chess-app";
+import { App, GameMode } from "../component/chess-app";
 
 const activateEmitter = (app: App, socket: any): EventEmitter => {
   const {
@@ -44,14 +44,20 @@ const activateEmitter = (app: App, socket: any): EventEmitter => {
     }
   });
 
-  emitter.on("pause-game", (currentPlayer: string) => {
-    let time;
-    if (currentPlayer === "White") {
-      time = game.timer.timer1;
+  emitter.on("pause-game", (currentPlayer: string, mode: string) => {
+    if (gameMode.mode === "Online") {
+      if (gameMode.player === game.state.currentPlayer) {
+        let time;
+        if (currentPlayer === "White") {
+          time = game.timer.timer1;
+        } else {
+          time = game.timer.timer2;
+        }
+        socket.emit("pause-game", { gameMode, currentPlayer, time });
+      }
     } else {
-      time = game.timer.timer2;
+      game.timer.pauseTimer();
     }
-    socket.emit("pause-game", { gameMode, currentPlayer, time });
   });
 
   emitter.on("undo-move", () => {
@@ -69,18 +75,23 @@ const activateEmitter = (app: App, socket: any): EventEmitter => {
     }
   });
 
-  emitter.on("create-match", ({ mode, clockTime, team }: any) => {
+  emitter.on("create-match", ({ mode, time, player }: GameMode) => {
     gameMode.mode = mode;
-    gameMode.time = clockTime;
-    gameMode.player = team;
+    gameMode.time = time;
+    gameMode.player = player;
     if (mode === "Offline") {
-      game.resetGame(clockTime);
-      renderScene(game, gameScene);
-      startScene.detachControl();
-      showScene.index = 1;
+      emitter.emit("prepare-game-scene");
     } else {
       socket.emit("create-room");
     }
+  });
+
+  emitter.on("prepare-game-scene", () => {
+    game.resetGame(gameMode.time);
+    renderScene(game, gameScene);
+    startScene.detachControl();
+    showScene.index = 1;
+    emitter.emit("reset-camera");
   });
 
   emitter.on("reset-camera", () => {
@@ -119,20 +130,6 @@ const activateEmitter = (app: App, socket: any): EventEmitter => {
     let room = prompt("Please enter the room key");
     socket.emit("join-room", room);
   });
-
-  // pauseButton.addEventListener("click", () => {
-  //   pauseButton.innerHTML === "Pause"
-  //     ? (pauseButton.innerHTML = "Paused")
-  //     : (pauseButton.innerHTML = "Pause");
-  //   if (gameMode.mode === "online") {
-  //     if (gameMode.player === game.state.currentPlayer) {
-  //       game.timer.pauseTimer();
-  //       emitter!.emit("pause-game", game.state.currentPlayer);
-  //     }
-  //   } else {
-  //     game.timer.pauseTimer();
-  //   }
-  // });
 
   return emitter;
 };

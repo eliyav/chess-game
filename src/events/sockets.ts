@@ -49,12 +49,8 @@ const activateSocket = (app: App) => {
 
   socket.on("start-match", () => {
     // Activate Game Settings
-    game.resetGame(gameMode.time);
-    renderScene(game, gameScene);
-    startScene.detachControl();
-    showScene.index = 1;
     console.log("game has been activated");
-    socket.emit("updateReactRequest");
+    socket.emit("prepare-game-scene-request");
   });
 
   socket.on("pause-game", ({ currentPlayer, time }) => {
