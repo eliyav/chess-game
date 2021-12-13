@@ -55,7 +55,7 @@ canvas {
   height: 100%;
   width: 250px;
   position: fixed;
-  z-index: 2;
+  z-index: 3;
   left: 0;
   background-color: #111;
   overflow-x: hidden;
@@ -85,9 +85,9 @@ canvas {
   text-decoration: underline;
 }
 
-/*!**********************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js!./src/component/game-overlay.css ***!
-  \**********************************************************************************/
+/*!***********************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./src/component/game-overlay/game-overlay.css ***!
+  \***********************************************************************************************/
 .overlayWrapper {
   display: flex;
   flex-flow: row wrap;
