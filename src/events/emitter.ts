@@ -1,8 +1,8 @@
 import EventEmitter from "./event-emitter";
 import { renderScene, rotateCamera } from "../helper/canvas-helpers";
-import { App, GameMode } from "../component/chess-app";
+import { ChessApp, GameMode } from "../component/chess-app";
 
-const activateEmitter = (app: App, socket: any): EventEmitter => {
+const activateEmitter = (app: ChessApp, socket: any): EventEmitter => {
   const {
     game,
     gameMode,

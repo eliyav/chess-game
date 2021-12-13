@@ -1,8 +1,8 @@
 import { io } from "socket.io-client";
 import { renderScene } from "../helper/canvas-helpers";
-import { App } from "../component/chess-app";
+import { ChessApp } from "../component/chess-app";
 
-const activateSocket = (app: App) => {
+const activateSocket = (app: ChessApp) => {
   const {
     game,
     gameMode,

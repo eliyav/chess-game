@@ -1,4 +1,7 @@
-import { checkForPawnPromotion, LocationsInfo } from "../../helper/game-helpers";
+import {
+  checkForPawnPromotion,
+  LocationsInfo,
+} from "../../helper/game-helpers";
 
 class GamePiece {
   name: string;

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { IconsIndex } from "../main";
+import { IconsIndex } from "../../main";
 import OverlaySelection from "./game-overlay-selection";
-import "./game-overlay.css";
-import Timer from "./game/timer";
+import Timer from "../game-logic/timer";
 import TimerOverlay from "./timer-overlay";
+import "./game-overlay.css";
 
 interface OverlayProps {
   timerRef: React.MutableRefObject<Timer>;

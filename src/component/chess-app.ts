@@ -1,6 +1,6 @@
 import { Engine, Scene } from "babylonjs";
-import Game from "./game/game";
-import chessData from "../data/chess-data-import";
+import Game from "./game-logic/game";
+import chessData from "./game-logic/chess-data-import";
 import startScreen from "../view/start-screen";
 import gameScreen from "../view/game-screen";
 
@@ -8,7 +8,7 @@ const initializeChessApp = async (
   canvas: HTMLCanvasElement,
   engine: Engine
 ) => {
-  const app: App = {
+  const app: ChessApp = {
     game: new Game(chessData),
     gameMode: {
       mode: undefined,
@@ -64,7 +64,7 @@ const initializeChessApp = async (
 
 export default initializeChessApp;
 
-export interface App {
+export interface ChessApp {
   game: Game;
   gameMode: GameMode;
   showScene: { index: number };

@@ -1,4 +1,4 @@
-import { State } from "../../data/chess-data-import";
+import { State } from "./chess-data-import";
 
 interface Timer {
   gameState: State;

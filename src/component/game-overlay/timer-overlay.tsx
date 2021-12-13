@@ -1,20 +1,24 @@
 import React, { useEffect, useState } from "react";
-import Timer from "./game/timer";
-import whitePlayer from "../../assets/white-player.png";
-import blackPlayer from "../../assets/black-player.png";
+import Timer from "../game-logic/timer";
+import whitePlayer from "../../../assets/white-player.png";
+import blackPlayer from "../../../assets/black-player.png";
 
-interface Props {
+interface TimerProps {
   timerRef: React.MutableRefObject<Timer>;
   paused: boolean;
 }
 
-const TimerOverlay: React.FC<Props> = ({ timerRef, paused }) => {
+const TimerOverlay: React.VFC<TimerProps> = ({ timerRef, paused }) => {
   const [time, setTime] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => {
+    const timeOut = setTimeout(() => {
       time ? setTime(false) : setTime(true);
     }, 1000);
+
+    return () => {
+      clearTimeout(timeOut);
+    };
   }, [timerRef.current.timer1, timerRef.current.timer2, time]);
 
   useEffect(() => {

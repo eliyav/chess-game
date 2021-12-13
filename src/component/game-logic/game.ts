@@ -7,7 +7,7 @@ import {
   undoUpdateLocation,
 } from "../../helper/game-helpers";
 import Board from "./board";
-import { Data, State } from "../../data/chess-data-import";
+import { Data, State } from "./chess-data-import";
 import Timer from "./timer";
 import GamePiece, { Move } from "./game-piece";
 

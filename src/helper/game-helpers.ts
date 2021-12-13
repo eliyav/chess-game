@@ -1,5 +1,5 @@
 import { Square } from "./board-helpers";
-import GamePiece from "../component/game/game-piece";
+import GamePiece from "../component/game-logic/game-piece";
 
 export interface TurnHistory {
   result: boolean;

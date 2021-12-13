@@ -1,5 +1,5 @@
-import { PieceInitialPoints } from "../data/chess-data-import";
-import GamePiece from "../component/game/game-piece";
+import { PieceInitialPoints } from "../component/game-logic/chess-data-import";
+import GamePiece from "../component/game-logic/game-piece";
 
 export interface Square {
   square: string;

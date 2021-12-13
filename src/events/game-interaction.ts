@@ -1,9 +1,9 @@
-import { App } from "../component/chess-app";
+import { ChessApp } from "../component/chess-app";
 import EventEmitter from "../events/event-emitter";
 import { ChessPieceMesh } from "../view/asset-loader";
 import inputController from "./input-controller";
 
-const activateGameInteraction = (chessApp: App, emitter: EventEmitter) => {
+const activateGameInteraction = (chessApp: ChessApp, emitter: EventEmitter) => {
   chessApp.scenes.gameScene.onPointerDown = async (e: any, pickResult: any) => {
     if (chessApp.gameMode.mode === "Online") {
       if (chessApp.gameMode.player === chessApp.game.state.currentPlayer) {

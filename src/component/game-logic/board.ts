@@ -1,5 +1,5 @@
 import { createGrid, Square } from "../../helper/board-helpers";
-import {Data, PieceInitialPoints} from "../../data/chess-data-import"
+import { Data, PieceInitialPoints } from "./chess-data-import";
 
 class Board {
   movementArray: number[];
@@ -8,7 +8,7 @@ class Board {
   columnNames: string[][];
   grid: Square[][];
 
-  constructor({ boardSize, pieceInitialPoints, movement, columnNames}: Data) {
+  constructor({ boardSize, pieceInitialPoints, movement, columnNames }: Data) {
     this.movementArray = movement;
     this.pieceInitialPoints = pieceInitialPoints;
     this.boardSize = boardSize;
