@@ -9,11 +9,11 @@
 }
 
 .sidenav button {
-  display: block;
   padding: 8px 8px 8px 32px;
-  text-decoration: none;
   font-size: 1.5rem;
   color: #818181;
+  background-color: transparent;
+  border: none;
 }
 
 .sidenav button:hover {
@@ -24,12 +24,10 @@
   display: block;
   top: 0;
   font-size: 2.25rem;
-  margin-left: 65%;
+  margin-left: 75%;
   color: white;
 }
 
-div.category {
-  color: white;
-  border-bottom: 1mm outset whitesmoke;
-  text-align: center;
+.category {
+  text-decoration: underline;
 }

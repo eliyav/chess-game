@@ -51,6 +51,7 @@ const Main: React.VFC<MainProps> = ({ chessApp, emitter, socket }) => {
                   setIsNavbarOpen(false);
                 }
               },
+              className: "category",
             },
             {
               text: "Create Match",
@@ -146,6 +147,7 @@ const Main: React.VFC<MainProps> = ({ chessApp, emitter, socket }) => {
               player,
             };
             emitter.emit("create-match", options);
+            setIsMatchSettings(false);
           }}
         />
       ) : null}

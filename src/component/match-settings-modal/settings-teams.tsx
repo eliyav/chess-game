@@ -1,26 +1,46 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 
-interface Props {}
+const SettingsTeams: React.VFC = () => {
+  const [isDefaultChecked, setIsDefaultChecked] = useState(true);
+  const whiteTeamRef = useRef<HTMLInputElement>(null);
+  const blackTeamRef = useRef<HTMLInputElement>(null);
 
-const SettingsTeams: React.FC<Props> = () => {
   return (
-    <div id="gameOptionsTeams">
-      <p id="gameOptionsTeamsText">Select team color</p>
+    <div className="subsection">
+      <p>Select team color</p>
       <input
+        ref={whiteTeamRef}
         type="radio"
-        id="gameOptionsTeamsWhite"
         name="team"
         value="White"
         defaultChecked={true}
+        className="hide"
       ></input>
-      <label>White</label>
+      <label
+        className={isDefaultChecked === true ? "option highlighted" : "option"}
+        onClick={() => {
+          whiteTeamRef.current!.checked = true;
+          setIsDefaultChecked(true);
+        }}
+      >
+        White
+      </label>
       <input
+        ref={blackTeamRef}
         type="radio"
-        id="gameOptionsTeamsBlack"
         name="team"
         value="Black"
+        className="hide"
       ></input>
-      <label>Black</label>
+      <label
+        className={isDefaultChecked === false ? "option highlighted" : "option"}
+        onClick={() => {
+          blackTeamRef.current!.checked = true;
+          setIsDefaultChecked(false);
+        }}
+      >
+        Black
+      </label>
     </div>
   );
 };

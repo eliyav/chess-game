@@ -1,23 +1,24 @@
-import React from "react";
+import React, { useRef } from "react";
 
-interface Props {}
+const SettingsTime: React.VFC = () => {
+  const timeRef = useRef<HTMLInputElement>(null);
 
-const SettingsTime: React.FC<Props> = () => {
   return (
-    <div id="gameOptionsTimer">
-      <p id="gameOptionsTimerText">Select Time on Clock (Minutes)</p>
+    <div className="subsection">
+      <p>Select Minutes on Clock</p>
       <input
-        type="radio"
-        id="No-Time"
         name="time"
-        value="00"
-        defaultChecked={true}
+        type="range"
+        min="0"
+        max="60"
+        step="10"
+        defaultValue="0"
+        onChange={(e) => {
+          const value = e.currentTarget.value;
+          timeRef.current!.innerText = value;
+        }}
       ></input>
-      <label>Not Timed</label>
-      <input type="radio" id="15Minutes" name="time" value="15"></input>
-      <label>15</label>
-      <input type="radio" id="30Minutes" name="time" value="30"></input>
-      <label>30</label>
+      <div ref={timeRef}>0</div>
     </div>
   );
 };

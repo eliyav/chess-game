@@ -1,30 +1,52 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 
-interface Props {
+interface ModeProps {
   setGameMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const SettingsMode: React.FC<Props> = ({ setGameMode }) => {
+const SettingsMode: React.VFC<ModeProps> = ({ setGameMode }) => {
+  const [isDefaultChecked, setIsDefaultChecked] = useState(true);
+  const offlineRef = useRef<HTMLInputElement>(null);
+  const onlineRef = useRef<HTMLInputElement>(null);
+
   return (
-    <div id="gameOptionsMode">
-      <p id="gameOptionsMode">Select Mode</p>
+    <div className="subsection">
+      <p>Select Mode</p>
       <input
+        ref={offlineRef}
         type="radio"
-        id="gameOptionsModeOffline"
         name="mode"
         value="Offline"
         defaultChecked={true}
-        onClick={() => setGameMode(false)}
+        className="hide"
       ></input>
-      <label>Offline</label>
+      <label
+        className={isDefaultChecked === true ? "option highlighted" : "option"}
+        onClick={() => {
+          offlineRef.current!.checked = true;
+          setIsDefaultChecked(true);
+          setGameMode(false);
+        }}
+      >
+        Offline
+      </label>
       <input
+        ref={onlineRef}
         type="radio"
-        id="gameOptionsModeOnline"
         name="mode"
         value="Online"
-        onClick={() => setGameMode(true)}
+        className="hide"
       ></input>
-      <label>Online</label>
+      <label
+        className={isDefaultChecked === false ? "option highlighted" : "option"}
+        onClick={() => {
+          onlineRef.current!.checked = true;
+          setIsDefaultChecked(false);
+          setGameMode(true);
+        }}
+      >
+        Online
+      </label>
     </div>
   );
 };

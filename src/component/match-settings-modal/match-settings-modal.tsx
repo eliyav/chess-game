@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import SettingsMode from "./settings-mode";
 import SettingsTeams from "./settings-teams";
 import SettingsTime from "./settings-time";
+import "./match-settings-modal.css";
 
 interface FormProps {
   onClose: () => void;
@@ -13,17 +14,17 @@ const MatchSettingsModal: React.VFC<FormProps> = ({ onClose, onSubmit }) => {
   const [isOnlineGame, setIsOnlineMode] = useState(false);
 
   return (
-    <div id="match-settings-modal">
-      <form id="gameOptionsScreen" ref={formRef}>
-        <a className="closebtn" onClick={() => onClose()}>
+    <div className="match-settings-modal">
+      <form className="gameOptionsScreen" ref={formRef}>
+        <a className="closeBtn" onClick={onClose}>
           &times;
         </a>
-        <p id="gameOptionsTitle">Game Options</p>
+        <p className="title">Game Options</p>
         <SettingsMode setGameMode={setIsOnlineMode} />
         {isOnlineGame ? <SettingsTeams /> : null}
         <SettingsTime />
         <button
-          id="gameOptionsConfirmation"
+          className="confirmButton"
           onClick={(e) => {
             e.preventDefault();
             onSubmit(formRef.current!);
