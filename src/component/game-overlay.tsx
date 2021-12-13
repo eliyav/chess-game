@@ -1,54 +1,24 @@
 import React, { useState } from "react";
-import EventEmitter from "../events/event-emitter";
-import OverlaySelection, { IconsIndex } from "./game-overlay-selection";
+import { IconsIndex } from "../main";
+import OverlaySelection from "./game-overlay-selection";
 import "./game-overlay.css";
 import Timer from "./game/timer";
 import TimerOverlay from "./timer-overlay";
 
-interface Props {
-  emitter: EventEmitter | undefined;
-  isNavbarOpen: boolean;
-  setIsNavbarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+interface OverlayProps {
   timerRef: React.MutableRefObject<Timer>;
+  items: Array<{ text: keyof IconsIndex; onClick: () => void }>;
+  icons: IconsIndex;
 }
 
-const GameOverlay: React.FC<Props> = ({
-  emitter,
-  isNavbarOpen,
-  setIsNavbarOpen,
-  timerRef,
-}) => {
+const GameOverlay: React.VFC<OverlayProps> = ({ timerRef, items, icons }) => {
   const [gamePaused, setGamePaused] = useState(false);
-
-  const overlaySelection = (e: any) => {
-    const choice = e.target.innerText;
-    if (choice === "Restart") {
-      emitter!.emit("reset-board");
-    } else if (choice === "Undo") {
-      emitter!.emit("undo-move");
-    } else if (choice === "Camera") {
-      emitter!.emit("reset-camera");
-    } else if (choice === "Pause") {
-      emitter?.emit("pause-game");
-      gamePaused ? setGamePaused(false) : setGamePaused(true);
-    } else if (choice === "Menu") {
-      isNavbarOpen ? setIsNavbarOpen(false) : setIsNavbarOpen(true);
-    }
-  };
-
-  const overlaySelections: IconsIndex[] = [
-    "menu",
-    "restart",
-    "camera",
-    "undo",
-    "pause",
-  ];
 
   return (
     <div className="overlayWrapper">
-      <div className="gameOverlay" onClick={overlaySelection}>
-        {overlaySelections.map((str, idx) => (
-          <OverlaySelection name={str} key={idx} />
+      <div className="gameOverlay">
+        {items.map((item, idx) => (
+          <OverlaySelection item={item} icons={icons} key={idx} />
         ))}
       </div>
       <TimerOverlay timerRef={timerRef} paused={gamePaused} />

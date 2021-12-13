@@ -1,17 +1,19 @@
 import React from "react";
-import * as icons from "./icons";
+import { IconsIndex } from "../main";
 
-export type IconsIndex = keyof typeof icons;
-
-interface Props {
-  name: IconsIndex;
+interface SelectionProps {
+  item: { text: keyof IconsIndex; onClick: () => void };
+  icons: IconsIndex;
 }
 
-const OverlaySelection: React.FC<Props> = ({ name }) => {
+const OverlaySelection: React.VFC<SelectionProps> = ({
+  item: { text, onClick },
+  icons,
+}) => {
   return (
-    <div className="item">
-      <img src={icons[name]} alt="logo"></img>
-      {name.charAt(0).toUpperCase() + name.slice(1)}
+    <div className="item" onClick={onClick}>
+      <img src={icons[text]} alt="logo"></img>
+      {text.charAt(0).toUpperCase() + text.slice(1)}
     </div>
   );
 };
