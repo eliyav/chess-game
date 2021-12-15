@@ -1,28 +1,28 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ChessApp } from "./component/chess-app";
 import SideNav from "./component/side-nav";
 import EventEmitter from "./events/event-emitter";
 import GameOverlay from "./component/game-overlay/game-overlay";
 import MatchSettingsModal from "./component/match-settings-modal/match-settings-modal";
 import InviteCode from "./component/match-settings-modal/invite-code";
 import * as icons from "./component/game-overlay/overlay-icons";
+import Game from "./component/game-logic/game";
 
 interface MainProps {
-  chessApp: ChessApp | undefined;
+  chessGame: Game | undefined;
   emitter: EventEmitter | undefined;
   socket: any;
 }
 
-const MainContent: React.VFC<MainProps> = ({ chessApp, emitter, socket }) => {
+const MainContent: React.VFC<MainProps> = ({ chessGame, emitter, socket }) => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const [isMatchSettings, setIsMatchSettings] = useState(false);
   const [updateReact, setUpdateReact] = useState(true);
   const [inviteCode, setInviteCode] = useState("");
-  const timerRef = useRef(chessApp!.game.timer);
+  const timerRef = useRef(chessGame!.timer);
 
   const display = (
     <>
-      {!chessApp!.game.gameStarted ? (
+      {!chessGame!.gameStarted ? (
         <button
           id="playButton"
           onClick={() => {
@@ -90,7 +90,7 @@ const MainContent: React.VFC<MainProps> = ({ chessApp, emitter, socket }) => {
     <div className="app">
       {display}
       {inviteCode !== "" ? <InviteCode code={inviteCode} /> : null}
-      {chessApp!.game.gameStarted ? (
+      {chessGame!.gameStarted ? (
         <GameOverlay
           timerRef={timerRef}
           items={[

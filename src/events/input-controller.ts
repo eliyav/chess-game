@@ -7,17 +7,17 @@ import {
 import Game from "../component/game-logic/game";
 import { CustomScene } from "../view/start-screen";
 import { ChessPieceMesh } from "../view/asset-loader";
-import { GameMode } from "../component/chess-app";
+import MatchContext from "../component/match-context";
 
 const inputController = (
   mesh: ChessPieceMesh,
   game: Game,
   gameScene: CustomScene,
-  gameMode: GameMode
+  matchContext: MatchContext
 ) => {
   if (!game.timer.gamePaused) {
-    if (gameMode.mode === "Online") {
-      if (gameMode.player === game.state.currentPlayer) {
+    if (matchContext.mode === "Online") {
+      if (matchContext.player === game.state.currentPlayer) {
         return processMove();
       }
     } else {

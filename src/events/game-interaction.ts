@@ -1,12 +1,23 @@
-import { ChessApp } from "../component/chess-app";
+import MatchContext from "../component/match-context";
+import Game from "../component/game-logic/game";
 import EventEmitter from "../events/event-emitter";
 import { ChessPieceMesh } from "../view/asset-loader";
+import { RenderContext } from "../view/render-context";
 import inputController from "./input-controller";
 
-const activateGameInteraction = (chessApp: ChessApp, emitter: EventEmitter) => {
-  chessApp.scenes.gameScene.onPointerDown = async (e: any, pickResult: any) => {
-    if (chessApp.gameMode.mode === "Online") {
-      if (chessApp.gameMode.player === chessApp.game.state.currentPlayer) {
+const activateGameInteraction = (
+  chessGame: Game,
+  matchContext: MatchContext,
+  renderContext: RenderContext,
+  emitter: EventEmitter
+) => {
+  const {
+    scenes: { gameScene },
+  } = renderContext;
+
+  gameScene.onPointerDown = async (e: any, pickResult: any) => {
+    if (matchContext.mode === "Online") {
+      if (matchContext.player === chessGame.state.currentPlayer) {
         onClickEvent();
       }
     } else {
@@ -18,13 +29,13 @@ const activateGameInteraction = (chessApp: ChessApp, emitter: EventEmitter) => {
         const mesh: ChessPieceMesh = pickResult.pickedMesh;
         const isCompleteMove = inputController(
           mesh,
-          chessApp.game,
-          chessApp.scenes.gameScene,
-          chessApp.gameMode
+          chessGame,
+          gameScene,
+          matchContext
         );
         isCompleteMove
           ? (() => {
-              const [originPoint, targetPoint] = chessApp.game.moves;
+              const [originPoint, targetPoint] = chessGame.moves;
               emitter!.emit("playerMove", originPoint, targetPoint);
             })()
           : null;

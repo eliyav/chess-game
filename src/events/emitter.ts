@@ -1,84 +1,93 @@
 import EventEmitter from "./event-emitter";
 import { renderScene, rotateCamera } from "../helper/canvas-helpers";
-import { ChessApp, GameMode } from "../component/chess-app";
+import { RenderContext } from "../view/render-context";
+import Game from "../component/game-logic/game";
+import MatchContext from "../component/match-context";
 
-const activateEmitter = (app: ChessApp, socket: any): EventEmitter => {
+const activateEmitter = (
+  chessGame: Game,
+  matchContext: MatchContext,
+  renderContext: RenderContext,
+  socket: any
+): EventEmitter => {
   const {
-    game,
-    gameMode,
     showScene,
-    scenes: { startScene, gameScene },
-  } = app;
+    scenes: { gameScene, startScene },
+  } = renderContext;
 
   const emitter = new EventEmitter();
 
   emitter.on("playerMove", (originPoint: Point, targetPoint: Point) => {
-    renderScene(game, gameScene);
-    const resolved = game.playerMove(originPoint!, targetPoint!);
+    renderScene(chessGame, gameScene);
+    const resolved = chessGame.playerMove(originPoint!, targetPoint!);
     if (resolved) {
-      if (gameMode.mode === "Offline") {
-        game.switchTurn();
-        renderScene(game, gameScene);
-        rotateCamera(game.state.currentPlayer, gameScene);
-      } else if (gameMode.mode === "Online") {
-        const room = gameMode.room;
-        renderScene(game, gameScene);
-        game.switchTurn();
+      if (matchContext.mode === "Offline") {
+        chessGame.switchTurn();
+        renderScene(chessGame, gameScene);
+        rotateCamera(chessGame.state.currentPlayer, gameScene);
+      } else if (matchContext.mode === "Online") {
+        const room = matchContext.room;
+        renderScene(chessGame, gameScene);
+        chessGame.switchTurn();
         socket.emit("stateChange", { originPoint, targetPoint, room });
       }
     }
-    game.moves.length = 0;
+    chessGame.moves.length = 0;
   });
 
   emitter.on("reset-board", () => {
     const answer = confirm("Are you sure you want to reset the board?");
     if (answer) {
-      if (gameMode.mode === "online") {
-        socket.emit("reset-board", gameMode);
+      if (matchContext.mode === "online") {
+        socket.emit("reset-board", matchContext);
       } else {
-        game.resetGame(gameMode.time);
-        renderScene(game, gameScene);
+        chessGame.resetGame(matchContext.time);
+        renderScene(chessGame, gameScene);
         let camera: any = gameScene.cameras[0];
         camera.alpha = Math.PI;
       }
     }
   });
 
-  emitter.on("pause-game", (currentPlayer: string, mode: string) => {
-    if (gameMode.mode === "Online") {
-      if (gameMode.player === game.state.currentPlayer) {
+  emitter.on("pause-game", (currentPlayer: string) => {
+    if (matchContext.mode === "Online") {
+      if (matchContext.player === chessGame.state.currentPlayer) {
         let time;
         if (currentPlayer === "White") {
-          time = game.timer.timer1;
+          time = chessGame.timer.timer1;
         } else {
-          time = game.timer.timer2;
+          time = chessGame.timer.timer2;
         }
-        socket.emit("pause-game", { gameMode, currentPlayer, time });
+        socket.emit("pause-game", {
+          matchContext,
+          currentPlayer,
+          time,
+        });
       }
     } else {
-      game.timer.pauseTimer();
+      chessGame.timer.pauseTimer();
     }
   });
 
   emitter.on("undo-move", () => {
-    if (gameMode.mode === "online") {
-      if (gameMode.player !== game.state.currentPlayer) {
-        const lastTurn = game.turnHistory.at(-1);
+    if (matchContext.mode === "online") {
+      if (matchContext.player !== chessGame.state.currentPlayer) {
+        const lastTurn = chessGame.turnHistory.at(-1);
         if (lastTurn !== undefined) {
-          socket.emit("undo-move", gameMode);
+          socket.emit("undo-move", matchContext);
         }
       }
     } else {
-      game.undoTurn();
-      renderScene(game, gameScene);
+      chessGame.undoTurn();
+      renderScene(chessGame, gameScene);
       emitter.emit("reset-camera");
     }
   });
 
-  emitter.on("create-match", ({ mode, time, player }: GameMode) => {
-    gameMode.mode = mode;
-    gameMode.time = time;
-    gameMode.player = player;
+  emitter.on("create-match", ({ mode, time, player }: MatchContext) => {
+    matchContext.mode = mode;
+    matchContext.time = time;
+    matchContext.player = player;
     if (mode === "Offline") {
       emitter.emit("prepare-game-scene");
     } else {
@@ -87,8 +96,8 @@ const activateEmitter = (app: ChessApp, socket: any): EventEmitter => {
   });
 
   emitter.on("prepare-game-scene", () => {
-    game.resetGame(gameMode.time);
-    renderScene(game, gameScene);
+    chessGame.resetGame(matchContext.time);
+    renderScene(chessGame, gameScene);
     startScene.detachControl();
     showScene.index = 1;
     emitter.emit("reset-camera");
@@ -96,10 +105,10 @@ const activateEmitter = (app: ChessApp, socket: any): EventEmitter => {
 
   emitter.on("reset-camera", () => {
     let camera: any = gameScene.cameras[0];
-    if (gameMode.mode === "online") {
-      gameMode.player === "White" ? setToWhitePlayer() : setToBlackPlayer();
+    if (matchContext.mode === "online") {
+      matchContext.player === "White" ? setToWhitePlayer() : setToBlackPlayer();
     } else {
-      game.state.currentPlayer === "White"
+      chessGame.state.currentPlayer === "White"
         ? setToWhitePlayer()
         : setToBlackPlayer();
     }
@@ -120,13 +129,13 @@ const activateEmitter = (app: ChessApp, socket: any): EventEmitter => {
   emitter.on("home-screen", () => {
     let camera: any = gameScene.cameras[0];
     camera.alpha = Math.PI;
-    game.gameStarted = false;
+    chessGame.gameStarted = false;
     gameScene.detachControl();
     showScene.index = 0;
   });
 
   emitter.on("join-online-match", () => {
-    gameMode.mode = "online";
+    matchContext.mode = "online";
     let room = prompt("Please enter the room key");
     socket.emit("join-room", room);
   });

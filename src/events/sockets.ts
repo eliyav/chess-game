@@ -1,14 +1,17 @@
 import { io } from "socket.io-client";
+import MatchContext from "../component/match-context";
+import Game from "../component/game-logic/game";
 import { renderScene } from "../helper/canvas-helpers";
-import { ChessApp } from "../component/chess-app";
+import { RenderContext } from "../view/render-context";
 
-const activateSocket = (app: ChessApp) => {
+const activateSocket = (
+  chessGame: Game,
+  matchContext: MatchContext,
+  renderContext: RenderContext
+) => {
   const {
-    game,
-    gameMode,
-    scenes: { gameScene, startScene },
-    showScene,
-  } = app;
+    scenes: { gameScene },
+  } = renderContext;
 
   const socket = io(`ws://${window.location.host}`);
 
@@ -18,33 +21,33 @@ const activateSocket = (app: ChessApp) => {
 
   socket.on("stateChange", (newState) => {
     const { originPoint, targetPoint } = newState;
-    game.playerMove(originPoint, targetPoint);
-    game.switchTurn();
-    renderScene(game, gameScene);
+    chessGame.playerMove(originPoint, targetPoint);
+    chessGame.switchTurn();
+    renderScene(chessGame, gameScene);
   });
 
   socket.on("assign-room-info", (matchInfo) => {
     ({
-      mode: gameMode.mode,
-      player: gameMode.player,
-      time: gameMode.time,
-      room: gameMode.room,
+      mode: matchContext.mode,
+      player: matchContext.player,
+      time: matchContext.time,
+      room: matchContext.room,
     } = matchInfo);
-    socket.emit("check-match-start", gameMode.room);
+    socket.emit("check-match-start", matchContext.room);
   });
 
   socket.on("assign-room-number", (room) => {
-    gameMode.room = room;
+    matchContext.room = room;
     socket.emit("check-match-start", room);
   });
 
   socket.on("request-room-info", () => {
-    const { mode, player, time, room } = gameMode;
-    const gameModeClone = { mode, player, time, room };
-    gameModeClone.player === "White"
-      ? (gameModeClone.player = "Black")
-      : (gameModeClone.player = "White");
-    socket.emit("reply-room-info", gameModeClone);
+    const { mode, player, time, room } = matchContext;
+    const gameContextClone = { mode, player, time, room };
+    gameContextClone.player === "White"
+      ? (gameContextClone.player = "Black")
+      : (gameContextClone.player = "White");
+    socket.emit("reply-room-info", gameContextClone);
   });
 
   socket.on("start-match", () => {
@@ -54,11 +57,11 @@ const activateSocket = (app: ChessApp) => {
   });
 
   socket.on("pause-game", ({ currentPlayer, time }) => {
-    game.timer.pauseTimer();
+    chessGame.timer.pauseTimer();
     if (currentPlayer === "White") {
-      game.timer.timer1 = time;
+      chessGame.timer.timer1 = time;
     } else {
-      game.timer.timer2 = time;
+      chessGame.timer.timer2 = time;
     }
   });
   socket.on("reset-board-request", () => {
@@ -66,13 +69,13 @@ const activateSocket = (app: ChessApp) => {
       "Opponent has requested to reset the board, do you agree?"
     );
     const string = answer ? "Yes" : "No";
-    socket.emit("reset-board-response", { string, gameMode });
+    socket.emit("reset-board-response", { string, matchContext });
   });
 
   socket.on("reset-board-resolve", (response) => {
     if (response === "Yes") {
-      game.resetGame(gameMode.time);
-      renderScene(game, gameScene);
+      chessGame.resetGame(matchContext.time);
+      renderScene(chessGame, gameScene);
     } else {
       console.log("Request Denied");
     }
@@ -83,13 +86,13 @@ const activateSocket = (app: ChessApp) => {
       "Opponent has requested to undo their last move, do you agree?"
     );
     const string = answer ? "Yes" : "No";
-    socket.emit("undo-move-response", { string, gameMode });
+    socket.emit("undo-move-response", { string, matchContext });
   });
 
   socket.on("undo-move-resolve", (response) => {
     if (response === "Yes") {
-      game.undoTurn();
-      renderScene(game, gameScene);
+      chessGame.undoTurn();
+      renderScene(chessGame, gameScene);
     } else {
       console.log("Request Denied");
     }

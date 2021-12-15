@@ -1,21 +1,12 @@
-import { Engine, Scene } from "babylonjs";
-import Game from "./game-logic/game";
-import chessData from "./game-logic/chess-data-import";
-import startScreen from "../view/start-screen";
+import { Engine } from "babylonjs";
+import startScreen, { CustomScene } from "../view/start-screen";
 import gameScreen from "../view/game-screen";
 
-const initializeChessApp = async (
+const initRender = async (
   canvas: HTMLCanvasElement,
   engine: Engine
-) => {
-  const app: ChessApp = {
-    game: new Game(chessData),
-    gameMode: {
-      mode: undefined,
-      player: undefined,
-      time: undefined,
-      room: undefined,
-    },
+): Promise<RenderContext> => {
+  const renderContext = {
     showScene: { index: 0 },
     scenes: {
       startScene: await startScreen(engine),
@@ -26,7 +17,7 @@ const initializeChessApp = async (
   const {
     showScene,
     scenes: { startScene, gameScene },
-  } = app;
+  } = renderContext;
 
   engine.runRenderLoop(function () {
     switch (showScene.index) {
@@ -59,24 +50,12 @@ const initializeChessApp = async (
 
   window.onresize = refreshCanvas;
 
-  return app;
+  return renderContext;
 };
 
-export default initializeChessApp;
+export default initRender;
 
-export interface ChessApp {
-  game: Game;
-  gameMode: GameMode;
+export type RenderContext = {
   showScene: { index: number };
-  scenes: {
-    startScene: Scene;
-    gameScene: Scene;
-  };
-}
-
-export type GameMode = {
-  mode: string | undefined;
-  player: string | undefined;
-  room: string | undefined;
-  time: number | undefined;
+  scenes: { startScene: CustomScene; gameScene: CustomScene };
 };

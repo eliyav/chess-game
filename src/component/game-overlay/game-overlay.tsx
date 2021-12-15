@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { IconsIndex } from "../../main";
+import { IconsIndex } from "../../main-content";
 import OverlaySelection from "./game-overlay-selection";
 import Timer from "../game-logic/timer";
 import TimerOverlay from "./timer-overlay";
