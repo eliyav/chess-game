@@ -1,11 +1,11 @@
 import React from "react";
 
-interface Props {
+interface InviteProps {
   code: string;
   onClose: () => void;
 }
 
-const InviteCode: React.FC<Props> = ({ code, onClose }) => {
+const InviteCode: React.VFC<InviteProps> = ({ code, onClose }) => {
   return (
     <div className="match-settings-modal">
       <div className="gameOptionsScreen">
