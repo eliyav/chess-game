@@ -7,11 +7,13 @@
 ### Built With
 
 - [Babylon.js](https://www.babylonjs.com)
+- [React.js](https://reactjs.org/)
+- [Node.js](https://nodejs.org/en)
 - [Express.js](https://expressjs.com)
 - [Socket.io](https://socket.io)
+- [MongoDB](https://www.mongodb.com/)
 - [TypeScript](https://www.typescriptlang.org)
 - [Webpack](https://webpack.js.org/)
-- [Node.js](https://nodejs.org/en)
 
 <!-- GETTING STARTED -->
 
@@ -56,11 +58,12 @@ This project is meant to be played. If you are having fun playing chess it is be
   - [] Fix game time sync
 - [x] Update game mesh models
 - [x] Implement React.js
-- [] Save & Load games
-- [] Add Game start options
+- [x] Add Game start options
+- [] Implement MongoDB - Save & Load games
 - [] Add Authorization/Login
 - [] Add Friends List
 - [] Add Chat
+- [] Add animations
 - [] Add Ranking Algorithim and search
 - [] More will be added.
 

@@ -84,12 +84,21 @@ const MainContent: React.VFC<MainProps> = ({ chessGame, emitter, socket }) => {
     socket.on("reply-invite-code", (roomCode: string) => {
       setInviteCode(roomCode);
     });
+
+    socket.emit("save-game");
   }, []);
 
   return (
     <div className="app">
       {display}
-      {inviteCode !== "" ? <InviteCode code={inviteCode} /> : null}
+      {inviteCode !== "" ? (
+        <InviteCode
+          code={inviteCode}
+          onClose={() => {
+            setInviteCode("");
+          }}
+        />
+      ) : null}
       {chessGame!.gameStarted ? (
         <GameOverlay
           timerRef={timerRef}

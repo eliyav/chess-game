@@ -36,7 +36,7 @@ const App: React.VFC = () => {
       chessGame.current,
       matchContext.current,
       renderContext.current,
-      socket
+      socket.current
     );
     //Activate Game Scene interactivity
     activateGameInteraction(
