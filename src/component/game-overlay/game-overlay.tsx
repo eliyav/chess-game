@@ -14,8 +14,6 @@ interface OverlayProps {
 const GameOverlay: React.VFC<OverlayProps> = ({ timerRef, items, icons }) => {
   const [gamePaused, setGamePaused] = useState(false);
 
-  console.log(timerRef);
-
   return (
     <div className="overlayWrapper">
       <div className="gameOverlay">
@@ -23,7 +21,9 @@ const GameOverlay: React.VFC<OverlayProps> = ({ timerRef, items, icons }) => {
           <OverlaySelection item={item} icons={icons} key={idx} />
         ))}
       </div>
-      <TimerOverlay timerRef={timerRef} paused={gamePaused} />
+      {timerRef?.gameStarted === true ? (
+        <TimerOverlay timerRef={timerRef} paused={gamePaused} />
+      ) : null}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import SideNav from "./component/side-nav";
 import EventEmitter from "./events/event-emitter";
 import GameOverlay from "./component/game-overlay/game-overlay";
@@ -6,7 +6,6 @@ import MatchSettingsModal from "./component/match-settings-modal/match-settings-
 import InviteCode from "./component/match-settings-modal/invite-code";
 import * as icons from "./component/game-overlay/overlay-icons";
 import Match from "./component/match";
-import initGameController from "./events/game-interaction";
 import { CanvasView } from "./view/view-init";
 
 interface MainProps {
@@ -22,10 +21,9 @@ const MainContent: React.VFC<MainProps> = ({
   emitter,
   socket,
 }) => {
-  const [gameStarted, setGameStarted] = useState(false);
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const [isMatchSettings, setIsMatchSettings] = useState(false);
-  const [updateReact, setUpdateReact] = useState(true);
+  const [gameStarted, setGameStarted] = useState(false);
   const [inviteCode, setInviteCode] = useState("");
 
   const display = (
@@ -55,8 +53,9 @@ const MainContent: React.VFC<MainProps> = ({
                   "Are you sure you would like to abandon the game?"
                 );
                 if (confirm) {
-                  emitter!.emit("home-screen");
+                  setGameStarted(false);
                   setIsNavbarOpen(false);
+                  emitter!.emit("home-screen");
                 }
               },
               className: "category",
@@ -64,15 +63,19 @@ const MainContent: React.VFC<MainProps> = ({
             {
               text: "Create Match",
               onClick: () => {
-                setIsMatchSettings(true);
-                setIsNavbarOpen(false);
+                if (!gameStarted) {
+                  setIsMatchSettings(true);
+                  setIsNavbarOpen(false);
+                }
               },
             },
             {
               text: "Join Online",
               onClick: () => {
-                emitter!.emit("join-online-match");
-                setIsNavbarOpen(false);
+                if (!gameStarted) {
+                  emitter!.emit("join-online-match");
+                  setIsNavbarOpen(false);
+                }
               },
             },
           ]}
@@ -82,24 +85,17 @@ const MainContent: React.VFC<MainProps> = ({
   );
 
   useEffect(() => {
-    // socket.on("prepare-game-scene", () => {
-    //   emitter!.emit("prepare-game-scene");
-    //   emitter!.emit("reset-camera");
-    //   updateReact ? setUpdateReact(false) : setUpdateReact(true);
-    //   setInviteCode("");
-    // });
-    // socket.on("reply-invite-code", (roomCode: string) => {
-    //   setInviteCode(roomCode);
-    // });
-    // socket.emit("save-game");
-  }, []);
+    socket.on("start-online-match", () => {
+      emitter!.emit("join-match");
+      matchRef.current?.startMatchTimer();
+      setInviteCode("");
+      setGameStarted(true);
+    });
 
-  useEffect(() => {
-    if (matchRef.current !== undefined) {
-      //Activate Game Scene interactivity
-      initGameController(matchRef.current, viewRef.current, emitter);
-    }
-  }, [matchRef.current]);
+    socket.on("reply-invite-code", (roomCode: string) => {
+      setInviteCode(roomCode);
+    });
+  }, []);
 
   return (
     <div className="app">
@@ -125,7 +121,7 @@ const MainContent: React.VFC<MainProps> = ({
             {
               text: "restart",
               onClick: () => {
-                emitter!.emit("reset-board");
+                emitter!.emit("restart-match");
               },
             },
             {
@@ -137,7 +133,7 @@ const MainContent: React.VFC<MainProps> = ({
             {
               text: "camera",
               onClick: () => {
-                emitter!.emit("reset-camera");
+                viewRef.current?.resetCamera(matchRef.current!);
               },
             },
             {

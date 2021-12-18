@@ -12,26 +12,25 @@ class Match implements Context {
     room: string | undefined;
   };
 
-  constructor({ matchSettings: { mode, player, time, room } }: Context) {
+  constructor({ mode, player, time, room }: MatchSettings) {
     this.matchSettings = { mode, player, time, room };
     this.createGame();
-    this.startMatchTimer();
+    mode === "Offline" ? this.startMatchTimer() : null;
   }
 
   resetMatch() {
-    this.createGame();
+    this.game.resetGame();
     this.timer.resetTimers(this.matchSettings.time);
-    this.timer.gameStarted = false;
   }
 
   createGame() {
     this.game = new Game(chessData);
+    this.game.resetGame();
   }
 
   startMatchTimer() {
     this.timer = new Timer(this.game.state, this.game.endGame.bind(this.game));
     this.timer.startTimer(this.matchSettings.time);
-    console.log(this.timer);
   }
 }
 
@@ -39,10 +38,12 @@ export default Match;
 
 type Context = {
   game?: Game | undefined;
-  matchSettings: {
-    mode?: string | undefined;
-    player?: string | undefined;
-    room?: string | undefined;
-    time?: number | undefined;
-  };
+  matchSettings: MatchSettings;
+};
+
+export type MatchSettings = {
+  mode?: string | undefined;
+  player?: string | undefined;
+  room?: string | undefined;
+  time?: number | undefined;
 };

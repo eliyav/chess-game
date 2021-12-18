@@ -5,11 +5,11 @@ import * as BABYLON from "babylonjs";
 import MainContent from "./main-content";
 import LoadingScreen from "./component/loading-screen";
 import initEmitter from "./events/emitter";
-import activateSocket from "./events/sockets";
-import initGameController from "./events/game-interaction";
+import initSocket from "./events/sockets";
 import EventEmitter from "./events/event-emitter";
 import initView, { CanvasView } from "./view/view-init";
 import Match from "./component/match";
+import initGameController from "./events/game-interaction";
 
 const App: React.VFC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -23,13 +23,11 @@ const App: React.VFC = () => {
     let engine = new BABYLON.Engine(canvas, true);
     canvasView.current = await initView(canvasRef.current!, engine);
     //Activate Socket
-    // socket.current = activateSocket(match.current, canvasView.current);
+    socket.current = initSocket(match, canvasView.current);
     //Activate Emitter
-    emitter.current = initEmitter(
-      match,
-      canvasView.current
-      // socket.current
-    );
+    emitter.current = initEmitter(match, canvasView.current, socket.current);
+    //Init Game Controller
+    initGameController(match, canvasView.current, emitter.current);
 
     setAppLoaded(true);
   }

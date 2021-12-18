@@ -19,6 +19,7 @@ const initCanvasView = async (
     prepareGameScene,
     resetCamera,
     updateGameView,
+    prepareHomeScreen,
   };
 
   const {
@@ -38,6 +39,11 @@ const initCanvasView = async (
     updateMeshesRender(match.game);
     showScene.index = 1;
     resetCamera(match);
+  }
+
+  function prepareHomeScreen() {
+    gameScene.detachControl();
+    showScene.index = 0;
   }
 
   function updateMeshesRender(game: Game) {
@@ -132,4 +138,5 @@ export type CanvasView = {
   updateMeshesRender: (game: Game) => void;
   resetCamera: (match: Match) => void;
   updateGameView: (match: Match) => void;
+  prepareHomeScreen: () => void;
 };
