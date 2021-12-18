@@ -4,7 +4,7 @@ import whitePlayer from "../../../assets/white-player.png";
 import blackPlayer from "../../../assets/black-player.png";
 
 interface TimerProps {
-  timerRef: React.MutableRefObject<Timer>;
+  timerRef: Timer | undefined;
   paused: boolean;
 }
 
@@ -19,7 +19,7 @@ const TimerOverlay: React.VFC<TimerProps> = ({ timerRef, paused }) => {
     return () => {
       clearTimeout(timeOut);
     };
-  }, [timerRef.current.timer1, timerRef.current.timer2, time]);
+  }, [timerRef!.timer1, timerRef!.timer2, time]);
 
   useEffect(() => {
     time ? setTime(false) : setTime(true);
@@ -28,12 +28,12 @@ const TimerOverlay: React.VFC<TimerProps> = ({ timerRef, paused }) => {
   return (
     <div className="timer">
       <div className="playerTimer">
-        <div id="timer1">{timerRef.current.timer1}</div>
+        <div id="timer1">{timerRef!.timer1}</div>
         <img id="whitePlayer" src={whitePlayer}></img>
       </div>
       <div className="playerTimer">
         <img id="blackPlayer" src={blackPlayer}></img>
-        <div id="timer2">{timerRef.current.timer2}</div>
+        <div id="timer2">{timerRef!.timer2}</div>
       </div>
     </div>
   );

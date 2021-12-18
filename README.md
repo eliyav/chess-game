@@ -64,6 +64,7 @@ This project is meant to be played. If you are having fun playing chess it is be
 - [] Add Friends List
 - [] Add Chat
 - [] Add animations
+- [] Add automation tests
 - [] Add Ranking Algorithim and search
 - [] More will be added.
 

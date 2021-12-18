@@ -4,32 +4,6 @@ import { CustomScene } from "../view/start-screen";
 import { ChessPieceMesh } from "../view/asset-loader";
 import { Move } from "../component/game-logic/game-piece";
 
-const renderScene = (game: Game, gameScene: CustomScene) => {
-  //Clears old meshes/memory usage
-  !gameScene.meshesToRender ? (gameScene.meshesToRender = []) : null;
-  if (gameScene.meshesToRender.length) {
-    for (let i = 0; i < gameScene.meshesToRender.length; i++) {
-      const mesh = gameScene.meshesToRender[i];
-      gameScene.removeMesh(mesh);
-      mesh.dispose();
-    }
-    gameScene.meshesToRender = [];
-  }
-  //Final Piece Mesh List
-  const meshesList = gameScene.finalMeshes!.piecesMeshes;
-  //For each active piece, creates a mesh clone and places on board
-  game.allPieces().forEach((square) => {
-    const { name, color, point } = square.on!;
-    const foundMesh = meshesList.find(
-      (mesh) => mesh.name === name && mesh.color === color
-    );
-    const clone = foundMesh!.clone(name, null);
-    [clone!.position.z, clone!.position.x] = findPosition(point, true);
-    clone!.isVisible = true;
-    gameScene.meshesToRender!.push(clone!);
-  });
-};
-
 const displayPieceMoves = (
   mesh: ChessPieceMesh,
   currentMove: Point[],
@@ -292,4 +266,4 @@ const findIndex = (position: Point, externalMesh: boolean) => {
   return result;
 };
 
-export { renderScene, rotateCamera, displayPieceMoves, findIndex };
+export { rotateCamera, displayPieceMoves, findIndex, findPosition };

@@ -1,23 +1,17 @@
+import Match from "../component/match";
 import { doMovesMatch } from "../helper/game-helpers";
-import {
-  renderScene,
-  findIndex,
-  displayPieceMoves,
-} from "../helper/canvas-helpers";
-import Game from "../component/game-logic/game";
-import { CustomScene } from "../view/start-screen";
+import { findIndex, displayPieceMoves } from "../helper/canvas-helpers";
 import { ChessPieceMesh } from "../view/asset-loader";
-import MatchContext from "../component/match-context";
+import { CanvasView } from "../view/view-init";
 
 const inputController = (
   mesh: ChessPieceMesh,
-  game: Game,
-  gameScene: CustomScene,
-  matchContext: MatchContext
+  view: CanvasView,
+  match: Match
 ) => {
-  if (!game.timer.gamePaused) {
-    if (matchContext.mode === "Online") {
-      if (matchContext.player === game.state.currentPlayer) {
+  if (!match.timer.gamePaused) {
+    if (match.matchSettings.mode === "Online") {
+      if (match.matchSettings.player === match.game.state.currentPlayer) {
         return processMove();
       }
     } else {
@@ -25,28 +19,33 @@ const inputController = (
     }
   }
   function processMove() {
-    const currentMove = game.moves;
+    const currentMove = match.game.moves;
     //If mesh
     if (mesh) {
       if (currentMove.length === 0) {
-        if (mesh.color === game.state.currentPlayer) {
+        if (mesh.color === match.game.state.currentPlayer) {
           //If no current move has been selected, and mesh belongs to current player
-          displayPieceMoves(mesh, currentMove, game, gameScene);
+          displayPieceMoves(
+            mesh,
+            currentMove,
+            match.game,
+            view.scenes.gameScene
+          );
         }
-      } else if (mesh.color === game.state.currentPlayer) {
+      } else if (mesh.color === match.game.state.currentPlayer) {
         //If there is already a mesh selected, and you select another of your own meshes
-        const originalPiece = game.lookupPiece(currentMove[0])!;
-        const newPiece = game.lookupPiece(
+        const originalPiece = match.game.lookupPiece(currentMove[0])!;
+        const newPiece = match.game.lookupPiece(
           findIndex([mesh.position.z, mesh.position.x], true)
         )!;
         if (originalPiece === newPiece) {
           //If both selected pieces are the same, reset current move
           currentMove.length = 0;
-          renderScene(game, gameScene);
+          view.updateMeshesRender(match.game);
         } else {
           if (newPiece.name === "Rook" && originalPiece.name === "King") {
             //Checks for castling
-            const isItCastling = game
+            const isItCastling = match.game
               .calculateAvailableMoves(originalPiece, true)
               .filter((move) => doMovesMatch(move[0], newPiece.point));
             if (isItCastling.length > 0) {
@@ -54,23 +53,33 @@ const inputController = (
             } else {
               //If rook is selected second and not castling, show rooks moves
               currentMove.length = 0;
-              renderScene(game, gameScene);
-              displayPieceMoves(mesh, currentMove, game, gameScene);
+              view.updateMeshesRender(match.game);
+              displayPieceMoves(
+                mesh,
+                currentMove,
+                match.game,
+                view.scenes.gameScene
+              );
             }
           } else {
             //If second selected piece is not a castling piece
             currentMove.length = 0;
-            renderScene(game, gameScene);
-            displayPieceMoves(mesh, currentMove, game, gameScene);
+            view.updateMeshesRender(match.game);
+            displayPieceMoves(
+              mesh,
+              currentMove,
+              match.game,
+              view.scenes.gameScene
+            );
           }
         }
-      } else if (mesh.color && mesh.color !== game.state.currentPlayer) {
+      } else if (mesh.color && mesh.color !== match.game.state.currentPlayer) {
         //If second selection is an enemy mesh, calculate move of original piece and push move if matches
-        const opponentsPiece = game.lookupPiece(
+        const opponentsPiece = match.game.lookupPiece(
           findIndex([mesh.position.z, mesh.position.x], true)
         )!;
-        const originalPiece = game.lookupPiece(currentMove[0])!;
-        const isValidMove = game
+        const originalPiece = match.game.lookupPiece(currentMove[0])!;
+        const isValidMove = match.game
           .calculateAvailableMoves(originalPiece, false)
           .find((move) => doMovesMatch(move[0], opponentsPiece.point));
         isValidMove ? currentMove.push(opponentsPiece.point) : null;

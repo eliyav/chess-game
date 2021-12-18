@@ -1,47 +1,46 @@
-import MatchContext from "../component/match-context";
-import Game from "../component/game-logic/game";
+import Match from "../component/match";
 import EventEmitter from "../events/event-emitter";
 import { ChessPieceMesh } from "../view/asset-loader";
-import { RenderContext } from "../view/render-context";
+import { CanvasView } from "../view/view-init";
 import inputController from "./input-controller";
 
-const activateGameInteraction = (
-  chessGame: Game,
-  matchContext: MatchContext,
-  renderContext: RenderContext,
-  emitter: EventEmitter
+const initGameController = (
+  match: Match | undefined,
+  view: CanvasView | undefined,
+  emitter: EventEmitter | undefined
 ) => {
-  const {
-    scenes: { gameScene },
-  } = renderContext;
-
-  gameScene.onPointerDown = async (e: any, pickResult: any) => {
-    if (matchContext.mode === "Online") {
-      if (matchContext.player === chessGame.state.currentPlayer) {
-        onClickEvent();
+  view!.scenes.gameScene.onPointerDown = async (e: any, pickResult: any) => {
+    if (match !== undefined) {
+      if (match.matchSettings.mode === "Online") {
+        if (match.matchSettings.player === match.game.state.currentPlayer) {
+          onClickEvent(match);
+        }
+      } else {
+        onClickEvent(match);
       }
-    } else {
-      onClickEvent();
-    }
 
-    function onClickEvent() {
-      if (pickResult.pickedMesh !== null) {
-        const mesh: ChessPieceMesh = pickResult.pickedMesh;
-        const isCompleteMove = inputController(
-          mesh,
-          chessGame,
-          gameScene,
-          matchContext
-        );
-        isCompleteMove
-          ? (() => {
-              const [originPoint, targetPoint] = chessGame.moves;
-              emitter!.emit("playerMove", originPoint, targetPoint);
-            })()
-          : null;
+      function onClickEvent(match: Match) {
+        if (pickResult.pickedMesh !== null) {
+          const mesh: ChessPieceMesh = pickResult.pickedMesh;
+          const isCompleteMove = inputController(mesh, view!, match);
+          isCompleteMove
+            ? (() => {
+                const [originPoint, targetPoint] = match.game.moves;
+                view!.updateMeshesRender(match.game);
+                const resolved = match.game.playerMove(
+                  originPoint!,
+                  targetPoint!
+                );
+                if (resolved) {
+                  emitter!.emit("resolveMove", originPoint, targetPoint);
+                }
+                match.game.resetMoves();
+              })()
+            : null;
+        }
       }
     }
   };
 };
 
-export default activateGameInteraction;
+export default initGameController;

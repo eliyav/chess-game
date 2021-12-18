@@ -1,10 +1,10 @@
 import * as BABYLON from "babylonjs";
-import { Engine } from "babylonjs/Engines/engine";
 import space from "../../assets/space.webp";
 import assetsLoader from "./asset-loader";
 import { Scene } from "babylonjs/scene";
 import { ChessPieceMesh } from "../view/asset-loader";
 import { AbstractMesh } from "babylonjs/Meshes/abstractMesh";
+import { Engine } from "babylonjs/Engines/engine";
 
 const startScreen = async (engine: Engine): Promise<CustomScene> => {
   const scene: CustomScene = new BABYLON.Scene(engine);

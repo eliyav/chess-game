@@ -6,13 +6,15 @@ import TimerOverlay from "./timer-overlay";
 import "./game-overlay.css";
 
 interface OverlayProps {
-  timerRef: React.MutableRefObject<Timer>;
+  timerRef: Timer | undefined;
   items: Array<{ text: keyof IconsIndex; onClick: () => void }>;
   icons: IconsIndex;
 }
 
 const GameOverlay: React.VFC<OverlayProps> = ({ timerRef, items, icons }) => {
   const [gamePaused, setGamePaused] = useState(false);
+
+  console.log(timerRef);
 
   return (
     <div className="overlayWrapper">

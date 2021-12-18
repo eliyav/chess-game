@@ -8,7 +8,6 @@ import {
 } from "../../helper/game-helpers";
 import Board from "./board";
 import { Data, State } from "./chess-data-import";
-import Timer from "./timer";
 import GamePiece, { Move } from "./game-piece";
 
 class Game {
@@ -19,7 +18,6 @@ class Game {
   moves: Point[];
   annotations: string[];
   turnHistory: TurnHistory[];
-  timer: Timer;
   gameStarted: boolean;
 
   constructor(chessData: Data) {
@@ -30,7 +28,6 @@ class Game {
     this.annotations = [];
     this.turnHistory = [];
     this.turnCounter = 1;
-    this.timer = new Timer(this.state, this.endGame.bind(this));
     this.setBoard();
     this.gameStarted = false;
   }
@@ -464,7 +461,6 @@ class Game {
       this.state.currentPlayer === this.teams[0]
         ? this.teams[1]
         : this.teams[0];
-    this.timer.gameStarted = false;
     let confirmation = confirm(
       `Game is over, ${winningTeam} player wins!, Would you like to start another game?`
     );
@@ -479,19 +475,14 @@ class Game {
     );
   }
 
-  resetGame(time?: number) {
+  resetGame() {
     this.board.grid = createGrid(this.board.boardSize, this.board.columnNames);
     this.setBoard();
     this.state.currentPlayer = this.teams[0];
-    this.timer.resetTimers(time);
-    this.timer.gameStarted = false;
     this.annotations = [];
     this.turnHistory = [];
     this.turnCounter = 1;
     this.gameStarted = true;
-    setTimeout(() => {
-      this.timer.startTimer(time);
-    }, 1000);
   }
 
   annotate(result: TurnHistory) {
@@ -522,8 +513,8 @@ class Game {
     return finalString;
   }
 
-  startTimer() {
-    this.timer.startTimer();
+  resetMoves() {
+    this.moves.length = 0;
   }
 }
 

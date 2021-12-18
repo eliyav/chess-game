@@ -5,24 +5,32 @@ import GameOverlay from "./component/game-overlay/game-overlay";
 import MatchSettingsModal from "./component/match-settings-modal/match-settings-modal";
 import InviteCode from "./component/match-settings-modal/invite-code";
 import * as icons from "./component/game-overlay/overlay-icons";
-import Game from "./component/game-logic/game";
+import Match from "./component/match";
+import initGameController from "./events/game-interaction";
+import { CanvasView } from "./view/view-init";
 
 interface MainProps {
-  chessGame: Game | undefined;
   emitter: EventEmitter | undefined;
   socket: any;
+  matchRef: React.MutableRefObject<Match | undefined>;
+  viewRef: React.MutableRefObject<CanvasView | undefined>;
 }
 
-const MainContent: React.VFC<MainProps> = ({ chessGame, emitter, socket }) => {
+const MainContent: React.VFC<MainProps> = ({
+  matchRef,
+  viewRef,
+  emitter,
+  socket,
+}) => {
+  const [gameStarted, setGameStarted] = useState(false);
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const [isMatchSettings, setIsMatchSettings] = useState(false);
   const [updateReact, setUpdateReact] = useState(true);
   const [inviteCode, setInviteCode] = useState("");
-  const timerRef = useRef(chessGame!.timer);
 
   const display = (
     <>
-      {!chessGame!.gameStarted ? (
+      {!gameStarted ? (
         <button
           id="playButton"
           onClick={() => {
@@ -74,19 +82,24 @@ const MainContent: React.VFC<MainProps> = ({ chessGame, emitter, socket }) => {
   );
 
   useEffect(() => {
-    socket.on("prepare-game-scene", () => {
-      emitter!.emit("prepare-game-scene");
-      emitter!.emit("reset-camera");
-      updateReact ? setUpdateReact(false) : setUpdateReact(true);
-      setInviteCode("");
-    });
-
-    socket.on("reply-invite-code", (roomCode: string) => {
-      setInviteCode(roomCode);
-    });
-
-    socket.emit("save-game");
+    // socket.on("prepare-game-scene", () => {
+    //   emitter!.emit("prepare-game-scene");
+    //   emitter!.emit("reset-camera");
+    //   updateReact ? setUpdateReact(false) : setUpdateReact(true);
+    //   setInviteCode("");
+    // });
+    // socket.on("reply-invite-code", (roomCode: string) => {
+    //   setInviteCode(roomCode);
+    // });
+    // socket.emit("save-game");
   }, []);
+
+  useEffect(() => {
+    if (matchRef.current !== undefined) {
+      //Activate Game Scene interactivity
+      initGameController(matchRef.current, viewRef.current, emitter);
+    }
+  }, [matchRef.current]);
 
   return (
     <div className="app">
@@ -99,9 +112,9 @@ const MainContent: React.VFC<MainProps> = ({ chessGame, emitter, socket }) => {
           }}
         />
       ) : null}
-      {chessGame!.gameStarted ? (
+      {gameStarted ? (
         <GameOverlay
-          timerRef={timerRef}
+          timerRef={matchRef.current!.timer}
           items={[
             {
               text: "menu",
@@ -157,6 +170,7 @@ const MainContent: React.VFC<MainProps> = ({ chessGame, emitter, socket }) => {
             };
             emitter!.emit("create-match", options);
             setIsMatchSettings(false);
+            setGameStarted(true);
           }}
         />
       ) : null}
