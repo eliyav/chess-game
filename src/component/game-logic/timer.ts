@@ -22,11 +22,9 @@ class Timer {
   }
 
   resetTimers = (time = 0) => {
-    setTimeout(() => {
-      this.timer1 = time / 2;
-      this.timer2 = time / 2;
-      this.gamePaused = false;
-    }, 1000);
+    this.timer1 = time / 2;
+    this.timer2 = time / 2;
+    this.gameStarted = false;
   };
 
   padZero = (number: number) => {
@@ -58,6 +56,7 @@ class Timer {
     }
     if (time > 0) {
       let timerId = setInterval(() => {
+        console.log("timer going");
         if (this.gameState.currentPlayer === "White") {
           this.timer1 = this.padZero(this.timer1 - 1);
           this.timer1 === 0 ? this.endGame() : null;

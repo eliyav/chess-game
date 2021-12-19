@@ -44,7 +44,7 @@ const initEmitter = (
   });
 
   emitter.on("home-screen", () => {
-    matchRef.current = undefined;
+    matchRef.current?.endMatch();
     view.prepareHomeScreen();
   });
 

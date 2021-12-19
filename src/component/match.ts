@@ -32,6 +32,10 @@ class Match implements Context {
     this.timer = new Timer(this.game.state, this.game.endGame.bind(this.game));
     this.timer.startTimer(this.matchSettings.time);
   }
+
+  endMatch() {
+    this.timer.resetTimers(this.matchSettings.time);
+  }
 }
 
 export default Match;
