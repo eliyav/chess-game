@@ -71,6 +71,7 @@ const gameScreen = async (
     }
   });
 
+  scene.detachControl();
   return scene;
 };
 

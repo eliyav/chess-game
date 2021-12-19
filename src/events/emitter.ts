@@ -1,6 +1,7 @@
 import EventEmitter from "./event-emitter";
 import { CanvasView } from "../view/view-init";
 import Match from "../component/match";
+import Timer from "../component/game-logic/timer";
 
 type MatchSettings = {
   mode: string | undefined;
@@ -9,93 +10,96 @@ type MatchSettings = {
 };
 
 const initEmitter = (
-  match: React.MutableRefObject<Match | undefined>,
+  matchRef: React.MutableRefObject<Match | undefined>,
   view: CanvasView,
-  socket: any
+  socket: any,
+  timerRef: React.MutableRefObject<Timer | undefined>
 ): EventEmitter => {
   const emitter = new EventEmitter();
 
   emitter.on("create-match", ({ mode, time, player }: MatchSettings) => {
-    match!.current = new Match({ mode, time, player });
+    matchRef!.current = new Match({ mode, time, player });
+    timerRef.current = matchRef.current.timer;
     if (mode === "Offline") {
-      view.prepareGameScene(match.current);
+      view.prepareGameScene(matchRef.current);
     } else {
       socket.emit("create-room");
     }
   });
 
   emitter.on("join-match", () => {
-    view.prepareGameScene(match.current!);
+    view.prepareGameScene(matchRef.current!);
+    matchRef.current?.startMatchTimer();
   });
 
   emitter.on("resolveMove", (originPoint: Point, targetPoint: Point) => {
-    if (match) {
-      match.current!.game.switchTurn();
-      view.updateGameView(match.current!);
-      if (match.current!.matchSettings.mode === "Online") {
-        const room = match.current!.matchSettings.room;
+    if (matchRef) {
+      matchRef.current!.game.switchTurn();
+      view.updateGameView(matchRef.current!);
+      if (matchRef.current!.matchSettings.mode === "Online") {
+        const room = matchRef.current!.matchSettings.room;
         socket.emit("stateChange", { originPoint, targetPoint, room });
       }
-
-      emitter.on("home-screen", () => {
-        match.current = undefined;
-        view.prepareHomeScreen();
-      });
     }
   });
 
+  emitter.on("home-screen", () => {
+    matchRef.current = undefined;
+    view.prepareHomeScreen();
+  });
+
   emitter.on("restart-match", () => {
-    if (match.current) {
+    if (matchRef.current) {
       const answer = confirm("Are you sure you want to reset the board?");
       if (answer) {
-        if (match.current.matchSettings.mode === "Online") {
-          const room = match.current.matchSettings.room;
+        if (matchRef.current.matchSettings.mode === "Online") {
+          const room = matchRef.current.matchSettings.room;
           socket.emit("reset-board", room);
         } else {
-          match.current.resetMatch();
-          view.updateGameView(match.current);
+          matchRef.current.resetMatch();
+          view.updateGameView(matchRef.current);
         }
       }
     }
   });
 
   emitter.on("undo-move", () => {
-    if (match.current) {
-      if (match.current.timer.gamePaused !== true) {
-        if (match.current.matchSettings.mode === "online") {
+    if (matchRef.current) {
+      if (matchRef.current.timer.gamePaused !== true) {
+        if (matchRef.current.matchSettings.mode === "online") {
           if (
-            match.current.matchSettings.player !==
-            match.current.game.state.currentPlayer
+            matchRef.current.matchSettings.player !==
+            matchRef.current.game.state.currentPlayer
           ) {
-            const lastTurn = match.current.game.turnHistory.at(-1);
+            const lastTurn = matchRef.current.game.turnHistory.at(-1);
             if (lastTurn !== undefined) {
-              const room = match.current.matchSettings.room;
+              const room = matchRef.current.matchSettings.room;
               socket.emit("undo-move", room);
             }
           }
         } else {
-          match.current.game.undoTurn();
-          view.updateMeshesRender(match.current.game);
-          view.resetCamera(match.current);
+          matchRef.current.game.undoTurn();
+          view.updateMeshesRender(matchRef.current.game);
+          view.resetCamera(matchRef.current);
         }
       }
     }
   });
 
   emitter.on("pause-game", (currentPlayer: string) => {
-    if (match.current) {
-      if (match.current.matchSettings.mode === "Online") {
+    if (matchRef.current) {
+      if (matchRef.current.matchSettings.mode === "Online") {
         if (
-          match.current.matchSettings.player ===
-          match.current.game.state.currentPlayer
+          matchRef.current.matchSettings.player ===
+          matchRef.current.game.state.currentPlayer
         ) {
           let time;
           if (currentPlayer === "White") {
-            time = match.current.timer.timer1;
+            time = matchRef.current.timer.timer1;
           } else {
-            time = match.current.timer.timer2;
+            time = matchRef.current.timer.timer2;
           }
-          const room = match.current.matchSettings.room;
+          const room = matchRef.current.matchSettings.room;
           socket.emit("pause-game", {
             room,
             currentPlayer,
@@ -103,8 +107,8 @@ const initEmitter = (
           });
         }
       } else {
-        match.current.timer.pauseTimer();
-        match.current.timer.gamePaused === true
+        matchRef.current.timer.pauseTimer();
+        matchRef.current.timer.gamePaused === true
           ? view.scenes.gameScene.detachControl()
           : view.scenes.gameScene.attachControl();
       }
@@ -114,6 +118,10 @@ const initEmitter = (
   emitter.on("join-online-match", () => {
     let room = prompt("Please enter the room key");
     socket.emit("join-room", room);
+  });
+
+  emitter.on("reset-camera", () => {
+    view.resetCamera(matchRef.current!);
   });
 
   return emitter;

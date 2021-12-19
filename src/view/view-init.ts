@@ -35,10 +35,10 @@ const initCanvasView = async (
   }
 
   function prepareGameScene(match: Match) {
-    startScene.detachControl();
     updateMeshesRender(match.game);
-    showScene.index = 1;
     resetCamera(match);
+    showScene.index = 1;
+    gameScene.attachControl();
   }
 
   function prepareHomeScreen() {
@@ -113,12 +113,9 @@ const initCanvasView = async (
   engine.runRenderLoop(function () {
     switch (showScene.index) {
       case 0:
-        gameScene.detachControl();
-        startScene.attachControl();
         startScene.render();
         break;
       case 1:
-        gameScene.attachControl();
         gameScene.render();
         break;
       default:
