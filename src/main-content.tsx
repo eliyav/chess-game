@@ -5,26 +5,27 @@ import GameOverlay from "./component/game-overlay/game-overlay";
 import MatchSettingsModal from "./component/match-settings-modal/match-settings-modal";
 import InviteCode from "./component/match-settings-modal/invite-code";
 import * as icons from "./component/game-overlay/overlay-icons";
-import Match from "./component/match";
-import { CanvasView } from "./view/view-init";
+import Timer from "./component/game-logic/timer";
 
 interface MainProps {
   emitter: EventEmitter | undefined;
   socket: any;
-  matchRef: React.MutableRefObject<Match | undefined>;
-  viewRef: React.MutableRefObject<CanvasView | undefined>;
+  timerRef: React.MutableRefObject<Timer | undefined>;
 }
 
-const MainContent: React.VFC<MainProps> = ({
-  matchRef,
-  viewRef,
-  emitter,
-  socket,
-}) => {
+type InviteCode = {
+  is: boolean;
+  code: string;
+};
+
+const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const [isMatchSettings, setIsMatchSettings] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
-  const [inviteCode, setInviteCode] = useState("");
+  const [inviteCode, setInviteCode] = useState<InviteCode>({
+    is: false,
+    code: "",
+  });
 
   const display = (
     <>
@@ -87,30 +88,37 @@ const MainContent: React.VFC<MainProps> = ({
   useEffect(() => {
     socket.on("start-online-match", () => {
       emitter!.emit("join-match");
-      matchRef.current?.startMatchTimer();
-      setInviteCode("");
+      setInviteCode((prevState) => ({
+        ...prevState,
+        is: false,
+        code: "",
+      }));
       setGameStarted(true);
     });
 
     socket.on("reply-invite-code", (roomCode: string) => {
-      setInviteCode(roomCode);
+      setInviteCode({ is: true, code: roomCode });
     });
   }, []);
 
   return (
     <div className="app">
       {display}
-      {inviteCode !== "" ? (
+      {inviteCode.is ? (
         <InviteCode
-          code={inviteCode}
+          code={inviteCode.code}
           onClose={() => {
-            setInviteCode("");
+            setInviteCode((prevState) => ({
+              ...prevState,
+              is: false,
+              code: "",
+            }));
           }}
         />
       ) : null}
       {gameStarted ? (
         <GameOverlay
-          timerRef={matchRef.current!.timer}
+          timerRef={timerRef.current}
           items={[
             {
               text: "menu",
@@ -133,7 +141,7 @@ const MainContent: React.VFC<MainProps> = ({
             {
               text: "camera",
               onClick: () => {
-                viewRef.current?.resetCamera(matchRef.current!);
+                emitter!.emit("reset-camera");
               },
             },
             {
@@ -166,7 +174,7 @@ const MainContent: React.VFC<MainProps> = ({
             };
             emitter!.emit("create-match", options);
             setIsMatchSettings(false);
-            setGameStarted(true);
+            mode === "Offline" ? setGameStarted(true) : null;
           }}
         />
       ) : null}

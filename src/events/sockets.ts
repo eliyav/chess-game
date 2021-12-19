@@ -3,7 +3,7 @@ import { CanvasView } from "../view/view-init";
 import Match, { MatchSettings } from "../component/match";
 
 const initSocket = (
-  match: React.MutableRefObject<Match | undefined>,
+  matchRef: React.MutableRefObject<Match | undefined>,
   view: CanvasView
 ) => {
   const socket = io(`ws://${window.location.host}`);
@@ -14,23 +14,23 @@ const initSocket = (
 
   socket.on("stateChange", (newState) => {
     const { originPoint, targetPoint } = newState;
-    match.current!.game.playerMove(originPoint, targetPoint);
-    match.current!.game.switchTurn();
-    view.updateGameView(match.current!);
+    matchRef.current!.game.playerMove(originPoint, targetPoint);
+    matchRef.current!.game.switchTurn();
+    view.updateGameView(matchRef.current!);
   });
 
   socket.on("assign-room-info", (matchInfo) => {
     const { mode, player, time, room }: MatchSettings = matchInfo;
-    match.current = new Match({ mode, player, time, room });
-    socket.emit("check-match-start", match.current!.matchSettings.room);
+    matchRef.current = new Match({ mode, player, time, room });
+    socket.emit("check-match-start", matchRef.current!.matchSettings.room);
   });
 
   socket.on("assign-room-number", (room) => {
-    match.current!.matchSettings.room = room;
+    matchRef.current!.matchSettings.room = room;
   });
 
   socket.on("request-room-info", () => {
-    const { mode, player, time, room } = match.current!.matchSettings;
+    const { mode, player, time, room } = matchRef.current!.matchSettings;
     const matchInfo = { mode, player, time, room };
     matchInfo.player === "White"
       ? (matchInfo.player = "Black")
@@ -45,15 +45,15 @@ const initSocket = (
   });
 
   socket.on("pause-game", ({ currentPlayer, time }) => {
-    match.current!.timer.pauseTimer();
+    matchRef.current!.timer.pauseTimer();
     if (currentPlayer === "White") {
-      match.current!.timer.timer1 = time;
+      matchRef.current!.timer.timer1 = time;
     } else {
-      match.current!.timer.timer2 = time;
+      matchRef.current!.timer.timer2 = time;
     }
   });
   socket.on("reset-board-request", () => {
-    const room = match.current!.matchSettings.room;
+    const room = matchRef.current!.matchSettings.room;
     const answer = confirm(
       "Opponent has requested to reset the board, do you agree?"
     );
@@ -63,15 +63,15 @@ const initSocket = (
 
   socket.on("reset-board-resolve", (response) => {
     if (response === "Yes") {
-      match.current!.game.resetGame();
-      view.updateGameView(match.current!);
+      matchRef.current!.game.resetGame();
+      view.updateGameView(matchRef.current!);
     } else {
       console.log("Request Denied");
     }
   });
 
   socket.on("undo-move-request", () => {
-    const room = match.current!.matchSettings.room;
+    const room = matchRef.current!.matchSettings.room;
     const answer = confirm(
       "Opponent has requested to undo their last move, do you agree?"
     );
@@ -81,8 +81,8 @@ const initSocket = (
 
   socket.on("undo-move-resolve", (response) => {
     if (response === "Yes") {
-      match.current!.game.undoTurn();
-      view.updateGameView(match.current!);
+      matchRef.current!.game.undoTurn();
+      view.updateGameView(matchRef.current!);
     } else {
       console.log("Request Denied");
     }

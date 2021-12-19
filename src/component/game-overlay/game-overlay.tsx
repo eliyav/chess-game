@@ -13,6 +13,7 @@ interface OverlayProps {
 
 const GameOverlay: React.VFC<OverlayProps> = ({ timerRef, items, icons }) => {
   const [gamePaused, setGamePaused] = useState(false);
+  console.log(timerRef);
 
   return (
     <div className="overlayWrapper">

@@ -5,21 +5,21 @@ import { CanvasView } from "../view/view-init";
 import inputController from "./input-controller";
 
 const initGameController = (
-  match: React.MutableRefObject<Match | undefined>,
+  matchRef: React.MutableRefObject<Match | undefined>,
   view: CanvasView | undefined,
   emitter: EventEmitter | undefined
 ) => {
   view!.scenes.gameScene.onPointerDown = async (e: any, pickResult: any) => {
-    if (match.current !== undefined) {
-      if (match.current.matchSettings.mode === "Online") {
+    if (matchRef.current !== undefined) {
+      if (matchRef.current.matchSettings.mode === "Online") {
         if (
-          match.current.matchSettings.player ===
-          match.current.game.state.currentPlayer
+          matchRef.current.matchSettings.player ===
+          matchRef.current.game.state.currentPlayer
         ) {
-          onClickEvent(match.current);
+          onClickEvent(matchRef.current);
         }
       } else {
-        onClickEvent(match.current);
+        onClickEvent(matchRef.current);
       }
 
       function onClickEvent(match: Match) {
