@@ -50,15 +50,12 @@ const initEmitter = (
 
   emitter.on("restart-match", () => {
     if (matchRef.current) {
-      const answer = confirm("Are you sure you want to reset the board?");
-      if (answer) {
-        if (matchRef.current.matchSettings.mode === "Online") {
-          const room = matchRef.current.matchSettings.room;
-          socket.emit("reset-board", room);
-        } else {
-          matchRef.current.resetMatch();
-          view.updateGameView(matchRef.current);
-        }
+      if (matchRef.current.matchSettings.mode === "Online") {
+        const room = matchRef.current.matchSettings.room;
+        socket.emit("reset-board", room);
+      } else {
+        matchRef.current.resetMatch();
+        view.updateGameView(matchRef.current);
       }
     }
   });
@@ -66,7 +63,7 @@ const initEmitter = (
   emitter.on("undo-move", () => {
     if (matchRef.current) {
       if (matchRef.current.timer.gamePaused !== true) {
-        if (matchRef.current.matchSettings.mode === "online") {
+        if (matchRef.current.matchSettings.mode === "Online") {
           if (
             matchRef.current.matchSettings.player !==
             matchRef.current.game.state.currentPlayer

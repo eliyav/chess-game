@@ -1,0 +1,62 @@
+.message-wrapper {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-flow: column wrap;
+}
+
+.message-wrapper .message {
+  display: flex;
+  flex-flow: column;
+  justify-content: space-around;
+  align-items: center;
+  height: 80%;
+  width: 80%;
+  z-index: 3;
+  background-image: url("/assets/options-background.png");
+  background-position: center;
+  background-size: cover;
+  text-align: center;
+  border: 0.5rem ridge whitesmoke;
+  color: black;
+  overflow-y: auto;
+}
+
+.message .question {
+  background-color: rgba(30, 143, 255, 0.7);
+  margin: 1rem;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  font-size: 1.5rem;
+  padding: 0.2rem;
+  border-radius: 1rem;
+  font-weight: bold;
+}
+
+.message button {
+  color: white;
+  font-size: 2.25rem;
+  padding: 0.1rem 1rem;
+  border-radius: 2rem;
+  margin: 1rem;
+}
+
+.message .confirm {
+  background-color: rgba(0, 255, 0, 0.7);
+}
+
+.message .reject {
+  background-color: rgba(255, 0, 0, 0.7);
+}
+
+@media only screen and (min-width: 768px) {
+  .message-wrapper .message {
+    height: 50%;
+    width: 50%;
+  }
+  .message .question {
+    font-size: 2rem;
+  }
+}

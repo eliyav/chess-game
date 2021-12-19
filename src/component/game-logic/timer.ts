@@ -56,7 +56,6 @@ class Timer {
     }
     if (time > 0) {
       let timerId = setInterval(() => {
-        console.log("timer going");
         if (this.gameState.currentPlayer === "White") {
           this.timer1 = this.padZero(this.timer1 - 1);
           this.timer1 === 0 ? this.endGame() : null;
