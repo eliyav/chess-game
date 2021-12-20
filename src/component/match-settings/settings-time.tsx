@@ -10,8 +10,8 @@ const SettingsTime: React.VFC = () => {
         name="time"
         type="range"
         min="0"
-        max="6"
-        step="1"
+        max="60"
+        step="10"
         defaultValue="0"
         onChange={(e) => {
           const value = e.currentTarget.value;

@@ -7,7 +7,7 @@ import InviteCode from "./component/match-settings/invite-code";
 import * as icons from "./component/game-overlay/overlay-icons";
 import Timer from "./component/game-logic/timer";
 import MessageModal from "./component/modals/message-modal";
-import Match, { MatchSettings } from "./component/match";
+import { MatchSettings } from "./component/match";
 
 interface MainProps {
   emitter: EventEmitter | undefined;
@@ -90,28 +90,24 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
 
     //#region Emitter Listeners
     emitter?.on("end-match", (winningTeam: string) => {
-      console.log(winningTeam);
-      //Notification modal
-      //`Game is over, ${winningTeam} player wins!, Would you like to start another game?`
+      setShowMessageModal({
+        is: true,
+        question: `Game is over, ${winningTeam} player wins!, Would you like to start another game?`,
+        onConfirm: () => {
+          emitter.emit("restart-match");
+          setShowMessageModal({});
+        },
+        onReject: () => {
+          setShowMessageModal({});
+        },
+      });
     });
     //#endregion
   }, []);
 
   return (
     <div className="app">
-      {!gameStarted ? (
-        <button
-          id="playButton"
-          onClick={() => {
-            isNavbarOpen === false
-              ? setIsNavbarOpen(true)
-              : setIsNavbarOpen(false);
-          }}
-        >
-          Play
-        </button>
-      ) : null}
-      {isNavbarOpen ? (
+      {isNavbarOpen && (
         <SideNav
           onClose={() => {
             setIsNavbarOpen(false);
@@ -157,22 +153,22 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
             },
           ]}
         />
-      ) : null}
-      {inviteCode.is ? (
+      )}
+      {inviteCode.is && (
         <InviteCode
           code={inviteCode.code}
           onClose={() => {
             setInviteCode({});
           }}
         />
-      ) : null}
-      {showMessageModal.is ? (
+      )}
+      {showMessageModal.is && (
         <MessageModal
           question={showMessageModal.question}
           onConfirm={showMessageModal.onConfirm}
           onReject={showMessageModal.onReject}
         />
-      ) : null}
+      )}
       {gameStarted ? (
         <GameOverlay
           timerRef={timerRef.current}
@@ -231,8 +227,19 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
           ]}
           icons={icons}
         />
-      ) : null}
-      {isMatchSettings ? (
+      ) : (
+        <button
+          id="playButton"
+          onClick={() => {
+            isNavbarOpen === false
+              ? setIsNavbarOpen(true)
+              : setIsNavbarOpen(false);
+          }}
+        >
+          Play
+        </button>
+      )}
+      {isMatchSettings && (
         <MatchSettingsModal
           onClose={() => setIsMatchSettings(false)}
           onSubmit={(formElement) => {
@@ -254,7 +261,7 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
             mode === "Offline" ? setGameStarted(true) : null;
           }}
         />
-      ) : null}
+      )}
     </div>
   );
 };
