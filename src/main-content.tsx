@@ -18,26 +18,68 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const [isMatchSettings, setIsMatchSettings] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
-  const [inviteCode, setInviteCode] = useState<InviteCode>({
-    is: false,
-    code: "",
-  });
+  const [inviteCode, setInviteCode] = useState<InviteCode>({});
   const [showMessageModal, setShowMessageModal] = useState<Message>({});
 
   useEffect(() => {
     socket.on("start-online-match", () => {
       emitter!.emit("join-match");
-      setInviteCode((prevState) => ({
-        ...prevState,
-        is: false,
-        code: "",
-      }));
+      setInviteCode({});
       setGameStarted(true);
     });
 
     socket.on("reply-invite-code", (roomCode: string) => {
       setInviteCode({ is: true, code: roomCode });
     });
+
+    socket.on("reset-board-request", (room: string) => {
+      setShowMessageModal({
+        is: true,
+        question: "Opponent has requested to reset the board, do you agree?",
+        onConfirm: () => {
+          socket.emit("confirm-board-reset", room);
+          setShowMessageModal({});
+        },
+        onReject: () => {
+          socket.emit("reject-board-reset", room);
+          setShowMessageModal({});
+        },
+      });
+    }),
+      socket.on("reset-board-resolve", (response: string) => {
+        if (response === "Yes") {
+          emitter?.emit("reset-board");
+          //Notification modal
+        } else {
+          console.log("Request Denied");
+          //Notification modal
+        }
+      });
+
+    socket.on("undo-move-request", (room: string) => {
+      setShowMessageModal({
+        is: true,
+        question:
+          "Opponent has requested to undo their last move, do you agree?",
+        onConfirm: () => {
+          socket.emit("confirm-undo-move", room);
+          setShowMessageModal({});
+        },
+        onReject: () => {
+          socket.emit("reject-undo-move", room);
+          setShowMessageModal({});
+        },
+      });
+    }),
+      socket.on("undo-move-resolve", (response: string) => {
+        if (response === "Yes") {
+          emitter?.emit("undo-move-action");
+          //Notification Modal
+        } else {
+          console.log("Request Denied");
+          //Notification Modal
+        }
+      });
   }, []);
 
   return (
@@ -105,11 +147,7 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
         <InviteCode
           code={inviteCode.code}
           onClose={() => {
-            setInviteCode((prevState) => ({
-              ...prevState,
-              is: false,
-              code: "",
-            }));
+            setInviteCode({});
           }}
         />
       ) : null}
@@ -211,8 +249,8 @@ export default MainContent;
 export type IconsIndex = typeof icons;
 
 type InviteCode = {
-  is: boolean;
-  code: string;
+  is?: boolean;
+  code?: string;
 };
 
 type Message = {

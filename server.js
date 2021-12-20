@@ -79,42 +79,40 @@ io.on("connection", (socket) => {
 
   socket.on("reset-board", (room) => {
     socket.to(room).emit("message", "Opponent has requested a board reset!");
-    socket.to(room).emit("reset-board-request");
+    socket.to(room).emit("reset-board-request", room);
   });
 
-  socket.on("reset-board-response", ({ string, room }) => {
-    if (string === "Yes") {
-      socket
-        .to(room)
-        .emit("message", "Opponent has agreed to reset the board!");
-      socket.to(room).emit("reset-board-resolve", "Yes");
-      socket.emit("reset-board-resolve", "Yes");
-    } else {
-      socket
-        .to(room)
-        .emit("message", "Opponent has declined to reset the board!");
-      socket.to(room).emit("reset-board-resolve", "No");
-      socket.emit("reset-board-resolve", "No");
-    }
+  socket.on("confirm-board-reset", (room) => {
+    socket.to(room).emit("message", "Opponent has agreed to reset the board!");
+    socket.to(room).emit("reset-board-resolve", "Yes");
+    socket.emit("reset-board-resolve", "Yes");
+  });
+
+  socket.on("reject-board-reset", (room) => {
+    socket
+      .to(room)
+      .emit("message", "Opponent has declined to reset the board!");
+    socket.to(room).emit("reset-board-resolve", "No");
+    socket.emit("reset-board-resolve", "No");
   });
 
   socket.on("undo-move", (room) => {
     socket
       .to(room)
       .emit("message", "Opponent has requested to undo their last turn!");
-    socket.to(room).emit("undo-move-request");
+    socket.to(room).emit("undo-move-request", room);
   });
 
-  socket.on("undo-move-response", ({ string, room }) => {
-    if (string === "Yes") {
-      socket.to(room).emit("message", "Opponent has agreed for game Draw!");
-      socket.to(room).emit("undo-move-resolve", "Yes");
-      socket.emit("undo-move-resolve", "Yes");
-    } else {
-      socket.to(room).emit("message", "Opponent has declined for game Draw!");
-      socket.to(room).emit("undo-move-resolve", "No");
-      socket.emit("undo-move-resolve", "No");
-    }
+  socket.on("confirm-undo-move", (room) => {
+    socket.to(room).emit("message", "Opponent has agreed for game Draw!");
+    socket.to(room).emit("undo-move-resolve", "Yes");
+    socket.emit("undo-move-resolve", "Yes");
+  });
+
+  socket.on("reject-undo-move", (room) => {
+    socket.to(room).emit("message", "Opponent has declined for game Draw!");
+    socket.to(room).emit("undo-move-resolve", "No");
+    socket.emit("undo-move-resolve", "No");
   });
 
   socket.on("resign-game", () => {

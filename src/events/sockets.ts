@@ -52,41 +52,6 @@ const initSocket = (
       matchRef.current!.timer.timer2 = time;
     }
   });
-  socket.on("reset-board-request", () => {
-    const room = matchRef.current!.matchSettings.room;
-    const answer = confirm(
-      "Opponent has requested to reset the board, do you agree?"
-    );
-    const string = answer ? "Yes" : "No";
-    socket.emit("reset-board-response", { string, room });
-  });
-
-  socket.on("reset-board-resolve", (response) => {
-    if (response === "Yes") {
-      matchRef.current!.game.resetGame();
-      view.updateGameView(matchRef.current!);
-    } else {
-      console.log("Request Denied");
-    }
-  });
-
-  socket.on("undo-move-request", () => {
-    const room = matchRef.current!.matchSettings.room;
-    const answer = confirm(
-      "Opponent has requested to undo their last move, do you agree?"
-    );
-    const string = answer ? "Yes" : "No";
-    socket.emit("undo-move-response", { string, room });
-  });
-
-  socket.on("undo-move-resolve", (response) => {
-    if (response === "Yes") {
-      matchRef.current!.game.undoTurn();
-      view.updateGameView(matchRef.current!);
-    } else {
-      console.log("Request Denied");
-    }
-  });
 
   return socket;
 };

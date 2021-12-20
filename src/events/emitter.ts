@@ -54,9 +54,15 @@ const initEmitter = (
         const room = matchRef.current.matchSettings.room;
         socket.emit("reset-board", room);
       } else {
-        matchRef.current.resetMatch();
-        view.updateGameView(matchRef.current);
+        emitter.emit("reset-board");
       }
+    }
+  });
+
+  emitter.on("reset-board", () => {
+    if (matchRef.current) {
+      matchRef.current.resetMatch();
+      view.updateGameView(matchRef.current);
     }
   });
 
@@ -75,11 +81,17 @@ const initEmitter = (
             }
           }
         } else {
-          matchRef.current.game.undoTurn();
-          view.updateMeshesRender(matchRef.current.game);
-          view.resetCamera(matchRef.current);
+          emitter.emit("undo-move-action");
         }
       }
+    }
+  });
+
+  emitter.on("undo-move-action", () => {
+    if (matchRef.current) {
+      matchRef.current.game.undoTurn();
+      view.updateMeshesRender(matchRef.current.game);
+      view.resetCamera(matchRef.current);
     }
   });
 

@@ -1,7 +1,7 @@
 import React from "react";
 
 interface InviteProps {
-  code: string;
+  code: string | undefined;
   onClose: () => void;
 }
 
