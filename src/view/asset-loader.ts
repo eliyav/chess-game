@@ -12,6 +12,7 @@ import { createMeshMaterials } from "./materials";
 import { Scene } from "babylonjs/scene";
 import { ISceneLoaderAsyncResult } from "babylonjs/Loading/sceneLoader";
 import { AbstractMesh } from "babylonjs/Meshes/abstractMesh";
+import pawnAnimation from "../../assets/pawn-animation.gltf";
 
 export interface ChessPieceMesh extends AbstractMesh {
   name: string;
@@ -42,8 +43,23 @@ const assetsLoader = async (scene: Scene, description: string) => {
       )
     );
 
+    const loadedpawnAnimation: ISceneLoaderAsyncResult =
+      await BABYLON.SceneLoader.ImportMeshAsync("", pawnAnimation, "");
+
+    loadedpawnAnimation.animationGroups.forEach((animation) => {
+      animation.loopAnimation = false;
+    });
+
+    loadedpawnAnimation.meshes.forEach((mesh) => {
+      // mesh.isVisible = false;
+    });
+
     const piecesMeshes: ChessPieceMesh[] = [];
     const boardMeshes: AbstractMesh[] = [];
+    const animations = {
+      Pawn: loadedpawnAnimation,
+      Queen: loadedpawnAnimation,
+    };
 
     const loadMeshSettings = (mesh: any, color: string) => {
       const name: string = mesh.meshes[1].id;
@@ -77,9 +93,11 @@ const assetsLoader = async (scene: Scene, description: string) => {
       boardMeshes.push(mesh);
     });
 
-    return { piecesMeshes, boardMeshes };
+    return { piecesMeshes, boardMeshes, animations };
   } else if (description === "startScreen") {
     //Start Scene
+    //
+    //
     let boardMesh = board;
 
     let textMeshes = [chessText];

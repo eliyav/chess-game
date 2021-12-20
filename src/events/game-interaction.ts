@@ -34,8 +34,13 @@ const initGameController = (
                   originPoint!,
                   targetPoint!
                 );
-                if (resolved) {
-                  emitter!.emit("resolveMove", originPoint, targetPoint);
+                if (typeof resolved !== "boolean" && resolved.result) {
+                  emitter!.emit(
+                    "resolveMove",
+                    originPoint,
+                    targetPoint,
+                    resolved
+                  );
                 }
                 match.game.resetMoves();
               })()

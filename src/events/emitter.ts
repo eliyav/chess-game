@@ -2,6 +2,7 @@ import EventEmitter from "./event-emitter";
 import { CanvasView } from "../view/view-init";
 import Match from "../component/match";
 import Timer from "../component/game-logic/timer";
+import { TurnHistory } from "../helper/game-helpers";
 
 const initEmitter = (
   matchRef: React.MutableRefObject<Match | undefined>,
@@ -32,16 +33,20 @@ const initEmitter = (
     socket.emit("check-match-start", matchRef.current!.matchSettings.room);
   });
 
-  emitter.on("resolveMove", (originPoint: Point, targetPoint: Point) => {
-    if (matchRef) {
-      matchRef.current!.game.switchTurn();
-      view.updateGameView(matchRef.current!);
-      if (matchRef.current!.matchSettings.mode === "Online") {
-        const room = matchRef.current!.matchSettings.room;
-        socket.emit("stateChange", { originPoint, targetPoint, room });
+  emitter.on(
+    "resolveMove",
+    (originPoint: Point, targetPoint: Point, resolved: TurnHistory) => {
+      if (matchRef) {
+        matchRef.current!.game.switchTurn();
+        view.updateGameView(matchRef.current!);
+        view.playAnimation(resolved);
+        if (matchRef.current!.matchSettings.mode === "Online") {
+          const room = matchRef.current!.matchSettings.room;
+          socket.emit("stateChange", { originPoint, targetPoint, room });
+        }
       }
     }
-  });
+  );
 
   emitter.on("home-screen", () => {
     matchRef.current?.endMatch();

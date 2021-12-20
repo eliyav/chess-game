@@ -34,7 +34,7 @@ class Game {
     this.endMatch = endMatch;
   }
 
-  playerMove(originPoint: Point, targetPoint: Point): boolean {
+  playerMove(originPoint: Point, targetPoint: Point): TurnHistory | boolean {
     const resolve = this.resolveMove(originPoint, targetPoint);
     if (typeof resolve !== "boolean") {
       resolve.result
@@ -45,7 +45,7 @@ class Game {
             this.turnHistory.push(resolve);
           })()
         : null;
-      return resolve.result;
+      return resolve;
     }
     return false;
   }

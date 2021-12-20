@@ -1,9 +1,14 @@
-import { Engine } from "babylonjs";
+import {
+  Engine,
+  InstantiatedEntries,
+  ISceneLoaderAsyncResult,
+} from "babylonjs";
 import startScreen, { CustomScene } from "./start-screen";
 import gameScreen from "./game-screen";
 import Game from "../component/game-logic/game";
 import { findPosition, rotateCamera } from "../helper/canvas-helpers";
 import Match from "../component/match";
+import { TurnHistory } from "../helper/game-helpers";
 
 const initCanvasView = async (
   canvas: HTMLCanvasElement,
@@ -20,12 +25,45 @@ const initCanvasView = async (
     resetCamera,
     updateGameView,
     prepareHomeScreen,
+    playAnimation,
   };
 
   const {
     showScene,
     scenes: { startScene, gameScene },
   } = view;
+
+  function playAnimation(resolved: TurnHistory) {
+    if (
+      (resolved.type === "standard" && resolved.targetPiece) ||
+      resolved.type === "enPassant"
+    ) {
+      //Look up animation group based on piece breaking,
+      const name = resolved.targetPiece?.name;
+      let targetPoint = resolved.targetPiece?.point!;
+      const [z, x] = findPosition(targetPoint, true);
+      duplicate(gameScene.animationContainer, x, z, 60000);
+    }
+    //Function to play the full animation and then dispose resources
+    //@ts-ignore
+    function duplicate(container, z, x, delay) {
+      let entries = container.instantiateModelsToScene();
+
+      for (var node of entries.rootNodes) {
+        node.position.y = 0.4;
+        node.position.x = -z;
+        node.position.z = x;
+      }
+
+      for (var group of entries.animationGroups) {
+        group.play();
+      }
+
+      setTimeout(() => {
+        entries.rootNodes[0].dispose();
+      }, delay);
+    }
+  }
 
   function updateGameView(match: Match) {
     updateMeshesRender(match.game);
@@ -136,4 +174,5 @@ export type CanvasView = {
   resetCamera: (match: Match) => void;
   updateGameView: (match: Match) => void;
   prepareHomeScreen: () => void;
+  playAnimation: (point: TurnHistory) => void;
 };

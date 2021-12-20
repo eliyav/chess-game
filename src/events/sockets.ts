@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 import { CanvasView } from "../view/view-init";
-import Match, { MatchSettings } from "../component/match";
+import Match from "../component/match";
 
 const initSocket = (
   matchRef: React.MutableRefObject<Match | undefined>,

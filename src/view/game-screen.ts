@@ -61,6 +61,16 @@ const gameScreen = async (
   createMovementMaterials(scene);
 
   scene.finalMeshes = await assetsLoader(scene, "gameScreen");
+  scene.animationContainer = new BABYLON.AssetContainer(scene);
+
+  scene.finalMeshes?.animations?.Pawn.meshes.forEach((mesh) =>
+    scene.animationContainer!.meshes.push(mesh)
+  );
+  scene.finalMeshes?.animations?.Pawn.animationGroups.forEach((anim) =>
+    scene.animationContainer!.animationGroups.push(anim)
+  );
+
+  scene.animationContainer.removeAllFromScene();
 
   scene.finalMeshes?.boardMeshes.forEach((mesh, idx) => {
     if (idx === 2) {
