@@ -7,6 +7,7 @@ import InviteCode from "./component/match-settings/invite-code";
 import * as icons from "./component/game-overlay/overlay-icons";
 import Timer from "./component/game-logic/timer";
 import MessageModal from "./component/modals/message-modal";
+import Match, { MatchSettings } from "./component/match";
 
 interface MainProps {
   emitter: EventEmitter | undefined;
@@ -22,6 +23,7 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
   const [showMessageModal, setShowMessageModal] = useState<Message>({});
 
   useEffect(() => {
+    //#region Socket Listeners
     socket.on("start-online-match", () => {
       emitter!.emit("join-match");
       setInviteCode({});
@@ -30,6 +32,10 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
 
     socket.on("reply-invite-code", (roomCode: string) => {
       setInviteCode({ is: true, code: roomCode });
+    });
+
+    socket.on("assign-room-info", (matchInfo: MatchSettings) => {
+      emitter?.emit("assign-room-info", matchInfo);
     });
 
     socket.on("reset-board-request", (room: string) => {
@@ -80,6 +86,15 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
           //Notification Modal
         }
       });
+    //#endregion
+
+    //#region Emitter Listeners
+    emitter?.on("end-match", (winningTeam: string) => {
+      console.log(winningTeam);
+      //Notification modal
+      //`Game is over, ${winningTeam} player wins!, Would you like to start another game?`
+    });
+    //#endregion
   }, []);
 
   return (

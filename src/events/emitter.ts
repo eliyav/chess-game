@@ -3,12 +3,6 @@ import { CanvasView } from "../view/view-init";
 import Match from "../component/match";
 import Timer from "../component/game-logic/timer";
 
-type MatchSettings = {
-  mode: string | undefined;
-  player: string | undefined;
-  time: number | undefined;
-};
-
 const initEmitter = (
   matchRef: React.MutableRefObject<Match | undefined>,
   view: CanvasView,
@@ -18,7 +12,7 @@ const initEmitter = (
   const emitter = new EventEmitter();
 
   emitter.on("create-match", ({ mode, time, player }: MatchSettings) => {
-    matchRef!.current = new Match({ mode, time, player });
+    matchRef!.current = new Match({ mode, time, player }, emitter);
     timerRef.current = matchRef.current.timer;
     if (mode === "Offline") {
       view.prepareGameScene(matchRef.current);
@@ -30,6 +24,12 @@ const initEmitter = (
   emitter.on("join-match", () => {
     view.prepareGameScene(matchRef.current!);
     matchRef.current?.startMatchTimer();
+  });
+
+  emitter.on("assign-room-info", (matchInfo: MatchSettings) => {
+    const { mode, player, time, room }: MatchSettings = matchInfo;
+    matchRef.current = new Match({ mode, player, time, room }, emitter);
+    socket.emit("check-match-start", matchRef.current!.matchSettings.room);
   });
 
   emitter.on("resolveMove", (originPoint: Point, targetPoint: Point) => {
@@ -137,3 +137,10 @@ const initEmitter = (
 };
 
 export default initEmitter;
+
+type MatchSettings = {
+  mode: string | undefined;
+  player: string | undefined;
+  time: number | undefined;
+  room?: string | undefined;
+};

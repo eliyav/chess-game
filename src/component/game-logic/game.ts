@@ -19,8 +19,9 @@ class Game {
   annotations: string[];
   turnHistory: TurnHistory[];
   gameStarted: boolean;
+  endMatch: () => void;
 
-  constructor(chessData: Data) {
+  constructor(chessData: Data, endMatch: () => void) {
     this.state = chessData.initialState;
     this.teams = chessData.teams;
     this.board = new Board(chessData);
@@ -30,6 +31,7 @@ class Game {
     this.turnCounter = 1;
     this.setBoard();
     this.gameStarted = false;
+    this.endMatch = endMatch;
   }
 
   playerMove(originPoint: Point, targetPoint: Point): boolean {
@@ -433,7 +435,7 @@ class Game {
   switchTurn() {
     this.turnCounter++;
     this.changePlayer();
-    this.isCheckmate() ? this.endGame() : null;
+    this.isCheckmate() ? this.endMatch() : null;
   }
 
   undoTurn() {
@@ -454,17 +456,6 @@ class Game {
       this.turnCounter--;
       this.changePlayer();
     }
-  }
-
-  endGame() {
-    const winningTeam =
-      this.state.currentPlayer === this.teams[0]
-        ? this.teams[1]
-        : this.teams[0];
-    let confirmation = confirm(
-      `Game is over, ${winningTeam} player wins!, Would you like to start another game?`
-    );
-    confirmation ? this.resetGame() : null;
   }
 
   setBoard() {

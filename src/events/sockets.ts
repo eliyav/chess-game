@@ -19,11 +19,11 @@ const initSocket = (
     view.updateGameView(matchRef.current!);
   });
 
-  socket.on("assign-room-info", (matchInfo) => {
-    const { mode, player, time, room }: MatchSettings = matchInfo;
-    matchRef.current = new Match({ mode, player, time, room });
-    socket.emit("check-match-start", matchRef.current!.matchSettings.room);
-  });
+  // socket.on("assign-room-info", (matchInfo) => {
+  //   const { mode, player, time, room }: MatchSettings = matchInfo;
+  //   matchRef.current = new Match({ mode, player, time, room });
+  //   socket.emit("check-match-start", matchRef.current!.matchSettings.room);
+  // });
 
   socket.on("assign-room-number", (room) => {
     matchRef.current!.matchSettings.room = room;

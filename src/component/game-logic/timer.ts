@@ -7,18 +7,18 @@ interface Timer {
   gameStarted: boolean;
   gamePaused: boolean;
   pauseId: NodeJS.Timeout;
-  endGame: () => void;
+  endMatch: () => void;
 }
 
 class Timer {
-  constructor(gameState: State, endGame: () => void) {
+  constructor(gameState: State, endMatch: () => void) {
     this.gameState = gameState;
     this.timer1 = 0;
     this.timer2 = 0;
     this.gameStarted = false;
     this.gamePaused = false;
     this.pauseId;
-    this.endGame = endGame;
+    this.endMatch = endMatch;
   }
 
   resetTimers = (time = 0) => {
@@ -58,11 +58,11 @@ class Timer {
       let timerId = setInterval(() => {
         if (this.gameState.currentPlayer === "White") {
           this.timer1 = this.padZero(this.timer1 - 1);
-          this.timer1 === 0 ? this.endGame() : null;
+          this.timer1 === 0 ? this.endOfMatch() : null;
         }
         if (this.gameState.currentPlayer !== "White") {
           this.timer2 = this.padZero(this.timer2 - 1);
-          this.timer2 === 0 ? this.endGame() : null;
+          this.timer2 === 0 ? this.endOfMatch() : null;
         }
         if (this.gameStarted === false || this.gamePaused === true) {
           clearInterval(timerId);
@@ -70,6 +70,11 @@ class Timer {
       }, 1000);
     }
   };
+
+  endOfMatch() {
+    this.gameStarted = false;
+    this.endMatch();
+  }
 }
 
 export default Timer;
