@@ -263,6 +263,7 @@ canvas {
   justify-content: center;
   align-items: center;
   flex-flow: column wrap;
+  position: absolute;
 }
 
 .message-wrapper .message {
@@ -299,6 +300,11 @@ canvas {
   padding: 0.1rem 1rem;
   border-radius: 2rem;
   margin: 1rem;
+}
+
+.message button:hover {
+  scale: 0.9;
+  background-color: royalblue;
 }
 
 .message .confirm {
