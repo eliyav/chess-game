@@ -6,6 +6,7 @@ import { ChessPieceMesh } from "../view/asset-loader";
 import { AbstractMesh } from "babylonjs/Meshes/abstractMesh";
 import { Engine } from "babylonjs/Engines/engine";
 import { AssetContainer } from "babylonjs";
+import { ISceneLoaderAsyncResult } from "babylonjs/Loading/sceneLoader";
 
 const startScreen = async (engine: Engine): Promise<CustomScene> => {
   const scene: CustomScene = new BABYLON.Scene(engine);
@@ -41,13 +42,26 @@ export interface CustomScene extends Scene {
   finalMeshes?: {
     piecesMeshes: ChessPieceMesh[];
     boardMeshes: AbstractMesh[];
-    animations?: {
-      Pawn: BABYLON.ISceneLoaderAsyncResult;
-      Queen: BABYLON.ISceneLoaderAsyncResult;
-    };
+    animations: AnimationsResults;
   };
   meshesToRender?: AbstractMesh[];
-  animationContainer?: AssetContainer;
+  animationsContainer?: Animations;
 }
 
 export default startScreen;
+
+type Animations = {
+  Pawn: AssetContainer;
+  Bishop: AssetContainer;
+  Rook: AssetContainer;
+  Knight: AssetContainer;
+  Queen: AssetContainer;
+};
+
+type AnimationsResults = {
+  Pawn: ISceneLoaderAsyncResult;
+  Bishop: ISceneLoaderAsyncResult;
+  Rook: ISceneLoaderAsyncResult;
+  Knight: ISceneLoaderAsyncResult;
+  Queen: ISceneLoaderAsyncResult;
+};

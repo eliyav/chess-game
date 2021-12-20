@@ -1,14 +1,11 @@
-import {
-  Engine,
-  InstantiatedEntries,
-  ISceneLoaderAsyncResult,
-} from "babylonjs";
+import { Engine } from "babylonjs";
 import startScreen, { CustomScene } from "./start-screen";
 import gameScreen from "./game-screen";
 import Game from "../component/game-logic/game";
 import { findPosition, rotateCamera } from "../helper/canvas-helpers";
 import Match from "../component/match";
 import { TurnHistory } from "../helper/game-helpers";
+import { createMeshMaterials } from "./materials";
 
 const initCanvasView = async (
   canvas: HTMLCanvasElement,
@@ -33,6 +30,8 @@ const initCanvasView = async (
     scenes: { startScene, gameScene },
   } = view;
 
+  const materials = createMeshMaterials(gameScene);
+
   function playAnimation(resolved: TurnHistory) {
     if (
       (resolved.type === "standard" && resolved.targetPiece) ||
@@ -40,15 +39,30 @@ const initCanvasView = async (
     ) {
       //Look up animation group based on piece breaking,
       const name = resolved.targetPiece?.name;
+      const team = resolved.targetPiece?.color;
       let targetPoint = resolved.targetPiece?.point!;
       const [z, x] = findPosition(targetPoint, true);
-      duplicate(gameScene.animationContainer, x, z, 60000);
+      //@ts-ignore
+      console.log(gameScene.animationsContainer[name]!);
+      duplicate(
+        //@ts-ignore
+        gameScene.animationsContainer![name],
+        x,
+        z,
+        team?.toLocaleLowerCase(),
+        2000
+      );
     }
     //Function to play the full animation and then dispose resources
     //@ts-ignore
-    function duplicate(container, z, x, delay) {
+    function duplicate(container, z, x, team, delay) {
       let entries = container.instantiateModelsToScene();
-
+      entries.rootNodes.forEach((mesh: any) =>
+        mesh
+          .getChildMeshes()
+          //@ts-ignore
+          .forEach((mesh2: any) => (mesh2.material = materials[team]))
+      );
       for (var node of entries.rootNodes) {
         node.position.y = 0.4;
         node.position.x = -z;

@@ -3,6 +3,7 @@ import assetsLoader from "./asset-loader";
 import space from "../../assets/space.webp";
 import { createMovementMaterials } from "./materials";
 import { CustomScene } from "./start-screen";
+import { Mesh } from "babylonjs/Meshes/mesh";
 
 const gameScreen = async (
   canvas: HTMLCanvasElement,
@@ -59,18 +60,80 @@ const gameScreen = async (
   photoDome.rotation = new BABYLON.Vector3(0, 1, 1.5);
 
   createMovementMaterials(scene);
-
   scene.finalMeshes = await assetsLoader(scene, "gameScreen");
-  scene.animationContainer = new BABYLON.AssetContainer(scene);
+
+  //#region Animations
+  //Pawn Animations
+  const pawnAnimationContainer = new BABYLON.AssetContainer(scene);
 
   scene.finalMeshes?.animations?.Pawn.meshes.forEach((mesh) =>
-    scene.animationContainer!.meshes.push(mesh)
-  );
-  scene.finalMeshes?.animations?.Pawn.animationGroups.forEach((anim) =>
-    scene.animationContainer!.animationGroups.push(anim)
+    pawnAnimationContainer!.meshes.push(mesh)
   );
 
-  scene.animationContainer.removeAllFromScene();
+  scene.finalMeshes?.animations?.Pawn.animationGroups.forEach((anim) =>
+    pawnAnimationContainer!.animationGroups.push(anim)
+  );
+
+  // pawnAnimationContainer.meshes.forEach(mesh => mesh.)
+  pawnAnimationContainer.removeAllFromScene();
+
+  // Rook Animations
+  const rookAnimationContainer = new BABYLON.AssetContainer(scene);
+
+  scene.finalMeshes?.animations?.Rook.meshes.forEach((mesh) =>
+    rookAnimationContainer!.meshes.push(mesh)
+  );
+  scene.finalMeshes?.animations?.Rook.animationGroups.forEach((anim) =>
+    rookAnimationContainer!.animationGroups.push(anim)
+  );
+
+  rookAnimationContainer.removeAllFromScene();
+
+  // Bishop Animations
+  const bishopAnimationContainer = new BABYLON.AssetContainer(scene);
+
+  scene.finalMeshes?.animations?.Bishop.meshes.forEach((mesh) =>
+    bishopAnimationContainer!.meshes.push(mesh)
+  );
+  scene.finalMeshes?.animations?.Bishop.animationGroups.forEach((anim) =>
+    bishopAnimationContainer!.animationGroups.push(anim)
+  );
+
+  bishopAnimationContainer.removeAllFromScene();
+
+  // Knight Animations
+  const knightAnimationContainer = new BABYLON.AssetContainer(scene);
+
+  scene.finalMeshes?.animations?.Knight.meshes.forEach((mesh) =>
+    knightAnimationContainer!.meshes.push(mesh)
+  );
+  scene.finalMeshes?.animations?.Knight.animationGroups.forEach((anim) =>
+    knightAnimationContainer!.animationGroups.push(anim)
+  );
+
+  knightAnimationContainer.removeAllFromScene();
+
+  // Queen Animations
+  const queenAnimationContainer = new BABYLON.AssetContainer(scene);
+
+  scene.finalMeshes?.animations?.Queen.meshes.forEach((mesh) =>
+    queenAnimationContainer!.meshes.push(mesh)
+  );
+  scene.finalMeshes?.animations?.Queen.animationGroups.forEach((anim) =>
+    queenAnimationContainer!.animationGroups.push(anim)
+  );
+
+  queenAnimationContainer.removeAllFromScene();
+
+  //#endregion
+
+  scene.animationsContainer = {
+    Pawn: pawnAnimationContainer,
+    Bishop: bishopAnimationContainer,
+    Rook: rookAnimationContainer,
+    Knight: knightAnimationContainer,
+    Queen: queenAnimationContainer,
+  };
 
   scene.finalMeshes?.boardMeshes.forEach((mesh, idx) => {
     if (idx === 2) {

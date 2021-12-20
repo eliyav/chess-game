@@ -12,7 +12,11 @@ import { createMeshMaterials } from "./materials";
 import { Scene } from "babylonjs/scene";
 import { ISceneLoaderAsyncResult } from "babylonjs/Loading/sceneLoader";
 import { AbstractMesh } from "babylonjs/Meshes/abstractMesh";
-import pawnAnimation from "../../assets/pawn-animation.gltf";
+import pawnAnimation from "../../assets/piece-animations/pawn-animation.gltf";
+import rookAnimation from "../../assets/piece-animations/rook-animation.gltf";
+import bishopAnimation from "../../assets/piece-animations/bishop-animation.gltf";
+import knightAnimation from "../../assets/piece-animations/knight-animation.gltf";
+import queenAnimation from "../../assets/piece-animations/queen-animation.gltf";
 
 export interface ChessPieceMesh extends AbstractMesh {
   name: string;
@@ -43,22 +47,49 @@ const assetsLoader = async (scene: Scene, description: string) => {
       )
     );
 
-    const loadedpawnAnimation: ISceneLoaderAsyncResult =
+    const loadedPawnAnimation: ISceneLoaderAsyncResult =
       await BABYLON.SceneLoader.ImportMeshAsync("", pawnAnimation, "");
 
-    loadedpawnAnimation.animationGroups.forEach((animation) => {
+    loadedPawnAnimation.animationGroups.forEach((animation) => {
       animation.loopAnimation = false;
     });
 
-    loadedpawnAnimation.meshes.forEach((mesh) => {
-      // mesh.isVisible = false;
+    const loadedRookAnimation: ISceneLoaderAsyncResult =
+      await BABYLON.SceneLoader.ImportMeshAsync("", rookAnimation, "");
+
+    loadedRookAnimation.animationGroups.forEach((animation) => {
+      animation.loopAnimation = false;
+    });
+
+    const loadedBishopAnimation: ISceneLoaderAsyncResult =
+      await BABYLON.SceneLoader.ImportMeshAsync("", bishopAnimation, "");
+
+    loadedBishopAnimation.animationGroups.forEach((animation) => {
+      animation.loopAnimation = false;
+    });
+
+    const loadedKnightAnimation: ISceneLoaderAsyncResult =
+      await BABYLON.SceneLoader.ImportMeshAsync("", knightAnimation, "");
+
+    loadedKnightAnimation.animationGroups.forEach((animation) => {
+      animation.loopAnimation = false;
+    });
+
+    const loadedQueenAnimation: ISceneLoaderAsyncResult =
+      await BABYLON.SceneLoader.ImportMeshAsync("", queenAnimation, "");
+
+    loadedQueenAnimation.animationGroups.forEach((animation) => {
+      animation.loopAnimation = false;
     });
 
     const piecesMeshes: ChessPieceMesh[] = [];
     const boardMeshes: AbstractMesh[] = [];
     const animations = {
-      Pawn: loadedpawnAnimation,
-      Queen: loadedpawnAnimation,
+      Pawn: loadedPawnAnimation,
+      Rook: loadedRookAnimation,
+      Bishop: loadedBishopAnimation,
+      Knight: loadedKnightAnimation,
+      Queen: loadedQueenAnimation,
     };
 
     const loadMeshSettings = (mesh: any, color: string) => {
