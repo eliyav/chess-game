@@ -31,7 +31,7 @@ canvas {
   left: 50vw;
   width: 200px;
   height: 50px;
-  background-color: transparent;
+  background-color: rgba(0, 0, 0, 0.5);
   color: white;
   font-size: larger;
   font-weight: bolder;
@@ -41,6 +41,6 @@ canvas {
 }
 
 #playButton:hover {
-  color: blue;
-  background-color: whitesmoke;
+  color: red;
+  background-color: rgba(245, 245, 245, 0.8);
 }
