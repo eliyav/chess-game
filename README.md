@@ -59,11 +59,11 @@ This project is meant to be played. If you are having fun playing chess it is be
 - [x] Update game mesh models
 - [x] Implement React.js
 - [x] Add Game start options
-- [] Implement MongoDB - Save & Load games
+- [x] Implement MongoDB - Save & Load games
 - [] Add Authorization/Login
 - [] Add Friends List
 - [] Add Chat
-- [] Add animations
+- [x] Add animations
 - [] Add automation tests
 - [] Add Ranking Algorithim and search
 - [] More will be added.
