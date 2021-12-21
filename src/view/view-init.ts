@@ -42,8 +42,6 @@ const initCanvasView = async (
       const team = resolved.targetPiece?.color;
       let targetPoint = resolved.targetPiece?.point!;
       const [z, x] = findPosition(targetPoint, true);
-      //@ts-ignore
-      console.log(gameScene.animationsContainer[name]!);
       duplicate(
         //@ts-ignore
         gameScene.animationsContainer![name],

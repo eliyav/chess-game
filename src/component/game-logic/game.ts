@@ -1,6 +1,11 @@
 import * as gameHelpers from "../../helper/game-helpers";
 import * as movementHelpers from "../../helper/movement-helpers";
-import { setPieces, createGrid, Square } from "../../helper/board-helpers";
+import {
+  setPieces,
+  loadPieces,
+  createGrid,
+  Square,
+} from "../../helper/board-helpers";
 import {
   TurnHistory,
   LocationsInfo,
@@ -21,17 +26,36 @@ class Game {
   gameStarted: boolean;
   endMatch: () => void;
 
-  constructor(chessData: Data, endMatch: () => void) {
-    this.state = chessData.initialState;
-    this.teams = chessData.teams;
-    this.board = new Board(chessData);
-    this.moves = [];
-    this.annotations = [];
-    this.turnHistory = [];
-    this.turnCounter = 1;
-    this.setBoard();
-    this.gameStarted = false;
-    this.endMatch = endMatch;
+  constructor(
+    chessData: Data,
+    endMatch: () => void,
+    load?: boolean,
+    options?: any
+  ) {
+    if (load) {
+      this.state = options.state;
+      this.teams = options.teams;
+      this.turnCounter = options.turnCounter;
+      this.board = new Board(chessData);
+      this.setBoard(false, options.board);
+      this.moves = [];
+      this.annotations = options.annotations;
+      this.turnHistory = options.turnHistory;
+      this.gameStarted = options.gameStarted;
+      this.turnCounter = options.turnCounter;
+      this.endMatch = endMatch;
+    } else {
+      this.state = chessData.initialState;
+      this.teams = chessData.teams;
+      this.board = new Board(chessData);
+      this.moves = [];
+      this.annotations = [];
+      this.turnHistory = [];
+      this.turnCounter = 1;
+      this.setBoard(true);
+      this.gameStarted = false;
+      this.endMatch = endMatch;
+    }
   }
 
   playerMove(originPoint: Point, targetPoint: Point): TurnHistory | boolean {
@@ -458,17 +482,21 @@ class Game {
     }
   }
 
-  setBoard() {
-    setPieces(
-      this.board.grid,
-      this.board.pieceInitialPoints,
-      this.board.movementArray
-    );
+  setBoard(newGame: boolean, loadedBoard?: any) {
+    if (newGame) {
+      setPieces(
+        this.board.grid,
+        this.board.pieceInitialPoints,
+        this.board.movementArray
+      );
+    } else {
+      loadPieces(this.board.grid, loadedBoard.grid!);
+    }
   }
 
   resetGame() {
     this.board.grid = createGrid(this.board.boardSize, this.board.columnNames);
-    this.setBoard();
+    this.setBoard(true);
     this.state.currentPlayer = this.teams[0];
     this.annotations = [];
     this.turnHistory = [];

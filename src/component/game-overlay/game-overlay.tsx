@@ -20,9 +20,9 @@ const GameOverlay: React.VFC<OverlayProps> = ({ timerRef, items, icons }) => {
           <OverlaySelection item={item} icons={icons} key={idx} />
         ))}
       </div>
-      {timerRef?.gameStarted === true ? (
+      {timerRef?.gameStarted && (
         <TimerOverlay timerRef={timerRef} paused={gamePaused} />
-      ) : null}
+      )}
     </div>
   );
 };

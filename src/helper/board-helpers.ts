@@ -31,4 +31,16 @@ const setPieces = (
   );
 };
 
-export { setPieces, createGrid };
+const loadPieces = (grid: Square[][], loadedBoard: Square[][]) => {
+  loadedBoard.forEach((array, idx) =>
+    array.forEach((square, idx2) => {
+      if (square.on !== undefined) {
+        const { name, color, point, movement } = square.on;
+        const squareIndex = grid[idx][idx2];
+        squareIndex.on = new GamePiece(name, color, point, movement);
+      }
+    })
+  );
+};
+
+export { setPieces, createGrid, loadPieces };

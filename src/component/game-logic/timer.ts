@@ -11,14 +11,29 @@ interface Timer {
 }
 
 class Timer {
-  constructor(gameState: State, endMatch: () => void) {
-    this.gameState = gameState;
-    this.timer1 = 0;
-    this.timer2 = 0;
-    this.gameStarted = false;
-    this.gamePaused = false;
-    this.pauseId;
-    this.endMatch = endMatch;
+  constructor(
+    gameState: State,
+    endMatch: () => void,
+    newGame: boolean,
+    timerSettings?: any
+  ) {
+    if (newGame) {
+      this.gameState = gameState;
+      this.timer1 = 0;
+      this.timer2 = 0;
+      this.gameStarted = false;
+      this.gamePaused = false;
+      this.pauseId;
+      this.endMatch = endMatch;
+    } else {
+      this.gameState = timerSettings.gameState;
+      this.timer1 = timerSettings.timer1;
+      this.timer2 = timerSettings.timer2;
+      this.gameStarted = true;
+      this.gamePaused = timerSettings.gamePaused;
+      this.pauseId = timerSettings.pauseId;
+      this.endMatch = endMatch;
+    }
   }
 
   resetTimers = (time = 0) => {

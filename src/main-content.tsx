@@ -7,7 +7,7 @@ import InviteCode from "./component/match-settings/invite-code";
 import * as icons from "./component/game-overlay/overlay-icons";
 import Timer from "./component/game-logic/timer";
 import MessageModal from "./component/modals/message-modal";
-import { MatchSettings } from "./component/match";
+import Match, { MatchSettings } from "./component/match";
 import InputModal from "./component/modals/input-modal";
 
 interface MainProps {
@@ -27,6 +27,10 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
 
   useEffect(() => {
     //#region Socket Listeners
+    socket.on("load-game", (match: Match) => {
+      emitter?.emit("load-game", match);
+    });
+
     socket.on("start-online-match", () => {
       emitter!.emit("join-match");
       setInviteCode({});
@@ -92,6 +96,10 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
     //#endregion
 
     //#region Emitter Listeners
+    emitter?.on("update-game-started", () => {
+      setGameStarted(true);
+    });
+
     emitter?.on("end-match", (winningTeam: string) => {
       setMessageModal({
         is: true,
@@ -165,6 +173,20 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
                     setInputModal({});
                   },
                 });
+              },
+            },
+            {
+              text: "Save Game",
+              onClick: () => {
+                setIsNavbarOpen(false);
+                emitter!.emit("save-game");
+              },
+            },
+            {
+              text: "Load Game",
+              onClick: () => {
+                setIsNavbarOpen(false);
+                emitter!.emit("lookup-game");
               },
             },
           ]}

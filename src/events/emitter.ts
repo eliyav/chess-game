@@ -12,6 +12,32 @@ const initEmitter = (
 ): EventEmitter => {
   const emitter = new EventEmitter();
 
+  emitter.on("save-game", () => {
+    const matchDocument = JSON.stringify(matchRef.current);
+    socket.emit("save-game", { match: matchDocument });
+  });
+
+  emitter.on("lookup-game", () => {
+    const lookupId = "61c243014899ba7db78383ae";
+    socket.emit("lookup-game", lookupId);
+  });
+
+  emitter.on("load-game", (match: any) => {
+    const loadedMatch = JSON.parse(match.match);
+    const matchSettings = loadedMatch.matchSettings;
+    const gameSettings = loadedMatch.game;
+    const timerSettings = loadedMatch.timer;
+    matchRef.current = new Match(
+      matchSettings,
+      emitter,
+      gameSettings,
+      timerSettings
+    );
+    timerRef.current = matchRef.current.timer;
+    view.prepareGameScene(matchRef.current!);
+    emitter.emit("update-game-started");
+  });
+
   emitter.on("create-match", ({ mode, time, player }: MatchSettings) => {
     matchRef!.current = new Match({ mode, time, player }, emitter);
     timerRef.current = matchRef.current.timer;

@@ -16,31 +16,57 @@ class Match implements Context {
 
   constructor(
     { mode, player, time, room }: MatchSettings,
-    emitter: EventEmitter
+    emitter: EventEmitter,
+    gameSettings?: any,
+    timerSettings?: any
   ) {
     this.matchSettings = { mode, player, time, room };
-    this.createGame();
-    mode === "Offline" ? this.startMatchTimer() : null;
+    if (gameSettings) {
+      this.createGame(false, gameSettings);
+      this.loadTimer(timerSettings);
+    } else {
+      this.createGame(true);
+      mode === "Offline" ? this.startMatchTimer() : null;
+    }
     this.emitter = emitter;
   }
 
   resetMatch() {
     this.game.resetGame();
-    this.timer.resetTimers(this.matchSettings.time);
+    this.resetMatchTimer();
   }
 
-  createGame() {
-    this.game = new Game(chessData, this.endMatch.bind(this));
-    this.game.resetGame();
+  createGame(newGame: boolean, gameSettings?: any) {
+    if (newGame) {
+      this.game = new Game(chessData, this.endMatch.bind(this));
+      this.game.resetGame();
+    } else {
+      this.game = new Game(
+        chessData,
+        this.endMatch.bind(this),
+        true,
+        gameSettings
+      );
+    }
+  }
+
+  loadTimer(timerSettings: any) {
+    this.timer = new Timer(
+      this.game.state,
+      this.endMatch.bind(this),
+      false,
+      timerSettings
+    );
   }
 
   startMatchTimer() {
-    this.timer = new Timer(this.game.state, this.endMatch.bind(this));
+    this.timer = new Timer(this.game.state, this.endMatch.bind(this), true);
     this.timer.startTimer(this.matchSettings.time);
   }
 
   resetMatchTimer() {
     this.timer.resetTimers(this.matchSettings.time);
+    this.timer.startTimer(this.matchSettings.time);
   }
 
   endMatch() {
