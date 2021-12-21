@@ -7,6 +7,7 @@ const SettingsTime: React.VFC = () => {
     <div className="subsection">
       <p>Select Minutes on Clock</p>
       <input
+        className="slider"
         name="time"
         type="range"
         min="0"
@@ -18,7 +19,9 @@ const SettingsTime: React.VFC = () => {
           timeRef.current!.innerText = value;
         }}
       ></input>
-      <div ref={timeRef}>0</div>
+      <div className="time-display" ref={timeRef}>
+        0
+      </div>
     </div>
   );
 };
