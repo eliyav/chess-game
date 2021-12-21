@@ -41,8 +41,8 @@ class Timer {
       if (this.pauseId) {
         clearTimeout(this.pauseId);
       }
+      this.gamePaused = false;
       this.pauseId = setTimeout(() => {
-        this.gamePaused = false;
         this.startTimer(this.timer1 + this.timer2);
       }, 1000);
     }

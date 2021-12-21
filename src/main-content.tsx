@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import SideNav from "./component/side-nav";
 import EventEmitter from "./events/event-emitter";
 import GameOverlay from "./component/game-overlay/game-overlay";
@@ -8,6 +8,7 @@ import * as icons from "./component/game-overlay/overlay-icons";
 import Timer from "./component/game-logic/timer";
 import MessageModal from "./component/modals/message-modal";
 import { MatchSettings } from "./component/match";
+import InputModal from "./component/modals/input-modal";
 
 interface MainProps {
   emitter: EventEmitter | undefined;
@@ -20,7 +21,9 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
   const [isMatchSettings, setIsMatchSettings] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
   const [inviteCode, setInviteCode] = useState<InviteCode>({});
-  const [showMessageModal, setShowMessageModal] = useState<Message>({});
+  const [messageModal, setMessageModal] = useState<Message>({});
+  const [inputModal, setInputModal] = useState<Input>({});
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     //#region Socket Listeners
@@ -39,16 +42,16 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
     });
 
     socket.on("reset-board-request", (room: string) => {
-      setShowMessageModal({
+      setMessageModal({
         is: true,
         question: "Opponent has requested to reset the board, do you agree?",
         onConfirm: () => {
           socket.emit("confirm-board-reset", room);
-          setShowMessageModal({});
+          setMessageModal({});
         },
         onReject: () => {
           socket.emit("reject-board-reset", room);
-          setShowMessageModal({});
+          setMessageModal({});
         },
       });
     }),
@@ -63,17 +66,17 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
       });
 
     socket.on("undo-move-request", (room: string) => {
-      setShowMessageModal({
+      setMessageModal({
         is: true,
         question:
           "Opponent has requested to undo their last move, do you agree?",
         onConfirm: () => {
           socket.emit("confirm-undo-move", room);
-          setShowMessageModal({});
+          setMessageModal({});
         },
         onReject: () => {
           socket.emit("reject-undo-move", room);
-          setShowMessageModal({});
+          setMessageModal({});
         },
       });
     }),
@@ -90,15 +93,15 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
 
     //#region Emitter Listeners
     emitter?.on("end-match", (winningTeam: string) => {
-      setShowMessageModal({
+      setMessageModal({
         is: true,
         question: `Game is over, ${winningTeam} player wins!, Would you like to start another game?`,
         onConfirm: () => {
           emitter.emit("restart-match");
-          setShowMessageModal({});
+          setMessageModal({});
         },
         onReject: () => {
-          setShowMessageModal({});
+          setMessageModal({});
         },
       });
     });
@@ -116,7 +119,7 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
             {
               text: "Home",
               onClick: () => {
-                setShowMessageModal({
+                setMessageModal({
                   is: true,
                   question:
                     "Are you sure you would like to leave the current game?",
@@ -124,10 +127,10 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
                     setGameStarted(false);
                     setIsNavbarOpen(false);
                     emitter!.emit("home-screen");
-                    setShowMessageModal({});
+                    setMessageModal({});
                   },
                   onReject: () => {
-                    setShowMessageModal({});
+                    setMessageModal({});
                   },
                 });
               },
@@ -145,13 +148,34 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
             {
               text: "Join Online",
               onClick: () => {
-                if (!gameStarted) {
-                  emitter!.emit("join-online-match");
-                  setIsNavbarOpen(false);
-                }
+                setIsNavbarOpen(false);
+                setInputModal({
+                  is: true,
+                  text: "Please enter the room key below:",
+                  onConfirm: () => {
+                    if (!gameStarted) {
+                      emitter!.emit(
+                        "join-online-match",
+                        inputRef.current!.value
+                      );
+                      setInputModal({});
+                    }
+                  },
+                  onReject: () => {
+                    setInputModal({});
+                  },
+                });
               },
             },
           ]}
+        />
+      )}
+      {inputModal.is && (
+        <InputModal
+          text={inputModal.text}
+          ref={inputRef}
+          onConfirm={inputModal.onConfirm}
+          onReject={inputModal.onReject}
         />
       )}
       {inviteCode.is && (
@@ -162,11 +186,11 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
           }}
         />
       )}
-      {showMessageModal.is && (
+      {messageModal.is && (
         <MessageModal
-          question={showMessageModal.question}
-          onConfirm={showMessageModal.onConfirm}
-          onReject={showMessageModal.onReject}
+          question={messageModal.question}
+          onConfirm={messageModal.onConfirm}
+          onReject={messageModal.onReject}
         />
       )}
       {gameStarted ? (
@@ -182,15 +206,15 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
             {
               text: "restart",
               onClick: () => {
-                setShowMessageModal({
+                setMessageModal({
                   is: true,
                   question: "Are you sure you would like to reset the board?",
                   onConfirm: () => {
                     emitter?.emit("restart-match");
-                    setShowMessageModal({});
+                    setMessageModal({});
                   },
                   onReject: () => {
-                    setShowMessageModal({});
+                    setMessageModal({});
                   },
                 });
               },
@@ -198,16 +222,16 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
             {
               text: "undo",
               onClick: () => {
-                setShowMessageModal({
+                setMessageModal({
                   is: true,
                   question:
                     "Are you sure you would like to undo the last move?",
                   onConfirm: () => {
                     emitter?.emit("undo-move");
-                    setShowMessageModal({});
+                    setMessageModal({});
                   },
                   onReject: () => {
-                    setShowMessageModal({});
+                    setMessageModal({});
                   },
                 });
               },
@@ -278,6 +302,13 @@ type InviteCode = {
 type Message = {
   is?: boolean;
   question?: string;
+  onConfirm?: () => void;
+  onReject?: () => void;
+};
+
+type Input = {
+  is?: boolean;
+  text?: string;
   onConfirm?: () => void;
   onReject?: () => void;
 };

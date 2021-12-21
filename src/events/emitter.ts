@@ -129,8 +129,7 @@ const initEmitter = (
     }
   });
 
-  emitter.on("join-online-match", () => {
-    let room = prompt("Please enter the room key");
+  emitter.on("join-online-match", (room: string) => {
     socket.emit("join-room", room);
   });
 

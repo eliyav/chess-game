@@ -1,4 +1,4 @@
-.message-wrapper {
+.input-wrapper {
   height: 100%;
   width: 100%;
   position: absolute;
@@ -9,7 +9,7 @@
   z-index: 3;
 }
 
-.message-wrapper .message {
+.input-wrapper .message {
   display: flex;
   flex-flow: row wrap;
   justify-content: space-evenly;
@@ -18,9 +18,23 @@
   text-align: center;
   border: 0.25rem inset whitesmoke;
   color: black;
+  /* overflow-y: auto; */
 }
 
-.message .question {
+.message input {
+  display: block;
+  width: 100%;
+  margin: 0 3rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 0.2rem solid black;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+}
+
+.message .text {
   width: 100%;
   background-color: rgba(245, 245, 245, 0.685);
   margin: 1rem;
@@ -34,7 +48,7 @@
 
 .message button {
   color: black;
-  font-size: 2.25rem;
+  font-size: 2rem;
   padding: 0.1rem 1rem;
   border-radius: 1rem;
   margin: 1rem;
@@ -55,11 +69,11 @@
 }
 
 @media only screen and (min-width: 768px) {
-  .message-wrapper .message {
+  .input-wrapper .message {
     height: 50%;
     width: 50%;
   }
-  .message .question {
+  .message .text {
     font-size: 2rem;
   }
 }

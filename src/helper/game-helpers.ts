@@ -107,7 +107,7 @@ const isEnPassantAvailable = (turnHistory: TurnHistory): EnPassantResult => {
   };
 };
 
-//Checks for pawn promotion
+//Checks for pawn promotion 
 const checkForPawnPromotion = (LocationsInfo: LocationsInfo) => {
   const { targetSquare, originPiece } = LocationsInfo;
   const y = getY(originPiece!.point);
