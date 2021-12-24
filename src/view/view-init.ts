@@ -2,9 +2,13 @@ import { Engine } from "babylonjs";
 import startScreen, { CustomScene } from "./start-screen";
 import gameScreen from "./game-screen";
 import Game from "../component/game-logic/game";
-import { findPosition, rotateCamera } from "../helper/canvas-helpers";
+import {
+  findIndex,
+  findPosition,
+  rotateCamera,
+} from "../helper/canvas-helpers";
 import Match from "../component/match";
-import { TurnHistory } from "../helper/game-helpers";
+import { doMovesMatch, TurnHistory } from "../helper/game-helpers";
 import { createMeshMaterials } from "./materials";
 
 const initCanvasView = async (
@@ -22,7 +26,7 @@ const initCanvasView = async (
     resetCamera,
     updateGameView,
     prepareHomeScreen,
-    playAnimation,
+    turnAnimation,
   };
 
   const {
@@ -32,48 +36,127 @@ const initCanvasView = async (
 
   const materials = createMeshMaterials(gameScene);
 
-  function playAnimation(resolved: TurnHistory) {
-    if (
-      (resolved.type === "standard" && resolved.targetPiece) ||
-      resolved.type === "enPassant"
-    ) {
-      //Look up animation group based on piece breaking,
-      const name = resolved.targetPiece?.name;
-      const team = resolved.targetPiece?.color;
-      let targetPoint = resolved.targetPiece?.point!;
-      const [z, x] = findPosition(targetPoint, true);
-      duplicate(
-        //@ts-ignore
-        gameScene.animationsContainer![name],
-        x,
-        z,
-        team?.toLocaleLowerCase(),
-        2000
+  function turnAnimation(
+    originPoint: Point,
+    targetPoint: Point,
+    TurnHistory: TurnHistory
+  ) {
+    const movingMesh = gameScene.meshesToRender?.find((mesh) => {
+      const meshPoint = findIndex([mesh.position.z, mesh.position.x], true);
+      return doMovesMatch(meshPoint, originPoint);
+    });
+
+    animateMovement(movingMesh);
+
+    pieceBreakAnimation(TurnHistory);
+
+    function animateMovement(movingMesh: any) {
+      const position = findPosition(originPoint, true);
+      const targetPosition = findPosition(targetPoint, true);
+
+      const frameRate = 1;
+
+      const myAnimX = new BABYLON.Animation(
+        "moveSquares",
+        "position.x",
+        frameRate,
+        BABYLON.Animation.ANIMATIONTYPE_FLOAT,
+        BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
+        false
       );
+
+      const myAnimY = new BABYLON.Animation(
+        "moveSquares",
+        "position.z",
+        frameRate,
+        BABYLON.Animation.ANIMATIONTYPE_FLOAT,
+        BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
+        false
+      );
+
+      const keyFramesX = [];
+      const keyFramesY = [];
+
+      keyFramesX.push({
+        frame: 0,
+        value: position[1],
+      });
+
+      keyFramesX.push({
+        frame: frameRate,
+        value: targetPosition[1],
+      });
+
+      keyFramesY.push({
+        frame: 0,
+        value: position[0],
+      });
+
+      keyFramesY.push({
+        frame: frameRate,
+        value: targetPosition[0],
+      });
+
+      myAnimX.setKeys(keyFramesX);
+      myAnimY.setKeys(keyFramesY);
+
+      movingMesh.animations.push(myAnimX);
+      movingMesh.animations.push(myAnimY);
+
+      gameScene.beginAnimation(movingMesh, 0, frameRate, false);
     }
-    //Function to play the full animation and then dispose resources
-    //@ts-ignore
-    function duplicate(container, z, x, team, delay) {
-      let entries = container.instantiateModelsToScene();
-      entries.rootNodes.forEach((mesh: any) =>
-        mesh
-          .getChildMeshes()
+
+    function pieceBreakAnimation(resolved: TurnHistory) {
+      if (
+        (resolved.type === "standard" && resolved.targetPiece) ||
+        resolved.type === "enPassant"
+      ) {
+        //Look up animation group based on piece breaking,
+        const name = resolved.targetPiece?.name;
+        const team = resolved.targetPiece?.color;
+        let newTargetPoint = resolved.targetPiece?.point!;
+
+        const targetMesh = gameScene.meshesToRender?.find((mesh) => {
+          const meshPoint = findIndex([mesh.position.z, mesh.position.x], true);
+          return doMovesMatch(meshPoint, newTargetPoint);
+        });
+
+        removeMesh(targetMesh);
+
+        const [z, x] = findPosition(newTargetPoint, true);
+        duplicate(
           //@ts-ignore
-          .forEach((mesh2: any) => (mesh2.material = materials[team]))
-      );
-      for (var node of entries.rootNodes) {
-        node.position.y = 0.4;
-        node.position.x = -z;
-        node.position.z = x;
+          gameScene.animationsContainer![name],
+          z,
+          x,
+          team?.toLocaleLowerCase(),
+          2000
+        );
       }
+      //Function to play the full animation and then dispose resources
+      //@ts-ignore
+      function duplicate(container, z, x, team, delay) {
+        let entries = container.instantiateModelsToScene();
+        entries.rootNodes.forEach((mesh: any) =>
+          mesh
+            .getChildMeshes()
+            //@ts-ignore
+            .forEach((mesh2: any) => (mesh2.material = materials[team]))
+        );
+        for (var node of entries.rootNodes) {
+          node.position.y = 0.4;
+          node.position.x = -x;
+          node.position.z = z;
+        }
 
-      for (var group of entries.animationGroups) {
-        group.play();
+        for (var group of entries.animationGroups) {
+          group.play();
+        }
+
+        setTimeout(() => {
+          entries.rootNodes[0].dispose();
+        }, delay);
       }
-
-      setTimeout(() => {
-        entries.rootNodes[0].dispose();
-      }, delay);
     }
   }
 
@@ -96,6 +179,10 @@ const initCanvasView = async (
     showScene.index = 0;
   }
 
+  function removeMesh(mesh: any) {
+    gameScene.removeMesh(mesh);
+    mesh.dispose();
+  }
   function updateMeshesRender(game: Game) {
     //Clears old meshes/memory usage
     !gameScene.meshesToRender ? (gameScene.meshesToRender = []) : null;
@@ -186,5 +273,9 @@ export type CanvasView = {
   resetCamera: (match: Match) => void;
   updateGameView: (match: Match) => void;
   prepareHomeScreen: () => void;
-  playAnimation: (point: TurnHistory) => void;
+  turnAnimation: (
+    originPoint: Point,
+    targetPoint: Point,
+    turnHistory: TurnHistory
+  ) => void;
 };

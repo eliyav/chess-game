@@ -62,15 +62,18 @@ const initEmitter = (
   emitter.on(
     "resolveMove",
     (originPoint: Point, targetPoint: Point, resolved: TurnHistory) => {
-      if (matchRef) {
-        matchRef.current!.game.switchTurn();
-        view.updateGameView(matchRef.current!);
-        view.playAnimation(resolved);
-        if (matchRef.current!.matchSettings.mode === "Online") {
-          const room = matchRef.current!.matchSettings.room;
-          socket.emit("stateChange", { originPoint, targetPoint, room });
+      function resolveMove() {
+        if (matchRef) {
+          console.log("called first");
+          matchRef.current!.game.switchTurn();
+          view.turnAnimation(originPoint, targetPoint, resolved);
+          if (matchRef.current!.matchSettings.mode === "Online") {
+            const room = matchRef.current!.matchSettings.room;
+            socket.emit("stateChange", { originPoint, targetPoint, room });
+          }
         }
       }
+      resolveMove();
     }
   );
 
