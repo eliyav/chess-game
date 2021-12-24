@@ -41,8 +41,8 @@ const initEmitter = (
 
   emitter.on("create-match", ({ mode, time, player }: MatchSettings) => {
     matchRef!.current = new Match({ mode, time, player }, emitter);
-    timerRef.current = matchRef.current.timer;
     if (mode === "Offline") {
+      timerRef.current = matchRef.current!.startMatchTimer();
       view.prepareGameScene(matchRef.current);
     } else {
       socket.emit("create-room");
@@ -50,8 +50,8 @@ const initEmitter = (
   });
 
   emitter.on("join-match", () => {
+    timerRef.current = matchRef.current!.startMatchTimer();
     view.prepareGameScene(matchRef.current!);
-    matchRef.current?.startMatchTimer();
   });
 
   emitter.on("assign-room-info", (matchInfo: MatchSettings) => {

@@ -38,19 +38,17 @@ const initSocket = (
     socket.emit("reply-room-info", matchInfo);
   });
 
-  socket.on("start-match", () => {
-    // Activate Game Settings
-    console.log("game has been activated");
-    socket.emit("prepare-game-request");
-  });
-
   socket.on("pause-game", ({ currentPlayer, time }) => {
+    console.log("paused timer called");
     matchRef.current!.timer.pauseTimer();
     if (currentPlayer === "White") {
       matchRef.current!.timer.timer1 = time;
     } else {
       matchRef.current!.timer.timer2 = time;
     }
+    matchRef.current!.timer.gamePaused === true
+      ? view.scenes.gameScene.detachControl()
+      : view.scenes.gameScene.attachControl();
   });
 
   return socket;

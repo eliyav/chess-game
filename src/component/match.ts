@@ -26,7 +26,6 @@ class Match implements Context {
       this.loadTimer(timerSettings);
     } else {
       this.createGame(true);
-      mode === "Offline" ? this.startMatchTimer() : null;
     }
     this.emitter = emitter;
   }
@@ -62,6 +61,7 @@ class Match implements Context {
   startMatchTimer() {
     this.timer = new Timer(this.game.state, this.endMatch.bind(this), true);
     this.timer.startTimer(this.matchSettings.time);
+    return this.timer;
   }
 
   resetMatchTimer() {

@@ -82,10 +82,6 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("prepare-game-request", () => {
-    socket.emit("prepare-game");
-  });
-
   socket.on("stateChange", ({ originPoint, targetPoint, room }) => {
     socket.to(room).emit("message", "Move has been entered");
     socket.to(room).emit("stateChange", { originPoint, targetPoint });
@@ -93,6 +89,7 @@ io.on("connection", (socket) => {
 
   socket.on("pause-game", ({ room, currentPlayer, time }) => {
     socket.to(room).emit("pause-game", { currentPlayer, time });
+    socket.emit("pause-game", { currentPlayer, time });
   });
 
   socket.on("reset-board", (room) => {
