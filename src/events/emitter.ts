@@ -3,6 +3,7 @@ import { CanvasView } from "../view/view-init";
 import Match from "../component/match";
 import Timer from "../component/game-logic/timer";
 import { TurnHistory } from "../helper/game-helpers";
+import { rotateCamera } from "../helper/canvas-helpers";
 
 const initEmitter = (
   matchRef: React.MutableRefObject<Match | undefined>,
@@ -70,6 +71,12 @@ const initEmitter = (
           targetPoint,
           resolved
         );
+        if (matchRef.current!.matchSettings.mode === "Offline") {
+          rotateCamera(
+            matchRef.current?.game.state.currentPlayer!,
+            view.scenes.gameScene
+          );
+        }
         if (matchRef.current!.matchSettings.mode === "Online") {
           const room = matchRef.current!.matchSettings.room;
           socket.emit("stateChange", { originPoint, targetPoint, room });

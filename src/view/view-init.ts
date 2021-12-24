@@ -42,29 +42,19 @@ const initCanvasView = async (
     targetPoint: Point,
     turnHistory: TurnHistory
   ) {
-    const movingMesh = gameScene.meshesToRender?.find((mesh) => {
-      const meshPoint = findIndex([mesh.position.z, mesh.position.x], true);
-      return doMovesMatch(meshPoint, originPoint);
-    });
+    const movingMesh = findMeshFromPoint(originPoint);
+    const targetMesh = findMeshFromPoint(targetPoint);
 
-    const targetMesh = gameScene.meshesToRender?.find((mesh) => {
-      const meshPoint = findIndex([mesh.position.z, mesh.position.x], true);
-      return doMovesMatch(meshPoint, targetPoint);
-    });
-
+    //Animate Piece Movement
     if (turnHistory.type === "castling") {
-      if (turnHistory.type === "castling") {
-        animateMovement(movingMesh, true);
-        animateMovement(targetMesh, true);
-      }
+      animateMovement(movingMesh, true);
+      animateMovement(targetMesh, true);
     } else {
-      if (movingMesh?.name === "Knight") {
-        animateMovement(movingMesh, false);
-      } else {
-        animateMovement(movingMesh, true);
-      }
+      movingMesh?.name === "Knight"
+        ? animateMovement(movingMesh, false)
+        : animateMovement(movingMesh, true);
     }
-
+    //Animate Target Piece breaking animation
     pieceBreakAnimation(turnHistory);
 
     function animateMovement(mesh: any, slide: boolean) {
@@ -231,6 +221,13 @@ const initCanvasView = async (
         }, delay);
       }
     }
+  }
+
+  function findMeshFromPoint(point: Point) {
+    return gameScene.meshesToRender?.find((mesh) => {
+      const meshPoint = findIndex([mesh.position.z, mesh.position.x], true);
+      return doMovesMatch(meshPoint, point);
+    });
   }
 
   function updateGameView(match: Match) {

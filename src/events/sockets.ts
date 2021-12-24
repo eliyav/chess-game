@@ -16,7 +16,13 @@ const initSocket = (
     const { originPoint, targetPoint } = newState;
     matchRef.current!.game.playerMove(originPoint, targetPoint);
     matchRef.current!.game.switchTurn();
-    view.updateGameView(matchRef.current!);
+    const turnHistory = matchRef.current?.game.turnHistory!;
+    view.turnAnimation(
+      matchRef.current?.game!,
+      originPoint,
+      targetPoint,
+      turnHistory.at(-1)!
+    );
   });
 
   socket.on("assign-room-number", (room) => {
