@@ -37,26 +37,61 @@ const initCanvasView = async (
   const materials = createMeshMaterials(gameScene);
 
   function turnAnimation(
+    game: Game,
     originPoint: Point,
     targetPoint: Point,
-    TurnHistory: TurnHistory
+    turnHistory: TurnHistory
   ) {
     const movingMesh = gameScene.meshesToRender?.find((mesh) => {
       const meshPoint = findIndex([mesh.position.z, mesh.position.x], true);
       return doMovesMatch(meshPoint, originPoint);
     });
 
-    if (movingMesh?.name === "Knight") {
-      animateMovement(movingMesh, false);
+    const targetMesh = gameScene.meshesToRender?.find((mesh) => {
+      const meshPoint = findIndex([mesh.position.z, mesh.position.x], true);
+      return doMovesMatch(meshPoint, targetPoint);
+    });
+
+    if (turnHistory.type === "castling") {
+      if (turnHistory.type === "castling") {
+        animateMovement(movingMesh, true);
+        animateMovement(targetMesh, true);
+      }
     } else {
-      animateMovement(movingMesh, true);
+      if (movingMesh?.name === "Knight") {
+        animateMovement(movingMesh, false);
+      } else {
+        animateMovement(movingMesh, true);
+      }
     }
 
-    pieceBreakAnimation(TurnHistory);
+    pieceBreakAnimation(turnHistory);
 
-    function animateMovement(movingMesh: any, slide: boolean) {
-      const position = findPosition(originPoint, true);
-      const targetPosition = findPosition(targetPoint, true);
+    function animateMovement(mesh: any, slide: boolean) {
+      let position;
+      let targetPosition;
+      if (turnHistory.type === "castling" && mesh.name === "King") {
+        const {
+          point: [x, y],
+        } = turnHistory.originPiece!;
+        const direction = turnHistory.direction!;
+        const newKingX = x + direction * 2;
+        const newKingPoint: Point = [newKingX, y];
+        position = findPosition(originPoint, true);
+        targetPosition = findPosition(newKingPoint, true);
+      } else if (turnHistory.type === "castling" && mesh.name === "Rook") {
+        const {
+          point: [x, y],
+        } = turnHistory.originPiece!;
+        const direction = turnHistory.direction!;
+        const newRookX = x + direction;
+        const newRookPoint: Point = [newRookX, y];
+        position = findPosition(targetPoint, true);
+        targetPosition = findPosition(newRookPoint, true);
+      } else {
+        position = findPosition(originPoint, true);
+        targetPosition = findPosition(targetPoint, true);
+      }
 
       const frameRate = 1;
 
@@ -127,16 +162,21 @@ const initCanvasView = async (
           value: 0.5,
         });
         myAnimZ.setKeys(keyFramesZ);
-        movingMesh.animations.push(myAnimZ);
+        mesh.animations.push(myAnimZ);
       }
 
       myAnimX.setKeys(keyFramesX);
       myAnimY.setKeys(keyFramesY);
 
-      movingMesh.animations.push(myAnimX);
-      movingMesh.animations.push(myAnimY);
+      mesh.animations.push(myAnimX);
+      mesh.animations.push(myAnimY);
 
-      gameScene.beginAnimation(movingMesh, 0, frameRate, false);
+      const animtable = gameScene.beginAnimation(mesh, 0, frameRate, false);
+      animtable.onAnimationEnd = () => {
+        if (turnHistory.promotion) {
+          updateMeshesRender(game);
+        }
+      };
     }
 
     function pieceBreakAnimation(resolved: TurnHistory) {
@@ -307,6 +347,7 @@ export type CanvasView = {
   updateGameView: (match: Match) => void;
   prepareHomeScreen: () => void;
   turnAnimation: (
+    game: Game,
     originPoint: Point,
     targetPoint: Point,
     turnHistory: TurnHistory

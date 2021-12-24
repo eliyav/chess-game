@@ -173,6 +173,8 @@ class Game {
       const newRookSquare = grid[newRookX][y];
       newKingSquare.on = new GamePiece(name, color, newKingPoint, movement);
       newRookSquare.on = new GamePiece(name2, color2, newRookPoint, movement2);
+      newKingSquare.on.update();
+      newRookSquare.on.update();
       return [newKingSquare, newRookSquare];
     }
   }
