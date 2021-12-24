@@ -46,11 +46,15 @@ const initCanvasView = async (
       return doMovesMatch(meshPoint, originPoint);
     });
 
-    animateMovement(movingMesh);
+    if (movingMesh?.name === "Knight") {
+      animateMovement(movingMesh, false);
+    } else {
+      animateMovement(movingMesh, true);
+    }
 
     pieceBreakAnimation(TurnHistory);
 
-    function animateMovement(movingMesh: any) {
+    function animateMovement(movingMesh: any, slide: boolean) {
       const position = findPosition(originPoint, true);
       const targetPosition = findPosition(targetPoint, true);
 
@@ -74,8 +78,18 @@ const initCanvasView = async (
         false
       );
 
+      const myAnimZ = new BABYLON.Animation(
+        "moveSquares",
+        "position.y",
+        frameRate,
+        BABYLON.Animation.ANIMATIONTYPE_FLOAT,
+        BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
+        false
+      );
+
       const keyFramesX = [];
       const keyFramesY = [];
+      const keyFramesZ = [];
 
       keyFramesX.push({
         frame: 0,
@@ -96,6 +110,25 @@ const initCanvasView = async (
         frame: frameRate,
         value: targetPosition[0],
       });
+
+      if (!slide) {
+        keyFramesZ.push({
+          frame: 0,
+          value: 0.5,
+        });
+
+        keyFramesZ.push({
+          frame: frameRate / 2,
+          value: 5,
+        });
+
+        keyFramesZ.push({
+          frame: frameRate,
+          value: 0.5,
+        });
+        myAnimZ.setKeys(keyFramesZ);
+        movingMesh.animations.push(myAnimZ);
+      }
 
       myAnimX.setKeys(keyFramesX);
       myAnimY.setKeys(keyFramesY);
