@@ -44,8 +44,8 @@ canvas {
 }
 
 #playButton:hover {
-  color: red;
-  background-color: rgba(245, 245, 245, 0.8);
+  color: black;
+  background-color: rgba(240, 230, 95, 0.5);
 }
 
 /*!******************************************************************************!*\
@@ -115,8 +115,11 @@ canvas {
   font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
     "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
   border: 0.1rem white solid;
-  padding: 0.4rem;
+  padding: 0.1rem;
+  font-size: 0.9rem;
   pointer-events: auto;
+  min-width: 0;
+  flex-grow: 1;
 }
 
 .gameOverlay > .item > img {
@@ -128,7 +131,8 @@ canvas {
 }
 
 .gameOverlay > .item:hover {
-  transform: scale(0.9);
+  transform: scale(0.95);
+  background-color: rgba(240, 230, 95, 0.5);
 }
 
 .timer {
@@ -137,6 +141,8 @@ canvas {
   background-color: rgba(255, 255, 255, 0.5);
   justify-content: space-between;
   text-align: center;
+  position: relative;
+  bottom: 0.1rem;
 }
 
 .timer > .playerTimer > img {
@@ -242,8 +248,8 @@ canvas {
 }
 
 .confirmButton:hover {
-  color: red;
-  background-color: rgba(245, 245, 245, 0.8);
+  color: black;
+  background-color: rgba(240, 230, 95, 0.5);
 }
 
 #inviteCode {
