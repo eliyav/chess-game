@@ -41,6 +41,6 @@ canvas {
 }
 
 #playButton:hover {
-  color: red;
-  background-color: rgba(245, 245, 245, 0.8);
+  color: black;
+  background-color: rgba(240, 230, 95, 0.5);
 }
