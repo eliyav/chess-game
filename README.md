@@ -60,7 +60,7 @@ This project is meant to be played. If you are having fun playing chess it is be
 - [x] Implement React.js
 - [x] Add Game start options
 - [x] Implement MongoDB - Save & Load games
-- [] Add Authorization/Login
+- [In Progress] Add Authorization/Login
 - [] Add Friends List
 - [] Add Chat
 - [x] Add animations
