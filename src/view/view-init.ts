@@ -235,6 +235,7 @@ const initCanvasView = async (
     match.matchSettings.mode === "Offline"
       ? rotateCamera(match.game.state.currentPlayer, gameScene)
       : null;
+    gameScene.attachControl();
   }
 
   function prepareGameScene(match: Match) {

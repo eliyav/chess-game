@@ -9,6 +9,8 @@ import Timer from "./component/game-logic/timer";
 import MessageModal from "./component/modals/message-modal";
 import Match, { MatchSettings } from "./component/match";
 import InputModal from "./component/modals/input-modal";
+import { TurnHistory } from "./helper/game-helpers";
+import PromotionModal from "./component/modals/promotion-modal";
 
 interface MainProps {
   emitter: EventEmitter | undefined;
@@ -23,6 +25,7 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
   const [inviteCode, setInviteCode] = useState<InviteCode>({});
   const [messageModal, setMessageModal] = useState<Message>({});
   const [inputModal, setInputModal] = useState<Input>({});
+  const [showPromotionModal, setShowPromotionModal] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -96,6 +99,20 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
     //#endregion
 
     //#region Emitter Listeners
+    emitter?.on("piece-promotion", (resolved: TurnHistory) => {
+      console.log(resolved);
+      emitter.emit("detach-game-control");
+      console.log("do promotion event now");
+      setShowPromotionModal(true);
+      // const square = result.targetSquare.square;
+      // const symbol = result.originPiece?.getSymbol();
+      // finalString = `${symbol}x${square}`;
+      // setShowPromotionModal()
+      // resolved.promotion = the modal selection
+      // const { color, point, movement } = resolved.originPiece!;
+      // resolved.targetSquare.on = new GamePiece(finalString, color, point, movement);
+    });
+
     emitter?.on("update-game-started", () => {
       setGameStarted(true);
     });
@@ -118,6 +135,14 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
 
   return (
     <div className="app">
+      {showPromotionModal && (
+        <PromotionModal
+          submitSelection={(e) => {
+            console.log(e.target.innerHTML);
+            return e.target.innerHTML;
+          }}
+        />
+      )}
       {isNavbarOpen && (
         <SideNav
           onClose={() => {

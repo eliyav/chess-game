@@ -107,35 +107,6 @@ const isEnPassantAvailable = (turnHistory: TurnHistory): EnPassantResult => {
   };
 };
 
-//Checks for pawn promotion 
-const checkForPawnPromotion = (LocationsInfo: LocationsInfo) => {
-  const { targetSquare, originPiece } = LocationsInfo;
-  const y = getY(originPiece!.point);
-  if (y === 7 || y === 0) {
-    let newClass;
-    do {
-      newClass = prompt(
-        "Piece Promoted! Please type your new piece. Your Choices are: Queen, Knight, Bishop, Rook",
-        "Enter class name here"
-      );
-    } while (
-      newClass !== "Queen" &&
-      newClass !== "queen" &&
-      newClass !== "Knight" &&
-      newClass !== "knight" &&
-      newClass !== "Bishop" &&
-      newClass !== "bishop" &&
-      newClass !== "Rook" &&
-      newClass !== "rook"
-    );
-    const char = newClass.charAt(0).toUpperCase();
-    const finalString = newClass.replace(newClass.charAt(0), char);
-    const { color, point, movement } = originPiece!;
-    targetSquare.on = new GamePiece(finalString, color, point, movement);
-    return finalString;
-  }
-};
-
 //Functions to switch game pieces back and forth between squares once move is entered
 const updateLocation = (LocationsInfo: LocationsInfo) => {
   const { originSquare, targetSquare, originPiece, targetPoint } =
@@ -175,7 +146,6 @@ export {
   doMovesMatch,
   updateLocation,
   undoUpdateLocation,
-  checkForPawnPromotion,
   isEnPassantAvailable,
   generateTurnHistory,
 };

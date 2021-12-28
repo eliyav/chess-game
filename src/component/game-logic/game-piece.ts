@@ -1,7 +1,4 @@
-import {
-  checkForPawnPromotion,
-  LocationsInfo,
-} from "../../helper/game-helpers";
+import { LocationsInfo } from "../../helper/game-helpers";
 
 class GamePiece {
   name: string;
@@ -29,7 +26,7 @@ class GamePiece {
 
   checkPromotion(locationsInfo: LocationsInfo) {
     if (this.name === "Pawn" && (this.point[1] === 0 || this.point[1] === 7)) {
-      return checkForPawnPromotion(locationsInfo);
+      return "";
     }
   }
 

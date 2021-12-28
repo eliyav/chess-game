@@ -64,26 +64,36 @@ const initEmitter = (
     "resolveMove",
     (originPoint: Point, targetPoint: Point, resolved: TurnHistory) => {
       if (matchRef) {
-        matchRef.current!.game.switchTurn();
         view.turnAnimation(
           matchRef.current?.game!,
           originPoint,
           targetPoint,
           resolved
         );
-        if (matchRef.current!.matchSettings.mode === "Offline") {
-          rotateCamera(
-            matchRef.current?.game.state.currentPlayer!,
-            view.scenes.gameScene
-          );
-        }
-        if (matchRef.current!.matchSettings.mode === "Online") {
-          const room = matchRef.current!.matchSettings.room;
-          socket.emit("stateChange", { originPoint, targetPoint, room });
+        if (resolved.promotion === undefined) {
+          const isMatchOver = matchRef.current!.game.switchTurn();
+          if (matchRef.current!.matchSettings.mode === "Offline") {
+            rotateCamera(
+              matchRef.current?.game.state.currentPlayer!,
+              view.scenes.gameScene
+            );
+          }
+          isMatchOver ? view.scenes.gameScene.detachControl() : null;
+          if (matchRef.current!.matchSettings.mode === "Online") {
+            const room = matchRef.current!.matchSettings.room;
+            socket.emit("stateChange", { originPoint, targetPoint, room });
+          }
+        } else {
+          //Handle Promotion Event
+          emitter.emit("piece-promotion", resolved);
         }
       }
     }
   );
+
+  emitter.on("detach-game-control", () => {
+    view.scenes.gameScene.detachControl();
+  });
 
   emitter.on("home-screen", () => {
     matchRef.current?.endMatch();

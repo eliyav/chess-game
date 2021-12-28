@@ -102,6 +102,7 @@ class Game {
       originPiece!.update();
       //Once move resolved check if pawn promotion is relevant
       const promotion = originPiece!.checkPromotion(locationsInfo);
+      console.log(promotion);
       return gameHelpers.generateTurnHistory("standard", locationsInfo, {
         promotion,
       });
@@ -461,7 +462,7 @@ class Game {
   switchTurn() {
     this.turnCounter++;
     this.changePlayer();
-    this.isCheckmate() ? this.endMatch() : null;
+    return this.isCheckmate() ? this.endMatch() : null;
   }
 
   undoTurn() {
@@ -516,7 +517,7 @@ class Game {
     const symbol = result.originPiece?.getSymbol();
     if (type === "castling") {
       finalString = result.direction === 1 ? "O-O" : "O-O-O";
-    } else if (promotion) {
+    } else if (promotion !== undefined) {
       finalString = `${square}=${symbol}`;
     } else {
       if (isCapturing) {

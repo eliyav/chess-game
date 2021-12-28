@@ -75,6 +75,7 @@ class Match implements Context {
         ? this.game.teams[1]
         : this.game.teams[0];
     this.emitter.emit("end-match", winningTeam);
+    return true;
   }
 }
 
