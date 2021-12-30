@@ -99,10 +99,8 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
     //#endregion
 
     //#region Emitter Listeners
-    emitter?.on("piece-promotion", (resolved: TurnHistory) => {
-      console.log(resolved);
+    emitter?.on("piece-promotion", () => {
       emitter.emit("detach-game-control");
-      console.log("do promotion event now");
       setShowPromotionModal(true);
     });
 

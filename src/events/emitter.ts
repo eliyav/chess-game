@@ -87,7 +87,7 @@ const initEmitter = (
           }
         } else {
           //Handle Promotion Event
-          emitter.emit("piece-promotion", resolved);
+          emitter.emit("piece-promotion");
         }
       }
     }

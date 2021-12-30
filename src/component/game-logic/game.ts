@@ -467,7 +467,6 @@ class Game {
 
   undoTurn() {
     const lastTurn = this.turnHistory.at(-1);
-    console.log(lastTurn);
     if (lastTurn !== undefined) {
       lastTurn.originPiece!.moveCounter === 1
         ? (lastTurn.originPiece!.moved = false)
