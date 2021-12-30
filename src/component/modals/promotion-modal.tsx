@@ -2,16 +2,16 @@ import React from "react";
 import "./promotion-modal.css";
 
 interface PromotionProps {
-  submitSelection: (e: any) => string;
+  submitSelection: (e: any) => void;
 }
 
 const PromotionModal: React.VFC<PromotionProps> = ({ submitSelection }) => {
   return (
     <div className="promotion-wrapper" onClick={submitSelection}>
-      <div className="selection">Rook</div>
-      <div className="selection">Bishop</div>
-      <div className="selection">Knight</div>
-      <div className="selection">Queen</div>
+      <div className="selection red">Rook</div>
+      <div className="selection blue">Bishop</div>
+      <div className="selection green">Knight</div>
+      <div className="selection yellow">Queen</div>
     </div>
   );
 };

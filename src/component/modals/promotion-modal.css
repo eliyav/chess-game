@@ -3,8 +3,41 @@
   width: 100%;
   position: absolute;
   display: flex;
-  flex-flow: row nowrap;
-  /* justify-content: center;
-  align-items: center; */
+  flex-flow: row wrap;
+  justify-content: center;
   z-index: 3;
+}
+
+.promotion-wrapper .selection {
+  width: 50%;
+}
+
+.red {
+  background-color: red;
+  background-image: url(../../../assets/promotion-choices/rook-choice.png);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.blue {
+  background-color: blue;
+  background-image: url(../../../assets/promotion-choices/bishop-choice.png);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.green {
+  background-color: green;
+  background-image: url(../../../assets/promotion-choices/knight-choice.png);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.yellow {
+  background-color: yellow;
+  background-image: url(../../../assets/promotion-choices/queen-choice.png);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
 }

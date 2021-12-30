@@ -4,6 +4,8 @@ import Match from "../component/match";
 import Timer from "../component/game-logic/timer";
 import { TurnHistory } from "../helper/game-helpers";
 import { rotateCamera } from "../helper/canvas-helpers";
+import GamePiece from "../component/game-logic/game-piece";
+import Game from "../component/game-logic/game";
 
 const initEmitter = (
   matchRef: React.MutableRefObject<Match | undefined>,
@@ -90,6 +92,25 @@ const initEmitter = (
       }
     }
   );
+
+  emitter?.on("promotion-selection", (selection: string) => {
+    const turnHistory = matchRef.current?.game.turnHistory.at(-1)!;
+    const square = turnHistory.targetSquare.square;
+    turnHistory.promotion = selection;
+    const { color, point, movement } = turnHistory.originPiece!;
+    turnHistory.targetSquare.on = new GamePiece(
+      selection,
+      color,
+      point,
+      movement
+    );
+    const symbol = turnHistory.targetSquare?.on.getSymbol();
+    const annotations = matchRef.current?.game.annotations!;
+    annotations[annotations?.length - 1] = `${square}${symbol}`;
+    view.updateMeshesRender(matchRef.current?.game!);
+    matchRef.current?.game.switchTurn();
+    view.scenes.gameScene.attachControl();
+  });
 
   emitter.on("detach-game-control", () => {
     view.scenes.gameScene.detachControl();

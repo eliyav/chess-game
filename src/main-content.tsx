@@ -104,13 +104,6 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
       emitter.emit("detach-game-control");
       console.log("do promotion event now");
       setShowPromotionModal(true);
-      // const square = result.targetSquare.square;
-      // const symbol = result.originPiece?.getSymbol();
-      // finalString = `${symbol}x${square}`;
-      // setShowPromotionModal()
-      // resolved.promotion = the modal selection
-      // const { color, point, movement } = resolved.originPiece!;
-      // resolved.targetSquare.on = new GamePiece(finalString, color, point, movement);
     });
 
     emitter?.on("update-game-started", () => {
@@ -138,8 +131,9 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
       {showPromotionModal && (
         <PromotionModal
           submitSelection={(e) => {
-            console.log(e.target.innerHTML);
-            return e.target.innerHTML;
+            const selection = e.target.innerHTML;
+            emitter?.emit("promotion-selection", selection);
+            setShowPromotionModal(false);
           }}
         />
       )}

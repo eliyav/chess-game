@@ -161,12 +161,7 @@ const initCanvasView = async (
       mesh.animations.push(myAnimX);
       mesh.animations.push(myAnimY);
 
-      const animtable = gameScene.beginAnimation(mesh, 0, frameRate, false);
-      animtable.onAnimationEnd = () => {
-        if (turnHistory.promotion) {
-          updateMeshesRender(game);
-        }
-      };
+      gameScene.beginAnimation(mesh, 0, frameRate, false);
     }
 
     function pieceBreakAnimation(resolved: TurnHistory) {
