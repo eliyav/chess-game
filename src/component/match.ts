@@ -17,17 +17,18 @@ class Match implements Context {
   constructor(
     { mode, player, time, room }: MatchSettings,
     emitter: EventEmitter,
+    newGame: boolean,
     gameSettings?: any,
     timerSettings?: any
   ) {
     this.matchSettings = { mode, player, time, room };
-    if (gameSettings) {
+    this.emitter = emitter;
+    if (newGame) {
+      this.createGame(true);
+    } else {
       this.createGame(false, gameSettings);
       this.loadTimer(timerSettings);
-    } else {
-      this.createGame(true);
     }
-    this.emitter = emitter;
   }
 
   resetMatch() {
@@ -36,16 +37,10 @@ class Match implements Context {
   }
 
   createGame(newGame: boolean, gameSettings?: any) {
-    if (newGame) {
-      this.game = new Game(chessData, this.endMatch.bind(this));
-      this.game.resetGame();
-    } else {
-      this.game = new Game(
-        chessData,
-        this.endMatch.bind(this),
-        true,
-        gameSettings
-      );
+    this.game = new Game(chessData, this.endMatch.bind(this));
+    this.game.resetGame();
+    if (!newGame) {
+      this.game.loadGame(gameSettings);
     }
   }
 

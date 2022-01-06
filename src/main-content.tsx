@@ -24,7 +24,7 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
   const [gameStarted, setGameStarted] = useState(false);
   const [inviteCode, setInviteCode] = useState<InviteCode>({});
   const [messageModal, setMessageModal] = useState<Message>({});
-  const [inputModal, setInputModal] = useState<Input>({});
+  const [inputModal, setInputModal] = useState<Input>();
   const [showPromotionModal, setShowPromotionModal] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -209,7 +209,7 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
           ]}
         />
       )}
-      {inputModal.is && (
+      {inputModal && (
         <InputModal
           text={inputModal.text}
           ref={inputRef}
