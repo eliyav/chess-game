@@ -49,7 +49,7 @@ const App: React.VFC = () => {
       {appLoaded ? (
         <MainContent
           timerRef={timerRef}
-          emitter={emitter.current}
+          emitter={emitter.current!}
           socket={socket.current}
         />
       ) : (
