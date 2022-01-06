@@ -15,10 +15,10 @@ import Timer from "./component/game-logic/timer";
 const App: React.VFC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [appLoaded, setAppLoaded] = useState(false);
-  const matchRef = useRef<Match>();
   const canvasView = useRef<CanvasView>();
   const socket = useRef<any>();
   const emitter = useRef<EventEmitter>();
+  const matchRef = useRef<Match>(new Match({}, emitter.current, true));
   const timerRef = useRef<Timer | undefined>();
 
   async function initApp(canvas: HTMLCanvasElement) {

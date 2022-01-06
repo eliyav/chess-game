@@ -3,7 +3,6 @@ import assetsLoader from "./asset-loader";
 import space from "../../assets/space.webp";
 import { createMovementMaterials } from "./materials";
 import { CustomScene } from "./start-screen";
-import { Mesh } from "babylonjs/Meshes/mesh";
 
 const gameScreen = async (
   canvas: HTMLCanvasElement,

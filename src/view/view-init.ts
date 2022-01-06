@@ -37,7 +37,6 @@ const initCanvasView = async (
   const materials = createMeshMaterials(gameScene);
 
   function turnAnimation(
-    game: Game,
     originPoint: Point,
     targetPoint: Point,
     turnHistory: TurnHistory
@@ -50,7 +49,7 @@ const initCanvasView = async (
       animateMovement(movingMesh, true);
       animateMovement(targetMesh, true);
     } else {
-      movingMesh?.name === "Knight"
+      movingMesh.name === "Knight"
         ? animateMovement(movingMesh, false)
         : animateMovement(movingMesh, true);
     }
@@ -222,7 +221,7 @@ const initCanvasView = async (
     return gameScene.meshesToRender?.find((mesh) => {
       const meshPoint = findIndex([mesh.position.z, mesh.position.x], true);
       return doMovesMatch(meshPoint, point);
-    });
+    })!;
   }
 
   function updateGameView(match: Match) {
@@ -340,7 +339,6 @@ export type CanvasView = {
   updateGameView: (match: Match) => void;
   prepareHomeScreen: () => void;
   turnAnimation: (
-    game: Game,
     originPoint: Point,
     targetPoint: Point,
     turnHistory: TurnHistory

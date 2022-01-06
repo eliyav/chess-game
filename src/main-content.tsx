@@ -9,7 +9,6 @@ import Timer from "./component/game-logic/timer";
 import MessageModal from "./component/modals/message-modal";
 import Match, { MatchSettings } from "./component/match";
 import InputModal from "./component/modals/input-modal";
-import { TurnHistory } from "./helper/game-helpers";
 import PromotionModal from "./component/modals/promotion-modal";
 
 interface MainProps {
