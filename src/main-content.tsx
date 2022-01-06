@@ -12,7 +12,7 @@ import InputModal from "./component/modals/input-modal";
 import PromotionModal from "./component/modals/promotion-modal";
 
 interface MainProps {
-  emitter: EventEmitter | undefined;
+  emitter: EventEmitter;
   socket: any;
   timerRef: React.MutableRefObject<Timer | undefined>;
 }
@@ -30,11 +30,11 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
   useEffect(() => {
     //#region Socket Listeners
     socket.on("load-game", (match: Match) => {
-      emitter?.emit("load-game", match);
+      emitter.emit("load-game", match);
     });
 
     socket.on("start-online-match", () => {
-      emitter!.emit("join-match");
+      emitter.emit("join-match");
       setInviteCode({});
       setGameStarted(true);
     });
@@ -44,7 +44,7 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
     });
 
     socket.on("assign-room-info", (matchInfo: MatchSettings) => {
-      emitter?.emit("assign-room-info", matchInfo);
+      emitter.emit("assign-room-info", matchInfo);
     });
 
     socket.on("reset-board-request", (room: string) => {
@@ -63,7 +63,7 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
     }),
       socket.on("reset-board-resolve", (response: string) => {
         if (response === "Yes") {
-          emitter?.emit("reset-board");
+          emitter.emit("reset-board");
           //Notification modal
         } else {
           console.log("Request Denied");
@@ -88,7 +88,7 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
     }),
       socket.on("undo-move-resolve", (response: string) => {
         if (response === "Yes") {
-          emitter?.emit("undo-move-action");
+          emitter.emit("undo-move-action");
           //Notification Modal
         } else {
           console.log("Request Denied");
@@ -98,16 +98,16 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
     //#endregion
 
     //#region Emitter Listeners
-    emitter?.on("piece-promotion", () => {
+    emitter.on("piece-promotion", () => {
       emitter.emit("detach-game-control");
       setShowPromotionModal(true);
     });
 
-    emitter?.on("update-game-started", () => {
+    emitter.on("update-game-started", () => {
       setGameStarted(true);
     });
 
-    emitter?.on("end-match", (winningTeam: string) => {
+    emitter.on("end-match", (winningTeam: string) => {
       setMessageModal({
         is: true,
         question: `Game is over, ${winningTeam} player wins!, Would you like to start another game?`,
@@ -129,7 +129,7 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
         <PromotionModal
           submitSelection={(e) => {
             const selection = e.target.innerHTML;
-            emitter?.emit("promotion-selection", selection);
+            emitter.emit("promotion-selection", selection);
             setShowPromotionModal(false);
           }}
         />
@@ -150,7 +150,7 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
                   onConfirm: () => {
                     setGameStarted(false);
                     setIsNavbarOpen(false);
-                    emitter!.emit("home-screen");
+                    emitter.emit("home-screen");
                     setMessageModal({});
                   },
                   onReject: () => {
@@ -178,7 +178,7 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
                   text: "Please enter the room key below:",
                   onConfirm: () => {
                     if (!gameStarted) {
-                      emitter!.emit(
+                      emitter.emit(
                         "join-online-match",
                         inputRef.current!.value
                       );
@@ -195,14 +195,14 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
               text: "Save Game",
               onClick: () => {
                 setIsNavbarOpen(false);
-                emitter!.emit("save-game");
+                emitter.emit("save-game");
               },
             },
             {
               text: "Load Game",
               onClick: () => {
                 setIsNavbarOpen(false);
-                emitter!.emit("lookup-game");
+                emitter.emit("lookup-game");
               },
             },
           ]}
@@ -248,7 +248,7 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
                   is: true,
                   question: "Are you sure you would like to reset the board?",
                   onConfirm: () => {
-                    emitter?.emit("restart-match");
+                    emitter.emit("restart-match");
                     setMessageModal({});
                   },
                   onReject: () => {
@@ -265,7 +265,7 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
                   question:
                     "Are you sure you would like to undo the last move?",
                   onConfirm: () => {
-                    emitter?.emit("undo-move");
+                    emitter.emit("undo-move");
                     setMessageModal({});
                   },
                   onReject: () => {
@@ -277,13 +277,13 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
             {
               text: "camera",
               onClick: () => {
-                emitter!.emit("reset-camera");
+                emitter.emit("reset-camera");
               },
             },
             {
               text: "pause",
               onClick: () => {
-                emitter!.emit("pause-game");
+                emitter.emit("pause-game");
               },
             },
           ]}
@@ -318,7 +318,7 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
               time,
               player,
             };
-            emitter!.emit("create-match", options);
+            emitter.emit("create-match", options);
             setIsMatchSettings(false);
             mode === "Offline" ? setGameStarted(true) : null;
           }}
