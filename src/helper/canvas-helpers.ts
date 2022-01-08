@@ -1,14 +1,13 @@
 import Game from "../component/game-logic/game";
 import { Material } from "babylonjs/Materials/material";
-import { CustomScene } from "../view/start-screen";
-import { ChessPieceMesh } from "../view/asset-loader";
+import { ChessPieceMesh, CustomGameScene } from "../view/asset-loader";
 import { Move } from "../component/game-logic/game-piece";
 
 const displayPieceMoves = (
   mesh: ChessPieceMesh,
   currentMove: Point[],
   game: Game,
-  gameScene: CustomScene
+  gameScene: CustomGameScene
 ) => {
   const piece = game.lookupPiece(
     findIndex([mesh.position.z, mesh.position.x], true)
@@ -22,7 +21,7 @@ const displayPieceMoves = (
   });
 };
 
-const displayMovementSquares = (move: Move, gameScene: CustomScene) => {
+const displayMovementSquares = (move: Move, gameScene: CustomGameScene) => {
   const [point, type] = move;
   const plane: any = BABYLON.MeshBuilder.CreatePlane(`plane`, {
     width: 2.8,
@@ -36,7 +35,7 @@ const displayMovementSquares = (move: Move, gameScene: CustomScene) => {
   gameScene.meshesToRender!.push(plane);
 };
 
-const displayPieceMarker = (move: Point, gameScene: CustomScene) => {
+const displayPieceMarker = (move: Point, gameScene: CustomGameScene) => {
   let type = "piece";
   const torus: any = BABYLON.MeshBuilder.CreateTorus("torus", {
     diameter: 2.6,
@@ -57,7 +56,7 @@ const matLookupTable: { [key: string]: string } = {
   piece: "greenMat",
 };
 
-const findMaterial = (moveType: string, gameScene: CustomScene) => {
+const findMaterial = (moveType: string, gameScene: CustomGameScene) => {
   const lookupValue = matLookupTable[moveType];
   const material = gameScene.materials.find(
     (mat: Material) => mat.id === lookupValue
@@ -65,7 +64,7 @@ const findMaterial = (moveType: string, gameScene: CustomScene) => {
   return material;
 };
 
-const rotateCamera = (currentPlayer: string, gameScene: CustomScene) => {
+const rotateCamera = (currentPlayer: string, gameScene: CustomGameScene) => {
   let camera: any = gameScene.cameras[0];
   let alpha = camera.alpha;
   let ratio;

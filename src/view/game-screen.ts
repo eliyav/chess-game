@@ -2,13 +2,13 @@ import * as BABYLON from "babylonjs";
 import assetsLoader from "./asset-loader";
 import space from "../../assets/space.webp";
 import { createMovementMaterials } from "./materials";
-import { CustomScene } from "./start-screen";
+import { CustomGameScene } from "./asset-loader";
 
 const gameScreen = async (
   canvas: HTMLCanvasElement,
   engine: BABYLON.Engine
-): Promise<CustomScene> => {
-  const scene: CustomScene = new BABYLON.Scene(engine);
+): Promise<CustomGameScene> => {
+  const scene: CustomGameScene = new BABYLON.Scene(engine);
   const camera = new BABYLON.ArcRotateCamera(
     "camera",
     Math.PI,

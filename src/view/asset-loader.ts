@@ -12,6 +12,7 @@ import { createMeshMaterials } from "./materials";
 import { Scene } from "babylonjs/scene";
 import { ISceneLoaderAsyncResult } from "babylonjs/Loading/sceneLoader";
 import { AbstractMesh } from "babylonjs/Meshes/abstractMesh";
+import { AssetContainer } from "babylonjs";
 import pawnAnimation from "../../assets/piece-animations/pawn-animation.gltf";
 import rookAnimation from "../../assets/piece-animations/rook-animation.gltf";
 import bishopAnimation from "../../assets/piece-animations/bishop-animation.gltf";
@@ -273,3 +274,29 @@ const resetMesh = (piece: DisplayMesh) => {
 };
 
 export default assetsLoader;
+
+export interface CustomGameScene extends Scene {
+  finalMeshes?: {
+    piecesMeshes: ChessPieceMesh[];
+    boardMeshes: AbstractMesh[];
+    animations: Animation;
+  };
+  meshesToRender?: AbstractMesh[];
+  animationsContainer?: Animation;
+}
+
+export interface CustomStartScene extends Scene {
+  finalMeshes?: {
+    piecesMeshes: ChessPieceMesh[];
+    boardMeshes: AbstractMesh[];
+    animations: Animation;
+  };
+}
+
+type Animation = {
+  Pawn: AssetContainer | ISceneLoaderAsyncResult;
+  Bishop: AssetContainer | ISceneLoaderAsyncResult;
+  Rook: AssetContainer | ISceneLoaderAsyncResult;
+  Knight: AssetContainer | ISceneLoaderAsyncResult;
+  Queen: AssetContainer | ISceneLoaderAsyncResult;
+};
