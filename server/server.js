@@ -3,9 +3,8 @@ const express = require("express");
 const webpack = require("webpack");
 const webpackDevMiddleware = require("webpack-dev-middleware");
 const compression = require("compression");
-const bcrypt = require("bcrypt");
-const { MongoClient, ObjectId } = require("mongodb");
 const config = require("../webpack.config.js");
+const { Mongo } = require("./mongoDB/mongo.js");
 
 // Tell express to use the webpack-dev-middleware and use the webpack.config.js
 // configuration file as a base.
@@ -14,39 +13,34 @@ const compiler = webpack(config);
 app.use(compression());
 app.use(webpackDevMiddleware(compiler));
 
-//MongoDB
-const uri = `mongodb+srv://${process.env.ADMIN_USER}:${process.env.ADMIN_PASS}@${process.env.PROJECT_NAME}.l0zxh.mongodb.net/${process.env.DATABASE_NAME}?retryWrites=true&w=majority`;
-const client = new MongoClient(uri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
 // Serve the files on port 3000.
 const port = process.env.PORT || 3000;
 const server = app.listen(port, function () {
   console.log("Example app listening on port 3000!\n");
 });
 
+//MongoDB
+const mongo = new Mongo();
+
 //Activate Sockets
 const io = require("socket.io")(server);
-
 io.on("connection", (socket) => {
-  socket.on("save-game", (match) => {
-    if (db) {
-      db.collection("matches").insertOne(match);
-      console.log("Match Added to DB");
-    }
-  });
+  // socket.on("save-game", (match) => {
+  //   if (db) {
+  //     db.collection("matches").insertOne(match);
+  //     console.log("Match Added to DB");
+  //   }
+  // });
 
-  socket.on("lookup-game", (objId) => {
-    if (db) {
-      async function loadGame() {
-        const match = await lookupObjId("matches", objId);
-        socket.emit("load-game", match);
-      }
-      loadGame();
-    }
-  });
+  // socket.on("lookup-game", (objId) => {
+  //   if (db) {
+  //     async function loadGame() {
+  //       const match = await lookupObjId("matches", objId);
+  //       socket.emit("load-game", match);
+  //     }
+  //     loadGame();
+  //   }
+  // });
 
   //Create Room
   socket.on("create-room", () => {
