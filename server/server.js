@@ -1,42 +1,36 @@
+require("dotenv").config();
 const express = require("express");
 const webpack = require("webpack");
 const webpackDevMiddleware = require("webpack-dev-middleware");
 const compression = require("compression");
-const mongodb = require("mongodb");
-const MongoClient = mongodb.MongoClient;
-const { ObjectId } = mongodb;
-
-const app = express();
-const config = require("./webpack.config.js");
-const compiler = webpack(config);
-
-const port = process.env.PORT || 3000;
+const bcrypt = require("bcrypt");
+const { MongoClient, ObjectId } = require("mongodb");
+const config = require("../webpack.config.js");
 
 // Tell express to use the webpack-dev-middleware and use the webpack.config.js
 // configuration file as a base.
+const app = express();
+const compiler = webpack(config);
 app.use(compression());
 app.use(webpackDevMiddleware(compiler));
 
+//MongoDB
+const uri = `mongodb+srv://${process.env.ADMIN_USER}:${process.env.ADMIN_PASS}@${process.env.PROJECT_NAME}.l0zxh.mongodb.net/${process.env.DATABASE_NAME}?retryWrites=true&w=majority`;
+const client = new MongoClient(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
 // Serve the files on port 3000.
+const port = process.env.PORT || 3000;
 const server = app.listen(port, function () {
   console.log("Example app listening on port 3000!\n");
 });
-
-// //MongoDB
-const connectionPath = "mongodb://localhost:27017";
-const databaseName = "chess-storage";
 
 //Activate Sockets
 const io = require("socket.io")(server);
 
 io.on("connection", (socket) => {
-  // MongoClient.connect(connectionPath, {}, (error, client) => {
-  //   if (error) {
-  //     console.log("Not Connected to the database!");
-  //   }
-  //   console.log("Connected to the database!");
-  //   const db = client.db(databaseName);
-
   socket.on("save-game", (match) => {
     if (db) {
       db.collection("matches").insertOne(match);
@@ -153,4 +147,3 @@ io.on("connection", (socket) => {
     return doc;
   }
 });
-// });
