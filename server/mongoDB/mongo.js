@@ -9,7 +9,10 @@ exports.Mongo = class Mongo {
     });
   }
 
-  userQueries() {
-    return userQueries(this.client);
+  lookUpUser(email) {
+    return this.client
+      .db("chess-game-data")
+      .collection("users")
+      .findOne({ email: email });
   }
 };

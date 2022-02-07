@@ -33,9 +33,6 @@ exports.userQueries = function userQueries(client) {
 
   //This script will be executed after a user that signed-up, and follows the "verification" link. The parameter: email is used to verify an account.
   function verify(email, callback) {
-    const MongoClient = require("mongodb@3.1.4").MongoClient;
-    const client = new MongoClient("mongodb://user:pass@localhost");
-
     client.connect(function (err) {
       if (err) return callback(err);
 
@@ -58,11 +55,6 @@ exports.userQueries = function userQueries(client) {
 
   //This script will be executed when the user changes their password to test if the user exists.
   function getByEmail(email, callback) {
-    const MongoClient = require("mongodb@3.1.4").MongoClient;
-    const client = new MongoClient(
-      "mongodb+srv://user:configuration.ADMIN_PASS@chess-game.l0zxh.mongodb.net/chess-game-data?retryWrites=true&w=majority"
-    );
-
     client.connect(function (err) {
       if (err) return callback(err);
 
@@ -86,16 +78,13 @@ exports.userQueries = function userQueries(client) {
 
   //This script will be executed when a user is deleted.
   function remove(id, callback) {
-    const MongoClient = require("mongodb@3.1.4").MongoClient;
-    const client = new MongoClient("mongodb://user:pass@localhost");
-
     client.connect(function (err) {
       if (err) return callback(err);
 
       const db = client.db("db-name");
       const users = db.collection("users");
 
-      users.remove({ _id: id }, function (err) {
+      users.remove({ email: id }, function (err) {
         client.close();
 
         if (err) return callback(err);
@@ -138,10 +127,6 @@ exports.userQueries = function userQueries(client) {
 
   //This script will be executed when the user changes their password, the reset email was sent and the user follows the "change password" link. The parameters: email and newPassword are used to confirm the new password.
   function changePassword(email, newPassword, callback) {
-    const bcrypt = require("bcrypt");
-    const MongoClient = require("mongodb@3.1.4").MongoClient;
-    const client = new MongoClient("mongodb://user:pass@localhost");
-
     client.connect(function (err) {
       if (err) return callback(err);
 

@@ -1,4 +1,5 @@
 import React from "react";
+import { LoginButton } from "./auth0/login";
 import "./side-nav.css";
 
 const SideNav: React.VFC<{
@@ -15,6 +16,7 @@ const SideNav: React.VFC<{
     >
       &times;
     </a>
+    <LoginButton />
     {items.map(({ text, onClick, className }, idx) => (
       <button onClick={onClick} className={className} key={idx}>
         {text}

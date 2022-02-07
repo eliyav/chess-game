@@ -11,6 +11,7 @@ import initView, { CanvasView } from "./view/view-init";
 import Match from "./component/match";
 import initGameController from "./events/game-interaction";
 import Timer from "./component/game-logic/timer";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const App: React.VFC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -38,6 +39,27 @@ const App: React.VFC = () => {
 
     setAppLoaded(true);
   }
+
+  const { user, isAuthenticated, isLoading, getAccessTokenSilently } =
+    useAuth0();
+
+  useEffect(() => {
+    if (isAuthenticated)
+      (async () => {
+        try {
+          const token = await getAccessTokenSilently();
+          const response = await fetch("http://localhost:3000/protected", {
+            method: "GET",
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
+          });
+          const data = await response.json();
+        } catch (err) {
+          console.log(err);
+        }
+      })();
+  }, [user, isAuthenticated]);
 
   useEffect(() => {
     initApp(canvasRef.current!);

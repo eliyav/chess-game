@@ -1,6 +1,7 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CompressionPlugin = require("compression-webpack-plugin");
+const { DefinePlugin } = require("webpack");
 
 /** @type {import("webpack").Configuration} */
 module.exports = {
@@ -20,6 +21,10 @@ module.exports = {
     }),
     new CompressionPlugin({
       algorithm: "gzip",
+    }),
+    new DefinePlugin({
+      AUTH0_DOMAIN: JSON.stringify(process.env.AUTH0_DOMAIN),
+      AUTH0_CLIENT_ID: JSON.stringify(process.env.AUTH0_CLIENT_ID),
     }),
   ],
   module: {
