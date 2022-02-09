@@ -6,8 +6,8 @@ import { Auth0Provider } from "@auth0/auth0-react";
 ReactDOM.render(
   <React.StrictMode>
     <Auth0Provider
-      domain={AUTH0_DOMAIN}
-      clientId={AUTH0_CLIENT_ID}
+      domain="chess-game.eu.auth0.com"
+      clientId="T3hIqwKbQqtTxqUJUcqJILVJ5fTEOAJK"
       redirectUri={window.location.origin}
       audience="chess-game API"
       scope="openid profile email"

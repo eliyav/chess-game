@@ -48,13 +48,21 @@ const App: React.VFC = () => {
       (async () => {
         try {
           const token = await getAccessTokenSilently();
-          const response = await fetch("http://localhost:3000/protected", {
-            method: "GET",
+          const response = await fetch("http://localhost:3000/login", {
+            method: "POST",
             headers: {
               authorization: `Bearer ${token}`,
             },
+            body: JSON.stringify({
+              user: {
+                email: user?.email,
+                sub: user?.sub,
+                created: new Date(user?.updated_at!),
+                lastLogin: new Date(user?.updated_at!),
+                picture: user?.picture,
+              },
+            }),
           });
-          const data = await response.json();
         } catch (err) {
           console.log(err);
         }

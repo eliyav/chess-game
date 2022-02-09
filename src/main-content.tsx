@@ -10,8 +10,6 @@ import MessageModal from "./component/modals/message-modal";
 import Match, { MatchSettings } from "./component/match";
 import InputModal from "./component/modals/input-modal";
 import PromotionModal from "./component/modals/promotion-modal";
-import { LoginButton } from "./component/auth0/login";
-import { useAuth0 } from "@auth0/auth0-react";
 
 interface MainProps {
   emitter: EventEmitter;
@@ -38,6 +36,7 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
     socket.on("start-online-match", () => {
       emitter.emit("join-match");
       setInviteCode({});
+      setInputModal(undefined);
       setGameStarted(true);
     });
 
