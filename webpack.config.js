@@ -49,17 +49,18 @@ module.exports = {
   output: {
     clean: true,
   },
-  //cache: { type: "filesystem" },
-  //   devServer: {
-  //     proxy: {
-  //       // proxy URLs to backend development server
-  //       "/api": "http://localhost:3000",
-  //     },
-  //     static: path.join(__dirname, "public"), // boolean | string | array | object, static file location
-  //     compress: true, // enable gzip compression
-  //     historyApiFallback: true, // true for index.html upon 404, object for multiple paths
-  //     hot: true, // hot module replacement. Depends on HotModuleReplacementPlugin
-  //     https: false, // true for self-signed, object for cert authority
-  //     // ...
-  //   },
+  devServer: {
+    port: 3000,
+    proxy: {
+      "/login": {
+        target: "http://localhost:8080",
+      },
+      "/socket.io": {
+        target: "http://localhost:8080",
+        ws: true,
+      },
+    },
+    compress: true, // enable gzip compression
+    hot: true, // hot module replacement. Depends on HotModuleReplacementPlugin
+  },
 };

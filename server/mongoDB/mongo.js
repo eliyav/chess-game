@@ -1,5 +1,4 @@
 const { MongoClient, ObjectId } = require("mongodb");
-const { userQueries } = require("./helpers/user-queries");
 
 exports.Mongo = class Mongo {
   constructor() {
@@ -9,10 +8,27 @@ exports.Mongo = class Mongo {
     });
   }
 
-  lookUpUser(email) {
-    return this.client
+  async createUser(user) {
+    const connected = await this.client.connect();
+    const newUser = await connected
+      .db("chess-game-data")
+      .collection("users")
+      .insertOne({
+        email: user.email,
+        sub: user.sub,
+        created: new Date(user.created),
+        lastLogin: new Date(user.lastLogin),
+        picture: user.picture,
+      });
+    return newUser;
+  }
+
+  async checkForUser(email) {
+    const connected = await this.client.connect();
+    const user = await connected
       .db("chess-game-data")
       .collection("users")
       .findOne({ email: email });
+    return user ? user : false;
   }
 };
