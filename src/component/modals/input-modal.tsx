@@ -1,5 +1,5 @@
 import React from "react";
-import "./input-modal.css";
+import "../../styles/input-modal.css";
 
 interface InputProps {
   text: string | undefined;

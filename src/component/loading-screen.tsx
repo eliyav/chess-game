@@ -1,5 +1,5 @@
 import React from "react";
-import "./loading-screen.css";
+import "../styles/loading-screen.css";
 
 interface Props {}
 

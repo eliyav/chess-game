@@ -14,6 +14,7 @@
   color: #818181;
   background-color: transparent;
   border: none;
+  display: block;
 }
 
 .sidenav button:hover {
@@ -28,6 +29,14 @@
   color: white;
 }
 
-.category {
-  text-decoration: underline;
+.sidenav .category {
+  display: block;
+  color: rgba(245, 245, 245, 0.842);
+  pointer-events: none;
+  margin: 0.75em 0 auto 0;
+  font-family: monospace;
+}
+
+button.highlight {
+  color: blanchedalmond;
 }

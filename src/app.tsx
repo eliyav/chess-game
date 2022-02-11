@@ -12,6 +12,7 @@ import Match from "./component/match";
 import initGameController from "./events/game-interaction";
 import Timer from "./component/game-logic/timer";
 import { useAuth0 } from "@auth0/auth0-react";
+import { getUserInfo } from "./helper/request-helpers";
 
 const App: React.VFC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -21,6 +22,7 @@ const App: React.VFC = () => {
   const emitter = useRef<EventEmitter>();
   const matchRef = useRef<Match>(new Match({}, emitter.current, true));
   const timerRef = useRef<Timer | undefined>();
+  const [currentUser, setCurrentUser] = useState<UserData>();
 
   async function initApp(canvas: HTMLCanvasElement) {
     let engine = new BABYLON.Engine(canvas, true);
@@ -40,8 +42,7 @@ const App: React.VFC = () => {
     setAppLoaded(true);
   }
 
-  const { user, isAuthenticated, isLoading, getAccessTokenSilently } =
-    useAuth0();
+  const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
 
   useEffect(() => {
     if (isAuthenticated)
@@ -53,21 +54,15 @@ const App: React.VFC = () => {
             headers: {
               authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({
-              user: {
-                email: user?.email,
-                sub: user?.sub,
-                created: new Date(user?.updated_at!),
-                lastLogin: new Date(user?.updated_at!),
-                picture: user?.picture,
-              },
-            }),
+            body: getUserInfo(user!),
           });
+          const userData: UserData = await response.json();
+          setCurrentUser(userData);
         } catch (err) {
-          console.log(err);
+          console.error(err);
         }
       })();
-  }, [user, isAuthenticated]);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     initApp(canvasRef.current!);
@@ -81,6 +76,7 @@ const App: React.VFC = () => {
           timerRef={timerRef}
           emitter={emitter.current!}
           socket={socket.current}
+          userData={currentUser}
         />
       ) : (
         <LoadingScreen />
@@ -90,3 +86,9 @@ const App: React.VFC = () => {
 };
 
 export default App;
+
+export interface UserData {
+  [key: string]: string;
+  picture: string;
+  name: string;
+}

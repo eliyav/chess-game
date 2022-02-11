@@ -3,7 +3,7 @@ import { IconsIndex } from "../../main-content";
 import OverlaySelection from "./game-overlay-selection";
 import Timer from "../game-logic/timer";
 import TimerOverlay from "./timer-overlay";
-import "./game-overlay.css";
+import "../../styles/game-overlay.css";
 
 interface OverlayProps {
   timerRef: Timer | undefined;

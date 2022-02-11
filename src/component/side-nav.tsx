@@ -1,11 +1,13 @@
 import React from "react";
 import { LoginButton } from "./auth0/login";
-import "./side-nav.css";
+import "../styles/side-nav.css";
 
 const SideNav: React.VFC<{
-  items: Array<{ text: string; onClick: () => void; className?: string }>;
+  items: Array<{ text: string; onClick?: () => void; className?: string }>;
   onClose: () => void;
-}> = ({ items, onClose }) => (
+  userItems: Array<{ text: string; onClick?: () => void; className?: string }>;
+  isLoggedIn: boolean;
+}> = ({ items, onClose, isLoggedIn, userItems }) => (
   <div className={"sidenav"}>
     <a
       className="closebtn"
@@ -22,6 +24,13 @@ const SideNav: React.VFC<{
         {text}
       </button>
     ))}
+    {isLoggedIn
+      ? userItems.map(({ text, onClick, className }, idx) => (
+          <button onClick={onClick} className={className} key={idx}>
+            {text}
+          </button>
+        ))
+      : null}
   </div>
 );
 

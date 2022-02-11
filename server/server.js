@@ -3,7 +3,6 @@ const express = require("express");
 const { Mongo } = require("./mongoDB/mongo.js");
 const jwt = require("express-jwt");
 const jwks = require("jwks-rsa");
-const bodyParser = require("body-parser");
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -22,8 +21,9 @@ const verifyJwt = jwt({
   algorithms: ["RS256"],
 }).unless({ path: ["/", "/favicon.ico"] });
 app.use(verifyJwt);
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.text());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.text());
+
 app.use((error, req, res, next) => {
   const status = error.status || 500;
   const message = error.message || "Internal server error";
@@ -37,8 +37,13 @@ const server = app.listen(port, function () {
 
 app.post("/login", async (req, res) => {
   const body = JSON.parse(req.body);
-  const user = await mongo.checkForUser(body.user.email);
-  !user ? await mongo.createUser(body.user) : null;
+  const user = await mongo.findUser({ email: body.user.email });
+  if (!user) {
+    const { insertedId } = await mongo.createUser(body.user);
+    const user = await mongo.findUser({ _id: insertedId });
+    return res.json(user);
+  }
+  return res.json(user);
 });
 
 //Activate Sockets

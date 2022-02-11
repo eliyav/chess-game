@@ -1,5 +1,5 @@
 import React from "react";
-import "./promotion-modal.css";
+import "../../styles/promotion-modal.css";
 
 interface PromotionProps {
   submitSelection: (e: any) => void;

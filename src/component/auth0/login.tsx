@@ -5,12 +5,16 @@ export const LoginButton = () => {
   const { loginWithPopup, logout, isAuthenticated } = useAuth0();
 
   return (
-    <div>
+    <>
       {isAuthenticated ? (
-        <button onClick={() => logout()}>Log Out</button>
+        <button onClick={() => logout()} className="highlight">
+          Log Out
+        </button>
       ) : (
-        <button onClick={() => loginWithPopup()}>Log In</button>
+        <button onClick={() => loginWithPopup()} className="highlight">
+          Log In
+        </button>
       )}
-    </div>
+    </>
   );
 };

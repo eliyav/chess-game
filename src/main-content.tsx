@@ -10,14 +10,23 @@ import MessageModal from "./component/modals/message-modal";
 import Match, { MatchSettings } from "./component/match";
 import InputModal from "./component/modals/input-modal";
 import PromotionModal from "./component/modals/promotion-modal";
+import { useAuth0 } from "@auth0/auth0-react";
+import { UserData } from "./app";
+import { Profile } from "./component/modals/profile";
 
 interface MainProps {
   emitter: EventEmitter;
   socket: any;
   timerRef: React.MutableRefObject<Timer | undefined>;
+  userData: UserData | undefined;
 }
 
-const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
+const MainContent: React.VFC<MainProps> = ({
+  emitter,
+  socket,
+  timerRef,
+  userData,
+}) => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const [isMatchSettings, setIsMatchSettings] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
@@ -26,6 +35,8 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
   const [inputModal, setInputModal] = useState<Input>();
   const [showPromotionModal, setShowPromotionModal] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { isAuthenticated } = useAuth0();
+  const [showProfile, setShowProfile] = useState(false);
 
   useEffect(() => {
     //#region Socket Listeners
@@ -142,7 +153,7 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
           }}
           items={[
             {
-              text: "Home Screen",
+              text: "Home",
               onClick: () => {
                 setMessageModal({
                   is: true,
@@ -160,6 +171,7 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
                 });
               },
             },
+            { text: "Matches", className: "category" },
             {
               text: "Create Match",
               onClick: () => {
@@ -206,8 +218,23 @@ const MainContent: React.VFC<MainProps> = ({ emitter, socket, timerRef }) => {
               },
             },
           ]}
+          isLoggedIn={isAuthenticated}
+          userItems={[
+            { text: "User Details", className: "category" },
+            {
+              text: "Profile",
+              onClick: () => {
+                setShowProfile(true);
+              },
+            },
+            {
+              text: "Edit Settings",
+              onClick: () => {},
+            },
+          ]}
         />
       )}
+      {showProfile && <Profile data={userData!} />}
       {inputModal && (
         <InputModal
           text={inputModal.text}

@@ -1,5 +1,5 @@
 import React from "react";
-import "./message-modal.css";
+import "../../styles/message-modal.css";
 
 interface MessageProps {
   question?: string;

@@ -14,7 +14,7 @@
 
 .red {
   background-color: red;
-  background-image: url(../../../assets/promotion-choices/rook-choice.png);
+  background-image: url(../../assets/promotion-choices/rook-choice.png);
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -22,21 +22,21 @@
 
 .blue {
   background-color: blue;
-  background-image: url(../../../assets/promotion-choices/bishop-choice.png);
+  background-image: url(../../assets/promotion-choices/bishop-choice.png);
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
 }
 .green {
   background-color: green;
-  background-image: url(../../../assets/promotion-choices/knight-choice.png);
+  background-image: url(../../assets/promotion-choices/knight-choice.png);
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
 }
 .yellow {
   background-color: yellow;
-  background-image: url(../../../assets/promotion-choices/queen-choice.png);
+  background-image: url(../../assets/promotion-choices/queen-choice.png);
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;

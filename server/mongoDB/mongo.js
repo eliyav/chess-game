@@ -14,6 +14,7 @@ exports.Mongo = class Mongo {
       .db("chess-game-data")
       .collection("users")
       .insertOne({
+        name: user.name,
         email: user.email,
         sub: user.sub,
         created: new Date(user.created),
@@ -23,12 +24,12 @@ exports.Mongo = class Mongo {
     return newUser;
   }
 
-  async checkForUser(email) {
+  async findUser(findBy) {
     const connected = await this.client.connect();
     const user = await connected
       .db("chess-game-data")
       .collection("users")
-      .findOne({ email: email });
+      .findOne(findBy);
     return user ? user : false;
   }
 };
