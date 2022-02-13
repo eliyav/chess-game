@@ -13,7 +13,7 @@ const gameScreen = async (
     "camera",
     Math.PI,
     Math.PI / 4,
-    40,
+    70,
     new BABYLON.Vector3(0, 0, 0),
     scene
   );

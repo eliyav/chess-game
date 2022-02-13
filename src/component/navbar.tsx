@@ -8,10 +8,10 @@ export const Navbar: React.VFC<{
     path: string;
   }>;
   onClose: () => void;
-  userItems: Array<{ text: string }>;
+  userItems: Array<{ text: string; path: string }>;
   isLoggedIn: boolean;
 }> = ({ items, onClose, isLoggedIn, userItems }) => (
-  <div className="sidenav">
+  <div className="navbar">
     <a
       className="closebtn"
       onClick={(e) => {

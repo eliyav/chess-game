@@ -83,23 +83,19 @@ export const initCanvasView = async (
     function setToWhitePlayer() {
       camera.alpha = Math.PI;
       camera.beta = Math.PI / 4;
-      camera.radius = 40;
+      camera.radius = 70;
     }
 
     function setToBlackPlayer() {
       camera.alpha = 0;
       camera.beta = Math.PI / 4;
-      camera.radius = 40;
+      camera.radius = 70;
     }
   }
 
   window.onresize = function refreshCanvas() {
     let gameSceneCamera: any = gameScene.cameras[0];
-    if (canvas.width < 768) {
-      gameSceneCamera.radius = 70;
-    } else {
-      gameSceneCamera.radius = 70;
-    }
+    gameSceneCamera.radius = 70;
     engine.resize();
   };
 

@@ -42,8 +42,8 @@ const initSocket = (
       matchRef.current.timer.timer2 = time;
     }
     matchRef.current.timer.gamePaused === true
-      ? view.scenes.gameScene.detachControl()
-      : view.scenes.gameScene.attachControl();
+      ? view.gameScene.detachControl()
+      : view.gameScene.attachControl();
   });
 
   return socket;

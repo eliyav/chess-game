@@ -43,7 +43,7 @@ const initEmitter = (
 
   emitter.on("create-match", ({ mode, time, player }: MatchSettings) => {
     matchRef.current = new Match({ mode, time, player }, emitter, true);
-    if (mode === "Offline") {
+    if (mode === "offline") {
       timerRef.current = matchRef.current.startMatchTimer();
       view.prepareGameScene(matchRef.current);
     } else {
@@ -72,10 +72,10 @@ const initEmitter = (
           if (matchRef.current.matchSettings.mode === "Offline") {
             rotateCamera(
               matchRef.current.game.state.currentPlayer,
-              view.scenes.gameScene
+              view.gameScene
             );
           }
-          isMatchOver ? view.scenes.gameScene.detachControl() : null;
+          isMatchOver ? view.gameScene.detachControl() : null;
           if (matchRef.current.matchSettings.mode === "Online") {
             const room = matchRef.current.matchSettings.room;
             socket.emit("stateChange", { originPoint, targetPoint, room });
@@ -105,17 +105,16 @@ const initEmitter = (
       annotations[annotations.length - 1] = `${square}${symbol}`;
       view.updateMeshesRender(matchRef.current.game);
       matchRef.current.game.switchTurn();
-      view.scenes.gameScene.attachControl();
+      view.gameScene.attachControl();
     }
   });
 
   emitter.on("detach-game-control", () => {
-    view.scenes.gameScene.detachControl();
+    view.gameScene.detachControl();
   });
 
   emitter.on("home-screen", () => {
     matchRef.current.endMatch();
-    view.prepareHomeScreen();
   });
 
   emitter.on("restart-match", () => {
@@ -181,8 +180,8 @@ const initEmitter = (
     } else {
       matchRef.current.timer.pauseTimer();
       matchRef.current.timer.gamePaused === true
-        ? view.scenes.gameScene.detachControl()
-        : view.scenes.gameScene.attachControl();
+        ? view.gameScene.detachControl()
+        : view.gameScene.attachControl();
     }
   });
 

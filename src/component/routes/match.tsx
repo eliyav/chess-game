@@ -1,39 +1,43 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Outlet } from "react-router-dom";
+import { MatchButton } from "../buttons/match-button";
 import { MenuButton } from "../buttons/menu-button";
-import MatchSettingsModal from "../match-settings/match-settings";
 
 interface MatchesProps {
   openNavbar: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const Matches: React.FC<MatchesProps> = ({ openNavbar }) => {
+  const [showSelections, setShowSelections] = useState(true);
+
   return (
     <div className="matches screen">
       <MenuButton open={openNavbar} />
-      <button>
-        <Link to="/game">Create Offline Match</Link>;
-      </button>
-
-      <MatchSettingsModal
-        onClose={() => {}}
-        onSubmit={(formElement) => {
-          let form = new FormData(formElement);
-          const mode = form.get("mode")?.toString();
-          const player = form.get("team")?.toString();
-          const clockTime = form.get("time")?.toString();
-          let time;
-          if (clockTime) {
-            time = 60 * parseInt(clockTime);
-          }
-          const options = {
-            mode,
-            time,
-            player,
-          };
-          //   emitter.emit("create-match", options);
-        }}
-      />
+      {showSelections && (
+        <div className="selections">
+          <p className="page-title">Select match:</p>
+          <div className="divider"></div>
+          <MatchButton
+            name="Offline Match"
+            path="./room?mode=offline"
+            description="Create an offline PvP match"
+            onSelect={() => setShowSelections(false)}
+          />
+          <MatchButton
+            name="Create Online"
+            path="./room"
+            description="Create an online room to invite a friend to a PvP match"
+            onSelect={() => setShowSelections(false)}
+          />
+          <MatchButton
+            name="Join Online"
+            path="./room"
+            description="Join a friend with an online code that was sent to you"
+            onSelect={() => setShowSelections(false)}
+          />
+        </div>
+      )}
+      {!showSelections && <Outlet></Outlet>}
     </div>
   );
 };

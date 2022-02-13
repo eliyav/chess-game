@@ -9,7 +9,7 @@ const initGameController = (
   view: CanvasView,
   emitter: EventEmitter
 ) => {
-  view!.scenes.gameScene.onPointerDown = async (e: any, pickResult: any) => {
+  view!.gameScene.onPointerDown = async (e: any, pickResult: any) => {
     if (matchRef.current.matchSettings.mode === "Online") {
       if (
         matchRef.current.matchSettings.player ===

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Content } from "./content";
 import { useAuth0 } from "@auth0/auth0-react";
 import { getUserInfo } from "./helper/request-helpers";
@@ -29,7 +29,7 @@ const App: React.VFC = () => {
   }, [isAuthenticated]);
 
   return (
-    <div className="app">
+    <div id="app">
       <Content userData={currentUser} />
     </div>
   );

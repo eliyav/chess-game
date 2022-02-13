@@ -83,7 +83,6 @@ class Game {
       originPiece!.update();
       //Once move resolved check if pawn promotion is relevant
       const promotion = originPiece!.checkPromotion(locationsInfo);
-      console.log(promotion);
       return gameHelpers.generateTurnHistory("standard", locationsInfo, {
         promotion,
       });

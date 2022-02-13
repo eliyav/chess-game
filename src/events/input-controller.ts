@@ -25,12 +25,7 @@ const inputController = (
       if (currentMove.length === 0) {
         if (mesh.color === match.game.state.currentPlayer) {
           //If no current move has been selected, and mesh belongs to current player
-          displayPieceMoves(
-            mesh,
-            currentMove,
-            match.game,
-            view.scenes.gameScene
-          );
+          displayPieceMoves(mesh, currentMove, match.game, view.gameScene);
         }
       } else if (mesh.color === match.game.state.currentPlayer) {
         //If there is already a mesh selected, and you select another of your own meshes
@@ -54,23 +49,13 @@ const inputController = (
               //If rook is selected second and not castling, show rooks moves
               currentMove.length = 0;
               view.updateMeshesRender(match.game);
-              displayPieceMoves(
-                mesh,
-                currentMove,
-                match.game,
-                view.scenes.gameScene
-              );
+              displayPieceMoves(mesh, currentMove, match.game, view.gameScene);
             }
           } else {
             //If second selected piece is not a castling piece
             currentMove.length = 0;
             view.updateMeshesRender(match.game);
-            displayPieceMoves(
-              mesh,
-              currentMove,
-              match.game,
-              view.scenes.gameScene
-            );
+            displayPieceMoves(mesh, currentMove, match.game, view.gameScene);
           }
         }
       } else if (mesh.color && mesh.color !== match.game.state.currentPlayer) {
