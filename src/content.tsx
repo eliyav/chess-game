@@ -152,22 +152,3 @@ export const Content: React.VFC<ContentProps> = ({ userData }) => {
 };
 
 export type IconsIndex = typeof icons;
-
-type InviteCode = {
-  is?: boolean;
-  code?: string;
-};
-
-type Message = {
-  is?: boolean;
-  question?: string;
-  onConfirm?: () => void;
-  onReject?: () => void;
-};
-
-type Input = {
-  is?: boolean;
-  text?: string;
-  onConfirm?: () => void;
-  onReject?: () => void;
-};

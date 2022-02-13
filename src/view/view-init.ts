@@ -1,11 +1,10 @@
 import { Engine } from "babylonjs";
-import startScreen from "./start-screen";
 import gameScreen from "./game-screen";
 import Game from "../component/game-logic/game";
 import { findPosition, rotateCamera } from "../helper/canvas-helpers";
 import Match from "../component/match";
 import { TurnHistory } from "../helper/game-helpers";
-import { CustomGameScene, CustomStartScene } from "./asset-loader";
+import { CustomGameScene } from "./asset-loader";
 import calcTurnAnimation from "./animation/turn-animation";
 
 export const initCanvasView = async (
@@ -13,23 +12,15 @@ export const initCanvasView = async (
   engine: Engine
 ): Promise<CanvasView> => {
   const view = {
-    showScene: { index: 0 },
-    scenes: {
-      startScene: await startScreen(engine),
-      gameScene: await gameScreen(canvas, engine),
-    },
+    gameScene: await gameScreen(canvas, engine),
     updateMeshesRender,
     prepareGameScene,
     resetCamera,
     updateGameView,
-    prepareHomeScreen,
     turnAnimation,
   };
 
-  const {
-    showScene,
-    scenes: { startScene, gameScene },
-  } = view;
+  const { gameScene } = view;
 
   function turnAnimation(
     ...props: [originPoint: Point, targetPoint: Point, turnHistory: TurnHistory]
@@ -48,13 +39,7 @@ export const initCanvasView = async (
   function prepareGameScene(match: Match) {
     updateMeshesRender(match.game);
     resetCamera(match);
-    showScene.index = 1;
     gameScene.attachControl();
-  }
-
-  function prepareHomeScreen() {
-    gameScene.detachControl();
-    showScene.index = 0;
   }
 
   function updateMeshesRender(game: Game) {
@@ -109,42 +94,28 @@ export const initCanvasView = async (
   }
 
   window.onresize = function refreshCanvas() {
-    let startSceneCamera: any = startScene.cameras[0];
     let gameSceneCamera: any = gameScene.cameras[0];
     if (canvas.width < 768) {
-      startSceneCamera.radius = 32;
-      gameSceneCamera.radius = 65;
+      gameSceneCamera.radius = 70;
     } else {
-      startSceneCamera.radius = 30;
-      gameSceneCamera.radius = 40;
+      gameSceneCamera.radius = 70;
     }
     engine.resize();
   };
 
   engine.runRenderLoop(function () {
-    switch (showScene.index) {
-      case 0:
-        startScene.render();
-        break;
-      case 1:
-        gameScene.render();
-        break;
-      default:
-        break;
-    }
+    gameScene.render();
   });
 
   return view;
 };
 
 export type CanvasView = {
-  showScene: { index: number };
-  scenes: { startScene: CustomStartScene; gameScene: CustomGameScene };
+  gameScene: CustomGameScene;
   prepareGameScene: (match: Match) => void;
   updateMeshesRender: (game: Game) => void;
   resetCamera: (match: Match) => void;
   updateGameView: (match: Match) => void;
-  prepareHomeScreen: () => void;
   turnAnimation: (
     originPoint: Point,
     targetPoint: Point,
