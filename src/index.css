@@ -1,46 +1,356 @@
 * {
   margin: 0;
   box-sizing: border-box;
+  background-color: var(--primary-background);
 }
 
-.app {
-  position: absolute;
+:root {
+  --primary-background: #333333;
+  --primary-color: #e9e9e9;
+  --primary-alt-color: #8b8b8b;
+  --primary-font: sans-serif;
+}
+
+#root {
+  height: 100vh;
+  color: var(--primary-color);
+  font-family: var(--primary-font);
+}
+
+#app {
   height: 100%;
-  width: 100%;
+  max-width: 95ch;
+  margin: auto;
+}
+
+.divider {
+  border-bottom: 1px solid #e9e9e9;
+  width: 90%;
+  margin: auto;
+}
+
+.menu-button {
+  position: relative;
+  width: 50px;
+  margin-top: 1em;
+  object-fit: contain;
+}
+
+.screen {
+  text-align: center;
+}
+
+/* Loading Screen-------------------  */
+#loading {
+  height: 100vh;
+  width: 100vw;
+  background-color: rgb(0, 0, 0);
+  z-index: 2;
+  position: relative;
+}
+
+#loading > p {
+  color: white;
+  text-align: center;
+  line-height: 100vh;
+  font-size: xx-large;
+  font-family: fantasy;
+  animation: loadingAnimation;
+  animation-duration: 0.75s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+@keyframes loadingAnimation {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 0.2;
+  }
+}
+/* Home Screen-------------------  */
+.home .page-title {
+  font-size: 3em;
+  padding: 0.5em;
+}
+
+.home .picture {
+  background-color: black;
+  height: 200px;
+  width: 80%;
+  margin: 1em auto;
+}
+
+.home button {
+  width: 80%;
+  max-width: 300px;
+  padding: 1em 0;
+  margin: 1em 0;
+  background-color: #999999;
+  font-weight: bold;
+  border: 2px solid whitesmoke;
+  border-radius: 6px;
+  font-size: 1em;
+}
+
+.home button:hover {
+  background-color: #c2c2c2;
+  transform: scale(0.95);
+}
+
+.home .page-info {
+  margin: 1em 0;
+  font-size: 1.1em;
+}
+
+/* Navbar-------------------  */
+.sidenav {
+  height: 100%;
+  width: 250px;
+  position: fixed;
+  z-index: 3;
+  left: 0;
+  background-color: #111;
+  overflow-x: hidden;
+}
+
+.sidenav button {
+  padding: 8px 8px 8px 32px;
+  font-size: 1.5rem;
+  background-color: transparent;
+  border: none;
+  display: block;
+}
+
+.sidenav .closebtn {
+  display: block;
+  background-color: transparent;
+  top: 0;
+  font-size: 2.25rem;
+  margin-left: 75%;
+  margin-top: 10px;
+  color: white;
+}
+
+.sidenav .category {
+  display: block;
+  color: rgba(245, 245, 245, 0.842);
+  pointer-events: none;
+  margin: 0.75em 0 auto 0;
+  font-family: monospace;
+}
+
+button.highlight {
+  color: whitesmoke;
+}
+
+.sidenav a {
+  text-decoration: none;
+  background-color: transparent;
+  color: #818181;
+}
+
+.sidenav a:hover {
+  color: #f1f1f1;
+}
+
+/* Game Overlay-------------------  */
+.overlayWrapper {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  height: 100%;
+  align-content: space-between;
   pointer-events: none;
 }
 
-.app > * {
-  pointer-events: all;
+.gameOverlay {
+  display: flex;
+  justify-content: center;
+  z-index: 2;
+  width: 100%;
+  height: 3.5rem;
+  background-color: transparent;
+  text-align: center;
+  pointer-events: none;
 }
 
-canvas {
-  position: absolute;
+.gameOverlay > .item {
+  color: black;
+  background-color: rgba(245, 245, 245, 0.5);
+  font-weight: bold;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  border: 0.1rem white solid;
+  padding: 0.1rem;
+  font-size: 0.9rem;
+  pointer-events: auto;
+  min-width: 0;
+  flex-grow: 1;
+}
+
+.gameOverlay > .item > img {
+  display: block;
+  height: 60%;
+  object-fit: contain;
+  margin: auto;
+  pointer-events: none;
+}
+
+.gameOverlay > .item:hover {
+  transform: scale(0.95);
+  background-color: rgba(240, 230, 95, 0.5);
+}
+
+.timer {
+  display: flex;
+  height: 2rem;
+  background-color: rgba(255, 255, 255, 0.5);
+  justify-content: space-between;
+  text-align: center;
+  position: relative;
+  bottom: 0.1rem;
+}
+
+.timer > .playerTimer > img {
+  height: 1.8rem;
+  object-fit: contain;
+  display: inline;
+  padding: 0 0.2rem;
+}
+
+.timer > .playerTimer > div {
+  display: inline;
+  padding: 0.1rem;
+  font-weight: bold;
+  font-style: oblique;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+}
+
+/* Promotion Modal-------------------  */
+.promotion-wrapper {
   height: 100%;
   width: 100%;
+  position: absolute;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  z-index: 3;
 }
 
-.hide {
+.promotion-wrapper .selection {
+  width: 50%;
+}
+
+.red {
+  background-color: red;
+  background-image: url(../assets/promotion-choices/rook-choice.png);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.blue {
+  background-color: blue;
+  background-image: url(../assets/promotion-choices/bishop-choice.png);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.green {
+  background-color: green;
+  background-image: url(../assets/promotion-choices/knight-choice.png);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.yellow {
+  background-color: yellow;
+  background-image: url(../assets/promotion-choices/queen-choice.png);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+/* Profile-------------------  */
+.profile-wrapper {
+  position: absolute;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+}
+
+.profile {
+  background-color: rgb(53, 53, 53);
+  position: relative;
+  top: 10%;
+  max-width: 80%;
+  margin: auto;
+  padding: 2.5% 5%;
+  color: whitesmoke;
+}
+
+.profile > .header {
+  display: flex;
+  align-items: center;
+  padding: 1em 0;
+  border: 7.5px inset silver;
+}
+
+.profile .header img {
+  object-fit: contain;
+  width: 80px;
+  margin: 1em;
+}
+
+.profile .header p {
+  font-size: 1.6em;
+  font-weight: 400;
+  font-family: Georgia, "Times New Roman", Times, serif;
+}
+
+.profile .past-matches {
+  display: flex;
+  flex-flow: row nowrap;
+  border: 1px ridge silver;
+  padding: 0.5em;
+  overflow-x: scroll;
+  text-align: center;
+  overflow: scroll;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.past-matches::-webkit-scrollbar {
   display: none;
 }
 
-#playButton {
-  position: absolute;
-  z-index: 1;
-  top: 64vh;
-  left: 50vw;
-  width: 200px;
-  height: 50px;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: white;
-  font-size: larger;
-  font-weight: bolder;
-  border: 1mm ridge whitesmoke;
-  transform: translateX(-50%);
-  border-radius: 2rem;
+/* Hide scrollbar for IE, Edge and Firefox */
+.past-matches {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
-#playButton:hover {
-  color: black;
-  background-color: rgba(240, 230, 95, 0.5);
+.profile .past-match {
+  min-width: 100px;
 }
+
+.profile .past-match > * {
+  padding: 0.4em 0;
+}
+
+.profile .label {
+  padding: 1em;
+}
+
+@media (max-width: 350px) {
+  .profile > .header {
+    border: 5px inset silver;
+  }
+
+  .profile .header img {
+    width: 60px;
+  }
+}
+
+/* -------------------  */

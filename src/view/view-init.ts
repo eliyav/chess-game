@@ -8,7 +8,7 @@ import { TurnHistory } from "../helper/game-helpers";
 import { CustomGameScene, CustomStartScene } from "./asset-loader";
 import calcTurnAnimation from "./animation/turn-animation";
 
-const initCanvasView = async (
+export const initCanvasView = async (
   canvas: HTMLCanvasElement,
   engine: Engine
 ): Promise<CanvasView> => {
@@ -136,8 +136,6 @@ const initCanvasView = async (
 
   return view;
 };
-
-export default initCanvasView;
 
 export type CanvasView = {
   showScene: { index: number };

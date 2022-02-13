@@ -2,7 +2,6 @@ import React, { useRef, useState } from "react";
 import SettingsMode from "./settings-mode";
 import SettingsTeams from "./settings-teams";
 import SettingsTime from "./settings-time";
-import "../../styles/match-settings.css";
 
 interface FormProps {
   onClose: () => void;

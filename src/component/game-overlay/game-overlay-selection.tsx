@@ -1,5 +1,5 @@
 import React from "react";
-import { IconsIndex } from "../../main-content";
+import { IconsIndex } from "../../content";
 
 interface SelectionProps {
   item: { text: keyof IconsIndex; onClick: () => void };
