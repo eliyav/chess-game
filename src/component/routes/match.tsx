@@ -19,19 +19,19 @@ export const Matches: React.FC<MatchesProps> = ({ openNavbar }) => {
           <div className="divider"></div>
           <MatchButton
             name="Offline Match"
-            path="./room?mode=offline"
+            path="./offline-lobby"
             description="Create an offline PvP match"
             onSelect={() => setShowSelections(false)}
           />
           <MatchButton
             name="Create Online"
-            path="./room"
+            path="./online-lobby"
             description="Create an online room to invite a friend to a PvP match"
             onSelect={() => setShowSelections(false)}
           />
           <MatchButton
             name="Join Online"
-            path="./room"
+            path="./"
             description="Join a friend with an online code that was sent to you"
             onSelect={() => setShowSelections(false)}
           />

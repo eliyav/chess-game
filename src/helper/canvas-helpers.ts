@@ -64,75 +64,6 @@ const findMaterial = (moveType: string, gameScene: CustomGameScene) => {
   return material;
 };
 
-const rotateCamera = (currentPlayer: string, gameScene: CustomGameScene) => {
-  let camera: any = gameScene.cameras[0];
-  let alpha = camera.alpha;
-  let ratio;
-  let subtractedRatio;
-  let piDistance;
-  let remainingDistance: number;
-  let remainder: number;
-
-  if (alpha < 0) {
-    ratio = Math.ceil(alpha / Math.PI);
-    subtractedRatio = alpha - ratio * Math.PI;
-    piDistance = Math.abs(Math.PI + subtractedRatio);
-  } else {
-    ratio = Math.floor(alpha / Math.PI);
-    subtractedRatio = alpha - ratio * Math.PI;
-    piDistance = Math.PI - subtractedRatio;
-  }
-
-  remainder = ratio % 2;
-
-  if (currentPlayer === "Black") {
-    remainder
-      ? (remainingDistance = piDistance)
-      : (remainingDistance = Math.PI - piDistance);
-  } else {
-    remainder
-      ? (remainingDistance = Math.PI - piDistance)
-      : (remainingDistance = piDistance);
-  }
-
-  const animateCameraRotation = (currentPlayer: string) => {
-    requestAnimationFrame(() => {
-      const playerFlag = currentPlayer === "Black" ? true : false;
-      const rotateAmount = remainingDistance > 0.05 ? 0.05 : 0.01;
-      rotateCam(playerFlag, rotateAmount);
-    });
-
-    const rotateCam = (playerFlag: boolean, rotateAmount: number) => {
-      if (remainder) {
-        if (alpha < 0) {
-          playerFlag
-            ? (camera.alpha -= rotateAmount)
-            : (camera.alpha += rotateAmount);
-        } else {
-          playerFlag
-            ? (camera.alpha += rotateAmount)
-            : (camera.alpha -= rotateAmount);
-        }
-      } else {
-        if (alpha > 0) {
-          playerFlag
-            ? (camera.alpha -= rotateAmount)
-            : (camera.alpha += rotateAmount);
-        } else {
-          playerFlag
-            ? (camera.alpha += rotateAmount)
-            : (camera.alpha -= rotateAmount);
-        }
-      }
-      remainingDistance -= rotateAmount;
-      if (remainingDistance > 0.01) {
-        animateCameraRotation(currentPlayer);
-      }
-    };
-  };
-  animateCameraRotation(currentPlayer);
-};
-
 //External Meshes have flipped Y coordinates on canvas from blender import
 const findPosition = (point: Point, externalMesh: boolean) => {
   const [x, y] = point;
@@ -265,4 +196,4 @@ const findIndex = (position: Point, externalMesh: boolean) => {
   return result;
 };
 
-export { rotateCamera, displayPieceMoves, findIndex, findPosition };
+export { displayPieceMoves, findIndex, findPosition };

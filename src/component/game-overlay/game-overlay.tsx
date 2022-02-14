@@ -1,17 +1,13 @@
 import React, { useState } from "react";
-import { IconsIndex } from "../../component/game-view";
+import { IconsIndex } from "../routes/offline-game-view";
 import OverlaySelection from "./game-overlay-selection";
-import Timer from "../game-logic/timer";
-import TimerOverlay from "./timer-overlay";
 
 interface OverlayProps {
-  timerRef: Timer | undefined;
   items: Array<{ text: keyof IconsIndex; onClick: () => void }>;
   icons: IconsIndex;
 }
 
-const GameOverlay: React.VFC<OverlayProps> = ({ timerRef, items, icons }) => {
-  const [gamePaused, setGamePaused] = useState(false);
+const GameOverlay: React.VFC<OverlayProps> = ({ items, icons }) => {
   return (
     <div className="overlayWrapper">
       <div className="gameOverlay">
@@ -19,9 +15,6 @@ const GameOverlay: React.VFC<OverlayProps> = ({ timerRef, items, icons }) => {
           <OverlaySelection item={item} icons={icons} key={idx} />
         ))}
       </div>
-      {timerRef?.gameStarted && (
-        <TimerOverlay timerRef={timerRef} paused={gamePaused} />
-      )}
     </div>
   );
 };

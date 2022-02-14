@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { Route, Routes, useLocation, useMatch } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Navbar } from "./component/navbar";
 import { Home } from "./component/routes/home";
 import { Matches } from "./component/routes/match";
-import { GameView } from "./component/game-view";
+import { OfflineGameView } from "./component/routes/offline-game-view";
 import { UserData } from "./app";
 import { Profile } from "./component/routes/profile";
-import { Room } from "./component/routes/room";
+import { OfflineLobby } from "./component/routes/offline-lobby";
 
 interface ContentProps {
   userData: UserData | undefined;
@@ -54,9 +54,10 @@ export const Content: React.VFC<ContentProps> = ({ userData }) => {
       <Routes>
         <Route path="/" element={<Home openNavbar={setNavbarOpen} />} />
         <Route path="/match" element={<Matches openNavbar={setNavbarOpen} />}>
-          <Route path="/match/room" element={<Room />} />
+          <Route path="/match/offline-lobby" element={<OfflineLobby />} />
+          <Route path="./online-lobby" element={<div>Hello</div>} />
         </Route>
-        <Route path="/game" element={<GameView />} />
+        <Route path="/offline-game" element={<OfflineGameView />} />
         <Route path="profile/:id" element={<Profile data={userData!} />} />
       </Routes>
     </>

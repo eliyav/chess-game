@@ -1,11 +1,6 @@
 import * as gameHelpers from "../../helper/game-helpers";
 import * as movementHelpers from "../../helper/movement-helpers";
-import {
-  setPieces,
-  loadPieces,
-  createGrid,
-  Square,
-} from "../../helper/board-helpers";
+import { setPieces, createGrid, Square } from "../../helper/board-helpers";
 import {
   TurnHistory,
   LocationsInfo,
@@ -34,7 +29,7 @@ class Game {
     this.annotations = [];
     this.turnHistory = [];
     this.turnCounter = 1;
-    this.setBoard(true);
+    this.setBoard();
     this.gameStarted = false;
     this.endMatch = endMatch;
   }
@@ -465,21 +460,17 @@ class Game {
     }
   }
 
-  setBoard(newGame: boolean, loadedBoard?: any) {
-    if (newGame) {
-      setPieces(
-        this.board.grid,
-        this.board.pieceInitialPoints,
-        this.board.movementArray
-      );
-    } else {
-      loadPieces(this.board.grid, loadedBoard.grid!);
-    }
+  setBoard() {
+    setPieces(
+      this.board.grid,
+      this.board.pieceInitialPoints,
+      this.board.movementArray
+    );
   }
 
   resetGame() {
     this.board.grid = createGrid(this.board.boardSize, this.board.columnNames);
-    this.setBoard(true);
+    this.setBoard();
     this.state.currentPlayer = this.teams[0];
     this.annotations = [];
     this.turnHistory = [];
@@ -527,7 +518,7 @@ class Game {
     this.turnHistory = options.turnHistory;
     this.gameStarted = options.gameStarted;
     this.turnCounter = options.turnCounter;
-    this.setBoard(false, options.board);
+    this.setBoard();
   }
 }
 
