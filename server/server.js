@@ -45,9 +45,17 @@ app.post("/login", async (req, res) => {
   }
   return res.json(user);
 });
-
+const lobbyLog = new Map();
 //Activate Sockets
 const io = require("socket.io")(server);
+setInterval(() => {
+  const socketedRooms = io.sockets.adapter.rooms;
+  for (let lobbyKey of lobbyLog.keys()) {
+    console.log(lobbyKey);
+    if (!socketedRooms.has(lobbyKey)) lobbyLog.delete(lobbyKey);
+  }
+}, 2000);
+
 io.on("connection", (socket) => {
   // socket.on("save-game", (match) => {
   //   if (db) {
@@ -67,13 +75,29 @@ io.on("connection", (socket) => {
   // });
 
   //Create Room
-  socket.on("create-room", () => {
-    const room = generateKey();
-    socket.join(room);
+  socket.on("create-lobby", () => {
+    const lobbyKey = generateKey();
+    socket.join(lobbyKey);
     socket.emit("message", "You have created a new Game Room!");
-    socket.emit("reply-invite-code", room);
-    socket.emit("assign-room-number", room);
+    socket.emit("lobby-key", lobbyKey);
+    const lobby = {
+      name: "Eliya",
+    };
+    lobbyLog.set(lobbyKey, lobby);
   });
+
+  socket.on("get-room-info", (lobbyKey) => {
+    const test = "2";
+    const players = io.sockets.adapter.rooms.get(lobbyKey);
+    const rooms = io.sockets.adapter.rooms;
+    // console.log(players);
+    // console.log(rooms);
+    const lobby = lobbyLog.get(lobbyKey);
+    // console.log(lobby);
+    // console.log(lobbyLog);
+    io.to(lobbyKey).emit("room-info", test);
+  });
+
   //Join Room
   socket.on("join-room", (room) => {
     socket.join(room);
@@ -156,12 +180,5 @@ io.on("connection", (socket) => {
       key[i] = char;
     }
     return key.join("");
-  }
-
-  async function lookupObjId(collection, objID) {
-    const doc = await db.collection(collection).findOne({
-      _id: ObjectId(objID),
-    });
-    return doc;
   }
 });

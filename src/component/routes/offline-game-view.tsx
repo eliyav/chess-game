@@ -12,9 +12,11 @@ import { TurnHistory } from "../../../src/helper/game-helpers";
 import EventEmitter from "../../../src/events/event-emitter";
 import offlineGameEmitter from "../../../src/events/offline-game-emit";
 
-interface Props {}
+interface OfflineProps {
+  openNavbar: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-export const OfflineGameView: React.FC<Props> = () => {
+export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
   const [gameLoaded, setGameLoaded] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasView = useRef<CanvasView>();
@@ -65,23 +67,19 @@ export const OfflineGameView: React.FC<Props> = () => {
           items={[
             {
               text: "menu",
-              onClick: () => {},
+              onClick: () => openNavbar(true),
             },
             {
               text: "restart",
-              onClick: () => {},
+              onClick: () => offlineEmitter.current!.emit("reset-board"),
             },
             {
               text: "undo",
-              onClick: () => {},
+              onClick: () => offlineEmitter.current!.emit("undo-move"),
             },
             {
               text: "camera",
-              onClick: () => {},
-            },
-            {
-              text: "pause",
-              onClick: () => {},
+              onClick: () => offlineEmitter.current!.emit("reset-camera"),
             },
           ]}
           icons={icons}

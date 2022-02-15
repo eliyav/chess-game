@@ -32,4 +32,11 @@ exports.Mongo = class Mongo {
       .findOne(findBy);
     return user ? user : false;
   }
+
+  async lookupObjId(collection, objID) {
+    const doc = await db.collection(collection).findOne({
+      _id: ObjectId(objID),
+    });
+    return doc;
+  }
 };

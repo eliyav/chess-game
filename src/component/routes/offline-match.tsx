@@ -2,14 +2,12 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Time from "../match-settings/time";
 
-interface OfflineLobbyProps {}
-
-export const OfflineLobby: React.FC<OfflineLobbyProps> = ({}) => {
+export const OfflineMatch: React.FC = ({}) => {
   const [time, setTime] = useState(0);
 
   return (
-    <div className="room">
-      <p className="page-title">Room</p>
+    <div className="lobby">
+      <p className="page-title">Lobby</p>
       <div className="divider"></div>
       <div className="settings">
         <p className="label">Mode:</p>

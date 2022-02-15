@@ -7,7 +7,8 @@ import { Matches } from "./component/routes/match";
 import { OfflineGameView } from "./component/routes/offline-game-view";
 import { UserData } from "./app";
 import { Profile } from "./component/routes/profile";
-import { OfflineLobby } from "./component/routes/offline-lobby";
+import { OfflineMatch } from "./component/routes/offline-match";
+import { OnlineMatch } from "./component/routes/online-match";
 
 interface ContentProps {
   userData: UserData | undefined;
@@ -16,6 +17,7 @@ interface ContentProps {
 export const Content: React.VFC<ContentProps> = ({ userData }) => {
   const { isAuthenticated } = useAuth0();
   const [navbarOpen, setNavbarOpen] = useState(false);
+  const [socketConnection, setSocketConnection] = useState<any>();
 
   // const location = useLocation();
   // const params = new URLSearchParams(location.search);
@@ -54,10 +56,25 @@ export const Content: React.VFC<ContentProps> = ({ userData }) => {
       <Routes>
         <Route path="/" element={<Home openNavbar={setNavbarOpen} />} />
         <Route path="/match" element={<Matches openNavbar={setNavbarOpen} />}>
-          <Route path="/match/offline-lobby" element={<OfflineLobby />} />
-          <Route path="./online-lobby" element={<div>Hello</div>} />
+          <Route path="/match/offline" element={<OfflineMatch />} />
+          <Route
+            path="/match/online-lobby"
+            element={
+              <OnlineMatch
+                setSocket={setSocketConnection}
+                userName={userData?.name}
+              />
+            }
+          />
         </Route>
-        <Route path="/offline-game" element={<OfflineGameView />} />
+        <Route
+          path="/offline-game"
+          element={<OfflineGameView openNavbar={setNavbarOpen} />}
+        />
+        <Route
+          path="/online-game"
+          element={<OfflineGameView openNavbar={setNavbarOpen} />}
+        />
         <Route path="profile/:id" element={<Profile data={userData!} />} />
       </Routes>
     </>
