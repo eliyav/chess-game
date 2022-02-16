@@ -1,25 +1,25 @@
 import React, { useState } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Navbar } from "./component/navbar";
 import { Home } from "./component/routes/home";
-import { Matches } from "./component/routes/match";
+import { Matches } from "./component/routes/matches";
 import { OfflineGameView } from "./component/routes/offline-game-view";
 import { UserData } from "./app";
 import { Profile } from "./component/routes/profile";
-import { OfflineMatch } from "./component/routes/offline-match";
-import { OnlineMatch } from "./component/routes/online-match";
+import { OfflineLobby } from "./component/routes/offline-match";
+import { OnlineLobby } from "./component/routes/online-match";
+import { JoinLobby } from "./component/routes/join-match";
 
 interface ContentProps {
   userData: UserData | undefined;
 }
 
 export const Content: React.VFC<ContentProps> = ({ userData }) => {
+  const location = useLocation();
   const { isAuthenticated } = useAuth0();
   const [navbarOpen, setNavbarOpen] = useState(false);
   const [socketConnection, setSocketConnection] = useState<any>();
-
-  // const location = useLocation();
   // const params = new URLSearchParams(location.search);
   // console.log(params.get("mode"));
   // const matchRoute = useMatch("/match/room");
@@ -55,12 +55,24 @@ export const Content: React.VFC<ContentProps> = ({ userData }) => {
 
       <Routes>
         <Route path="/" element={<Home openNavbar={setNavbarOpen} />} />
-        <Route path="/match" element={<Matches openNavbar={setNavbarOpen} />}>
-          <Route path="/match/offline" element={<OfflineMatch />} />
+        <Route
+          path="/match"
+          element={<Matches location={location} openNavbar={setNavbarOpen} />}
+        >
+          <Route path="/match/offline-lobby" element={<OfflineLobby />} />
           <Route
             path="/match/online-lobby"
             element={
-              <OnlineMatch
+              <OnlineLobby
+                setSocket={setSocketConnection}
+                userName={userData?.name}
+              />
+            }
+          />
+          <Route
+            path="/match/join-lobby"
+            element={
+              <JoinLobby
                 setSocket={setSocketConnection}
                 userName={userData?.name}
               />

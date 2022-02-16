@@ -31,7 +31,7 @@ html {
 .mini-divider {
   border-bottom: 1px solid #e9e9e9;
   width: 45%;
-  margin: auto;
+  margin: 1em auto auto auto;
 }
 .menu-button {
   position: relative;
@@ -61,7 +61,7 @@ button {
   width: 80%;
   max-width: 300px;
   padding: 1em 0;
-  margin: 2em 0 0.2em 0;
+  margin: 1em 0.5em 1em 0.5em;
   background-color: #999999;
   font-weight: bold;
   border: 2px solid whitesmoke;
@@ -78,6 +78,10 @@ a {
   text-decoration: none;
   background-color: transparent;
   color: black;
+}
+
+.highlight-choice {
+  background-color: rgba(73, 255, 73, 0.678);
 }
 
 /* Loading Screen-------------------  */
@@ -116,23 +120,6 @@ a {
   height: 200px;
   width: 80%;
   margin: 1em auto;
-}
-
-.home button {
-  width: 80%;
-  max-width: 300px;
-  padding: 1em 0;
-  margin: 1em 0;
-  background-color: #999999;
-  font-weight: bold;
-  border: 2px solid whitesmoke;
-  border-radius: 6px;
-  font-size: 1em;
-}
-
-.home button:hover {
-  background-color: #c2c2c2;
-  transform: scale(0.95);
 }
 
 .home .page-info {
@@ -396,7 +383,7 @@ button.highlight {
   }
 }
 
-/* -------------------  */
+/* Lobby Settings -------------------  */
 
 .lobby .settings {
   margin: 1em;

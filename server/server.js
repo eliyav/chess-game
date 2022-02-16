@@ -51,10 +51,9 @@ const io = require("socket.io")(server);
 setInterval(() => {
   const socketedRooms = io.sockets.adapter.rooms;
   for (let lobbyKey of lobbyLog.keys()) {
-    console.log(lobbyKey);
     if (!socketedRooms.has(lobbyKey)) lobbyLog.delete(lobbyKey);
   }
-}, 2000);
+}, 5000);
 
 io.on("connection", (socket) => {
   // socket.on("save-game", (match) => {
@@ -74,39 +73,38 @@ io.on("connection", (socket) => {
   //   }
   // });
 
-  //Create Room
   socket.on("create-lobby", () => {
     const lobbyKey = generateKey();
     socket.join(lobbyKey);
-    socket.emit("message", "You have created a new Game Room!");
-    socket.emit("lobby-key", lobbyKey);
     const lobby = {
-      name: "Eliya",
+      hostName: "Guest",
+      opponentName: "Waiting...",
+      time: 0,
+      firstMove: "Host",
     };
     lobbyLog.set(lobbyKey, lobby);
+    socket.emit("lobby-key", lobbyKey);
   });
 
   socket.on("get-room-info", (lobbyKey) => {
-    const test = "2";
-    const players = io.sockets.adapter.rooms.get(lobbyKey);
-    const rooms = io.sockets.adapter.rooms;
-    // console.log(players);
-    // console.log(rooms);
-    const lobby = lobbyLog.get(lobbyKey);
-    // console.log(lobby);
-    // console.log(lobbyLog);
-    io.to(lobbyKey).emit("room-info", test);
+    io.to(lobbyKey).emit("room-info", lobbyLog.get(lobbyKey));
   });
 
-  //Join Room
-  socket.on("join-room", (room) => {
-    socket.join(room);
-    socket.to(room).emit("message", "A new player has joined the room");
-    socket.to(room).emit("request-room-info");
+  socket.on("join-lobby", ({ lobbyKey, name }) => {
+    const lobbyExists = lobbyLog.has(lobbyKey);
+    if (lobbyExists) {
+      socket.join(lobbyKey);
+      const lobby = lobbyLog.get(lobbyKey);
+      lobbyLog.set(lobbyKey, { ...lobby, opponentName: name });
+      io.to(lobbyKey).emit("room-info", lobbyLog.get(lobbyKey));
+    } else {
+      socket.emit("message", "No Such Lobby Exists");
+    }
   });
 
-  socket.on("reply-room-info", (matchInfo) => {
-    socket.to(matchInfo.room).emit("assign-room-info", matchInfo);
+  socket.on("update-lobby", ({ lobbyKey, lobbySettings }) => {
+    lobbyLog.set(lobbyKey, lobbySettings);
+    socket.to(lobbyKey).emit("room-info", lobbyLog.get(lobbyKey));
   });
 
   socket.on("check-match-start", (room) => {

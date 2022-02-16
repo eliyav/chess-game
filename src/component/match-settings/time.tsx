@@ -1,13 +1,14 @@
 import React, { useRef } from "react";
+import { LobbySettings } from "../routes/online-match";
 
 const Time: React.VFC<{
-  time: React.Dispatch<React.SetStateAction<number>>;
-}> = ({ time }) => {
+  setTime: React.Dispatch<React.SetStateAction<LobbySettings>>;
+}> = ({ setTime }) => {
   const timeRef = useRef<HTMLDivElement>(null);
 
   return (
     <>
-      <p className="label">Time on clock:</p>
+      <p className="label">Time on clock</p>
       <input
         className="slider"
         name="time"
@@ -19,7 +20,7 @@ const Time: React.VFC<{
         onChange={(e) => {
           const value = e.currentTarget.value;
           timeRef.current!.innerText = value;
-          time(parseInt(value));
+          setTime((prevState) => ({ ...prevState, time: parseInt(value) }));
         }}
       ></input>
       <div className="time-display" ref={timeRef}>

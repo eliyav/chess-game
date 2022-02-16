@@ -1,27 +1,50 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import Time from "../match-settings/time";
 
-interface OnlineMatch {
+interface OnlineLobbyProps {
   setSocket: React.Dispatch<any>;
   userName: string | undefined;
 }
 
-export const OnlineMatch: React.FC<OnlineMatch> = ({ setSocket, userName }) => {
-  const [time, setTime] = useState(0);
-  const [lobbyKey, setLobbyKey] = useState<string>("");
-  const [opponentName, setOpponentName] = useState<string>("Waiting..");
+export interface LobbySettings {
+  hostName: string;
+  opponentName: string;
+  time: number;
+  firstMove: string;
+}
+
+export const OnlineLobby: React.FC<OnlineLobbyProps> = ({
+  setSocket,
+  userName,
+}) => {
+  const [socket] = useState<any>(io(`ws://${window.location.host}`));
+  const [lobbyKey, setLobbyKey] = useState<string>();
+  const defaultChoice = useRef(true);
+  const [lobbySettings, setLobbySettings] = useState<LobbySettings>({
+    hostName: "Guest",
+    opponentName: "Waiting...",
+    time: 0,
+    firstMove: "Host",
+  });
 
   useEffect(() => {
-    const socket = io(`ws://${window.location.host}`);
     socket.emit("create-lobby");
-    socket.on("lobby-key", (lobbyKey) => {
+    socket.on("lobby-key", (lobbyKey: string) => {
       setLobbyKey(lobbyKey);
       socket.emit("get-room-info", lobbyKey);
     });
-    socket.on("room-info", (test) => console.log(test));
-  }, []);
+    socket.on("room-info", (info: any) => setLobbySettings(info));
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    if (lobbyKey) socket.emit("update-lobby", { lobbyKey, lobbySettings });
+  }, [lobbySettings]);
 
   return (
     <div className="lobby">
@@ -36,12 +59,42 @@ export const OnlineMatch: React.FC<OnlineMatch> = ({ setSocket, userName }) => {
         <div className="mini-divider"></div>
         <p className="label">Players</p>
         <p className="player">{`You: ${userName ? userName : "Guest"}`}</p>
-        <p className="player">{`Opponent: ${opponentName}`}</p>
+        <p className="player">{`Opponent: ${lobbySettings.opponentName}`}</p>
         <div className="mini-divider"></div>
-        <Time time={setTime} />
+        <p className="label">First move - (White Player)</p>
+        <button
+          className={defaultChoice.current === true ? "highlight-choice" : ""}
+          value="Host"
+          onClick={(e) => {
+            const value = e.currentTarget.value;
+            defaultChoice.current = true;
+            setLobbySettings((prevState) => ({
+              ...prevState,
+              firstMove: value,
+            }));
+          }}
+        >
+          Host
+        </button>
+        <button
+          className={defaultChoice.current === false ? "highlight-choice" : ""}
+          value="Opponent"
+          onClick={(e) => {
+            const value = e.currentTarget.value;
+            defaultChoice.current = false;
+            setLobbySettings((prevState) => ({
+              ...prevState,
+              firstMove: value,
+            }));
+          }}
+        >
+          Opponent
+        </button>
+        <div className="mini-divider"></div>
+        <Time setTime={setLobbySettings} />
       </div>
       <button>
-        <Link to={`/online-game?mode=online&time=${time}`}>Start Match</Link>
+        <Link to={`/online-game?mode=online`}>Start Match</Link>
       </button>
     </div>
   );

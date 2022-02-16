@@ -1,9 +1,15 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Time from "../match-settings/time";
+import { LobbySettings } from "./online-match";
 
-export const OfflineMatch: React.FC = ({}) => {
-  const [time, setTime] = useState(0);
+export const OfflineLobby: React.FC = ({}) => {
+  const [lobbySettings, setLobbySettings] = useState<LobbySettings>({
+    hostName: "Guest",
+    opponentName: "Waiting...",
+    time: 0,
+    firstMove: "host",
+  });
 
   return (
     <div className="lobby">
@@ -13,10 +19,12 @@ export const OfflineMatch: React.FC = ({}) => {
         <p className="label">Mode:</p>
         <p>Offline</p>
         <div className="mini-divider"></div>
-        <Time time={setTime} />
+        <Time setTime={setLobbySettings} />
       </div>
       <button>
-        <Link to={`/offline-game?mode=offline&time=${time}`}>Start Match</Link>
+        <Link to={`/offline-game?mode=offline&time=${lobbySettings.time}`}>
+          Start Match
+        </Link>
       </button>
     </div>
   );

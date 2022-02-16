@@ -1,14 +1,19 @@
-import React, { useState } from "react";
-import { Outlet } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Location, Outlet } from "react-router-dom";
 import { MatchButton } from "../buttons/match-button";
 import { MenuButton } from "../buttons/menu-button";
 
 interface MatchesProps {
   openNavbar: React.Dispatch<React.SetStateAction<boolean>>;
+  location: Location;
 }
 
-export const Matches: React.FC<MatchesProps> = ({ openNavbar }) => {
+export const Matches: React.FC<MatchesProps> = ({ location, openNavbar }) => {
   const [showSelections, setShowSelections] = useState(true);
+
+  useEffect(() => {
+    if (location.pathname === "/match") setShowSelections(true);
+  }, [location.pathname]);
 
   return (
     <div className="matches screen">
@@ -31,7 +36,7 @@ export const Matches: React.FC<MatchesProps> = ({ openNavbar }) => {
           />
           <MatchButton
             name="Join Online"
-            path="./"
+            path="./join-lobby"
             description="Join a friend with an online code that was sent to you"
             onSelect={() => setShowSelections(false)}
           />
