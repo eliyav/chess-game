@@ -2,10 +2,10 @@ import EventEmitter from "../../src/events/event-emitter";
 import { CanvasView } from "../../src/view/create-view";
 import { TurnHistory } from "../../src/helper/game-helpers";
 import GamePiece from "../../src/component/game-logic/game-piece";
-import OfflineMatch from "../component/offline-match";
+import OnlineMatch from "../../src/component/online-match";
 
-export const offlineGameEmitter = (
-  offlineMatch: OfflineMatch,
+export const onlineGameEmitter = (
+  onlineMatch: OnlineMatch,
   canvasView: CanvasView
 ): EventEmitter => {
   const emitter = new EventEmitter();
@@ -15,8 +15,8 @@ export const offlineGameEmitter = (
     (originPoint: Point, targetPoint: Point, resolved: TurnHistory) => {
       canvasView.turnAnimation(originPoint, targetPoint, resolved);
       if (resolved.promotion === undefined) {
-        const isMatchOver = offlineMatch.game.switchTurn();
-        canvasView.rotateCamera(offlineMatch.game);
+        const isMatchOver = onlineMatch.game.switchTurn();
+        canvasView.rotateCamera(onlineMatch.game);
         isMatchOver ? canvasView.gameScene.detachControl() : null;
       } else {
         //Handle Promotion Event
@@ -26,7 +26,7 @@ export const offlineGameEmitter = (
   );
 
   emitter.on("promotion-selection", (selection: string) => {
-    const turnHistory = offlineMatch.game.turnHistory.at(-1);
+    const turnHistory = onlineMatch.game.turnHistory.at(-1);
     if (turnHistory !== undefined) {
       const square = turnHistory.targetSquare.square;
       turnHistory.promotion = selection;
@@ -38,10 +38,10 @@ export const offlineGameEmitter = (
         movement
       );
       const symbol = turnHistory.targetSquare.on.getSymbol();
-      const annotations = offlineMatch.game.annotations;
+      const annotations = onlineMatch.game.annotations;
       annotations[annotations.length - 1] = `${square}${symbol}`;
-      canvasView.updateMeshesRender(offlineMatch.game);
-      offlineMatch.game.switchTurn();
+      canvasView.updateMeshesRender(onlineMatch.game);
+      onlineMatch.game.switchTurn();
       canvasView.gameScene.attachControl();
     }
   });
@@ -51,17 +51,17 @@ export const offlineGameEmitter = (
   });
 
   emitter.on("reset-board", () => {
-    offlineMatch.resetMatch();
-    canvasView.updateMeshesRender(offlineMatch.game);
+    onlineMatch.resetMatch();
+    canvasView.updateMeshesRender(onlineMatch.game);
   });
 
   emitter.on("undo-move", () => {
-    offlineMatch.game.undoTurn();
-    canvasView.updateGameView(offlineMatch.game);
+    onlineMatch.game.undoTurn();
+    canvasView.updateGameView(onlineMatch.game);
   });
 
   emitter.on("reset-camera", () => {
-    canvasView.resetCamera(offlineMatch.game);
+    canvasView.resetCamera(onlineMatch.game);
   });
 
   return emitter;

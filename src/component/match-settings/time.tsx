@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { LobbySettings } from "../routes/online-match";
+import { LobbySettings } from "../routes/online-lobby";
 
 const Time: React.VFC<{
   setTime: React.Dispatch<React.SetStateAction<LobbySettings>>;

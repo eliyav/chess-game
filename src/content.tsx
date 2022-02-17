@@ -7,9 +7,10 @@ import { Matches } from "./component/routes/matches";
 import { OfflineGameView } from "./component/routes/offline-game-view";
 import { UserData } from "./app";
 import { Profile } from "./component/routes/profile";
-import { OfflineLobby } from "./component/routes/offline-match";
-import { OnlineLobby } from "./component/routes/online-match";
+import { OfflineLobby } from "./component/routes/offline-lobby";
+import { OnlineLobby } from "./component/routes/online-lobby";
 import { JoinLobby } from "./component/routes/join-match";
+import { OnlineGameView } from "./component/routes/online-game-view";
 
 interface ContentProps {
   userData: UserData | undefined;
@@ -20,10 +21,7 @@ export const Content: React.VFC<ContentProps> = ({ userData }) => {
   const { isAuthenticated } = useAuth0();
   const [navbarOpen, setNavbarOpen] = useState(false);
   const [socketConnection, setSocketConnection] = useState<any>();
-  // const params = new URLSearchParams(location.search);
-  // console.log(params.get("mode"));
-  // const matchRoute = useMatch("/match/room");
-  // console.log(matchRoute);
+
   return (
     <>
       {navbarOpen && (
@@ -85,7 +83,13 @@ export const Content: React.VFC<ContentProps> = ({ userData }) => {
         />
         <Route
           path="/online-game"
-          element={<OfflineGameView openNavbar={setNavbarOpen} />}
+          element={
+            <OnlineGameView
+              location={location}
+              socket={socketConnection}
+              openNavbar={setNavbarOpen}
+            />
+          }
         />
         <Route path="profile/:id" element={<Profile data={userData!} />} />
       </Routes>

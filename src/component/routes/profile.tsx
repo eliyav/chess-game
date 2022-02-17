@@ -1,5 +1,5 @@
 import React from "react";
-import { UserData } from "~/src/app";
+import { UserData } from "../../app";
 
 export const Profile: React.FC<{ data: UserData }> = ({
   data: { name, picture },

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
-import Time from "../match-settings/time";
-import { LobbySettings } from "./online-match";
+import { LobbySettings } from "./online-lobby";
 
 interface JoinLobbyProps {
   setSocket: React.Dispatch<any>;
@@ -12,31 +12,30 @@ export const JoinLobby: React.FC<JoinLobbyProps> = ({
   setSocket,
   userName,
 }) => {
+  const navigate = useNavigate();
   const [socket] = useState<any>(io(`ws://${window.location.host}`));
   const keyInputRef = useRef<HTMLInputElement>(null);
   const [lobbyKey, setLobbyKey] = useState<string>();
   const [keyVerified, setKeyVerified] = useState(false);
-  const [roomInfo, setRoomInfo] = useState<LobbySettings>();
+  const [lobbySettings, setLobbySettings] = useState<LobbySettings>();
 
   useEffect(() => {
     if (lobbyKey) {
+      setSocket(socket);
       socket.emit("join-lobby", {
         lobbyKey,
         name: userName ? userName : "Guest",
       });
-      socket.on("room-info", (roomInfo: LobbySettings) => {
-        setRoomInfo(roomInfo);
+      socket.on("room-info", (lobbyInfo: LobbySettings) => {
+        setLobbySettings(lobbyInfo);
         setKeyVerified(true);
       });
-      socket.on("message", (message: string) => console.log(message));
-
-      return () => {
-        socket.disconnect();
-      };
+      socket.on("start-match", () => {
+        navigate("/online-game");
+      });
     }
   }, [lobbyKey]);
 
-  console.log(roomInfo);
   return (
     <div className="lobby">
       <p className="page-title">Lobby</p>
@@ -50,9 +49,9 @@ export const JoinLobby: React.FC<JoinLobbyProps> = ({
               type="text"
               placeholder="Enter here"
             ></input>
-            <button
-              onClick={() => setLobbyKey(keyInputRef.current?.value)}
-            ></button>
+            <button onClick={() => setLobbyKey(keyInputRef.current?.value)}>
+              Enter Lobby
+            </button>
           </>
         ) : (
           <>
@@ -64,10 +63,15 @@ export const JoinLobby: React.FC<JoinLobbyProps> = ({
             <div className="mini-divider"></div>
             <p className="label">Players</p>
             <p className="player">{`You: ${userName ? userName : "Guest"}`}</p>
-            <p className="player">{`Opponent: `}</p>
+            <p className="player">{`Opponent: ${lobbySettings?.hostName}`}</p>
             <div className="mini-divider"></div>
-            <p className="label">Time</p>
-            <p className="player">{`time`}</p>
+            <p className="label">First move - (White Player)</p>
+            <p>
+              {lobbySettings?.firstMove === "Game Host" ? "Opponent" : "You"}
+            </p>
+            <div className="mini-divider"></div>
+            <p className="label">Time on clock</p>
+            <p className="player">{lobbySettings?.time}</p>
           </>
         )}
       </div>

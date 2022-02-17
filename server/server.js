@@ -51,6 +51,7 @@ const io = require("socket.io")(server);
 setInterval(() => {
   const socketedRooms = io.sockets.adapter.rooms;
   for (let lobbyKey of lobbyLog.keys()) {
+    console.log(lobbyKey);
     if (!socketedRooms.has(lobbyKey)) lobbyLog.delete(lobbyKey);
   }
 }, 5000);
@@ -77,13 +78,14 @@ io.on("connection", (socket) => {
     const lobbyKey = generateKey();
     socket.join(lobbyKey);
     const lobby = {
+      lobbyKey: lobbyKey,
       hostName: "Guest",
       opponentName: "Waiting...",
       time: 0,
-      firstMove: "Host",
+      firstMove: "Game Host",
     };
     lobbyLog.set(lobbyKey, lobby);
-    socket.emit("lobby-key", lobbyKey);
+    socket.emit("room-info", lobbyLog.get(lobbyKey));
   });
 
   socket.on("get-room-info", (lobbyKey) => {
@@ -102,23 +104,29 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("update-lobby", ({ lobbyKey, lobbySettings }) => {
-    lobbyLog.set(lobbyKey, lobbySettings);
-    socket.to(lobbyKey).emit("room-info", lobbyLog.get(lobbyKey));
+  socket.on("update-lobby", ({ lobbySettings }) => {
+    lobbyLog.set(lobbySettings.lobbyKey, lobbySettings);
+    socket
+      .to(lobbySettings.lobbyKey)
+      .emit("room-info", lobbyLog.get(lobbySettings.lobbyKey));
   });
 
-  socket.on("check-match-start", (room) => {
-    const clients = io.sockets.adapter.rooms.get(room);
+  socket.on("resolvedTurn", ({ originPoint, targetPoint, lobbyKey }) => {
+    console.log("resolved");
+    console.log(lobbyKey);
+    socket.to(lobbyKey).emit("message", "Move has been entered");
+    socket.to(lobbyKey).emit("opponentsTurn", { originPoint, targetPoint });
+  });
+
+  socket.on("start-match", (lobbyKey) => {
+    console.log(lobbyKey);
+    const clients = io.sockets.adapter.rooms.get(lobbyKey);
     const serializedSet = [...clients.keys()];
     if (serializedSet.length === 2) {
-      socket.to(room).emit("start-online-match");
-      socket.emit("start-online-match");
+      socket.to(lobbyKey).emit("start-match");
+      // socket.emit("start-match");
+      socket.emit("message", "Emitted Message");
     }
-  });
-
-  socket.on("stateChange", ({ originPoint, targetPoint, room }) => {
-    socket.to(room).emit("message", "Move has been entered");
-    socket.to(room).emit("stateChange", { originPoint, targetPoint });
   });
 
   socket.on("pause-game", ({ room, currentPlayer, time }) => {

@@ -10,7 +10,7 @@ import OfflineMatch from "../offline-match";
 import initCanvasInput from "../../../src/view/canvas-input";
 import { TurnHistory } from "../../../src/helper/game-helpers";
 import EventEmitter from "../../../src/events/event-emitter";
-import offlineGameEmitter from "../../../src/events/offline-game-emit";
+import { offlineGameEmitter } from "../../../src/events/offline-game-emit";
 
 interface OfflineProps {
   openNavbar: React.Dispatch<React.SetStateAction<boolean>>;

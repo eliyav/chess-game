@@ -35,9 +35,11 @@ html {
 }
 .menu-button {
   position: relative;
+  display: block;
   width: 50px;
-  margin-top: 1em;
+  padding-top: 1em;
   object-fit: contain;
+  margin-left: 1.5em;
 }
 .screen {
   text-align: center;
@@ -66,7 +68,7 @@ button {
   font-weight: bold;
   border: 2px solid whitesmoke;
   border-radius: 6px;
-  font-size: 1em;
+  font-size: 17px;
 }
 
 button:hover {
