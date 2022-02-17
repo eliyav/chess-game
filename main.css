@@ -6,52 +6,134 @@
   box-sizing: border-box;
 }
 
-.app {
-  position: absolute;
+html {
+  background-color: var(--primary-background);
+}
+:root {
+  --primary-background: #333333;
+  --primary-color: #e9e9e9;
+  --primary-alt-color: #8b8b8b;
+  --primary-font: sans-serif;
+}
+#root {
+  background-color: var(--primary-background);
   height: 100%;
-  width: 100%;
-  pointer-events: none;
+  color: var(--primary-color);
+  font-family: var(--primary-font);
 }
-
-.app > * {
-  pointer-events: all;
+#app {
+  height: 100%;
+  max-width: 100ch;
+  margin: auto;
 }
-
+.divider {
+  border-bottom: 1px solid #e9e9e9;
+  width: 90%;
+  margin: auto;
+}
+.mini-divider {
+  border-bottom: 1px solid #e9e9e9;
+  width: 45%;
+  margin: 1em auto auto auto;
+}
+.menu-button {
+  position: relative;
+  display: block;
+  width: 50px;
+  padding-top: 1em;
+  object-fit: contain;
+  margin-left: 1.5em;
+}
+.screen {
+  text-align: center;
+  width: 90%;
+  margin: auto;
+}
 canvas {
-  position: absolute;
-  height: 100%;
+  height: 100vh;
   width: 100%;
 }
-
-.hide {
-  display: none;
+.page-title {
+  font-size: 3em;
+  padding: 0.5em;
 }
 
-#playButton {
-  position: absolute;
-  z-index: 1;
-  top: 64vh;
-  left: 50vw;
-  width: 200px;
-  height: 50px;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: white;
-  font-size: larger;
-  font-weight: bolder;
-  border: 1mm ridge whitesmoke;
-  transform: translateX(-50%);
-  border-radius: 2rem;
+.label {
+  color: peachpuff;
 }
 
-#playButton:hover {
+button {
+  width: 80%;
+  max-width: 300px;
+  padding: 1em 0;
+  margin: 1em 0.5em 1em 0.5em;
+  background-color: #999999;
+  font-weight: bold;
+  border: 2px solid whitesmoke;
+  border-radius: 6px;
+  font-size: 17px;
+}
+
+button:hover {
+  background-color: #c2c2c2;
+  transform: scale(0.95);
+}
+
+a {
+  text-decoration: none;
+  background-color: transparent;
   color: black;
-  background-color: rgba(240, 230, 95, 0.5);
 }
 
-/*!***************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js!./src/styles/side-nav.css ***!
-  \***************************************************************************/
-.sidenav {
+.highlight-choice {
+  background-color: rgba(73, 255, 73, 0.678);
+}
+
+/* Loading Screen-------------------  */
+#loading {
+  height: 100%;
+  width: 100%;
+  background-color: rgb(0, 0, 0);
+  z-index: 2;
+  position: relative;
+}
+
+#loading > p {
+  color: white;
+  text-align: center;
+  line-height: 100vh;
+  font-size: xx-large;
+  font-family: fantasy;
+  animation: loadingAnimation;
+  animation-duration: 0.75s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+@keyframes loadingAnimation {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 0.2;
+  }
+}
+/* Home Screen-------------------  */
+
+.home .picture {
+  background-color: black;
+  height: 200px;
+  width: 80%;
+  margin: 1em auto;
+}
+
+.home .page-info {
+  margin: 1em 0;
+  font-size: 1.1em;
+}
+
+/* Navbar-------------------  */
+.navbar {
   height: 100%;
   width: 250px;
   position: fixed;
@@ -61,28 +143,25 @@ canvas {
   overflow-x: hidden;
 }
 
-.sidenav button {
+.navbar button {
   padding: 8px 8px 8px 32px;
   font-size: 1.5rem;
-  color: #818181;
   background-color: transparent;
   border: none;
   display: block;
 }
 
-.sidenav button:hover {
-  color: #f1f1f1;
-}
-
-.sidenav .closebtn {
+.navbar .closebtn {
   display: block;
+  background-color: transparent;
   top: 0;
   font-size: 2.25rem;
   margin-left: 75%;
+  margin-top: 10px;
   color: white;
 }
 
-.sidenav .category {
+.navbar .category {
   display: block;
   color: rgba(245, 245, 245, 0.842);
   pointer-events: none;
@@ -91,19 +170,31 @@ canvas {
 }
 
 button.highlight {
-  color: blanchedalmond;
+  color: whitesmoke;
 }
 
-/*!*******************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js!./src/styles/game-overlay.css ***!
-  \*******************************************************************************/
+.navbar a {
+  text-decoration: none;
+  background-color: transparent;
+  color: #818181;
+}
+
+.navbar a:hover {
+  color: whitesmoke;
+}
+
+/* Game Overlay-------------------  */
 .overlayWrapper {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  max-width: 100ch;
   display: flex;
   flex-flow: row wrap;
   justify-content: center;
-  height: 100%;
   align-content: space-between;
   pointer-events: none;
+  background-color: transparent;
 }
 
 .gameOverlay {
@@ -137,11 +228,12 @@ button.highlight {
   object-fit: contain;
   margin: auto;
   pointer-events: none;
+  background-color: transparent;
 }
 
 .gameOverlay > .item:hover {
   transform: scale(0.95);
-  background-color: rgba(240, 230, 95, 0.5);
+  background-color: gainsboro;
 }
 
 .timer {
@@ -159,9 +251,11 @@ button.highlight {
   object-fit: contain;
   display: inline;
   padding: 0 0.2rem;
+  background-color: transparent;
 }
 
 .timer > .playerTimer > div {
+  background-color: transparent;
   display: inline;
   padding: 0.1rem;
   font-weight: bold;
@@ -169,284 +263,7 @@ button.highlight {
   font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 }
 
-/*!*********************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js!./src/styles/match-settings.css ***!
-  \*********************************************************************************/
-.match-settings-modal {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-flow: column wrap;
-}
-
-.gameOptionsScreen {
-  height: 80%;
-  width: 80%;
-  z-index: 2;
-  background-image: url(12a515cf977bfbfdac69.png);
-  background-position: center;
-  background-size: cover;
-  text-align: center;
-  border: 0.5rem ridge whitesmoke;
-  color: black;
-  overflow-y: auto;
-}
-
-.gameOptionsScreen > .title {
-  font-size: 2.5rem;
-  background-color: rgba(30, 143, 255, 0.8);
-  margin-bottom: 1rem;
-  margin-top: 1rem;
-  padding: 0.25rem;
-  font-weight: bold;
-  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-    "Lucida Sans", Arial, sans-serif;
-}
-
-.gameOptionsScreen > .subsection {
-  background-color: rgba(255, 255, 255, 0.7);
-  padding-bottom: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.gameOptionsScreen > .subsection > p {
-  background-color: rgba(30, 143, 255, 0.486);
-  font-size: 1.25rem;
-  border: 2px inset black;
-}
-
-.gameOptionsScreen > .closeBtn {
-  display: inline-block;
-  color: white;
-  font-size: 2.25rem;
-  background-color: rgba(0, 0, 0, 0.5);
-  padding: 0 1rem;
-  border-radius: 1rem;
-  border: 0.15rem solid black;
-  margin-top: 0.5rem;
-}
-
-.gameOptionsScreen > .closeBtn:hover {
-  color: red;
-  background-color: rgba(245, 245, 245, 0.8);
-}
-
-.option {
-  display: block;
-  margin: 0.5rem;
-  border: 0.1rem solid black;
-  padding: 0.5rem;
-}
-
-.highlighted {
-  background-color: rgba(0, 255, 0, 0.5);
-}
-
-.confirmButton {
-  margin: 1rem;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: whitesmoke;
-  font-size: larger;
-  font-weight: bolder;
-  border: 1mm ridge whitesmoke;
-  border-radius: 5rem;
-  border: 0.15rem solid black;
-  padding: 1rem 1rem;
-}
-
-.confirmButton:hover {
-  color: black;
-  background-color: rgba(240, 230, 95, 0.5);
-}
-
-#inviteCode {
-  font-weight: bolder;
-  margin: 1rem;
-  border: 0.2rem solid black;
-}
-
-.gameOptionsScreen .slider {
-  -webkit-appearance: none; /* Override default look */
-  appearance: none;
-  background-color: rgba(0, 0, 0, 0.5);
-  border-radius: 1rem;
-  border: 0.2rem solid blue;
-  margin: 1rem;
-}
-
-.time-display {
-  font-size: 1.5rem;
-  font-weight: bolder;
-}
-
-@media only screen and (min-width: 768px) {
-  .gameOptionsScreen {
-    height: 80%;
-    width: 50%;
-  }
-  #InviteCode {
-    height: 80%;
-    width: 50%;
-  }
-}
-
-/*!********************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js!./src/styles/message-modal.css ***!
-  \********************************************************************************/
-.message-wrapper {
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  display: flex;
-  flex-flow: column wrap;
-  justify-content: center;
-  align-items: center;
-  z-index: 2;
-}
-
-.message-wrapper .message {
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: space-evenly;
-  align-items: center;
-  background: linear-gradient(rgba(30, 143, 255, 0.7), rgba(0, 0, 0, 1));
-  text-align: center;
-  border: 0.25rem inset whitesmoke;
-  color: black;
-}
-
-.message .question {
-  width: 100%;
-  background-color: rgba(245, 245, 245, 0.685);
-  margin: 1rem;
-  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-    "Lucida Sans", Arial, sans-serif;
-  font-size: 1.75rem;
-  padding: 0.2rem;
-  border-radius: 0.5rem;
-  font-weight: bold;
-}
-
-.message button {
-  color: black;
-  font-size: 2.25rem;
-  padding: 0.1rem 1rem;
-  border-radius: 1rem;
-  margin: 1rem;
-  border: 0.25rem solid black;
-}
-
-.message button:hover {
-  transform: scale(0.9);
-  background-color: rgb(238, 224, 153);
-}
-
-.message .confirm {
-  background-color: rgba(0, 255, 0, 0.7);
-}
-
-.message .reject {
-  background-color: rgba(255, 0, 0, 0.7);
-}
-
-@media only screen and (min-width: 768px) {
-  .message-wrapper .message {
-    height: 50%;
-    width: 50%;
-  }
-  .message .question {
-    font-size: 2rem;
-  }
-}
-
-/*!******************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js!./src/styles/input-modal.css ***!
-  \******************************************************************************/
-.input-wrapper {
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  display: flex;
-  flex-flow: column wrap;
-  justify-content: center;
-  align-items: center;
-  z-index: 2;
-}
-
-.input-wrapper .message {
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: space-evenly;
-  align-items: center;
-  background: linear-gradient(rgba(30, 143, 255, 0.7), rgba(0, 0, 0, 1));
-  text-align: center;
-  border: 0.25rem inset whitesmoke;
-  color: black;
-  /* overflow-y: auto; */
-}
-
-.message input {
-  display: block;
-  width: 100%;
-  margin: 0 3rem;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  border: 0.2rem solid black;
-  text-align: center;
-  font-size: 2rem;
-  font-weight: bold;
-  letter-spacing: 0.1em;
-}
-
-.message .text {
-  width: 100%;
-  background-color: rgba(245, 245, 245, 0.685);
-  margin: 1rem;
-  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-    "Lucida Sans", Arial, sans-serif;
-  font-size: 1.75rem;
-  padding: 0.2rem;
-  border-radius: 0.5rem;
-  font-weight: bold;
-}
-
-.message button {
-  color: black;
-  font-size: 2rem;
-  padding: 0.1rem 1rem;
-  border-radius: 1rem;
-  margin: 1rem;
-  border: 0.25rem solid black;
-}
-
-.message button:hover {
-  transform: scale(0.9);
-  background-color: rgb(238, 224, 153);
-}
-
-.message .confirm {
-  background-color: rgba(0, 255, 0, 0.7);
-}
-
-.message .reject {
-  background-color: rgba(255, 0, 0, 0.7);
-}
-
-@media only screen and (min-width: 768px) {
-  .input-wrapper .message {
-    height: 50%;
-    width: 50%;
-  }
-  .message .text {
-    font-size: 2rem;
-  }
-}
-
-/*!**********************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js!./src/styles/promotion-modal.css ***!
-  \**********************************************************************************/
+/* Promotion Modal-------------------  */
 .promotion-wrapper {
   height: 100%;
   width: 100%;
@@ -491,9 +308,7 @@ button.highlight {
   background-repeat: no-repeat;
 }
 
-/*!**************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js!./src/styles/profile.css ***!
-  \**************************************************************************/
+/* Profile-------------------  */
 .profile-wrapper {
   position: absolute;
   z-index: 2;
@@ -573,36 +388,15 @@ button.highlight {
   }
 }
 
-/*!*********************************************************************************!*\
-  !*** css ./node_modules/css-loader/dist/cjs.js!./src/styles/loading-screen.css ***!
-  \*********************************************************************************/
-#loading {
-  height: 100vh;
-  width: 100vw;
-  background-color: rgb(0, 0, 0);
-  z-index: 2;
-  position: relative;
+/* Lobby Settings -------------------  */
+
+.lobby .settings {
+  margin: 1em;
+  font-size: 1.3em;
 }
 
-#loading > p {
-  color: white;
-  text-align: center;
-  line-height: 100vh;
-  font-size: xx-large;
-  font-family: fantasy;
-  animation: loadingAnimation;
-  animation-duration: 0.75s;
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
-}
-
-@keyframes loadingAnimation {
-  from {
-    opacity: 0.6;
-  }
-  to {
-    opacity: 0.2;
-  }
+.lobby .settings > p {
+  margin: 1em;
 }
 
 
