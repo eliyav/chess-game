@@ -24,15 +24,15 @@ export const OnlineLobby: React.FC<OnlineLobbyProps> = ({
   const defaultChoice = useRef(true);
   const [lobbySettings, setLobbySettings] = useState<LobbySettings>({
     lobbyKey: "",
-    hostName: "Guest",
+    hostName: userName ? userName : "Guest",
     opponentName: "Waiting...",
     time: 0,
-    firstMove: "Host",
+    firstMove: "Game Host",
   });
 
   useEffect(() => {
     setSocket(socket);
-    socket.emit("create-lobby");
+    socket.emit("create-lobby", lobbySettings);
     socket.on("room-info", (settings: LobbySettings) =>
       setLobbySettings(settings)
     );
@@ -58,7 +58,7 @@ export const OnlineLobby: React.FC<OnlineLobbyProps> = ({
         <p>{lobbySettings.lobbyKey}</p>
         <div className="mini-divider"></div>
         <p className="label">Players</p>
-        <p className="player">{`You: ${userName ? userName : "Guest"}`}</p>
+        <p className="player">{`You: ${lobbySettings.hostName}`}</p>
         <p className="player">{`Opponent: ${lobbySettings.opponentName}`}</p>
         <div className="mini-divider"></div>
         <p className="label">First move - (White Player)</p>

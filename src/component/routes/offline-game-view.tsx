@@ -87,7 +87,7 @@ export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
       ) : (
         <LoadingScreen />
       )}
-      <canvas ref={canvasRef} touch-action="none"></canvas>
+      <canvas ref={canvasRef} id="gameCanvas" touch-action="none"></canvas>
     </>
   );
 };

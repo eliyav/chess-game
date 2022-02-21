@@ -1,8 +1,8 @@
 import * as BABYLON from "babylonjs";
 import space from "../../assets/space.webp";
-import { assetsLoader } from "./asset-loader";
+import { gameAssets } from "./game-assets";
 import { createMovementMaterials } from "./materials";
-import { CustomGameScene } from "./asset-loader";
+import { CustomGameScene } from "./game-assets";
 
 const gameScreen = async (
   canvas: HTMLCanvasElement,
@@ -59,7 +59,7 @@ const gameScreen = async (
   photoDome.rotation = new BABYLON.Vector3(0, 1, 1.5);
 
   createMovementMaterials(scene);
-  scene.finalMeshes = await assetsLoader(scene);
+  scene.finalMeshes = await gameAssets(scene);
 
   //#region Animations
   //Pawn Animations

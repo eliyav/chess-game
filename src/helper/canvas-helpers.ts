@@ -1,6 +1,6 @@
 import Game from "../component/game-logic/game";
 import { Material } from "babylonjs/Materials/material";
-import { ChessPieceMesh, CustomGameScene } from "../view/asset-loader";
+import { ChessPieceMesh, CustomGameScene } from "../view/game-assets";
 import { Move } from "../component/game-logic/game-piece";
 
 const displayPieceMoves = (

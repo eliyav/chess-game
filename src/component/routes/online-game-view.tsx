@@ -1,17 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Location } from "react-router-dom";
 import "babylonjs-loaders";
 import * as BABYLON from "babylonjs";
 import * as icons from "../game-overlay/overlay-icons";
 import { createView, CanvasView } from "../../view/create-view";
+import { LobbySettings } from "./online-lobby";
+import { onlineGameEmitter } from "../../../src/events/online-game-emit";
+import { TurnHistory } from "../../../src/helper/game-helpers";
 import OnlineMatch from "../online-match";
 import GameOverlay from "../game-overlay/game-overlay";
 import LoadingScreen from "../loading-screen";
 import initCanvasInput from "../../../src/view/canvas-input";
-import { TurnHistory } from "../../../src/helper/game-helpers";
 import EventEmitter from "../../../src/events/event-emitter";
-import { onlineGameEmitter } from "../../../src/events/online-game-emit";
-import { LobbySettings } from "./online-lobby";
-import { Location } from "react-router-dom";
 
 interface OnlineProps {
   location: Location;
@@ -51,7 +51,6 @@ export const OnlineGameView: React.FC<OnlineProps> = ({
     resolved: TurnHistory
   ) {
     const lobbyKey = lobbySettings.current?.lobbyKey;
-    console.log(lobbyKey);
     onlineEmitter.current!.emit(type, originPoint, targetPoint, resolved);
     socket.emit("resolvedTurn", { originPoint, targetPoint, lobbyKey });
   }
@@ -123,7 +122,7 @@ export const OnlineGameView: React.FC<OnlineProps> = ({
       ) : (
         <LoadingScreen />
       )}
-      <canvas ref={canvasRef} touch-action="none"></canvas>
+      <canvas ref={canvasRef} id="gameCanvas" touch-action="none"></canvas>
     </>
   );
 };

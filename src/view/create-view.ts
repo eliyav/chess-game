@@ -3,7 +3,7 @@ import gameScreen from "./game-screen";
 import Game from "../component/game-logic/game";
 import { findPosition } from "../helper/canvas-helpers";
 import { TurnHistory } from "../helper/game-helpers";
-import { CustomGameScene } from "./asset-loader";
+import { CustomGameScene } from "./game-assets";
 import calcTurnAnimation from "./animation/turn-animation";
 
 export const createView = async (

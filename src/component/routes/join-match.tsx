@@ -34,6 +34,10 @@ export const JoinLobby: React.FC<JoinLobbyProps> = ({
         navigate("/online-game");
       });
     }
+
+    return () => {
+      socket.off("room.info");
+    };
   }, [lobbyKey]);
 
   return (

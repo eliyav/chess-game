@@ -51,10 +51,9 @@ const io = require("socket.io")(server);
 setInterval(() => {
   const socketedRooms = io.sockets.adapter.rooms;
   for (let lobbyKey of lobbyLog.keys()) {
-    console.log(lobbyKey);
     if (!socketedRooms.has(lobbyKey)) lobbyLog.delete(lobbyKey);
   }
-}, 5000);
+}, 10000);
 
 io.on("connection", (socket) => {
   // socket.on("save-game", (match) => {
@@ -74,12 +73,12 @@ io.on("connection", (socket) => {
   //   }
   // });
 
-  socket.on("create-lobby", () => {
+  socket.on("create-lobby", (lobbySettings) => {
     const lobbyKey = generateKey();
     socket.join(lobbyKey);
     const lobby = {
       lobbyKey: lobbyKey,
-      hostName: "Guest",
+      hostName: lobbySettings.hostName,
       opponentName: "Waiting...",
       time: 0,
       firstMove: "Game Host",
@@ -112,19 +111,15 @@ io.on("connection", (socket) => {
   });
 
   socket.on("resolvedTurn", ({ originPoint, targetPoint, lobbyKey }) => {
-    console.log("resolved");
-    console.log(lobbyKey);
     socket.to(lobbyKey).emit("message", "Move has been entered");
     socket.to(lobbyKey).emit("opponentsTurn", { originPoint, targetPoint });
   });
 
   socket.on("start-match", (lobbyKey) => {
-    console.log(lobbyKey);
     const clients = io.sockets.adapter.rooms.get(lobbyKey);
     const serializedSet = [...clients.keys()];
     if (serializedSet.length === 2) {
       socket.to(lobbyKey).emit("start-match");
-      // socket.emit("start-match");
       socket.emit("message", "Emitted Message");
     }
   });

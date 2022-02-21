@@ -34,22 +34,28 @@ html {
   margin: 1em auto auto auto;
 }
 .menu-button {
-  position: relative;
+  position: fixed;
   display: block;
   width: 50px;
-  padding-top: 1em;
   object-fit: contain;
+  padding-bottom: 1em;
   margin-left: 1.5em;
+  bottom: 0;
 }
 .screen {
   text-align: center;
-  width: 90%;
-  margin: auto;
 }
-canvas {
+
+#gameCanvas {
   height: 100vh;
   width: 100%;
 }
+
+#displayCanvas {
+  width: 100%;
+  height: 450px;
+}
+
 .page-title {
   font-size: 3em;
   padding: 0.5em;

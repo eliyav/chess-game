@@ -17,7 +17,7 @@ import bishopAnimation from "../../assets/piece-animations/bishop-animation.gltf
 import knightAnimation from "../../assets/piece-animations/knight-animation.gltf";
 import queenAnimation from "../../assets/piece-animations/queen-animation.gltf";
 
-export const assetsLoader = async (scene: Scene) => {
+export const gameAssets = async (scene: Scene) => {
   const materials = createMeshMaterials(scene);
   //Game Scene
   let meshesToLoad = [king, queen, knight, bishop, rook, pawn];

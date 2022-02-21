@@ -1,7 +1,7 @@
 import Game from "../component/game-logic/game";
 import { doMovesMatch } from "../../src/helper/game-helpers";
 import { findIndex, displayPieceMoves } from "../../src/helper/canvas-helpers";
-import { ChessPieceMesh } from "../../src/view/asset-loader";
+import { ChessPieceMesh } from "./game-assets";
 import { CanvasView } from "../../src/view/create-view";
 
 const gameInput = (mesh: ChessPieceMesh, view: CanvasView, game: Game) => {

@@ -4,12 +4,12 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { Navbar } from "./component/navbar";
 import { Home } from "./component/routes/home";
 import { Matches } from "./component/routes/matches";
-import { OfflineGameView } from "./component/routes/offline-game-view";
 import { UserData } from "./app";
 import { Profile } from "./component/routes/profile";
 import { OfflineLobby } from "./component/routes/offline-lobby";
 import { OnlineLobby } from "./component/routes/online-lobby";
 import { JoinLobby } from "./component/routes/join-match";
+import { OfflineGameView } from "./component/routes/offline-game-view";
 import { OnlineGameView } from "./component/routes/online-game-view";
 
 interface ContentProps {

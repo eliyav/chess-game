@@ -1,6 +1,6 @@
 import Game from "../component/game-logic/game";
 import gameInput from "./game-input";
-import { ChessPieceMesh } from "./asset-loader";
+import { ChessPieceMesh } from "./game-assets";
 import { CanvasView } from "./create-view";
 import { TurnHistory } from "../helper/game-helpers";
 

@@ -9,7 +9,7 @@ export const MenuButton: React.FC<Props> = ({ open }) => {
   return (
     <img
       className="menu-button"
-      alt="Error in loading image"
+      alt="Menu"
       src={menuIcon}
       onClick={() => open(true)}
     ></img>
