@@ -22,11 +22,10 @@ export const OfflineLobby: React.FC = ({}) => {
         <div className="mini-divider"></div>
         <Time setTime={setLobbySettings} />
       </div>
-      <button>
-        <Link to={`/offline-game?mode=offline&time=${lobbySettings.time}`}>
-          Start Match
-        </Link>
-      </button>
+
+      <Link to={`/offline-game?mode=offline&time=${lobbySettings.time}`}>
+        <button>Start Match</button>
+      </Link>
     </div>
   );
 };

@@ -1,11 +1,9 @@
 import React from "react";
 
-interface Props {}
-
-const LoadingScreen: React.FC<Props> = () => {
+const LoadingScreen: React.FC<{ text: string }> = ({ text }) => {
   return (
-    <div id="loading">
-      <p>Loading</p>
+    <div className="loading">
+      <p>{text}</p>
     </div>
   );
 };

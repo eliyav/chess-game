@@ -41,7 +41,11 @@ export const OnlineGameView: React.FC<OnlineProps> = ({
     );
     canvasView.current.prepareGame(onlineMatch.current.game);
     initCanvasInput(onlineMatch.current.game, canvasView.current, resolve);
+
+    canvasRef.current?.classList.add("gameCanvas");
+    canvasRef.current?.classList.remove("notDisplayed");
     setGameLoaded(true);
+    engine.resize();
   }
 
   function resolve(
@@ -120,9 +124,11 @@ export const OnlineGameView: React.FC<OnlineProps> = ({
           icons={icons}
         />
       ) : (
-        <LoadingScreen />
+        <div className="loadingContainer">
+          <LoadingScreen text="..." />
+        </div>
       )}
-      <canvas ref={canvasRef} id="gameCanvas" touch-action="none"></canvas>
+      <canvas ref={canvasRef} id="notDisplayed" touch-action="none"></canvas>
     </>
   );
 };

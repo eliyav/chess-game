@@ -37,7 +37,11 @@ export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
     );
     canvasView.current.prepareGame(offlineMatch.current.game);
     initCanvasInput(offlineMatch.current.game, canvasView.current, resolve);
+
+    canvasRef.current?.classList.add("gameCanvas");
+    canvasRef.current?.classList.remove("notDisplayed");
     setGameLoaded(true);
+    engine.resize();
   }
 
   function resolve(
@@ -85,9 +89,15 @@ export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
           icons={icons}
         />
       ) : (
-        <LoadingScreen />
+        <div className="loadingContainer">
+          <LoadingScreen text="..." />
+        </div>
       )}
-      <canvas ref={canvasRef} id="gameCanvas" touch-action="none"></canvas>
+      <canvas
+        ref={canvasRef}
+        className="notDisplayed"
+        touch-action="none"
+      ></canvas>
     </>
   );
 };
