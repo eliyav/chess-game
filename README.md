@@ -2,7 +2,7 @@
 
 ## About The Project
 
-![Capture](https://user-images.githubusercontent.com/70218822/143668339-43ec93f4-490f-409f-80fe-117fc5365def.png)
+![Capture](https://user-images.githubusercontent.com/70218822/155197922-b1f530f8-a17e-4d58-ae65-823d747ea943.PNG)
 
 ### Built With
 
@@ -14,6 +14,8 @@
 - [MongoDB](https://www.mongodb.com/)
 - [TypeScript](https://www.typescriptlang.org)
 - [Webpack](https://webpack.js.org/)
+- [React Router](https://reactrouter.com/)
+- [Auth0](https://auth0.com/)
 
 <!-- GETTING STARTED -->
 
@@ -40,7 +42,12 @@ Install the latest node package manager before installing dependencies
    ```sh
    npm install
    ```
-3. Serve app on http://localhost:3000/
+3a. To static serve the app on http://localhost:3000/ 
+   ```js
+   npm start
+   ```
+
+3b. To start backend on http://localhost:8080/
    ```js
    npm run server
    ```
@@ -55,14 +62,14 @@ This project is meant to be played. If you are having fun playing chess it is be
 - [x] Implement back-end to enable websockets
 - [x] Create online matches
   - [x] Create p2p interaction
-  - [] Fix game time sync
+  - [In Progress] Fix game time sync
 - [x] Update game mesh models
 - [x] Implement React.js
 - [x] Add Game start options
 - [x] Implement MongoDB - Save & Load games
-- [In Progress - Branched] Add Authorization/Login
-- [] Add Friends List
-- [] Add Chat
+- [x] Add Authorization/Login
+- [In Progress] Add Friends List
+- [In Progress] Add Chat
 - [x] Add animations
 - [] Add automation tests
 - [] Add Ranking Algorithim and search
