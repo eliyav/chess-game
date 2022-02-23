@@ -30,6 +30,7 @@ export const createView = async (
 
   function prepareGame(game: Game) {
     updateMeshesRender(game);
+    resetCamera(game);
     gameScene.attachControl();
   }
 

@@ -16,8 +16,14 @@ export const onlineGameEmitter = (
       canvasView.turnAnimation(originPoint, targetPoint, history);
       if (history.promotion === undefined) {
         const isMatchOver = onlineMatch.game.switchTurn();
-        canvasView.rotateCamera(onlineMatch.game);
-        isMatchOver ? canvasView.gameScene.detachControl() : null;
+        if (isMatchOver) {
+          canvasView.gameScene.detachControl();
+          const winningTeam =
+            onlineMatch.game.state.currentPlayer === onlineMatch.game.teams[0]
+              ? onlineMatch.game.teams[1]
+              : onlineMatch.game.teams[0];
+          emitter.emit("end-match", winningTeam);
+        }
       } else {
         //Handle Promotion Event
         emitter.emit("promotion-selections");

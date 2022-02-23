@@ -12,6 +12,7 @@ import { TurnHistory } from "../helper/game-helpers";
 import EventEmitter from "../events/event-emitter";
 import { offlineGameEmitter } from "../events/offline-game-emit";
 import PromotionModal from "../component/modals/promotion-modal";
+import { RequestModal } from "../component/modals/request-modal";
 
 interface OfflineProps {
   openNavbar: React.Dispatch<React.SetStateAction<boolean>>;
@@ -19,6 +20,12 @@ interface OfflineProps {
 
 export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
   const [gameLoaded, setGameLoaded] = useState(false);
+  const [promotion, setPromotion] = useState(false);
+  const [request, setRequest] = useState<{
+    question: string;
+    onConfirm: () => void;
+    onReject: () => void;
+  } | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasView = useRef<CanvasView>();
   const offlineMatch = useRef<OfflineMatch>();
@@ -27,7 +34,6 @@ export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
   const params = new URLSearchParams(location.search);
   const mode = params.get("mode")!;
   const time = parseInt(params.get("time")!);
-  const [promotion, setPromotion] = useState(false);
 
   async function initGame() {
     let engine = new BABYLON.Engine(canvasRef.current!, true);
@@ -52,6 +58,20 @@ export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
 
     offlineEmitter.current.on("promotion-selections", () => {
       setTimeout(() => setPromotion(true), 1000);
+    });
+
+    offlineEmitter.current.on("end-match", (winningTeam: string) => {
+      setRequest({
+        question: `${winningTeam} team has won!, Would you like to play another game?`,
+        onConfirm: () => {
+          offlineMatch.current?.resetMatch();
+          canvasView.current?.prepareGame(offlineMatch.current?.game!);
+          setRequest(null);
+        },
+        onReject: () => {
+          setRequest(null);
+        },
+      });
     });
   }
 
@@ -102,6 +122,13 @@ export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
         className="notDisplayed"
         touch-action="none"
       ></canvas>
+      {request ? (
+        <RequestModal
+          question={request.question}
+          onConfirm={request.onConfirm}
+          onReject={request.onReject}
+        />
+      ) : null}
       {promotion ? (
         <PromotionModal
           submitSelection={(e) => {

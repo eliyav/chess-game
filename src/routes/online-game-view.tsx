@@ -71,10 +71,14 @@ export const OnlineGameView: React.FC<OnlineProps> = ({
     });
 
     onlineEmitter.current.on("end-match", (winningTeam: string) => {
-      setMessage({
-        text: `Game is over, ${winningTeam} player wins!, Would you like to start another game?`,
+      setRequest({
+        question: `${winningTeam} team has won!, Would you like to play another game?`,
         onConfirm: () => {
-          setMessage(null);
+          socket.emit("match-restart", lobbySettings.current?.lobbyKey);
+          setRequest(null);
+        },
+        onReject: () => {
+          setRequest(null);
         },
       });
     });
@@ -89,8 +93,8 @@ export const OnlineGameView: React.FC<OnlineProps> = ({
     const lobbyKey = lobbySettings.current?.lobbyKey;
     onlineEmitter.current!.emit(type, originPoint, targetPoint, history);
     socket.emit("resolvedTurn", { originPoint, targetPoint, lobbyKey });
-    //Emit second event if history.promotion !== undefined
-    //Make opponent wait on your next even choice
+    if (history.promotion !== undefined)
+      socket.emit("promotion-await", lobbyKey);
   }
 
   useEffect(() => {
@@ -108,25 +112,79 @@ export const OnlineGameView: React.FC<OnlineProps> = ({
         targetPoint: Point;
       }) => {
         onlineMatch.current!.game.playerMove(originPoint, targetPoint);
-        const turnHistory = onlineMatch.current?.game.turnHistory!;
+        const turnHistoryLog = onlineMatch.current?.game.turnHistory!;
+        const turnHistory = turnHistoryLog[turnHistoryLog.length - 1];
         canvasView.current!.turnAnimation(
           originPoint,
           targetPoint,
-          turnHistory.at(-1)!
+          turnHistory
         );
-        onlineMatch.current!.game.switchTurn();
+        if (turnHistory.promotion === undefined) {
+          const isMatchOver = onlineMatch.current!.game.switchTurn();
+          if (isMatchOver) {
+            canvasView.current?.gameScene.detachControl();
+            const winningTeam =
+              onlineMatch.current?.game.state.currentPlayer ===
+              onlineMatch.current?.game.teams[0]
+                ? onlineMatch.current?.game.teams[1]
+                : onlineMatch.current?.game.teams[0];
+            onlineEmitter.current?.emit("end-match", winningTeam);
+          }
+        }
       }
     );
 
-    socket.on("board-reset-request", (room: string) => {
+    socket.on("promotion-await", () => {
+      canvasView.current!.gameScene.detachControl();
+      setMessage({
+        text: "Please wait for opponent to select his promotion piece",
+        onConfirm: () => setMessage(null),
+      });
+    });
+
+    socket.on("promote-piece", (piece: string) => {
+      onlineEmitter.current!.emit("selected-promotion-piece", piece);
+    });
+
+    socket.on("match-restart-request", (lobbyKey: string) => {
       setRequest({
-        question: "Opponent has requested to reset the board, do you agree?",
+        question: "Opponent has requested to restart the match, do you agree?",
         onConfirm: () => {
-          socket.emit("board-reset-response", true, room);
+          socket.emit("match-restart-response", true, lobbyKey);
           setRequest(null);
         },
         onReject: () => {
-          socket.emit("board-reset-response", false, room);
+          socket.emit("match-restart-response", false, lobbyKey);
+          setRequest(null);
+        },
+      });
+    });
+
+    socket.on("match-restart-resolve", (response: boolean) => {
+      if (response) {
+        onlineMatch.current?.resetMatch();
+        canvasView.current?.prepareGame(onlineMatch.current?.game!);
+        setMessage({
+          text: "Match restart request has been accepted",
+          onConfirm: () => setMessage(null),
+        });
+      } else {
+        setMessage({
+          text: "Board reset request has been denied",
+          onConfirm: () => setMessage(null),
+        });
+      }
+    });
+
+    socket.on("board-reset-request", (lobbyKey: string) => {
+      setRequest({
+        question: "Opponent has requested to reset the board, do you agree?",
+        onConfirm: () => {
+          socket.emit("board-reset-response", true, lobbyKey);
+          setRequest(null);
+        },
+        onReject: () => {
+          socket.emit("board-reset-response", false, lobbyKey);
           setRequest(null);
         },
       });
@@ -146,16 +204,16 @@ export const OnlineGameView: React.FC<OnlineProps> = ({
         }
       });
 
-    socket.on("undo-move-request", (room: string) => {
+    socket.on("undo-move-request", (lobbyKey: string) => {
       setRequest({
         question:
           "Opponent has requested to undo their last move, do you agree?",
         onConfirm: () => {
-          socket.emit("undo-move-response", true, room);
+          socket.emit("undo-move-response", true, lobbyKey);
           setRequest(null);
         },
         onReject: () => {
-          socket.emit("undo-move-response", false, room);
+          socket.emit("undo-move-response", false, lobbyKey);
           setRequest(null);
         },
       });
@@ -232,15 +290,15 @@ export const OnlineGameView: React.FC<OnlineProps> = ({
       ) : null}
       {promotion ? (
         <PromotionModal
-          submitSelection={(e) => console.log(e.target.innerText)}
-        />
-      ) : null}
-      {promotion ? (
-        <PromotionModal
           submitSelection={(e) => {
             onlineEmitter.current!.emit(
               "selected-promotion-piece",
               e.target.innerText
+            );
+            socket.emit(
+              "promote-piece",
+              e.target.innerText,
+              lobbySettings.current!.lobbyKey
             );
             setPromotion(false);
           }}

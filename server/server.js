@@ -7,7 +7,7 @@ const jwks = require("jwks-rsa");
 const app = express();
 const port = process.env.PORT || 8080;
 //MongoDB
-// const mongo = new Mongo();
+const mongo = new Mongo();
 //#region Middleware
 const verifyJwt = jwt({
   secret: jwks.expressJwtSecret({
@@ -94,7 +94,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("resolvedTurn", ({ originPoint, targetPoint, lobbyKey }) => {
-    socket.to(lobbyKey).emit("message", "Move has been entered");
     socket.to(lobbyKey).emit("resolvedMove", { originPoint, targetPoint });
   });
 
@@ -107,10 +106,29 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("promotion-await", (lobbyKey) => {
+    socket.to(lobbyKey).emit("promotion-await");
+  });
+
+  socket.on("promote-piece", (piece, lobbyKey) => {
+    socket.to(lobbyKey).emit("promote-piece", piece);
+  });
+
+  socket.on("match-restart", (lobbyKey) => {
+    socket.to(lobbyKey).emit("match-restart-request", lobbyKey);
+  });
+
+  socket.on("match-restart-response", (response, lobbyKey) => {
+    if (response) {
+      socket.to(lobbyKey).emit("match-restart-resolve", true);
+      socket.emit("match-restart-resolve", true);
+    } else {
+      socket.to(lobbyKey).emit("match-restart-resolve", false);
+      socket.emit("match-restart-resolve", false);
+    }
+  });
+
   socket.on("board-reset", (lobbyKey) => {
-    socket
-      .to(lobbyKey)
-      .emit("message", "Opponent has requested a board reset!");
     socket.to(lobbyKey).emit("board-reset-request", lobbyKey);
   });
 
@@ -125,9 +143,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("undo-move", (lobbyKey) => {
-    socket
-      .to(lobbyKey)
-      .emit("message", "Opponent has requested to undo their last turn!");
     socket.to(lobbyKey).emit("undo-move-request", lobbyKey);
   });
 

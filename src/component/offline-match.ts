@@ -18,10 +18,6 @@ class OfflineMatch {
   }
 
   endMatch() {
-    const winningTeam =
-      this.game.state.currentPlayer === this.game.teams[0]
-        ? this.game.teams[1]
-        : this.game.teams[0];
     return true;
   }
 }
