@@ -263,19 +263,21 @@ const calcPawnMovement = (
   const [x, y] = point;
   const movePoint1: Point = [x, y + range * direction];
   const [moveX, moveY] = movePoint1;
-  if (grid[moveX][moveY].on === undefined) {
-    bounds(moveX, grid) && bounds(moveY, grid)
-      ? finalObj.push([movePoint1, "movement"])
-      : null;
-    //If he hasnt moved, then can move 2 spaces
-    if (!moved) {
-      range = 2;
-      const movePoint2: Point = [x, y + range * direction];
-      const [moveX2, moveY2] = movePoint2;
-      if (grid[moveX2][moveY2].on === undefined) {
-        bounds(moveX2, grid) && bounds(moveY2, grid)
-          ? finalObj.push([movePoint2, "movement"])
-          : null;
+  if (grid[moveX][moveY]) {
+    if (grid[moveX][moveY].on === undefined) {
+      bounds(moveX, grid) && bounds(moveY, grid)
+        ? finalObj.push([movePoint1, "movement"])
+        : null;
+      //If he hasnt moved, then can move 2 spaces
+      if (!moved) {
+        range = 2;
+        const movePoint2: Point = [x, y + range * direction];
+        const [moveX2, moveY2] = movePoint2;
+        if (grid[moveX2][moveY2].on === undefined) {
+          bounds(moveX2, grid) && bounds(moveY2, grid)
+            ? finalObj.push([movePoint2, "movement"])
+            : null;
+        }
       }
     }
   }

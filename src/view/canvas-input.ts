@@ -13,16 +13,16 @@ const initCanvasInput = (
     target: Point,
     resolved: TurnHistory
   ) => void,
-    online: boolean,
-    team?: string,
+  online: boolean,
+  team?: string
 ) => {
   view!.gameScene.onPointerDown = async (e: any, pickResult: any) => {
-      if (online) {
-        team === game.state.currentPlayer ? resolveInput() : null
-      } else {
-        resolveInput();
-      }
-    function resolveInput(){
+    if (online) {
+      team === game.state.currentPlayer ? resolveInput() : null;
+    } else {
+      resolveInput();
+    }
+    function resolveInput() {
       if (pickResult.pickedMesh !== null) {
         const mesh: ChessPieceMesh = pickResult.pickedMesh;
         const isCompleteMove = gameInput(mesh, view!, game);

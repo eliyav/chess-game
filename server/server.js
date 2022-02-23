@@ -56,23 +56,6 @@ setInterval(() => {
 }, 10000);
 
 io.on("connection", (socket) => {
-  // socket.on("save-game", (match) => {
-  //   if (db) {
-  //     db.collection("matches").insertOne(match);
-  //     console.log("Match Added to DB");
-  //   }
-  // });
-
-  // socket.on("lookup-game", (objId) => {
-  //   if (db) {
-  //     async function loadGame() {
-  //       const match = await lookupObjId("matches", objId);
-  //       socket.emit("load-game", match);
-  //     }
-  //     loadGame();
-  //   }
-  // });
-
   socket.on("create-lobby", (lobbySettings) => {
     const lobbyKey = generateKey();
     socket.join(lobbyKey);
@@ -112,64 +95,50 @@ io.on("connection", (socket) => {
 
   socket.on("resolvedTurn", ({ originPoint, targetPoint, lobbyKey }) => {
     socket.to(lobbyKey).emit("message", "Move has been entered");
-    socket.to(lobbyKey).emit("opponentsTurn", { originPoint, targetPoint });
+    socket.to(lobbyKey).emit("resolvedMove", { originPoint, targetPoint });
   });
 
   socket.on("start-match", (lobbyKey, firstMove) => {
     const clients = io.sockets.adapter.rooms.get(lobbyKey);
     const serializedSet = [...clients.keys()];
     if (serializedSet.length === 2) {
-      socket.to(lobbyKey).emit("start-match", lobbyKey, firstMove );
-      socket.emit("message", "Emitted Message");
+      socket.to(lobbyKey).emit("start-match", lobbyKey, firstMove);
+      socket.emit("message", "Match started!");
     }
   });
 
-  socket.on("pause-game", ({ room, currentPlayer, time }) => {
-    socket.to(room).emit("pause-game", { currentPlayer, time });
-    socket.emit("pause-game", { currentPlayer, time });
-  });
-
-  socket.on("reset-board", (room) => {
-    socket.to(room).emit("message", "Opponent has requested a board reset!");
-    socket.to(room).emit("reset-board-request", room);
-  });
-
-  socket.on("confirm-board-reset", (room) => {
-    socket.to(room).emit("message", "Opponent has agreed to reset the board!");
-    socket.to(room).emit("reset-board-resolve", "Yes");
-    socket.emit("reset-board-resolve", "Yes");
-  });
-
-  socket.on("reject-board-reset", (room) => {
+  socket.on("board-reset", (lobbyKey) => {
     socket
-      .to(room)
-      .emit("message", "Opponent has declined to reset the board!");
-    socket.to(room).emit("reset-board-resolve", "No");
-    socket.emit("reset-board-resolve", "No");
+      .to(lobbyKey)
+      .emit("message", "Opponent has requested a board reset!");
+    socket.to(lobbyKey).emit("board-reset-request", lobbyKey);
   });
 
-  socket.on("undo-move", (room) => {
+  socket.on("board-reset-response", (response, lobbyKey) => {
+    if (response) {
+      socket.to(lobbyKey).emit("board-reset-resolve", true);
+      socket.emit("board-reset-resolve", true);
+    } else {
+      socket.to(lobbyKey).emit("board-reset-resolve", false);
+      socket.emit("board-reset-resolve", false);
+    }
+  });
+
+  socket.on("undo-move", (lobbyKey) => {
     socket
-      .to(room)
+      .to(lobbyKey)
       .emit("message", "Opponent has requested to undo their last turn!");
-    socket.to(room).emit("undo-move-request", room);
+    socket.to(lobbyKey).emit("undo-move-request", lobbyKey);
   });
 
-  socket.on("confirm-undo-move", (room) => {
-    socket.to(room).emit("message", "Opponent has agreed for game Draw!");
-    socket.to(room).emit("undo-move-resolve", "Yes");
-    socket.emit("undo-move-resolve", "Yes");
-  });
-
-  socket.on("reject-undo-move", (room) => {
-    socket.to(room).emit("message", "Opponent has declined for game Draw!");
-    socket.to(room).emit("undo-move-resolve", "No");
-    socket.emit("undo-move-resolve", "No");
-  });
-
-  socket.on("resign-game", () => {
-    socket.to(room).emit("message", "Opponent has resigned the game!");
-    socket.to(room).emit("resign-request");
+  socket.on("undo-move-response", (response, lobbyKey) => {
+    if (response) {
+      socket.to(lobbyKey).emit("undo-move-resolve", true);
+      socket.emit("undo-move-resolve", true);
+    } else {
+      socket.to(lobbyKey).emit("undo-move-resolve", false);
+      socket.emit("undo-move-resolve", false);
+    }
   });
 
   function generateKey() {

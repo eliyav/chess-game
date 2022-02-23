@@ -11,6 +11,7 @@ import initCanvasInput from "../view/canvas-input";
 import { TurnHistory } from "../helper/game-helpers";
 import EventEmitter from "../events/event-emitter";
 import { offlineGameEmitter } from "../events/offline-game-emit";
+import PromotionModal from "../component/modals/promotion-modal";
 
 interface OfflineProps {
   openNavbar: React.Dispatch<React.SetStateAction<boolean>>;
@@ -26,6 +27,7 @@ export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
   const params = new URLSearchParams(location.search);
   const mode = params.get("mode")!;
   const time = parseInt(params.get("time")!);
+  const [promotion, setPromotion] = useState(false);
 
   async function initGame() {
     let engine = new BABYLON.Engine(canvasRef.current!, true);
@@ -36,12 +38,21 @@ export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
       canvasView.current!
     );
     canvasView.current.prepareGame(offlineMatch.current.game);
-    initCanvasInput(offlineMatch.current.game, canvasView.current, resolve, false);
+    initCanvasInput(
+      offlineMatch.current.game,
+      canvasView.current,
+      resolve,
+      false
+    );
 
     canvasRef.current?.classList.add("gameCanvas");
     canvasRef.current?.classList.remove("notDisplayed");
     setGameLoaded(true);
     engine.resize();
+
+    offlineEmitter.current.on("promotion-selections", () => {
+      setTimeout(() => setPromotion(true), 1000);
+    });
   }
 
   function resolve(
@@ -52,13 +63,6 @@ export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
   ) {
     offlineEmitter.current!.emit(type, originPoint, targetPoint, resolved);
   }
-
-  useEffect(() => {
-    //   emitter.on("piece-promotion", () => {
-    //     emitter.emit("detach-game-control");
-    //     setShowPromotionModal(true);
-    //   });
-  }, []);
 
   useEffect(() => {
     initGame();
@@ -75,7 +79,7 @@ export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
             },
             {
               text: "restart",
-              onClick: () => offlineEmitter.current!.emit("reset-board"),
+              onClick: () => offlineEmitter.current!.emit("board-reset"),
             },
             {
               text: "undo",
@@ -98,6 +102,17 @@ export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
         className="notDisplayed"
         touch-action="none"
       ></canvas>
+      {promotion ? (
+        <PromotionModal
+          submitSelection={(e) => {
+            offlineEmitter.current!.emit(
+              "selected-promotion-piece",
+              e.target.innerText
+            );
+            setPromotion(false);
+          }}
+        />
+      ) : null}
     </>
   );
 };

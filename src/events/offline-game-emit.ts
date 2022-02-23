@@ -20,12 +20,12 @@ export const offlineGameEmitter = (
         isMatchOver ? canvasView.gameScene.detachControl() : null;
       } else {
         //Handle Promotion Event
-        emitter.emit("piece-promotion");
+        emitter.emit("promotion-selections");
       }
     }
   );
 
-  emitter.on("promotion-selection", (selection: string) => {
+  emitter.on("selected-promotion-piece", (selection: string) => {
     const turnHistory = offlineMatch.game.turnHistory.at(-1);
     if (turnHistory !== undefined) {
       const square = turnHistory.targetSquare.square;
@@ -50,7 +50,7 @@ export const offlineGameEmitter = (
     canvasView.gameScene.detachControl();
   });
 
-  emitter.on("reset-board", () => {
+  emitter.on("board-reset", () => {
     offlineMatch.resetMatch();
     canvasView.updateMeshesRender(offlineMatch.game);
   });

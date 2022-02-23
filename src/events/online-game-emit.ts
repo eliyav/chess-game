@@ -12,20 +12,20 @@ export const onlineGameEmitter = (
 
   emitter.on(
     "resolveMove",
-    (originPoint: Point, targetPoint: Point, resolved: TurnHistory) => {
-      canvasView.turnAnimation(originPoint, targetPoint, resolved);
-      if (resolved.promotion === undefined) {
+    (originPoint: Point, targetPoint: Point, history: TurnHistory) => {
+      canvasView.turnAnimation(originPoint, targetPoint, history);
+      if (history.promotion === undefined) {
         const isMatchOver = onlineMatch.game.switchTurn();
         canvasView.rotateCamera(onlineMatch.game);
         isMatchOver ? canvasView.gameScene.detachControl() : null;
       } else {
         //Handle Promotion Event
-        emitter.emit("piece-promotion");
+        emitter.emit("promotion-selections");
       }
     }
   );
 
-  emitter.on("promotion-selection", (selection: string) => {
+  emitter.on("selected-promotion-piece", (selection: string) => {
     const turnHistory = onlineMatch.game.turnHistory.at(-1);
     if (turnHistory !== undefined) {
       const square = turnHistory.targetSquare.square;
@@ -46,11 +46,7 @@ export const onlineGameEmitter = (
     }
   });
 
-  emitter.on("detach-game-control", () => {
-    canvasView.gameScene.detachControl();
-  });
-
-  emitter.on("reset-board", () => {
+  emitter.on("board-reset", () => {
     onlineMatch.resetMatch();
     canvasView.updateMeshesRender(onlineMatch.game);
   });

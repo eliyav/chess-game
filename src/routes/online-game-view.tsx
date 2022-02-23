@@ -12,6 +12,9 @@ import GameOverlay from "../component/game-overlay/game-overlay";
 import LoadingScreen from "../component/loading-screen";
 import initCanvasInput from "../view/canvas-input";
 import EventEmitter from "../events/event-emitter";
+import { RequestModal } from "../component/modals/request-modal";
+import { MessageModal } from "../component/modals/message-modal";
+import PromotionModal from "../component/modals/promotion-modal";
 
 interface OnlineProps {
   location: Location;
@@ -30,6 +33,16 @@ export const OnlineGameView: React.FC<OnlineProps> = ({
   const onlineMatch = useRef<OnlineMatch>();
   const onlineEmitter = useRef<EventEmitter>();
   const lobbySettings = useRef<LobbySettings>();
+  const [request, setRequest] = useState<{
+    question: string;
+    onConfirm: () => void;
+    onReject: () => void;
+  } | null>(null);
+  const [message, setMessage] = useState<{
+    text: string;
+    onConfirm: () => void;
+  } | null>(null);
+  const [promotion, setPromotion] = useState(false);
 
   async function initGame(team: string) {
     let engine = new BABYLON.Engine(canvasRef.current!, true);
@@ -40,23 +53,44 @@ export const OnlineGameView: React.FC<OnlineProps> = ({
       canvasView.current!
     );
     canvasView.current.prepareGame(onlineMatch.current.game);
-    initCanvasInput(onlineMatch.current.game, canvasView.current, resolve, true, onlineMatch.current.team);
+    initCanvasInput(
+      onlineMatch.current.game,
+      canvasView.current,
+      resolve,
+      true,
+      onlineMatch.current.team
+    );
 
     canvasRef.current?.classList.add("gameCanvas");
     canvasRef.current?.classList.remove("notDisplayed");
     setGameLoaded(true);
     engine.resize();
+
+    onlineEmitter.current.on("promotion-selections", () => {
+      setTimeout(() => setPromotion(true), 1000);
+    });
+
+    onlineEmitter.current.on("end-match", (winningTeam: string) => {
+      setMessage({
+        text: `Game is over, ${winningTeam} player wins!, Would you like to start another game?`,
+        onConfirm: () => {
+          setMessage(null);
+        },
+      });
+    });
   }
 
   function resolve(
     type: string,
     originPoint: Point,
     targetPoint: Point,
-    resolved: TurnHistory
+    history: TurnHistory
   ) {
     const lobbyKey = lobbySettings.current?.lobbyKey;
-    onlineEmitter.current!.emit(type, originPoint, targetPoint, resolved);
+    onlineEmitter.current!.emit(type, originPoint, targetPoint, history);
     socket.emit("resolvedTurn", { originPoint, targetPoint, lobbyKey });
+    //Emit second event if history.promotion !== undefined
+    //Make opponent wait on your next even choice
   }
 
   useEffect(() => {
@@ -65,7 +99,7 @@ export const OnlineGameView: React.FC<OnlineProps> = ({
       lobbySettings.current = settings;
     });
     socket.on(
-      "opponentsTurn",
+      "resolvedMove",
       ({
         originPoint,
         targetPoint,
@@ -83,6 +117,63 @@ export const OnlineGameView: React.FC<OnlineProps> = ({
         onlineMatch.current!.game.switchTurn();
       }
     );
+
+    socket.on("board-reset-request", (room: string) => {
+      setRequest({
+        question: "Opponent has requested to reset the board, do you agree?",
+        onConfirm: () => {
+          socket.emit("board-reset-response", true, room);
+          setRequest(null);
+        },
+        onReject: () => {
+          socket.emit("board-reset-response", false, room);
+          setRequest(null);
+        },
+      });
+    }),
+      socket.on("board-reset-resolve", (response: boolean) => {
+        if (response) {
+          onlineEmitter.current!.emit("board-reset");
+          setMessage({
+            text: "Board reset request has been accepted",
+            onConfirm: () => setMessage(null),
+          });
+        } else {
+          setMessage({
+            text: "Board reset request has been denied",
+            onConfirm: () => setMessage(null),
+          });
+        }
+      });
+
+    socket.on("undo-move-request", (room: string) => {
+      setRequest({
+        question:
+          "Opponent has requested to undo their last move, do you agree?",
+        onConfirm: () => {
+          socket.emit("undo-move-response", true, room);
+          setRequest(null);
+        },
+        onReject: () => {
+          socket.emit("undo-move-response", false, room);
+          setRequest(null);
+        },
+      });
+    }),
+      socket.on("undo-move-resolve", (response: boolean) => {
+        if (response) {
+          onlineEmitter.current!.emit("undo-move");
+          setMessage({
+            text: "Undo move request has been accepted",
+            onConfirm: () => setMessage(null),
+          });
+        } else {
+          setMessage({
+            text: "Undo move request has been denied",
+            onConfirm: () => setMessage(null),
+          });
+        }
+      });
 
     return () => {
       socket.disconnect();
@@ -108,11 +199,13 @@ export const OnlineGameView: React.FC<OnlineProps> = ({
             },
             {
               text: "restart",
-              onClick: () => onlineEmitter.current!.emit("reset-board"),
+              onClick: () =>
+                socket.emit("board-reset", lobbySettings.current?.lobbyKey),
             },
             {
               text: "undo",
-              onClick: () => onlineEmitter.current!.emit("undo-move"),
+              onClick: () =>
+                socket.emit("undo-move", lobbySettings.current?.lobbyKey),
             },
             {
               text: "camera",
@@ -127,6 +220,32 @@ export const OnlineGameView: React.FC<OnlineProps> = ({
         </div>
       )}
       <canvas ref={canvasRef} id="notDisplayed" touch-action="none"></canvas>
+      {request ? (
+        <RequestModal
+          question={request.question}
+          onConfirm={request.onConfirm}
+          onReject={request.onReject}
+        />
+      ) : null}
+      {message ? (
+        <MessageModal text={message.text} onConfirm={message.onConfirm} />
+      ) : null}
+      {promotion ? (
+        <PromotionModal
+          submitSelection={(e) => console.log(e.target.innerText)}
+        />
+      ) : null}
+      {promotion ? (
+        <PromotionModal
+          submitSelection={(e) => {
+            onlineEmitter.current!.emit(
+              "selected-promotion-piece",
+              e.target.innerText
+            );
+            setPromotion(false);
+          }}
+        />
+      ) : null}
     </>
   );
 };

@@ -435,3 +435,113 @@ button.highlight {
 .lobby .settings > p {
   margin: 1em;
 }
+
+/* Message Request -------------------  */
+.message-wrapper {
+  height: 100%;
+  width: 100%;
+  max-width: 100ch;
+  position: absolute;
+  top: 0;
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5em;
+  margin: auto;
+  z-index: 3;
+}
+
+.message-wrapper .message {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-evenly;
+  align-items: center;
+  background: linear-gradient(rgba(30, 143, 255, 0.7), rgba(0, 0, 0, 1));
+  text-align: center;
+  border: 0.25rem inset whitesmoke;
+  color: black;
+}
+
+.message .text {
+  width: 100%;
+  background-color: rgba(245, 245, 245, 0.685);
+  margin: 1rem;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  font-size: 1.5rem;
+  padding: 0.2rem;
+  border-radius: 0.5rem;
+  font-weight: bold;
+}
+
+.message button {
+  color: black;
+  font-size: 1.75rem;
+  padding: 0.1rem 1rem;
+  border-radius: 1rem;
+  margin: 1rem;
+  border: 0.25rem solid black;
+}
+
+.message button:hover {
+  transform: scale(0.9);
+  background-color: rgb(238, 224, 153);
+}
+
+.message .confirm {
+  background-color: rgba(0, 255, 0, 0.7);
+}
+
+.message .reject {
+  background-color: rgba(255, 0, 0, 0.7);
+}
+
+/*  Promotion Modal -------------------  */
+.promotion-wrapper {
+  height: 100%;
+  width: 100%;
+  max-width: 100ch;
+  top: 0;
+  position: absolute;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  z-index: 3;
+}
+
+.promotion-wrapper .selection {
+  width: 50%;
+}
+
+.red {
+  background-color: red;
+  background-image: url(../assets/promotion-choices/rook-choice.png);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.blue {
+  background-color: blue;
+  background-image: url(../assets/promotion-choices/bishop-choice.png);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.green {
+  background-color: green;
+  background-image: url(../assets/promotion-choices/knight-choice.png);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.yellow {
+  background-color: yellow;
+  background-image: url(../assets/promotion-choices/queen-choice.png);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+/*  -------------------  */
