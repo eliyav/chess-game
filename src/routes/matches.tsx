@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Location, Outlet } from "react-router-dom";
-import { MatchButton } from "../buttons/match-button";
-import { MenuButton } from "../buttons/menu-button";
+import { MatchButton } from "../component/buttons/match-button";
+import { MenuButton } from "../component/buttons/menu-button";
 
 interface MatchesProps {
   openNavbar: React.Dispatch<React.SetStateAction<boolean>>;

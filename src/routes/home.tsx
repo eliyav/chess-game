@@ -1,9 +1,9 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { displayScreen } from "../../../src/view/display-screen";
-import { MenuButton } from "../buttons/menu-button";
-import LoadingScreen from "../loading-screen";
+import { displayScreen } from "../view/display-screen";
+import { MenuButton } from "../component/buttons/menu-button";
+import LoadingScreen from "../component/loading-screen";
 
 interface HomeScreenProps {
   openNavbar: React.Dispatch<React.SetStateAction<boolean>>;

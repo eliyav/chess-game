@@ -12,20 +12,29 @@ const initCanvasInput = (
     origin: Point,
     target: Point,
     resolved: TurnHistory
-  ) => void
+  ) => void,
+    online: boolean,
+    team?: string,
 ) => {
   view!.gameScene.onPointerDown = async (e: any, pickResult: any) => {
-    if (pickResult.pickedMesh !== null) {
-      const mesh: ChessPieceMesh = pickResult.pickedMesh;
-      const isCompleteMove = gameInput(mesh, view!, game);
-      if (isCompleteMove) {
-        const [originPoint, targetPoint] = game.moves;
-        view.updateMeshesRender(game);
-        const resolved = game.playerMove(originPoint, targetPoint);
-        if (typeof resolved !== "boolean" && resolved.result) {
-          resolve("resolveMove", originPoint, targetPoint, resolved);
+      if (online) {
+        team === game.state.currentPlayer ? resolveInput() : null
+      } else {
+        resolveInput();
+      }
+    function resolveInput(){
+      if (pickResult.pickedMesh !== null) {
+        const mesh: ChessPieceMesh = pickResult.pickedMesh;
+        const isCompleteMove = gameInput(mesh, view!, game);
+        if (isCompleteMove) {
+          const [originPoint, targetPoint] = game.moves;
+          view.updateMeshesRender(game);
+          const resolved = game.playerMove(originPoint, targetPoint);
+          if (typeof resolved !== "boolean" && resolved.result) {
+            resolve("resolveMove", originPoint, targetPoint, resolved);
+          }
+          game.resetMoves();
         }
-        game.resetMoves();
       }
     }
   };

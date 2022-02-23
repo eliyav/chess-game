@@ -133,6 +133,20 @@ a {
   height: 450px;
 }
 
+.input-wrapper {
+  margin: 0.5em auto;
+  text-align: center;
+}
+.lobby-input {
+  display: block;
+  border-radius: 6px;
+  font-size: 1.5em;
+  padding: 0.2em;
+  max-width: 100%;
+  text-align: center;
+  margin: 0.5em auto;
+}
+
 @keyframes loadingAnimation {
   from {
     opacity: 0.6;

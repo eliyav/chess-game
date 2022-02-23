@@ -20,25 +20,27 @@ export const JoinLobby: React.FC<JoinLobbyProps> = ({
   const [lobbySettings, setLobbySettings] = useState<LobbySettings>();
 
   useEffect(() => {
+    socket.on("room-info", (lobbyInfo: LobbySettings) => {
+      setLobbySettings(lobbyInfo);
+      setKeyVerified(true);
+    });
+    socket.on("start-match", (lobbyKey: string, firstMove: string) => {
+      navigate(`/online-game?room=${lobbyKey}&move=${firstMove === "Game Host" ? 2 : 1}`);
+    });
+
+    return () => {
+      socket.off("room-info");
+    };
+  }, [])
+
+  useEffect(() => {
     if (lobbyKey) {
       setSocket(socket);
       socket.emit("join-lobby", {
         lobbyKey,
         name: userName ? userName : "Guest",
       });
-      socket.on("room-info", (lobbyInfo: LobbySettings) => {
-        setLobbySettings(lobbyInfo);
-        setKeyVerified(true);
-      });
-      socket.on("start-match", () => {
-        navigate("/online-game");
-      });
-    }
-
-    return () => {
-      socket.off("room.info");
-    };
-  }, [lobbyKey]);
+    }}, [lobbyKey]);
 
   return (
     <div className="lobby">
@@ -47,12 +49,15 @@ export const JoinLobby: React.FC<JoinLobbyProps> = ({
       <div className="settings">
         {!lobbyKey || !keyVerified ? (
           <>
+          <div className="input-wrapper">
             <label>Online lobby key:</label>
             <input
+              className="lobby-input"
               ref={keyInputRef}
               type="text"
               placeholder="Enter here"
             ></input>
+          </div>
             <button onClick={() => setLobbyKey(keyInputRef.current?.value)}>
               Enter Lobby
             </button>
@@ -76,10 +81,10 @@ export const JoinLobby: React.FC<JoinLobbyProps> = ({
             <div className="mini-divider"></div>
             <p className="label">Time on clock</p>
             <p className="player">{lobbySettings?.time}</p>
+            <p>Waiting for game host to start game.</p>
           </>
         )}
       </div>
-      <p>Waiting for game host to start game.</p>
     </div>
   );
 };

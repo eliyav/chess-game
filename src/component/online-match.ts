@@ -3,9 +3,11 @@ import Game from "./game-logic/game";
 
 class OnlineMatch {
   game: Game;
+  team: string;
 
-  constructor() {
+  constructor(team: string) {
     this.game = new Game(chessData, this.endMatch.bind(this));
+    this.team = team === "1" ? "White" : "Black";
   }
 
   resetMatch() {

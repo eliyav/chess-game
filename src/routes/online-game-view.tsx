@@ -2,16 +2,16 @@ import React, { useEffect, useRef, useState } from "react";
 import { Location } from "react-router-dom";
 import "babylonjs-loaders";
 import * as BABYLON from "babylonjs";
-import * as icons from "../game-overlay/overlay-icons";
-import { createView, CanvasView } from "../../view/create-view";
+import * as icons from "../component/game-overlay/overlay-icons";
+import { createView, CanvasView } from "../view/create-view";
 import { LobbySettings } from "./online-lobby";
-import { onlineGameEmitter } from "../../../src/events/online-game-emit";
-import { TurnHistory } from "../../../src/helper/game-helpers";
-import OnlineMatch from "../online-match";
-import GameOverlay from "../game-overlay/game-overlay";
-import LoadingScreen from "../loading-screen";
-import initCanvasInput from "../../../src/view/canvas-input";
-import EventEmitter from "../../../src/events/event-emitter";
+import { onlineGameEmitter } from "../events/online-game-emit";
+import { TurnHistory } from "../helper/game-helpers";
+import OnlineMatch from "../component/online-match";
+import GameOverlay from "../component/game-overlay/game-overlay";
+import LoadingScreen from "../component/loading-screen";
+import initCanvasInput from "../view/canvas-input";
+import EventEmitter from "../events/event-emitter";
 
 interface OnlineProps {
   location: Location;
@@ -31,16 +31,16 @@ export const OnlineGameView: React.FC<OnlineProps> = ({
   const onlineEmitter = useRef<EventEmitter>();
   const lobbySettings = useRef<LobbySettings>();
 
-  async function initGame() {
+  async function initGame(team: string) {
     let engine = new BABYLON.Engine(canvasRef.current!, true);
     canvasView.current = await createView(canvasRef.current!, engine);
-    onlineMatch.current = new OnlineMatch();
+    onlineMatch.current = new OnlineMatch(team);
     onlineEmitter.current = onlineGameEmitter(
       onlineMatch.current!,
       canvasView.current!
     );
     canvasView.current.prepareGame(onlineMatch.current.game);
-    initCanvasInput(onlineMatch.current.game, canvasView.current, resolve);
+    initCanvasInput(onlineMatch.current.game, canvasView.current, resolve, true, onlineMatch.current.team);
 
     canvasRef.current?.classList.add("gameCanvas");
     canvasRef.current?.classList.remove("notDisplayed");
@@ -92,11 +92,9 @@ export const OnlineGameView: React.FC<OnlineProps> = ({
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const lobbyKey = params.get("room");
+    const team = params.get("move") as string;
     socket.emit("get-room-info", lobbyKey);
-  }, []);
-
-  useEffect(() => {
-    initGame();
+    initGame(team);
   }, []);
 
   return (

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { IconsIndex } from "../routes/offline-game-view";
+import { IconsIndex } from "../../routes/offline-game-view";
 import OverlaySelection from "./game-overlay-selection";
 
 interface OverlayProps {

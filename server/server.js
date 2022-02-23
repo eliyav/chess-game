@@ -7,7 +7,7 @@ const jwks = require("jwks-rsa");
 const app = express();
 const port = process.env.PORT || 8080;
 //MongoDB
-const mongo = new Mongo();
+// const mongo = new Mongo();
 //#region Middleware
 const verifyJwt = jwt({
   secret: jwks.expressJwtSecret({
@@ -115,11 +115,11 @@ io.on("connection", (socket) => {
     socket.to(lobbyKey).emit("opponentsTurn", { originPoint, targetPoint });
   });
 
-  socket.on("start-match", (lobbyKey) => {
+  socket.on("start-match", (lobbyKey, firstMove) => {
     const clients = io.sockets.adapter.rooms.get(lobbyKey);
     const serializedSet = [...clients.keys()];
     if (serializedSet.length === 2) {
-      socket.to(lobbyKey).emit("start-match");
+      socket.to(lobbyKey).emit("start-match", lobbyKey, firstMove );
       socket.emit("message", "Emitted Message");
     }
   });

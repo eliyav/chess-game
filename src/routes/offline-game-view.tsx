@@ -2,15 +2,15 @@ import React, { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import "babylonjs-loaders";
 import * as BABYLON from "babylonjs";
-import * as icons from "../game-overlay/overlay-icons";
-import { createView, CanvasView } from "../../view/create-view";
-import GameOverlay from "../game-overlay/game-overlay";
-import LoadingScreen from "../loading-screen";
-import OfflineMatch from "../offline-match";
-import initCanvasInput from "../../../src/view/canvas-input";
-import { TurnHistory } from "../../../src/helper/game-helpers";
-import EventEmitter from "../../../src/events/event-emitter";
-import { offlineGameEmitter } from "../../../src/events/offline-game-emit";
+import * as icons from "../component/game-overlay/overlay-icons";
+import { createView, CanvasView } from "../view/create-view";
+import GameOverlay from "../component/game-overlay/game-overlay";
+import LoadingScreen from "../component/loading-screen";
+import OfflineMatch from "../component/offline-match";
+import initCanvasInput from "../view/canvas-input";
+import { TurnHistory } from "../helper/game-helpers";
+import EventEmitter from "../events/event-emitter";
+import { offlineGameEmitter } from "../events/offline-game-emit";
 
 interface OfflineProps {
   openNavbar: React.Dispatch<React.SetStateAction<boolean>>;
@@ -36,7 +36,7 @@ export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
       canvasView.current!
     );
     canvasView.current.prepareGame(offlineMatch.current.game);
-    initCanvasInput(offlineMatch.current.game, canvasView.current, resolve);
+    initCanvasInput(offlineMatch.current.game, canvasView.current, resolve, false);
 
     canvasRef.current?.classList.add("gameCanvas");
     canvasRef.current?.classList.remove("notDisplayed");

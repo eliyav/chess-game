@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { io } from "socket.io-client";
-import Time from "../match-settings/time";
+import Time from "../component/match-settings/time";
 
 interface OnlineLobbyProps {
   setSocket: React.Dispatch<any>;
@@ -94,10 +94,10 @@ export const OnlineLobby: React.FC<OnlineLobbyProps> = ({
         <Time setTime={setLobbySettings} />
       </div>
 
-      <Link to={`/online-game?room=${lobbySettings.lobbyKey}`}>
+      <Link to={`/online-game?room=${lobbySettings.lobbyKey}&move=${lobbySettings.firstMove === "Game Host"? 1 : 2}`}>
         <button
           onClick={() => {
-            socket.emit("start-match", lobbySettings.lobbyKey);
+            socket.emit("start-match", lobbySettings.lobbyKey, lobbySettings.firstMove);
           }}
         >
           Start Match!

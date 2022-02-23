@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import Time from "../match-settings/time";
+import Time from "../component/match-settings/time";
 import { LobbySettings } from "./online-lobby";
 
 export const OfflineLobby: React.FC = ({}) => {
