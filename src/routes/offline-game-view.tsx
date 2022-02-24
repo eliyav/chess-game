@@ -4,7 +4,7 @@ import "babylonjs-loaders";
 import * as BABYLON from "babylonjs";
 import * as icons from "../component/game-overlay/overlay-icons";
 import { createView, CanvasView } from "../view/create-view";
-import GameOverlay from "../component/game-overlay/game-overlay";
+import { MenuOverlay } from "../component/game-overlay/menu-overlay";
 import LoadingScreen from "../component/loading-screen";
 import OfflineMatch from "../component/offline-match";
 import initCanvasInput from "../view/canvas-input";
@@ -13,12 +13,14 @@ import EventEmitter from "../events/event-emitter";
 import { offlineGameEmitter } from "../events/offline-game-emit";
 import PromotionModal from "../component/modals/promotion-modal";
 import { RequestModal } from "../component/modals/request-modal";
+import { Timer } from "../timer/timer";
+import { TimerOverlay } from "../timer/timer-overlay";
 
 interface OfflineProps {
   openNavbar: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
+export const OfflineGameView: React.VFC<OfflineProps> = ({ openNavbar }) => {
   const [gameLoaded, setGameLoaded] = useState(false);
   const [promotion, setPromotion] = useState(false);
   const [request, setRequest] = useState<{
@@ -46,6 +48,7 @@ export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
     canvasView.current.prepareGame(offlineMatch.current.game);
     initCanvasInput(
       offlineMatch.current.game,
+      offlineMatch.current.timer,
       canvasView.current,
       resolve,
       false
@@ -55,6 +58,7 @@ export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
     canvasRef.current?.classList.remove("notDisplayed");
     setGameLoaded(true);
     engine.resize();
+    offlineMatch.current.startMatch();
 
     offlineEmitter.current.on("promotion-selections", () => {
       setTimeout(() => setPromotion(true), 1000);
@@ -90,8 +94,13 @@ export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
 
   return (
     <>
+      <canvas
+        ref={canvasRef}
+        className="notDisplayed"
+        touch-action="none"
+      ></canvas>
       {gameLoaded ? (
-        <GameOverlay
+        <MenuOverlay
           items={[
             {
               text: "menu",
@@ -109,6 +118,10 @@ export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
               text: "camera",
               onClick: () => offlineEmitter.current!.emit("reset-camera"),
             },
+            {
+              text: "pause",
+              onClick: () => offlineMatch.current?.timer.toggleTimer(),
+            },
           ]}
           icons={icons}
         />
@@ -117,11 +130,7 @@ export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
           <LoadingScreen text="..." />
         </div>
       )}
-      <canvas
-        ref={canvasRef}
-        className="notDisplayed"
-        touch-action="none"
-      ></canvas>
+      {gameLoaded && <TimerOverlay timer={offlineMatch.current?.timer!} />}
       {request ? (
         <RequestModal
           question={request.question}

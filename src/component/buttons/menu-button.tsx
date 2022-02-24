@@ -5,7 +5,7 @@ interface Props {
   open: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const MenuButton: React.FC<Props> = ({ open }) => {
+export const MenuButton: React.VFC<Props> = ({ open }) => {
   return (
     <img
       className="menu-button"

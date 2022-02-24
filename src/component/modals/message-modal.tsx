@@ -5,7 +5,7 @@ interface MessageProps {
   onConfirm: (() => void) | undefined;
 }
 
-export const MessageModal: React.FC<MessageProps> = (props) => {
+export const MessageModal: React.VFC<MessageProps> = (props) => {
   return (
     <div className="message-wrapper">
       <div className="message">

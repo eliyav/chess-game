@@ -16,7 +16,7 @@ export interface LobbySettings {
   firstMove: string;
 }
 
-export const OnlineLobby: React.FC<OnlineLobbyProps> = ({
+export const OnlineLobby: React.VFC<OnlineLobbyProps> = ({
   setSocket,
   userName,
 }) => {
@@ -94,10 +94,18 @@ export const OnlineLobby: React.FC<OnlineLobbyProps> = ({
         <Time setTime={setLobbySettings} />
       </div>
 
-      <Link to={`/online-game?room=${lobbySettings.lobbyKey}&move=${lobbySettings.firstMove === "Game Host"? 1 : 2}`}>
+      <Link
+        to={`/online-game?room=${lobbySettings.lobbyKey}&move=${
+          lobbySettings.firstMove === "Game Host" ? 1 : 2
+        }`}
+      >
         <button
           onClick={() => {
-            socket.emit("start-match", lobbySettings.lobbyKey, lobbySettings.firstMove);
+            socket.emit(
+              "start-match",
+              lobbySettings.lobbyKey,
+              lobbySettings.firstMove
+            );
           }}
         >
           Start Match!

@@ -1,13 +1,16 @@
+import { Timer } from "../timer/timer";
 import chessData from "./game-logic/chess-data-import";
 import Game from "./game-logic/game";
 
 class OnlineMatch {
   game: Game;
   team: string;
+  timer: Timer;
 
-  constructor(team: string) {
+  constructor(team: string, time: number) {
     this.game = new Game(chessData, this.endMatch.bind(this));
     this.team = team === "1" ? "White" : "Black";
+    this.timer = new Timer(time, this.game.state, this.endMatch);
   }
 
   resetMatch() {
@@ -15,10 +18,6 @@ class OnlineMatch {
   }
 
   endMatch() {
-    const winningTeam =
-      this.game.state.currentPlayer === this.game.teams[0]
-        ? this.game.teams[1]
-        : this.game.teams[0];
     return true;
   }
 }

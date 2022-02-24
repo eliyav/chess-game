@@ -8,7 +8,7 @@ interface MatchBtnProps {
   onSelect: () => void;
 }
 
-export const MatchButton: React.FC<MatchBtnProps> = ({
+export const MatchButton: React.VFC<MatchBtnProps> = ({
   name,
   path,
   description,

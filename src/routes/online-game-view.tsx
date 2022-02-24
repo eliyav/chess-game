@@ -7,13 +7,13 @@ import { createView, CanvasView } from "../view/create-view";
 import { LobbySettings } from "./online-lobby";
 import { onlineGameEmitter } from "../events/online-game-emit";
 import { TurnHistory } from "../helper/game-helpers";
-import OnlineMatch from "../component/online-match";
-import GameOverlay from "../component/game-overlay/game-overlay";
-import LoadingScreen from "../component/loading-screen";
-import initCanvasInput from "../view/canvas-input";
-import EventEmitter from "../events/event-emitter";
 import { RequestModal } from "../component/modals/request-modal";
 import { MessageModal } from "../component/modals/message-modal";
+import { MenuOverlay } from "../component/game-overlay/menu-overlay";
+import OnlineMatch from "../component/online-match";
+import initCanvasInput from "../view/canvas-input";
+import EventEmitter from "../events/event-emitter";
+import LoadingScreen from "../component/loading-screen";
 import PromotionModal from "../component/modals/promotion-modal";
 
 interface OnlineProps {
@@ -22,7 +22,7 @@ interface OnlineProps {
   socket: any;
 }
 
-export const OnlineGameView: React.FC<OnlineProps> = ({
+export const OnlineGameView: React.VFC<OnlineProps> = ({
   openNavbar,
   socket,
   location,
@@ -47,7 +47,8 @@ export const OnlineGameView: React.FC<OnlineProps> = ({
   async function initGame(team: string) {
     let engine = new BABYLON.Engine(canvasRef.current!, true);
     canvasView.current = await createView(canvasRef.current!, engine);
-    onlineMatch.current = new OnlineMatch(team);
+    onlineMatch.current = new OnlineMatch(team, 0);
+    //Update the time above from lobby
     onlineEmitter.current = onlineGameEmitter(
       onlineMatch.current!,
       canvasView.current!
@@ -55,6 +56,7 @@ export const OnlineGameView: React.FC<OnlineProps> = ({
     canvasView.current.prepareGame(onlineMatch.current.game);
     initCanvasInput(
       onlineMatch.current.game,
+      onlineMatch.current.timer,
       canvasView.current,
       resolve,
       true,
@@ -249,7 +251,7 @@ export const OnlineGameView: React.FC<OnlineProps> = ({
   return (
     <>
       {gameLoaded ? (
-        <GameOverlay
+        <MenuOverlay
           items={[
             {
               text: "menu",

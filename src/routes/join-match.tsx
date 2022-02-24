@@ -8,7 +8,7 @@ interface JoinLobbyProps {
   userName: string | undefined;
 }
 
-export const JoinLobby: React.FC<JoinLobbyProps> = ({
+export const JoinLobby: React.VFC<JoinLobbyProps> = ({
   setSocket,
   userName,
 }) => {
@@ -25,13 +25,17 @@ export const JoinLobby: React.FC<JoinLobbyProps> = ({
       setKeyVerified(true);
     });
     socket.on("start-match", (lobbyKey: string, firstMove: string) => {
-      navigate(`/online-game?room=${lobbyKey}&move=${firstMove === "Game Host" ? 2 : 1}`);
+      navigate(
+        `/online-game?room=${lobbyKey}&move=${
+          firstMove === "Game Host" ? 2 : 1
+        }`
+      );
     });
 
     return () => {
       socket.off("room-info");
     };
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (lobbyKey) {
@@ -40,7 +44,8 @@ export const JoinLobby: React.FC<JoinLobbyProps> = ({
         lobbyKey,
         name: userName ? userName : "Guest",
       });
-    }}, [lobbyKey]);
+    }
+  }, [lobbyKey]);
 
   return (
     <div className="lobby">
@@ -49,15 +54,15 @@ export const JoinLobby: React.FC<JoinLobbyProps> = ({
       <div className="settings">
         {!lobbyKey || !keyVerified ? (
           <>
-          <div className="input-wrapper">
-            <label>Online lobby key:</label>
-            <input
-              className="lobby-input"
-              ref={keyInputRef}
-              type="text"
-              placeholder="Enter here"
-            ></input>
-          </div>
+            <div className="input-wrapper">
+              <label>Online lobby key:</label>
+              <input
+                className="lobby-input"
+                ref={keyInputRef}
+                type="text"
+                placeholder="Enter here"
+              ></input>
+            </div>
             <button onClick={() => setLobbyKey(keyInputRef.current?.value)}>
               Enter Lobby
             </button>
