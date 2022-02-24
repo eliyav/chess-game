@@ -14,7 +14,7 @@ export class Timer {
     endMatch: () => void
   ) {
     this.state = gameState;
-    this.gameTime = time;
+    this.gameTime = time * 60;
     this.timer1 = { time: this.gameTime / 2 };
     this.timer2 = { time: this.gameTime / 2 };
     this.paused = false;
@@ -45,8 +45,9 @@ export class Timer {
   };
 
   endOfMatch() {
-    console.log("Game has ended");
-    this.endMatch();
+    setTimeout(() => {
+      this.endMatch();
+    }, 500);
   }
 
   resetTimers = () => {

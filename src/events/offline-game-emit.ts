@@ -16,16 +16,7 @@ export const offlineGameEmitter = (
       canvasView.turnAnimation(originPoint, targetPoint, history);
       if (history.promotion === undefined) {
         const isMatchOver = offlineMatch.game.switchTurn();
-        if (isMatchOver) {
-          canvasView.gameScene.detachControl();
-          const winningTeam =
-            offlineMatch.game.state.currentPlayer === offlineMatch.game.teams[0]
-              ? offlineMatch.game.teams[1]
-              : offlineMatch.game.teams[0];
-          emitter.emit("end-match", winningTeam);
-        } else {
-          canvasView.rotateCamera(offlineMatch.game);
-        }
+        if (!isMatchOver) canvasView.rotateCamera(offlineMatch.game);
       } else {
         //Handle Promotion Event
         emitter.emit("promotion-selections");

@@ -40,7 +40,7 @@ export const OfflineGameView: React.VFC<OfflineProps> = ({ openNavbar }) => {
   async function initGame() {
     let engine = new BABYLON.Engine(canvasRef.current!, true);
     canvasView.current = await createView(canvasRef.current!, engine);
-    offlineMatch.current = new OfflineMatch({ mode, time });
+    offlineMatch.current = new OfflineMatch({ mode, time }, endMatch);
     offlineEmitter.current = offlineGameEmitter(
       offlineMatch.current!,
       canvasView.current!
@@ -65,6 +65,7 @@ export const OfflineGameView: React.VFC<OfflineProps> = ({ openNavbar }) => {
     });
 
     offlineEmitter.current.on("end-match", (winningTeam: string) => {
+      canvasView.current?.gameScene.detachControl();
       setRequest({
         question: `${winningTeam} team has won!, Would you like to play another game?`,
         onConfirm: () => {
@@ -86,6 +87,15 @@ export const OfflineGameView: React.VFC<OfflineProps> = ({ openNavbar }) => {
     resolved: TurnHistory
   ) {
     offlineEmitter.current!.emit(type, originPoint, targetPoint, resolved);
+  }
+
+  function endMatch() {
+    const winningTeam =
+      offlineMatch.current?.game.state.currentPlayer ===
+      offlineMatch.current?.game.teams[0]
+        ? offlineMatch.current?.game.teams[1]
+        : offlineMatch.current?.game.teams[0];
+    offlineEmitter.current?.emit("end-match", winningTeam);
   }
 
   useEffect(() => {
