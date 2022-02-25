@@ -45,18 +45,16 @@ export const offlineGameEmitter = (
     }
   });
 
-  emitter.on("detach-game-control", () => {
-    canvasView.gameScene.detachControl();
-  });
-
   emitter.on("board-reset", () => {
     offlineMatch.resetMatch();
-    canvasView.updateMeshesRender(offlineMatch.game);
+    canvasView.prepareGame(offlineMatch.game);
   });
 
   emitter.on("undo-move", () => {
-    offlineMatch.game.undoTurn();
-    canvasView.updateGameView(offlineMatch.game);
+    if (offlineMatch.game.gameStarted) {
+      offlineMatch.game.undoTurn();
+      canvasView.updateGameView(offlineMatch.game);
+    }
   });
 
   emitter.on("reset-camera", () => {

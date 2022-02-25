@@ -156,6 +156,20 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("pause-game", (lobbyKey) => {
+    socket.to(lobbyKey).emit("pause-game-request", lobbyKey);
+  });
+
+  socket.on("pause-game-response", (response, lobbyKey) => {
+    if (response) {
+      socket.to(lobbyKey).emit("pause-game-resolve", true);
+      socket.emit("pause-game-resolve", true);
+    } else {
+      socket.to(lobbyKey).emit("pause-game-resolve", false);
+      socket.emit("pause-game-resolve", false);
+    }
+  });
+
   function generateKey() {
     let chars = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
     let key = [];

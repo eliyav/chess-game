@@ -13,7 +13,6 @@ import EventEmitter from "../events/event-emitter";
 import { offlineGameEmitter } from "../events/offline-game-emit";
 import PromotionModal from "../component/modals/promotion-modal";
 import { RequestModal } from "../component/modals/request-modal";
-import { Timer } from "../timer/timer";
 import { TimerOverlay } from "../timer/timer-overlay";
 
 interface OfflineProps {
@@ -34,13 +33,12 @@ export const OfflineGameView: React.VFC<OfflineProps> = ({ openNavbar }) => {
   const offlineEmitter = useRef<EventEmitter>();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const mode = params.get("mode")!;
   const time = parseInt(params.get("time")!);
 
   async function initGame() {
     let engine = new BABYLON.Engine(canvasRef.current!, true);
     canvasView.current = await createView(canvasRef.current!, engine);
-    offlineMatch.current = new OfflineMatch({ mode, time }, endMatch);
+    offlineMatch.current = new OfflineMatch(time, endMatch);
     offlineEmitter.current = offlineGameEmitter(
       offlineMatch.current!,
       canvasView.current!

@@ -24,13 +24,12 @@ const displayPieceMoves = (
 const displayMovementSquares = (move: Move, gameScene: CustomGameScene) => {
   const [point, type] = move;
   const plane: any = BABYLON.MeshBuilder.CreatePlane(`plane`, {
-    width: 2.8,
-    height: 2.8,
+    width: 2.5,
+    height: 2.5,
   });
   [plane.position.z, plane.position.x] = findPosition(point, false);
-  plane.position.y += 0.51;
+  plane.position.y += 0.52;
   plane.rotation = new BABYLON.Vector3(Math.PI / 2, 0, 0);
-
   plane.material = findMaterial(type, gameScene);
   gameScene.meshesToRender!.push(plane);
 };

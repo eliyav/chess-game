@@ -15,15 +15,7 @@ export const onlineGameEmitter = (
     (originPoint: Point, targetPoint: Point, history: TurnHistory) => {
       canvasView.turnAnimation(originPoint, targetPoint, history);
       if (history.promotion === undefined) {
-        const isMatchOver = onlineMatch.game.switchTurn();
-        if (isMatchOver) {
-          canvasView.gameScene.detachControl();
-          const winningTeam =
-            onlineMatch.game.state.currentPlayer === onlineMatch.game.teams[0]
-              ? onlineMatch.game.teams[1]
-              : onlineMatch.game.teams[0];
-          emitter.emit("end-match", winningTeam);
-        }
+        onlineMatch.game.switchTurn();
       } else {
         //Handle Promotion Event
         emitter.emit("promotion-selections");
@@ -54,12 +46,14 @@ export const onlineGameEmitter = (
 
   emitter.on("board-reset", () => {
     onlineMatch.resetMatch();
-    canvasView.updateMeshesRender(onlineMatch.game);
+    canvasView.prepareGame(onlineMatch.game);
   });
 
   emitter.on("undo-move", () => {
-    onlineMatch.game.undoTurn();
-    canvasView.updateGameView(onlineMatch.game);
+    if (onlineMatch.game.gameStarted) {
+      onlineMatch.game.undoTurn();
+      canvasView.updateGameView(onlineMatch.game);
+    }
   });
 
   emitter.on("reset-camera", () => {

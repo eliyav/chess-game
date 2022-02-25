@@ -4,21 +4,15 @@ import { Timer } from "../timer/timer";
 
 class OfflineMatch {
   game: Game;
+  time: number;
   timer: Timer;
-  matchSettings: {
-    mode: string | undefined;
-    time: number | undefined;
-  };
   endMatchFunc: () => void;
 
-  constructor(
-    { mode, time }: OfflineMatchSettings,
-    endMatchCallback: () => void
-  ) {
-    this.matchSettings = { mode, time };
+  constructor(time: number, endMatchCallback: () => void) {
+    this.time = time;
     this.game = new Game(chessData, this.endMatch.bind(this));
     this.timer = new Timer(
-      this.matchSettings.time!,
+      this.time,
       this.game.state,
       this.endMatch.bind(this)
     );
@@ -27,6 +21,7 @@ class OfflineMatch {
 
   startMatch() {
     this.timer.startTimer();
+    this.game.gameStarted = true;
   }
 
   resetMatch() {
@@ -36,14 +31,10 @@ class OfflineMatch {
   }
 
   endMatch() {
+    this.game.gameStarted = false;
     this.endMatchFunc();
     return true;
   }
 }
 
 export default OfflineMatch;
-
-export type OfflineMatchSettings = {
-  mode: string | undefined;
-  time: number | undefined;
-};

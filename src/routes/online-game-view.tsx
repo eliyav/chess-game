@@ -15,6 +15,7 @@ import initCanvasInput from "../view/canvas-input";
 import EventEmitter from "../events/event-emitter";
 import LoadingScreen from "../component/loading-screen";
 import PromotionModal from "../component/modals/promotion-modal";
+import { TimerOverlay } from "../timer/timer-overlay";
 
 interface OnlineProps {
   location: Location;
@@ -47,13 +48,16 @@ export const OnlineGameView: React.VFC<OnlineProps> = ({
   async function initGame(team: string) {
     let engine = new BABYLON.Engine(canvasRef.current!, true);
     canvasView.current = await createView(canvasRef.current!, engine);
-    onlineMatch.current = new OnlineMatch(team, 0);
-    //Update the time above from lobby
+    onlineMatch.current = new OnlineMatch(
+      team,
+      lobbySettings.current?.time!,
+      endMatch
+    );
     onlineEmitter.current = onlineGameEmitter(
       onlineMatch.current!,
       canvasView.current!
     );
-    canvasView.current.prepareGame(onlineMatch.current.game);
+    canvasView.current.prepareGame(onlineMatch.current.game, team);
     initCanvasInput(
       onlineMatch.current.game,
       onlineMatch.current.timer,
@@ -67,12 +71,14 @@ export const OnlineGameView: React.VFC<OnlineProps> = ({
     canvasRef.current?.classList.remove("notDisplayed");
     setGameLoaded(true);
     engine.resize();
+    onlineMatch.current.startMatch();
 
     onlineEmitter.current.on("promotion-selections", () => {
       setTimeout(() => setPromotion(true), 1000);
     });
 
     onlineEmitter.current.on("end-match", (winningTeam: string) => {
+      canvasView.current?.gameScene.detachControl();
       setRequest({
         question: `${winningTeam} team has won!, Would you like to play another game?`,
         onConfirm: () => {
@@ -97,6 +103,15 @@ export const OnlineGameView: React.VFC<OnlineProps> = ({
     socket.emit("resolvedTurn", { originPoint, targetPoint, lobbyKey });
     if (history.promotion !== undefined)
       socket.emit("promotion-await", lobbyKey);
+  }
+
+  function endMatch() {
+    const winningTeam =
+      onlineMatch.current?.game.state.currentPlayer ===
+      onlineMatch.current?.game.teams[0]
+        ? onlineMatch.current?.game.teams[1]
+        : onlineMatch.current?.game.teams[0];
+    onlineEmitter.current?.emit("end-match", winningTeam);
   }
 
   useEffect(() => {
@@ -235,6 +250,46 @@ export const OnlineGameView: React.VFC<OnlineProps> = ({
         }
       });
 
+    socket.on("pause-game-request", (lobbyKey: string) => {
+      let requestText;
+      if (onlineMatch.current?.timer.paused) {
+        requestText =
+          "Opponent has requested to unpause the game, do you agree?";
+      } else {
+        requestText = "Opponent has requested to pause the game, do you agree?";
+      }
+      setRequest({
+        question: requestText,
+        onConfirm: () => {
+          socket.emit("pause-game-response", true, lobbyKey);
+          setRequest(null);
+        },
+        onReject: () => {
+          socket.emit("pause-game-response", false, lobbyKey);
+          setRequest(null);
+        },
+      });
+    }),
+      socket.on("pause-game-resolve", (response: boolean) => {
+        const gamePaused = onlineMatch.current?.timer.paused;
+        if (response) {
+          onlineMatch.current?.timer.toggleTimer();
+          setMessage({
+            text: `${
+              gamePaused ? "Unpause" : "Pause"
+            } game request has been accepted`,
+            onConfirm: () => setMessage(null),
+          });
+        } else {
+          setMessage({
+            text: `${
+              gamePaused ? "Unpause" : "Pause"
+            } game request has been denied`,
+            onConfirm: () => setMessage(null),
+          });
+        }
+      });
+
     return () => {
       socket.disconnect();
     };
@@ -250,6 +305,7 @@ export const OnlineGameView: React.VFC<OnlineProps> = ({
 
   return (
     <>
+      <canvas ref={canvasRef} id="notDisplayed" touch-action="none"></canvas>
       {gameLoaded ? (
         <MenuOverlay
           items={[
@@ -271,6 +327,11 @@ export const OnlineGameView: React.VFC<OnlineProps> = ({
               text: "camera",
               onClick: () => onlineEmitter.current!.emit("reset-camera"),
             },
+            {
+              text: "pause",
+              onClick: () =>
+                socket.emit("pause-game", lobbySettings.current?.lobbyKey),
+            },
           ]}
           icons={icons}
         />
@@ -279,7 +340,7 @@ export const OnlineGameView: React.VFC<OnlineProps> = ({
           <LoadingScreen text="..." />
         </div>
       )}
-      <canvas ref={canvasRef} id="notDisplayed" touch-action="none"></canvas>
+      {gameLoaded && <TimerOverlay timer={onlineMatch.current?.timer!} />}
       {request ? (
         <RequestModal
           question={request.question}

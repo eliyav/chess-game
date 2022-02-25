@@ -28,9 +28,9 @@ export const createView = async (
     return calcTurnAnimation(gameScene, ...props);
   }
 
-  function prepareGame(game: Game) {
+  function prepareGame(game: Game, team?: string) {
     updateMeshesRender(game);
-    resetCamera(game);
+    resetCamera(game, team);
     gameScene.attachControl();
   }
 
@@ -65,11 +65,15 @@ export const createView = async (
     rotateCamera(game);
   }
 
-  function resetCamera(game: Game) {
+  function resetCamera(game: Game, team?: string) {
     let camera: any = gameScene.cameras[0];
-    game.state.currentPlayer === "White"
-      ? setToWhitePlayer()
-      : setToBlackPlayer();
+    if (!team) {
+      game.state.currentPlayer === "White"
+        ? setToWhitePlayer()
+        : setToBlackPlayer();
+    } else {
+      parseInt(team) === 1 ? setToWhitePlayer() : setToBlackPlayer();
+    }
     function setToWhitePlayer() {
       camera.alpha = Math.PI;
       camera.beta = Math.PI / 4;
@@ -168,10 +172,10 @@ export const createView = async (
 
 export type CanvasView = {
   gameScene: CustomGameScene;
-  prepareGame: (game: Game) => void;
+  prepareGame: (game: Game, team?: string) => void;
   updateMeshesRender: (game: Game) => void;
   updateGameView: (game: Game) => void;
-  resetCamera: (game: Game) => void;
+  resetCamera: (game: Game, team?: string) => void;
   rotateCamera: (game: Game) => void;
   turnAnimation: (
     originPoint: Point,
