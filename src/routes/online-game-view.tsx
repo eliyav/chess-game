@@ -57,7 +57,6 @@ export const OnlineGameView: React.VFC<OnlineProps> = ({
       onlineMatch.current!,
       canvasView.current!
     );
-    canvasView.current.prepareGame(onlineMatch.current.game, team);
     initCanvasInput(
       onlineMatch.current.game,
       onlineMatch.current.timer,
@@ -69,8 +68,9 @@ export const OnlineGameView: React.VFC<OnlineProps> = ({
 
     canvasRef.current?.classList.add("gameCanvas");
     canvasRef.current?.classList.remove("notDisplayed");
-    setGameLoaded(true);
+    canvasView.current.prepareGame(onlineMatch.current.game, team);
     engine.resize();
+    setGameLoaded(true);
     onlineMatch.current.startMatch();
 
     onlineEmitter.current.on("promotion-selections", () => {
