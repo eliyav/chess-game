@@ -13,7 +13,7 @@ const App: React.VFC = () => {
       (async () => {
         try {
           const token = await getAccessTokenSilently();
-          const response = await fetch("http://localhost:3000/login", {
+          const response = await fetch(`${window.location.host}/login`, {
             method: "POST",
             headers: {
               authorization: `Bearer ${token}`,

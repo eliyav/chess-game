@@ -3,6 +3,7 @@ const express = require("express");
 const { Mongo } = require("./mongoDB/mongo.js");
 const jwt = require("express-jwt");
 const jwks = require("jwks-rsa");
+const path = require("path");
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -20,6 +21,7 @@ const verifyJwt = jwt({
   issuer: process.env.JWKS_ISSUER,
   algorithms: ["RS256"],
 }).unless({ path: ["/", "/favicon.ico"] });
+app.use(express.static(path.join(__dirname, "../dist")));
 app.use(verifyJwt);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.text());
@@ -32,7 +34,7 @@ app.use((error, req, res, next) => {
 //#endregion
 
 const server = app.listen(port, function () {
-  console.log("Example app listening on port 3000!\n");
+  console.log(`Example app listening on port ${port}!\n`);
 });
 
 app.post("/login", async (req, res) => {

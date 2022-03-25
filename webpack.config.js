@@ -2,6 +2,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CompressionPlugin = require("compression-webpack-plugin");
 const { DefinePlugin } = require("webpack");
+const path = require("path");
 
 /** @type {import("webpack").Configuration} */
 module.exports = {
@@ -48,19 +49,20 @@ module.exports = {
   devtool: "source-map",
   output: {
     clean: true,
+    path: path.resolve(__dirname, "dist"),
   },
-  devServer: {
-    port: 3000,
-    proxy: {
-      "/login": {
-        target: "http://localhost:8080",
-      },
-      "/socket.io": {
-        target: "http://localhost:8080",
-        ws: true,
-      },
-    },
-    compress: true, // enable gzip compression
-    hot: true, // hot module replacement. Depends on HotModuleReplacementPlugin
-  },
+  // devServer: {
+  //   port: 3000,
+  //   proxy: {
+  //     "/login": {
+  //       target: "http://localhost:8080",
+  //     },
+  //     "/socket.io": {
+  //       target: "http://localhost:8080",
+  //       ws: true,
+  //     },
+  //   },
+  //   compress: true, // enable gzip compression
+  //   hot: true, // hot module replacement. Depends on HotModuleReplacementPlugin
+  // },
 };

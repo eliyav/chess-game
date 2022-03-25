@@ -6,7 +6,8 @@
   "scripts": {
     "build": "webpack",
     "watch": "webpack --watch",
-    "start": "webpack serve --open",
+    "start": "node server/server.js",
+    "serve": "webpack serve --open",
     "server": "node server/server.js",
     "servermon": "nodemon server/server.js"
   },
