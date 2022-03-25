@@ -13,7 +13,7 @@ export const JoinLobby: React.VFC<JoinLobbyProps> = ({
   userName,
 }) => {
   const navigate = useNavigate();
-  const [socket] = useState<any>(io(`ws://${window.location.host}`));
+  const [socket] = useState<any>(io(`wss://${window.location.host}`));
   const keyInputRef = useRef<HTMLInputElement>(null);
   const [lobbyKey, setLobbyKey] = useState<string>();
   const [keyVerified, setKeyVerified] = useState(false);
