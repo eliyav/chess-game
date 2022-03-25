@@ -2,7 +2,7 @@
   "name": "chess",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/bundle.js",
+  "main": "dist/main.js",
   "scripts": {
     "build": "webpack",
     "watch": "webpack --watch",
@@ -20,6 +20,7 @@
     "@auth0/auth0-react": "^1.9.0",
     "babylonjs": "^4.2.2",
     "babylonjs-loaders": "^4.2.2",
+    "compression": "^1.7.4",
     "express": "^4.17.3",
     "express-jwt": "^6.1.1",
     "jwks-rsa": "^2.0.5",

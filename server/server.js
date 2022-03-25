@@ -4,6 +4,7 @@ const { Mongo } = require("./mongoDB/mongo.js");
 const jwt = require("express-jwt");
 const jwks = require("jwks-rsa");
 const path = require("path");
+const compression = require("compression");
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -21,6 +22,7 @@ const verifyJwt = jwt({
   issuer: process.env.JWKS_ISSUER,
   algorithms: ["RS256"],
 }).unless({ path: ["/", "/favicon.ico"] });
+app.use(compression());
 app.use(express.static(path.join(__dirname, "../dist")));
 app.use(verifyJwt);
 app.use(express.urlencoded({ extended: true }));
