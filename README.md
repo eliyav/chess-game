@@ -44,15 +44,16 @@ Install the latest node package manager before installing dependencies
    ```sh
    npm install
    ```
-3a. To static serve the app on http://localhost:3000/ 
+   3a. To static serve the app on http://localhost:3000/
    ```js
    npm start
    ```
 
 3b. To start backend on http://localhost:8080/
-   ```js
-   npm run server
-   ```
+
+```js
+npm run server
+```
 
 ## Usage
 
@@ -73,6 +74,7 @@ This project is meant to be played. If you are having fun playing chess it is be
 - [In Progress] Add Friends List
 - [In Progress] Add Chat
 - [x] Add animations
+- [] Add AI opponent
 - [] Add automation tests
 - [] Add Ranking Algorithim and search
 - [] More will be added.
