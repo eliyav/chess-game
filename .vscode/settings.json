@@ -1,4 +1,0 @@
-{
-  "appService.defaultWebAppToDeploy": "/subscriptions/992d7d2d-1d71-4055-91a8-7a923acead16/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/3D-chess-testing",
-  "appService.deploySubpath": "."
-}
