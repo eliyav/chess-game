@@ -20,7 +20,11 @@ export const OnlineLobby: React.VFC<OnlineLobbyProps> = ({
   setSocket,
   userName,
 }) => {
-  const [socket] = useState<any>(io(`wss://${window.location.host}`));
+  const [socket] = useState<any>(
+    io(`wss://${window.location.host}`, {
+      transports: ["websocket"],
+    })
+  );
   const defaultChoice = useRef(true);
   const [lobbySettings, setLobbySettings] = useState<LobbySettings>({
     lobbyKey: "",

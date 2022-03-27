@@ -24,9 +24,9 @@ const port = process.env.PORT || 8080;
 // }).unless({ path: ["/", "/favicon.ico"] });
 // app.use(verifyJwt);
 app.use(compression());
-app.use(express.static(path.join(__dirname, "../dist")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.text());
+app.use(express.static(path.join(__dirname, "../dist")));
 
 app.use((error, req, res, next) => {
   const status = error.status || 500;
