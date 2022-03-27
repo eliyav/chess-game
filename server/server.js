@@ -1,30 +1,30 @@
 require("dotenv").config();
 const express = require("express");
-const { Mongo } = require("./mongoDB/mongo.js");
-const jwt = require("express-jwt");
-const jwks = require("jwks-rsa");
+// const { Mongo } = require("./mongoDB/mongo.js");
+// const jwt = require("express-jwt");
+// const jwks = require("jwks-rsa");
 const path = require("path");
 const compression = require("compression");
 
 const app = express();
 const port = process.env.PORT || 8080;
 //MongoDB
-const mongo = new Mongo();
+// const mongo = new Mongo();
 //#region Middleware
-const verifyJwt = jwt({
-  secret: jwks.expressJwtSecret({
-    cache: false,
-    rateLimit: true,
-    jwksRequestsPerMinute: 5,
-    jwksUri: process.env.JWKS_URI,
-  }),
-  audience: process.env.JWKS_AUDIENCE,
-  issuer: process.env.JWKS_ISSUER,
-  algorithms: ["RS256"],
-}).unless({ path: ["/", "/favicon.ico"] });
+// const verifyJwt = jwt({
+//   secret: jwks.expressJwtSecret({
+//     cache: false,
+//     rateLimit: true,
+//     jwksRequestsPerMinute: 5,
+//     jwksUri: process.env.JWKS_URI,
+//   }),
+//   audience: process.env.JWKS_AUDIENCE,
+//   issuer: process.env.JWKS_ISSUER,
+//   algorithms: ["RS256"],
+// }).unless({ path: ["/", "/favicon.ico"] });
+// app.use(verifyJwt);
 app.use(compression());
 app.use(express.static(path.join(__dirname, "../dist")));
-app.use(verifyJwt);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.text());
 
@@ -39,16 +39,16 @@ const server = app.listen(port, function () {
   console.log(`Example app listening on port ${port}!\n`);
 });
 
-app.post("/login", async (req, res) => {
-  const body = JSON.parse(req.body);
-  const user = await mongo.findUser({ email: body.user.email });
-  if (!user) {
-    const { insertedId } = await mongo.createUser(body.user);
-    const user = await mongo.findUser({ _id: insertedId });
-    return res.json(user);
-  }
-  return res.json(user);
-});
+// app.post("/login", async (req, res) => {
+//   const body = JSON.parse(req.body);
+//   const user = await mongo.findUser({ email: body.user.email });
+//   if (!user) {
+//     const { insertedId } = await mongo.createUser(body.user);
+//     const user = await mongo.findUser({ _id: insertedId });
+//     return res.json(user);
+//   }
+//   return res.json(user);
+// });
 const lobbyLog = new Map();
 //Activate Sockets
 const io = require("socket.io")(server);
