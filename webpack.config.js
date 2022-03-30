@@ -50,6 +50,7 @@ module.exports = {
   output: {
     clean: true,
     path: path.resolve(__dirname, "dist"),
+    publicPath: "/",
   },
   // devServer: {
   //   port: 3000,

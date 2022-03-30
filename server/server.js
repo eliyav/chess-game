@@ -1,8 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 // const { Mongo } = require("./mongoDB/mongo.js");
-// const jwt = require("express-jwt");
-// const jwks = require("jwks-rsa");
+const jwt = require("express-jwt");
+const jwks = require("jwks-rsa");
 const path = require("path");
 const compression = require("compression");
 
@@ -11,23 +11,25 @@ const port = process.env.PORT || 8080;
 //MongoDB
 // const mongo = new Mongo();
 //#region Middleware
-// const verifyJwt = jwt({
-//   secret: jwks.expressJwtSecret({
-//     cache: false,
-//     rateLimit: true,
-//     jwksRequestsPerMinute: 5,
-//     jwksUri: process.env.JWKS_URI,
-//   }),
-//   audience: process.env.JWKS_AUDIENCE,
-//   issuer: process.env.JWKS_ISSUER,
-//   algorithms: ["RS256"],
-// }).unless({ path: ["/", "/favicon.ico"] });
-// app.use(verifyJwt);
+const verifyJwt = jwt({
+  secret: jwks.expressJwtSecret({
+    cache: false,
+    rateLimit: true,
+    jwksRequestsPerMinute: 5,
+    jwksUri: process.env.JWKS_URI,
+  }),
+  audience: process.env.JWKS_AUDIENCE,
+  issuer: process.env.JWKS_ISSUER,
+  algorithms: ["RS256"],
+}).unless({ path: ["/", "/favicon.ico"] });
 app.use(compression());
+app.use(express.static(path.join(__dirname, "../dist")));
+app.get("*", function (req, res) {
+  res.sendFile(path.join(__dirname, "../dist/", "index.html"));
+});
+app.use(verifyJwt);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.text());
-app.use(express.static(path.join(__dirname, "../dist")));
-
 app.use((error, req, res, next) => {
   const status = error.status || 500;
   const message = error.message || "Internal server error";
