@@ -5,7 +5,7 @@ interface InviteProps {
   onClose: () => void;
 }
 
-const InviteCode: React.VFC<InviteProps> = ({ code, onClose }) => {
+const InviteCode: React.FC<InviteProps> = ({ code, onClose }) => {
   return (
     <div className="match-settings-modal">
       <div className="gameOptionsScreen">

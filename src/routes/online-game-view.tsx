@@ -23,7 +23,7 @@ interface OnlineProps {
   socket: any;
 }
 
-export const OnlineGameView: React.VFC<OnlineProps> = ({
+export const OnlineGameView: React.FC<OnlineProps> = ({
   openNavbar,
   socket,
   location,

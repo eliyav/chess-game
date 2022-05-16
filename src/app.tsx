@@ -3,7 +3,7 @@ import { Content } from "./content";
 import { useAuth0 } from "@auth0/auth0-react";
 import { getUserInfo } from "./helper/request-helpers";
 
-const App: React.VFC = () => {
+const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<UserData>();
 
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();

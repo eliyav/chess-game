@@ -9,7 +9,7 @@ interface HomeScreenProps {
   openNavbar: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const Home: React.VFC<HomeScreenProps> = ({ openNavbar }) => {
+export const Home: React.FC<HomeScreenProps> = ({ openNavbar }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { loginWithPopup, isAuthenticated, user } = useAuth0();
   const [displayLoaded, setDisplayLoaded] = useState(false);

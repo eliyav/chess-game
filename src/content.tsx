@@ -16,7 +16,7 @@ interface ContentProps {
   userData: UserData | undefined;
 }
 
-export const Content: React.VFC<ContentProps> = ({ userData }) => {
+export const Content: React.FC<ContentProps> = ({ userData }) => {
   const location = useLocation();
   const { isAuthenticated } = useAuth0();
   const [navbarOpen, setNavbarOpen] = useState(false);

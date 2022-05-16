@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { LoginButton } from "./auth0/login";
 
-export const Navbar: React.VFC<{
+export const Navbar: React.FC<{
   items: Array<{
     text: string;
     path: string;

@@ -7,7 +7,7 @@ interface TimerProps {
   timer: Timer;
 }
 
-export const TimerOverlay: React.VFC<TimerProps> = ({ timer }) => {
+export const TimerOverlay: React.FC<TimerProps> = ({ timer }) => {
   const [timer1, setTimer1] = useState(timer.timer1.time);
   const [timer2, setTimer2] = useState(timer.timer2.time);
 

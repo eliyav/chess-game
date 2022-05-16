@@ -6,7 +6,7 @@ interface SelectionProps {
   icons: IconsIndex;
 }
 
-const OverlaySelection: React.VFC<SelectionProps> = ({
+const OverlaySelection: React.FC<SelectionProps> = ({
   item: { text, onClick },
   icons,
 }) => {

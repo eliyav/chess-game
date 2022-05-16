@@ -4,7 +4,7 @@ interface PromotionProps {
   submitSelection: (e: any) => void;
 }
 
-const PromotionModal: React.VFC<PromotionProps> = ({ submitSelection }) => {
+const PromotionModal: React.FC<PromotionProps> = ({ submitSelection }) => {
   return (
     <div className="promotion-wrapper" onClick={submitSelection}>
       <div className="selection red">Rook</div>

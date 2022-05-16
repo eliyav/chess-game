@@ -19,7 +19,7 @@ interface OfflineProps {
   openNavbar: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const OfflineGameView: React.VFC<OfflineProps> = ({ openNavbar }) => {
+export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
   const [gameLoaded, setGameLoaded] = useState(false);
   const [promotion, setPromotion] = useState(false);
   const [request, setRequest] = useState<{

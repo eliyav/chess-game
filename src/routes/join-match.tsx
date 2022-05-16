@@ -8,7 +8,7 @@ interface JoinLobbyProps {
   userName: string | undefined;
 }
 
-export const JoinLobby: React.VFC<JoinLobbyProps> = ({
+export const JoinLobby: React.FC<JoinLobbyProps> = ({
   setSocket,
   userName,
 }) => {

@@ -7,7 +7,7 @@ interface MenuOverlayProps {
   icons: IconsIndex;
 }
 
-export const MenuOverlay: React.VFC<MenuOverlayProps> = ({ items, icons }) => {
+export const MenuOverlay: React.FC<MenuOverlayProps> = ({ items, icons }) => {
   return (
     <div className="menu-overlay">
       {items.map((item, idx) => (

@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 
-const SettingsTeams: React.VFC = () => {
+const SettingsTeams: React.FC = () => {
   const [isDefaultChecked, setIsDefaultChecked] = useState(true);
   const whiteTeamRef = useRef<HTMLInputElement>(null);
   const blackTeamRef = useRef<HTMLInputElement>(null);

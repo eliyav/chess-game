@@ -4,7 +4,7 @@ interface ModeProps {
   setGameMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const SettingsMode: React.VFC<ModeProps> = ({ setGameMode }) => {
+const SettingsMode: React.FC<ModeProps> = ({ setGameMode }) => {
   const [isDefaultChecked, setIsDefaultChecked] = useState(true);
   const offlineRef = useRef<HTMLInputElement>(null);
   const onlineRef = useRef<HTMLInputElement>(null);

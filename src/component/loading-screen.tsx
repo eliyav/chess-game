@@ -1,6 +1,6 @@
 import React from "react";
 
-const LoadingScreen: React.VFC<{ text: string }> = ({ text }) => {
+const LoadingScreen: React.FC<{ text: string }> = ({ text }) => {
   return (
     <div className="loading">
       <p>{text}</p>

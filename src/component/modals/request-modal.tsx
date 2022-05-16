@@ -6,7 +6,7 @@ interface RequestProps {
   onReject: () => void;
 }
 
-export const RequestModal: React.VFC<RequestProps> = ({
+export const RequestModal: React.FC<RequestProps> = ({
   onConfirm,
   onReject,
   question,

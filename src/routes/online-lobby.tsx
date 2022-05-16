@@ -16,7 +16,7 @@ export interface LobbySettings {
   firstMove: string;
 }
 
-export const OnlineLobby: React.VFC<OnlineLobbyProps> = ({
+export const OnlineLobby: React.FC<OnlineLobbyProps> = ({
   setSocket,
   userName,
 }) => {

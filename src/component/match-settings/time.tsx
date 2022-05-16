@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { LobbySettings } from "../../routes/online-lobby";
 
-const Time: React.VFC<{
+const Time: React.FC<{
   setTime: React.Dispatch<React.SetStateAction<LobbySettings>>;
 }> = ({ setTime }) => {
   const timeRef = useRef<HTMLDivElement>(null);

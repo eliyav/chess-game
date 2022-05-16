@@ -8,7 +8,7 @@ interface MatchesProps {
   location: Location;
 }
 
-export const Matches: React.VFC<MatchesProps> = ({ location, openNavbar }) => {
+export const Matches: React.FC<MatchesProps> = ({ location, openNavbar }) => {
   const [showSelections, setShowSelections] = useState(true);
 
   useEffect(() => {

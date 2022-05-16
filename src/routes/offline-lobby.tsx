@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Time from "../component/match-settings/time";
 import { LobbySettings } from "./online-lobby";
 
-export const OfflineLobby: React.VFC = ({}) => {
+export const OfflineLobby: React.FC = ({}) => {
   const [lobbySettings, setLobbySettings] = useState<LobbySettings>({
     lobbyKey: "Unassaigned",
     hostName: "Guest",
