@@ -1,0 +1,464 @@
+/*! *****************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+
+/*! ../OBJ/index */
+
+/*! ../STL/index */
+
+/*! ../glTF/1.0/index */
+
+/*! ../glTF/2.0/Extensions/index */
+
+/*! ../glTF/2.0/glTFLoaderInterfaces */
+
+/*! ../glTF/2.0/index */
+
+/*! ../glTF/glTFFileLoader */
+
+/*! ../glTF/glTFValidation */
+
+/*! ../glTFFileLoader */
+
+/*! ../glTFLoader */
+
+/*! ../index */
+
+/*! ./1.0/index */
+
+/*! ./2.0/index */
+
+/*! ./EXT_lights_image_based */
+
+/*! ./EXT_mesh_gpu_instancing */
+
+/*! ./EXT_meshopt_compression */
+
+/*! ./EXT_texture_webp */
+
+/*! ./Extensions/index */
+
+/*! ./ExtrasAsMetadata */
+
+/*! ./KHR_draco_mesh_compression */
+
+/*! ./KHR_lights_punctual */
+
+/*! ./KHR_materials_clearcoat */
+
+/*! ./KHR_materials_emissive_strength */
+
+/*! ./KHR_materials_ior */
+
+/*! ./KHR_materials_iridescence */
+
+/*! ./KHR_materials_pbrSpecularGlossiness */
+
+/*! ./KHR_materials_sheen */
+
+/*! ./KHR_materials_specular */
+
+/*! ./KHR_materials_translucency */
+
+/*! ./KHR_materials_transmission */
+
+/*! ./KHR_materials_unlit */
+
+/*! ./KHR_materials_variants */
+
+/*! ./KHR_materials_volume */
+
+/*! ./KHR_mesh_quantization */
+
+/*! ./KHR_texture_basisu */
+
+/*! ./KHR_texture_transform */
+
+/*! ./KHR_xmp_json_ld */
+
+/*! ./MSFT_audio_emitter */
+
+/*! ./MSFT_lod */
+
+/*! ./MSFT_minecraftMesh */
+
+/*! ./MSFT_sRGBFactors */
+
+/*! ./OBJ/index */
+
+/*! ./STL/index */
+
+/*! ./glTF/index */
+
+/*! ./glTFBinaryExtension */
+
+/*! ./glTFFileLoader */
+
+/*! ./glTFLoader */
+
+/*! ./glTFLoaderExtension */
+
+/*! ./glTFLoaderInterfaces */
+
+/*! ./glTFLoaderUtils */
+
+/*! ./glTFMaterialsCommonExtension */
+
+/*! ./glTFValidation */
+
+/*! ./legacy-glTF */
+
+/*! ./legacy-glTF1 */
+
+/*! ./legacy-glTF2 */
+
+/*! ./legacy-objFileLoader */
+
+/*! ./legacy-stlFileLoader */
+
+/*! ./mtlFileLoader */
+
+/*! ./objFileLoader */
+
+/*! ./objLoadingOptions */
+
+/*! ./solidParser */
+
+/*! ./stlFileLoader */
+
+/*! core/Audio/weightedsound */
+
+/*! core/Engines/constants */
+
+/*! core/Lights/light */
+
+/*! core/Lights/spotLight */
+
+/*! core/Materials/PBR/pbrMaterial */
+
+/*! core/Materials/Textures/rawCubeTexture */
+
+/*! core/Materials/Textures/texture */
+
+/*! core/Materials/standardMaterial */
+
+/*! core/Maths/math.color */
+
+/*! core/Meshes/Compression/meshoptCompression */
+
+/*! core/Meshes/geometry */
+
+/*! core/Meshes/mesh */
+
+/*! core/Meshes/mesh.vertexData */
+
+/*! core/Meshes/thinInstanceMesh */
+
+/*! core/Misc/deferred */
+
+/*! core/Misc/error */
+
+/*! core/Misc/stringTools */
+
+/*! core/Misc/tools */
+
+/*! core/assetContainer */
+
+/*! loaders/legacy/legacy */
+
+/*! tslib */
+
+/*!**********************!*\
+  !*** ./src/index.ts ***!
+  \**********************/
+
+/*!******************************************!*\
+  !*** ../../../lts/loaders/dist/index.js ***!
+  \******************************************/
+
+/*!**********************************************!*\
+  !*** ../../../lts/loaders/dist/OBJ/index.js ***!
+  \**********************************************/
+
+/*!**********************************************!*\
+  !*** ../../../lts/loaders/dist/STL/index.js ***!
+  \**********************************************/
+
+/*!***********************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/index.js ***!
+  \***********************************************/
+
+/*!**************************************************!*\
+  !*** ../../../lts/loaders/dist/legacy/legacy.js ***!
+  \**************************************************/
+
+/*!***************************************************!*\
+  !*** ../../../../node_modules/tslib/tslib.es6.js ***!
+  \***************************************************/
+
+/*!***************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/1.0/index.js ***!
+  \***************************************************/
+
+/*!***************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/index.js ***!
+  \***************************************************/
+
+/*!****************************************************!*\
+  !*** ../../../lts/loaders/dist/OBJ/solidParser.js ***!
+  \****************************************************/
+
+/*!******************************************************!*\
+  !*** ../../../lts/loaders/dist/OBJ/mtlFileLoader.js ***!
+  \******************************************************/
+
+/*!******************************************************!*\
+  !*** ../../../lts/loaders/dist/OBJ/objFileLoader.js ***!
+  \******************************************************/
+
+/*!******************************************************!*\
+  !*** ../../../lts/loaders/dist/STL/stlFileLoader.js ***!
+  \******************************************************/
+
+/*!*******************************************************!*\
+  !*** ../../../lts/loaders/dist/legacy/legacy-glTF.js ***!
+  \*******************************************************/
+
+/*!********************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/1.0/glTFLoader.js ***!
+  \********************************************************/
+
+/*!********************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/glTFLoader.js ***!
+  \********************************************************/
+
+/*!********************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/glTFFileLoader.js ***!
+  \********************************************************/
+
+/*!********************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/glTFValidation.js ***!
+  \********************************************************/
+
+/*!********************************************************!*\
+  !*** ../../../lts/loaders/dist/legacy/legacy-glTF1.js ***!
+  \********************************************************/
+
+/*!********************************************************!*\
+  !*** ../../../lts/loaders/dist/legacy/legacy-glTF2.js ***!
+  \********************************************************/
+
+/*!**********************************************************!*\
+  !*** ../../../lts/loaders/dist/OBJ/objLoadingOptions.js ***!
+  \**********************************************************/
+
+/*!*************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/1.0/glTFLoaderUtils.js ***!
+  \*************************************************************/
+
+/*!**************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/index.js ***!
+  \**************************************************************/
+
+/*!****************************************************************!*\
+  !*** ../../../lts/loaders/dist/legacy/legacy-objFileLoader.js ***!
+  \****************************************************************/
+
+/*!****************************************************************!*\
+  !*** ../../../lts/loaders/dist/legacy/legacy-stlFileLoader.js ***!
+  \****************************************************************/
+
+/*!*****************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/1.0/glTFBinaryExtension.js ***!
+  \*****************************************************************/
+
+/*!*****************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/MSFT_lod.js ***!
+  \*****************************************************************/
+
+/*!*****************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/glTFLoaderExtension.js ***!
+  \*****************************************************************/
+
+/*!******************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/1.0/glTFLoaderInterfaces.js ***!
+  \******************************************************************/
+
+/*!******************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/glTFLoaderInterfaces.js ***!
+  \******************************************************************/
+
+/*!************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/KHR_xmp_json_ld.js ***!
+  \************************************************************************/
+
+/*!*************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/EXT_texture_webp.js ***!
+  \*************************************************************************/
+
+/*!*************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/ExtrasAsMetadata.js ***!
+  \*************************************************************************/
+
+/*!*************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/MSFT_sRGBFactors.js ***!
+  \*************************************************************************/
+
+/*!**************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/1.0/glTFMaterialsCommonExtension.js ***!
+  \**************************************************************************/
+
+/*!**************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/KHR_materials_ior.js ***!
+  \**************************************************************************/
+
+/*!***************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/KHR_texture_basisu.js ***!
+  \***************************************************************************/
+
+/*!***************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/MSFT_audio_emitter.js ***!
+  \***************************************************************************/
+
+/*!***************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/MSFT_minecraftMesh.js ***!
+  \***************************************************************************/
+
+/*!****************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/KHR_lights_punctual.js ***!
+  \****************************************************************************/
+
+/*!****************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/KHR_materials_sheen.js ***!
+  \****************************************************************************/
+
+/*!****************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/KHR_materials_unlit.js ***!
+  \****************************************************************************/
+
+/*!*****************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/KHR_materials_volume.js ***!
+  \*****************************************************************************/
+
+/*!******************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/KHR_mesh_quantization.js ***!
+  \******************************************************************************/
+
+/*!******************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/KHR_texture_transform.js ***!
+  \******************************************************************************/
+
+/*!*******************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/EXT_lights_image_based.js ***!
+  \*******************************************************************************/
+
+/*!*******************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/KHR_materials_specular.js ***!
+  \*******************************************************************************/
+
+/*!*******************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/KHR_materials_variants.js ***!
+  \*******************************************************************************/
+
+/*!********************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/EXT_mesh_gpu_instancing.js ***!
+  \********************************************************************************/
+
+/*!********************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/EXT_meshopt_compression.js ***!
+  \********************************************************************************/
+
+/*!********************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/KHR_materials_clearcoat.js ***!
+  \********************************************************************************/
+
+/*!**********************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/KHR_materials_iridescence.js ***!
+  \**********************************************************************************/
+
+/*!***********************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/KHR_draco_mesh_compression.js ***!
+  \***********************************************************************************/
+
+/*!***********************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/KHR_materials_translucency.js ***!
+  \***********************************************************************************/
+
+/*!***********************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/KHR_materials_transmission.js ***!
+  \***********************************************************************************/
+
+/*!****************************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/KHR_materials_emissive_strength.js ***!
+  \****************************************************************************************/
+
+/*!********************************************************************************************!*\
+  !*** ../../../lts/loaders/dist/glTF/2.0/Extensions/KHR_materials_pbrSpecularGlossiness.js ***!
+  \********************************************************************************************/
+
+/*!****************************************************************************************************!*\
+  !*** external {"root":"BABYLON","commonjs":"babylonjs","commonjs2":"babylonjs","amd":"babylonjs"} ***!
+  \****************************************************************************************************/
+
+/**
+ * @license React
+ * react-dom.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
+ * @license React
+ * react.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
+ * @license React
+ * scheduler.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
+ * React Router DOM v6.3.0
+ *
+ * Copyright (c) Remix Software Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE.md file in the root directory of this source tree.
+ *
+ * @license MIT
+ */
+
+/**
+ * React Router v6.3.0
+ *
+ * Copyright (c) Remix Software Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE.md file in the root directory of this source tree.
+ *
+ * @license MIT
+ */
