@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 // const { Mongo } = require("./mongoDB/mongo.js");
-const jwt = require("express-jwt");
+const { expressjwt: jwt } = require("express-jwt");
 const jwks = require("jwks-rsa");
 const path = require("path");
 const compression = require("compression");
