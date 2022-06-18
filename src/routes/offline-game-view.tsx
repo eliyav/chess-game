@@ -98,6 +98,8 @@ export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
 
   useEffect(() => {
     initGame();
+
+    return () => offlineMatch.current?.resetMatch();
   }, []);
 
   return (

@@ -301,6 +301,8 @@ export const OnlineGameView: React.FC<OnlineProps> = ({
     const team = params.get("move") as string;
     socket.emit("get-room-info", lobbyKey);
     initGame(team);
+
+    return () => onlineMatch.current?.resetMatch();
   }, []);
 
   return (
