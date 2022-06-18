@@ -3,7 +3,7 @@
 ## About The Project
 
 <p align="center">
-   <img align="center" src="https://user-images.githubusercontent.com/70218822/155197922-b1f530f8-a17e-4d58-ae65-823d747ea943.PNG">
+   <img align="center" src="https://user-images.githubusercontent.com/70218822/174459746-2753e5fe-83ef-4863-84e2-30e16c4fdb1e.png">
 </p>
 
 ### Built With
@@ -44,16 +44,19 @@ Install the latest node package manager before installing dependencies
    ```sh
    npm install
    ```
-   3a. To static serve the app on http://localhost:3000/
+
+3. Static serve the app on http://localhost:3000/
    ```js
    npm start
    ```
+   
+   OR
+   
+   Start express backend on http://localhost:8080/
 
-3b. To start backend on http://localhost:8080/
-
-```js
-npm run server
-```
+   ```js
+   npm run server
+   ```
 
 ## Usage
 
@@ -89,6 +92,6 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 Eliya Vahl - eliyavahl@gmail.com
 
-Project Link: [https://github.com/eliyav/chess-game](https://github.com/eliyav/chess-game)
+Project Link: [https://www.3d-chess.net](https://www.3d-chess.net)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
