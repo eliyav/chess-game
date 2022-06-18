@@ -34,8 +34,9 @@ export const Home: React.FC<HomeScreenProps> = ({ openNavbar }) => {
   return (
     <div className="home screen">
       <MenuButton open={openNavbar} />
-      <h1 className="page-title">3D Chess</h1>
-      <div className="divider"></div>
+      <h1 className="page-title">
+        <span className="highlight-site-title">3D</span> Chess
+      </h1>
       <p className="page-info">Play with your friends, no account required!</p>
       {!displayLoaded && (
         <div className="loadingDisplay">

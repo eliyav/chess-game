@@ -54,12 +54,11 @@ export const JoinLobby: React.FC<JoinLobbyProps> = ({
   return (
     <div className="lobby">
       <p className="page-title">Lobby</p>
-      <div className="divider"></div>
       <div className="settings">
         {!lobbyKey || !keyVerified ? (
           <>
             <div className="input-wrapper">
-              <label>Online lobby key:</label>
+              <label>Key:</label>
               <input
                 className="lobby-input"
                 ref={keyInputRef}

@@ -21,7 +21,6 @@ export const Matches: React.FC<MatchesProps> = ({ location, openNavbar }) => {
       {showSelections && (
         <div className="selections">
           <p className="page-title">Select match:</p>
-          <div className="divider"></div>
           <MatchButton
             name="Offline Match"
             path="./offline-lobby"

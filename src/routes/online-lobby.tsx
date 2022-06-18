@@ -53,7 +53,6 @@ export const OnlineLobby: React.FC<OnlineLobbyProps> = ({
   return (
     <div className="lobby">
       <p className="page-title">Lobby</p>
-      <div className="divider"></div>
       <div className="settings">
         <p className="label">Mode:</p>
         <p>Online</p>
