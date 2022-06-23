@@ -34,8 +34,8 @@ html {
   display: block;
   width: 50px;
   object-fit: contain;
-  padding-top: 1em;
-  margin-left: 1em;
+  padding-top: 5px;
+  margin-left: 5px;
   top: 0;
 }
 .screen {
@@ -198,6 +198,7 @@ a {
   position: fixed;
   z-index: 3;
   left: 0;
+  top: 0;
   background-color: #111;
   overflow-x: hidden;
 }
@@ -559,6 +560,5 @@ button.highlight {
 }
 
 /*  -------------------  */
-
 
 /*# sourceMappingURL=main.css.map*/

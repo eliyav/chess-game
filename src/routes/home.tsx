@@ -7,9 +7,13 @@ import LoadingScreen from "../component/loading-screen";
 
 interface HomeScreenProps {
   openNavbar: React.Dispatch<React.SetStateAction<boolean>>;
+  isNavbarOpen: boolean;
 }
 
-export const Home: React.FC<HomeScreenProps> = ({ openNavbar }) => {
+export const Home: React.FC<HomeScreenProps> = ({
+  isNavbarOpen,
+  openNavbar,
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { loginWithPopup, isAuthenticated, user } = useAuth0();
   const [displayLoaded, setDisplayLoaded] = useState(false);
@@ -32,24 +36,35 @@ export const Home: React.FC<HomeScreenProps> = ({ openNavbar }) => {
     loadDisplay();
   }, []);
   return (
-    <div className="home screen">
-      <MenuButton open={openNavbar} />
-      <h1 className="page-title">
-        <span className="highlight-site-title">3D</span> Chess
-      </h1>
-      <p className="page-info">Play with your friends, no account required!</p>
-      {!displayLoaded && (
+    <>
+      <canvas ref={canvasRef} className="notDisplayed"></canvas>
+      {!displayLoaded ? (
         <div className="loadingDisplay">
           <LoadingScreen text="..." />
         </div>
+      ) : (
+        <div>
+          <div className="home screen">
+            <MenuButton isNavbarOpen={isNavbarOpen} openNavbar={openNavbar} />
+            <div>
+              <h1 className="page-title">
+                <span className="highlight-site-title">3D</span> Chess
+              </h1>
+              <p className="page-info">
+                Play with your friends, no account required!
+              </p>
+            </div>
+            <div>
+              <Link className="btn" to={"./match"}>
+                Start Playing!
+              </Link>
+              <button className="btn" onClick={() => loginWithPopup()}>
+                {isAuthenticated ? user?.nickname : "Sign Up / Login"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
-      <canvas ref={canvasRef} className="notDisplayed"></canvas>
-      <Link to={"./match"}>
-        <button>Start Playing!</button>
-      </Link>
-      <button onClick={() => loginWithPopup()}>
-        {isAuthenticated ? user?.nickname : "Sign Up / Login"}
-      </button>
-    </div>
+    </>
   );
 };

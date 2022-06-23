@@ -50,12 +50,22 @@ export const Content: React.FC<ContentProps> = ({ userData }) => {
           ]}
         />
       )}
-
       <Routes>
-        <Route path="/" element={<Home openNavbar={setNavbarOpen} />} />
+        <Route
+          path="/"
+          element={
+            <Home isNavbarOpen={navbarOpen} openNavbar={setNavbarOpen} />
+          }
+        />
         <Route
           path="/match"
-          element={<Matches location={location} openNavbar={setNavbarOpen} />}
+          element={
+            <Matches
+              location={location}
+              isNavbarOpen={navbarOpen}
+              openNavbar={setNavbarOpen}
+            />
+          }
         >
           <Route path="/match/offline-lobby" element={<OfflineLobby />} />
           <Route

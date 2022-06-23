@@ -17,7 +17,7 @@ export const MatchButton: React.FC<MatchBtnProps> = ({
   return (
     <>
       <Link to={path}>
-        <button className="match-button" onClick={onSelect}>
+        <button className="btn" onClick={onSelect}>
           {name}
         </button>
       </Link>

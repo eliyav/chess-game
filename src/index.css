@@ -3,9 +3,6 @@
   box-sizing: border-box;
 }
 
-html {
-  background-color: var(--primary-background);
-}
 :root {
   --primary-background: #333333;
   --primary-color: #e9e9e9;
@@ -13,15 +10,12 @@ html {
   --primary-font: sans-serif;
 }
 #root {
-  background-color: var(--primary-background);
   height: 100%;
   color: var(--primary-color);
   font-family: var(--primary-font);
 }
 #app {
   height: 100%;
-  max-width: 100ch;
-  margin: auto;
 }
 
 .mini-divider {
@@ -38,6 +32,10 @@ html {
 }
 .screen {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 5em 0 2em 0;
 }
 
 .gameCanvas {
@@ -47,8 +45,11 @@ html {
 }
 
 .displayCanvas {
+  position: absolute;
+  top: 0;
+  z-index: -1;
   width: 100%;
-  height: 450px;
+  height: 100%;
   touch-action: none;
   pointer-events: none;
 }
@@ -59,28 +60,15 @@ html {
 
 .page-title {
   font-size: 3em;
-  padding: 0.5em;
-  margin-top: 0.5em;
+  margin-bottom: 0.3em;
+  text-shadow: 4px 4px red;
 }
 
 .label {
   color: peachpuff;
 }
 
-button {
-  color: aqua;
-  width: 80%;
-  max-width: 300px;
-  padding: 1em 0;
-  margin: 1em 0.5em 1em 0.5em;
-  background-color: transparent;
-  font-weight: bold;
-  border: 2px solid aqua;
-  border-radius: 15px;
-  font-size: 17px;
-}
-
-button:hover {
+.btn:hover {
   background-color: #c2c2c252;
   transform: scale(0.95);
 }
@@ -92,20 +80,6 @@ button:hover {
 .highlight-site-title {
   color: aqua;
   display: inline-block;
-  transform: rotate3d(1, 1, 1, 35deg);
-  animation-name: spinner;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  animation-duration: 5s;
-}
-
-@keyframes spinner {
-  from {
-    transform: rotate3d(1, 1, 1, 0deg);
-  }
-  to {
-    transform: rotate3d(1, 1, 1, 360deg);
-  }
 }
 
 a {
@@ -114,8 +88,12 @@ a {
   color: black;
 }
 
-.highlight-choice {
-  background-color: rgba(73, 255, 73, 0.678);
+.btn.highlight-choice {
+  color: rgba(73, 255, 73, 0.678);
+}
+
+.unselected-choice.btn {
+  color: white;
 }
 
 /* Loading Screen-------------------  */
@@ -177,7 +155,33 @@ a {
 }
 /* Home Screen-------------------  */
 
-.home .picture {
+.home {
+  height: 100vh;
+  background-color: transparent;
+}
+
+.home > * {
+  background-color: transparent;
+}
+
+.btn {
+  display: block;
+  margin: 0 auto;
+  font-size: 1.75em;
+  border-radius: 6px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: aqua;
+  width: 80%;
+  max-width: 300px;
+  padding: 1em 0;
+  border: 2px solid currentColor;
+}
+
+.btn + .btn {
+  margin-top: 0.5em;
+}
+
+.home .home .picture {
   background-color: black;
   height: 200px;
   width: 80%;
@@ -186,7 +190,12 @@ a {
 
 .home .page-info {
   margin: 1em 0;
-  font-size: 1.1em;
+  font-size: 1.2em;
+  font-weight: bold;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000,
+    1px 1px 0 #000;
+  color: white;
+  stroke: rgb(0, 0, 0);
 }
 
 /* Navbar-------------------  */
@@ -196,6 +205,7 @@ a {
   position: fixed;
   z-index: 3;
   left: 0;
+  top: 0;
   background-color: #111;
   overflow-x: hidden;
 }
@@ -245,8 +255,9 @@ button.highlight {
   z-index: 2;
   position: absolute;
   top: 0;
+  min-width: 300px;
   width: 100%;
-  max-width: 100ch;
+  margin: auto;
   display: flex;
   justify-content: center;
   height: 3.5rem;
@@ -265,7 +276,7 @@ button.highlight {
   padding: 0.1rem;
   font-size: 0.9rem;
   pointer-events: auto;
-  min-width: 0;
+  min-width: 70px;
   flex-grow: 1;
 }
 
@@ -287,11 +298,12 @@ button.highlight {
   position: absolute;
   display: flex;
   width: 100%;
-  max-width: 100ch;
+  margin: auto;
   background-color: rgba(255, 255, 255, 0.5);
   justify-content: space-around;
   text-align: center;
   bottom: 0;
+  padding-bottom: 0.25em;
 }
 
 .timer > .playerTimer > img {
@@ -325,6 +337,12 @@ button.highlight {
 
 .promotion-wrapper .selection {
   width: 50%;
+}
+
+.selections p {
+  font-size: 1.5em;
+  padding: 0.3em 0.1em;
+  padding-bottom: 2em;
 }
 
 .red {

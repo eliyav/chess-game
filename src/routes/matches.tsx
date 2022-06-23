@@ -4,11 +4,16 @@ import { MatchButton } from "../component/buttons/match-button";
 import { MenuButton } from "../component/buttons/menu-button";
 
 interface MatchesProps {
+  isNavbarOpen: boolean;
   openNavbar: React.Dispatch<React.SetStateAction<boolean>>;
   location: Location;
 }
 
-export const Matches: React.FC<MatchesProps> = ({ location, openNavbar }) => {
+export const Matches: React.FC<MatchesProps> = ({
+  location,
+  isNavbarOpen,
+  openNavbar,
+}) => {
   const [showSelections, setShowSelections] = useState(true);
 
   useEffect(() => {
@@ -17,10 +22,10 @@ export const Matches: React.FC<MatchesProps> = ({ location, openNavbar }) => {
 
   return (
     <div className="matches screen">
-      <MenuButton open={openNavbar} />
+      <MenuButton isNavbarOpen={isNavbarOpen} openNavbar={openNavbar} />
       {showSelections && (
         <div className="selections">
-          <p className="page-title">Select match:</p>
+          <h1 className="page-title">Select match:</h1>
           <MatchButton
             name="Offline Match"
             path="./offline-lobby"

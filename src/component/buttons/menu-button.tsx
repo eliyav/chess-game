@@ -2,21 +2,22 @@ import React, { MouseEventHandler, useRef } from "react";
 const menuUrl = new URL("../../../assets/icons/menu.svg", import.meta.url);
 
 interface Props {
-  open: React.Dispatch<React.SetStateAction<boolean>>;
+  openNavbar: React.Dispatch<React.SetStateAction<boolean>>;
+  isNavbarOpen: boolean;
 }
 
-export const MenuButton: React.FC<Props> = ({ open }) => {
+export const MenuButton: React.FC<Props> = ({ isNavbarOpen, openNavbar }) => {
   const ellipseRef = useRef<SVGEllipseElement>(null);
   return (
     <svg
       className="menu-button"
-      onClick={() => open(true)}
+      onClick={() => (isNavbarOpen ? openNavbar(false) : openNavbar(true))}
       width="53"
       height="56"
       viewBox="0 0 53 56"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      onMouseOver={() => {
+      onMouseEnter={() => {
         ellipseRef.current &&
           ellipseRef.current.setAttribute("fill", "#FFFFFF");
       }}

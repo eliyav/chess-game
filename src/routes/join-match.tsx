@@ -53,7 +53,7 @@ export const JoinLobby: React.FC<JoinLobbyProps> = ({
 
   return (
     <div className="lobby">
-      <p className="page-title">Lobby</p>
+      <h1 className="page-title">Lobby</h1>
       <div className="settings">
         {!lobbyKey || !keyVerified ? (
           <>
@@ -66,7 +66,10 @@ export const JoinLobby: React.FC<JoinLobbyProps> = ({
                 placeholder="Enter here"
               ></input>
             </div>
-            <button onClick={() => setLobbyKey(keyInputRef.current?.value)}>
+            <button
+              className="btn"
+              onClick={() => setLobbyKey(keyInputRef.current?.value)}
+            >
               Enter Lobby
             </button>
           </>

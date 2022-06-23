@@ -52,7 +52,7 @@ export const OnlineLobby: React.FC<OnlineLobbyProps> = ({
 
   return (
     <div className="lobby">
-      <p className="page-title">Lobby</p>
+      <h1 className="page-title">Lobby</h1>
       <div className="settings">
         <p className="label">Mode:</p>
         <p>Online</p>
@@ -66,7 +66,11 @@ export const OnlineLobby: React.FC<OnlineLobbyProps> = ({
         <div className="mini-divider"></div>
         <p className="label">First move - (White Player)</p>
         <button
-          className={defaultChoice.current === true ? "highlight-choice" : ""}
+          className={
+            defaultChoice.current === true
+              ? "highlight-choice btn"
+              : "unselected-choice btn"
+          }
           value="Game Host"
           onClick={(e) => {
             const value = e.currentTarget.value;
@@ -80,7 +84,11 @@ export const OnlineLobby: React.FC<OnlineLobbyProps> = ({
           Game Host
         </button>
         <button
-          className={defaultChoice.current === false ? "highlight-choice" : ""}
+          className={
+            defaultChoice.current === false
+              ? "highlight-choice btn"
+              : "unselected-choice btn"
+          }
           value="Opponent"
           onClick={(e) => {
             const value = e.currentTarget.value;
@@ -103,6 +111,7 @@ export const OnlineLobby: React.FC<OnlineLobbyProps> = ({
         }`}
       >
         <button
+          className="btn"
           onClick={() => {
             socket.emit(
               "start-match",

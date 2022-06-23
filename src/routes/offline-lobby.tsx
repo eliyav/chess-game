@@ -14,7 +14,7 @@ export const OfflineLobby: React.FC = ({}) => {
 
   return (
     <div className="lobby">
-      <p className="page-title">Lobby</p>
+      <h1 className="page-title">Lobby</h1>
       <div className="settings">
         <p className="label">Mode:</p>
         <p>Offline</p>
@@ -23,7 +23,7 @@ export const OfflineLobby: React.FC = ({}) => {
       </div>
 
       <Link to={`/offline-game?mode=offline&time=${lobbySettings.time}`}>
-        <button>Start Match</button>
+        <button className="btn">Start Match</button>
       </Link>
     </div>
   );
