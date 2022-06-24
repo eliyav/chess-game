@@ -162,6 +162,7 @@ a {
 
 .home {
   height: 100vh;
+  max-height: 100%;
   background-color: transparent;
 }
 
