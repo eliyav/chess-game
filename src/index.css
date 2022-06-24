@@ -3,6 +3,11 @@
   box-sizing: border-box;
 }
 
+html,
+body {
+  height: 100%;
+}
+
 :root {
   --primary-background: #333333;
   --primary-color: #e9e9e9;
