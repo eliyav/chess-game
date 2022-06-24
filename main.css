@@ -36,7 +36,6 @@ body {
   top: 0;
 }
 .screen {
-  position: fixed;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -163,6 +162,7 @@ a {
 /* Home Screen-------------------  */
 
 .home {
+  position: fixed;
   height: 100%;
   background-color: transparent;
 }
