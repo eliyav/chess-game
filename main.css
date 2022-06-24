@@ -36,11 +36,13 @@ body {
   top: 0;
 }
 .screen {
+  position: fixed;
   text-align: center;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 5em 0 2em 0;
+  justify-content: space-evenly;
+  margin: auto;
+  width: 100%;
 }
 
 .gameCanvas {
@@ -161,8 +163,7 @@ a {
 /* Home Screen-------------------  */
 
 .home {
-  height: 100vh;
-  max-height: 100%;
+  height: 100%;
   background-color: transparent;
 }
 
