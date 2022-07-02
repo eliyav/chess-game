@@ -4,11 +4,11 @@
   "description": "",
   "main": "dist/main.js",
   "scripts": {
-    "dev": "webpack",
-    "build": "webpack --mode=production",
+    "build": "webpack",
+    "prod": "webpack --mode=production",
     "watch": "webpack --watch",
-    "start": "webpack serve --open",
-    "server": "node server/server.js",
+    "dev": "webpack serve --open",
+    "start": "node server/server.js",
     "servermon": "nodemon server/server.js"
   },
   "browserslist": [
