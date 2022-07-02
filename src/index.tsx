@@ -1,11 +1,14 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import * as ReactDOMClient from "react-dom/client";
 import App from "./app";
 import { Auth0Provider } from "@auth0/auth0-react";
 import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 
-ReactDOM.render(
+const container = document.getElementById("root") as HTMLDivElement;
+const root = ReactDOMClient.createRoot(container);
+
+root.render(
   <React.StrictMode>
     <BrowserRouter>
       <Auth0Provider
@@ -18,6 +21,5 @@ ReactDOM.render(
         <App />
       </Auth0Provider>
     </BrowserRouter>
-  </React.StrictMode>,
-  document.getElementById("root")
+  </React.StrictMode>
 );
