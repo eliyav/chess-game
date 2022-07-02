@@ -139,6 +139,8 @@ PERFORMANCE OF THIS SOFTWARE.
 
 /*! core/Audio/weightedsound */
 
+/*! core/Culling/boundingInfo */
+
 /*! core/Engines/constants */
 
 /*! core/Lights/light */
@@ -168,8 +170,6 @@ PERFORMANCE OF THIS SOFTWARE.
 /*! core/Misc/deferred */
 
 /*! core/Misc/error */
-
-/*! core/Misc/stringTools */
 
 /*! core/Misc/tools */
 
