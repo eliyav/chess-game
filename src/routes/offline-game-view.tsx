@@ -140,7 +140,12 @@ export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
           <LoadingScreen text="..." />
         </div>
       )}
-      {gameLoaded && <TimerOverlay timer={offlineMatch.current?.timer!} />}
+      {gameLoaded && (
+        <TimerOverlay
+          timer={offlineMatch.current?.timer!}
+          state={offlineMatch.current?.game.state!}
+        />
+      )}
       {request ? (
         <RequestModal
           question={request.question}

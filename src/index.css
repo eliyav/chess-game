@@ -310,7 +310,27 @@ button.highlight {
   justify-content: space-around;
   text-align: center;
   bottom: 0;
-  padding-bottom: 0.25em;
+}
+
+.playerTimer {
+  flex-grow: 1;
+  max-width: 30%;
+}
+
+.active-player {
+  animation-name: flash;
+  animation-duration: 1.5s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+@keyframes flash {
+  from {
+    background-color: rgba(255, 0, 0, 1);
+  }
+  to {
+    background-color: rgba(255, 0, 0, 0.5);
+  }
 }
 
 .timer > .playerTimer > img {
@@ -324,7 +344,7 @@ button.highlight {
 .timer > .playerTimer > div {
   background-color: transparent;
   color: black;
-  display: inline;
+  display: inline-block;
   padding: 0.1rem;
   font-weight: bold;
   font-style: oblique;

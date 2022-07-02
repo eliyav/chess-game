@@ -342,7 +342,12 @@ export const OnlineGameView: React.FC<OnlineProps> = ({
           <LoadingScreen text="..." />
         </div>
       )}
-      {gameLoaded && <TimerOverlay timer={onlineMatch.current?.timer!} />}
+      {gameLoaded && (
+        <TimerOverlay
+          timer={onlineMatch.current?.timer!}
+          state={onlineMatch.current?.game.state!}
+        />
+      )}
       {request ? (
         <RequestModal
           question={request.question}
