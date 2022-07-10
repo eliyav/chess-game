@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
-import { useAuth0 } from "@auth0/auth0-react";
-import { Navbar } from "./component/navbar";
 import { Home } from "./routes/home";
 import { Matches } from "./routes/matches";
 import { UserData } from "./app";
@@ -18,55 +16,13 @@ interface ContentProps {
 
 export const Content: React.FC<ContentProps> = ({ userData }) => {
   const location = useLocation();
-  const { isAuthenticated } = useAuth0();
-  const [navbarOpen, setNavbarOpen] = useState(false);
   const [socketConnection, setSocketConnection] = useState<any>();
 
   return (
     <>
-      {navbarOpen && (
-        <Navbar
-          onClose={() => setNavbarOpen(false)}
-          items={[
-            {
-              text: "Home",
-              path: "/",
-            },
-            {
-              text: "Match",
-              path: "/match",
-            },
-          ]}
-          isLoggedIn={isAuthenticated}
-          userItems={[
-            {
-              text: "Profile",
-              path: "/profile",
-            },
-            {
-              text: "Edit Settings",
-              path: "/user-settings",
-            },
-          ]}
-        />
-      )}
       <Routes>
-        <Route
-          path="/"
-          element={
-            <Home isNavbarOpen={navbarOpen} openNavbar={setNavbarOpen} />
-          }
-        />
-        <Route
-          path="/match"
-          element={
-            <Matches
-              location={location}
-              isNavbarOpen={navbarOpen}
-              openNavbar={setNavbarOpen}
-            />
-          }
-        >
+        <Route path="/" element={<Home />} />
+        <Route path="/match" element={<Matches />}>
           <Route path="/match/offline-lobby" element={<OfflineLobby />} />
           <Route
             path="/match/online-lobby"
@@ -87,18 +43,11 @@ export const Content: React.FC<ContentProps> = ({ userData }) => {
             }
           />
         </Route>
-        <Route
-          path="/offline-game"
-          element={<OfflineGameView openNavbar={setNavbarOpen} />}
-        />
+        <Route path="/offline-game" element={<OfflineGameView />} />
         <Route
           path="/online-game"
           element={
-            <OnlineGameView
-              location={location}
-              socket={socketConnection}
-              openNavbar={setNavbarOpen}
-            />
+            <OnlineGameView location={location} socket={socketConnection} />
           }
         />
         <Route path="profile/:id" element={<Profile data={userData!} />} />

@@ -15,11 +15,7 @@ import PromotionModal from "../component/modals/promotion-modal";
 import { RequestModal } from "../component/modals/request-modal";
 import { TimerOverlay } from "../timer/timer-overlay";
 
-interface OfflineProps {
-  openNavbar: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
+export const OfflineGameView: React.FC = () => {
   const [gameLoaded, setGameLoaded] = useState(false);
   const [promotion, setPromotion] = useState(false);
   const [request, setRequest] = useState<{
@@ -113,8 +109,8 @@ export const OfflineGameView: React.FC<OfflineProps> = ({ openNavbar }) => {
         <MenuOverlay
           items={[
             {
-              text: "menu",
-              onClick: () => openNavbar(true),
+              text: "home",
+              onClick: () => {},
             },
             {
               text: "restart",

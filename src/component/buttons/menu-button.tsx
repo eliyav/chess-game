@@ -1,17 +1,10 @@
-import React, { MouseEventHandler, useRef } from "react";
-const menuUrl = new URL("../../../assets/icons/menu.svg", import.meta.url);
+import React, { useRef } from "react";
 
-interface Props {
-  openNavbar: React.Dispatch<React.SetStateAction<boolean>>;
-  isNavbarOpen: boolean;
-}
-
-export const MenuButton: React.FC<Props> = ({ isNavbarOpen, openNavbar }) => {
+export const MenuButton: React.FC = () => {
   const ellipseRef = useRef<SVGEllipseElement>(null);
   return (
     <svg
       className="menu-button"
-      onClick={() => (isNavbarOpen ? openNavbar(false) : openNavbar(true))}
       width="53"
       height="56"
       viewBox="0 0 53 56"

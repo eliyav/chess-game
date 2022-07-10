@@ -5,7 +5,6 @@ import { getUserInfo } from "./helper/request-helpers";
 
 const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<UserData>();
-
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
 
   useEffect(() => {

@@ -19,15 +19,10 @@ import { TimerOverlay } from "../timer/timer-overlay";
 
 interface OnlineProps {
   location: Location;
-  openNavbar: React.Dispatch<React.SetStateAction<boolean>>;
   socket: any;
 }
 
-export const OnlineGameView: React.FC<OnlineProps> = ({
-  openNavbar,
-  socket,
-  location,
-}) => {
+export const OnlineGameView: React.FC<OnlineProps> = ({ socket, location }) => {
   const [gameLoaded, setGameLoaded] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasView = useRef<CanvasView>();
@@ -313,7 +308,7 @@ export const OnlineGameView: React.FC<OnlineProps> = ({
           items={[
             {
               text: "menu",
-              onClick: () => openNavbar(true),
+              onClick: () => {},
             },
             {
               text: "restart",

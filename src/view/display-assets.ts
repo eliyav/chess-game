@@ -45,9 +45,9 @@ export const displayAssets = async (scene: CustomGameScene) => {
         : (finalMesh.material = materials.black);
     finalMesh.speed = Math.random() * 0.6;
     finalMesh.position.z = calcRandomZ();
-    finalMesh.rotationIndex = calcRandomIndex(rotationArray.length);
-    finalMesh.rotationIndex2 = calcRandomIndex(rotationArray.length);
-    finalMesh.rotationIndex3 = calcRandomIndex(rotationArray.length);
+    finalMesh.rotationIndex = calcRandomNumber();
+    finalMesh.rotationIndex2 = calcRandomNumber();
+    finalMesh.rotationIndex3 = calcRandomNumber();
     piecesMeshes.push(finalMesh);
   };
 
@@ -81,24 +81,22 @@ export const displayAssets = async (scene: CustomGameScene) => {
 
   const animateDistance = () => {
     requestAnimationFrame(() => {
-      alpha += 0.02;
-      beta += 0.02;
-      gamma += 0.02;
-      boardClone!.rotate(
-        new BABYLON.Vector3(0, beta, 0),
-        Math.PI / 500,
-        BABYLON.Space.LOCAL
-      );
-      boardClone2!.rotate(
-        new BABYLON.Vector3(0, -beta * 2, 0),
-        Math.PI / 500,
-        BABYLON.Space.LOCAL
-      );
       piecesMeshes.forEach((mesh) => {
         mesh.position.y -= mesh.speed!;
         if (mesh.position.y < -15) {
           resetMesh(mesh);
         }
+        boardClone!.rotate(
+          new BABYLON.Vector3(0, 1, 0),
+          0.001,
+          BABYLON.Space.LOCAL
+        );
+        boardClone2!.rotate(
+          new BABYLON.Vector3(0, 1, 0),
+          0.002,
+          BABYLON.Space.LOCAL
+        );
+
         mesh.rotate(
           new BABYLON.Vector3(
             alpha * rotationArray[mesh.rotationIndex!],
@@ -116,30 +114,29 @@ export const displayAssets = async (scene: CustomGameScene) => {
 };
 
 function calcRandomZ() {
-  const num = Math.random();
-  const pos = num > 0.5 ? -1 : 1;
+  const pos = Math.random() > 0.5 ? -1 : 1;
   const distance = 13;
-  const z = Math.random() * distance * pos;
-  return z;
+  return Math.random() * distance * pos;
 }
 
-function calcRandomIndex(length: number) {
-  const index = Math.floor(Math.random() * length);
-  return index;
+function calcRandomNumber() {
+  return Math.floor(Math.random() * 10);
 }
 
 function resetMesh(piece: DisplayMesh) {
-  const speed = Math.random() * 0.1;
-  piece.speed = speed;
+  piece.speed = Math.random() * 0.1;
   piece.position.z = calcRandomZ();
   piece.position.y = 20;
+  piece.rotationIndex = calcRandomNumber();
+  piece.rotationIndex2 = calcRandomNumber();
+  piece.rotationIndex3 = calcRandomNumber();
 }
 
 interface DisplayMesh extends AbstractMesh {
   name: string;
-  color?: string;
-  speed?: number;
-  rotationIndex?: number;
-  rotationIndex2?: number;
-  rotationIndex3?: number;
+  color: string;
+  speed: number;
+  rotationIndex: number;
+  rotationIndex2: number;
+  rotationIndex3: number;
 }

@@ -21,18 +21,9 @@ export const displayScreen = async (
   );
   camera.useFramingBehavior = false;
 
-  const light = new BABYLON.HemisphericLight(
-    "light",
-    new BABYLON.Vector3(0, 1, 0),
-    scene
-  );
+  new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+  new BABYLON.PhotoDome("spaceDome", space, { size: 250 }, scene);
 
-  const photoDome = new BABYLON.PhotoDome(
-    "spaceDome",
-    space,
-    { size: 250 },
-    scene
-  );
   await displayAssets(scene);
 
   return scene;
