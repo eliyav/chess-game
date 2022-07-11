@@ -11,39 +11,53 @@ import { OfflineLobby } from "./routes/offline-lobby";
 import { OnlineGameView } from "./routes/online-game-view";
 import { OnlineLobby } from "./routes/online-lobby";
 import { displayScreen } from "./view/display-screen";
+import { CustomGameScene } from "./view/game-assets";
+import gameScreen from "./view/game-screen";
 
 const App: React.FC = () => {
-  const [isInitDone, setIsInitDone] = useState(false);
+  const [isInit, setIsInit] = useState(false);
   const [loadingScreen, setloadingScreen] = useState(true);
+  const [canvasGameMode, setCanvasGameMode] = useState(false);
   const [currentUser, setCurrentUser] = useState<UserData>();
   const [socketConnection, setSocketConnection] = useState<any>();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const engineRef = useRef<BABYLON.Engine>();
   const location = useLocation();
   const [user, isAuthenticated] = useAuthentication(setCurrentUser);
 
   useEffect(() => {
-    if (isInitDone) {
-      let engine = new BABYLON.Engine(canvasRef.current, true);
+    isInit
+      ? (engineRef.current = new BABYLON.Engine(canvasRef.current, true))
+      : setIsInit(true);
+  }, [isInit]);
+
+  useEffect(() => {
+    if (canvasRef.current?.getAttribute("data-engine") !== null) {
+      let scene: CustomGameScene;
       (async () => {
-        const displayScene = await displayScreen(engine);
-        engine.runRenderLoop(() => {
-          displayScene.render();
-          engine.resize();
+        if (canvasGameMode) {
+          scene = await gameScreen(canvasRef.current!, engineRef.current!);
+        } else {
+          scene = await displayScreen(engineRef.current!);
+        }
+        engineRef.current!.runRenderLoop(() => {
+          scene.render();
+          engineRef.current!.resize();
         });
         setTimeout(() => setloadingScreen(false), 1000);
       })();
-      return () => engine.stopRenderLoop();
+
+      return () => engineRef.current!.stopRenderLoop();
     }
-    setIsInitDone(true);
-  }, [isInitDone]);
+  }, [canvasRef.current, canvasGameMode]);
 
   return (
     <div id="app">
-      <canvas ref={canvasRef} className="displayCanvas screen"></canvas>
+      <canvas ref={canvasRef} className="canvasDisplay screen"></canvas>
       <Routes>
         <Route
           path="/"
-          element={loadingScreen ? <LoadingScreen text="..." /> : <Home />}
+          element={loadingScreen ? <LoadingScreen text="..." /> : null}
         />
         <Route path="/match" element={<Matches />}>
           <Route path="/match/offline-lobby" element={<OfflineLobby />} />
@@ -52,7 +66,7 @@ const App: React.FC = () => {
             element={
               <OnlineLobby
                 setSocket={setSocketConnection}
-                userName={currentUser!.name}
+                userName={currentUser?.name}
               />
             }
           />
@@ -61,7 +75,7 @@ const App: React.FC = () => {
             element={
               <JoinLobby
                 setSocket={setSocketConnection}
-                userName={currentUser!.name}
+                userName={currentUser?.name}
               />
             }
           />
