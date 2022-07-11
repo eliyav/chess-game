@@ -1,8 +1,8 @@
-import * as BABYLON from "babylonjs";
 import React, { useEffect, useRef, useState } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import LoadingScreen from "./component/loading-screen";
 import { useAuthentication } from "./hooks/use-authentication";
+import { useCanvasRender } from "./hooks/use-canvas-render";
 import { Home } from "./routes/home";
 import { JoinLobby } from "./routes/join-match";
 import { Matches } from "./routes/matches";
@@ -10,46 +10,15 @@ import { OfflineGameView } from "./routes/offline-game-view";
 import { OfflineLobby } from "./routes/offline-lobby";
 import { OnlineGameView } from "./routes/online-game-view";
 import { OnlineLobby } from "./routes/online-lobby";
-import { displayScreen } from "./view/display-screen";
-import { CustomGameScene } from "./view/game-assets";
-import gameScreen from "./view/game-screen";
 
 const App: React.FC = () => {
-  const [isInit, setIsInit] = useState(false);
-  const [loadingScreen, setloadingScreen] = useState(true);
   const [canvasGameMode, setCanvasGameMode] = useState(false);
   const [currentUser, setCurrentUser] = useState<UserData>();
   const [socketConnection, setSocketConnection] = useState<any>();
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const engineRef = useRef<BABYLON.Engine>();
-  const location = useLocation();
+  const [loadingScreen] = useCanvasRender(canvasRef.current, canvasGameMode);
   const [user, isAuthenticated] = useAuthentication(setCurrentUser);
-
-  useEffect(() => {
-    isInit
-      ? (engineRef.current = new BABYLON.Engine(canvasRef.current, true))
-      : setIsInit(true);
-  }, [isInit]);
-
-  useEffect(() => {
-    if (canvasRef.current?.getAttribute("data-engine") !== null) {
-      let scene: CustomGameScene;
-      (async () => {
-        if (canvasGameMode) {
-          scene = await gameScreen(canvasRef.current!, engineRef.current!);
-        } else {
-          scene = await displayScreen(engineRef.current!);
-        }
-        engineRef.current!.runRenderLoop(() => {
-          scene.render();
-          engineRef.current!.resize();
-        });
-        setTimeout(() => setloadingScreen(false), 1000);
-      })();
-
-      return () => engineRef.current!.stopRenderLoop();
-    }
-  }, [canvasRef.current, canvasGameMode]);
+  const location = useLocation();
 
   return (
     <div id="app">
@@ -57,7 +26,7 @@ const App: React.FC = () => {
       <Routes>
         <Route
           path="/"
-          element={loadingScreen ? <LoadingScreen text="..." /> : null}
+          element={loadingScreen ? <LoadingScreen text="..." /> : <Home />}
         />
         <Route path="/match" element={<Matches />}>
           <Route path="/match/offline-lobby" element={<OfflineLobby />} />
