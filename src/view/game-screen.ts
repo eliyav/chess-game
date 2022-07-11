@@ -4,7 +4,7 @@ import { gameAssets } from "./game-assets";
 import { createMovementMaterials } from "./materials";
 import { CustomGameScene } from "./game-assets";
 
-const gameScreen = async (
+export const gameScreen = async (
   canvas: HTMLCanvasElement,
   engine: BABYLON.Engine
 ): Promise<CustomGameScene> => {
@@ -146,5 +146,3 @@ const gameScreen = async (
   scene.detachControl();
   return scene;
 };
-
-export default gameScreen;

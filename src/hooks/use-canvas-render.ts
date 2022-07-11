@@ -2,7 +2,6 @@ import * as BABYLON from "babylonjs";
 import React, { useEffect, useRef, useState } from "react";
 import { displayScreen } from "../view/display-screen";
 import { CustomGameScene } from "../view/game-assets";
-import gameScreen from "../view/game-screen";
 
 export const useCanvasRender = (
   canvasRef: HTMLCanvasElement | null,
@@ -24,6 +23,7 @@ export const useCanvasRender = (
         let scene: CustomGameScene;
         (async () => {
           if (canvasGameMode) {
+            const { gameScreen } = await import("../view/game-screen");
             scene = await gameScreen(canvasRef!, engineRef.current!);
           } else {
             scene = await displayScreen(engineRef.current!);

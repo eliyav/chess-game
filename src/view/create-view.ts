@@ -1,5 +1,5 @@
 import { Engine } from "babylonjs";
-import gameScreen from "./game-screen";
+import { gameScreen } from "./game-screen";
 import Game from "../component/game-logic/game";
 import { findPosition } from "../helper/canvas-helpers";
 import { TurnHistory } from "../helper/game-helpers";
