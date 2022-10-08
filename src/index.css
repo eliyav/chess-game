@@ -95,43 +95,44 @@ canvas {
   display: block;
   font-family: inherit;
   font-size: 4em;
-  padding: 1em;
+  margin-top: 0.5em;
+  padding: 0.5em;
   text-shadow: 2px 2px black;
-  color: grey;
   text-align: center;
-  font-style: italic;
+  background: rgba(1, 1, 1, 0.3);
+  color: whitesmoke;
 }
 
 .menu {
   position: inherit;
   bottom: 0;
-  margin: 50px 20px;
+  margin: 50px 0px;
+  width: 100%;
+  text-align: center;
 }
 
 .menu-item {
-  margin: 20px 10px;
+  margin: 20px 0px;
 }
 
 .menu-item button {
-  width: 200px;
+  width: 250px;
   max-width: 75vw;
-  height: 40px;
   border-radius: 6px;
-  background: rgba(1, 1, 1, 0.5);
-  border: 2px solid white;
-  box-shadow: 0px 0px 10px 1px white;
+  background: rgba(1, 1, 1, 0.3);
+  box-shadow: 0px 0px 5px 0.5px white;
   color: white;
   font-family: inherit;
   font-style: italic;
-  font-size: 25px;
-  text-align: left;
-  padding-left: 10px;
+  font-size: 45px;
+  text-align: center;
   transition: width 0.25s;
+  padding: 0.25em;
+  backdrop-filter: blur(5px);
 }
 
 .menu-item button:hover {
-  color: rgb(140, 140, 140);
-  width: 300px;
+  border: 1px solid yellow;
 }
 
 /* Game Overlay-------------------  */
