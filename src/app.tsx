@@ -4,13 +4,7 @@ import { Route, Routes, useLocation } from "react-router-dom";
 import LoadingScreen from "./component/loading-screen";
 import { useAuthentication } from "./hooks/use-authentication";
 import { Home } from "./routes/home";
-import { JoinLobby } from "./routes/join-match";
-import { Matches } from "./routes/matches";
-import { OfflineGameView } from "./routes/offline-game-view";
-import { OfflineLobby } from "./routes/offline-lobby";
-import { OnlineGameView } from "./routes/online-game-view";
-import { OnlineLobby } from "./routes/online-lobby";
-import { displayScreen } from "./view/display-screen";
+import { homeScene } from "./view/home-scene";
 import { CustomGameScene } from "./view/game-assets";
 
 // const [currentUser, setCurrentUser] = useState<UserData>();
@@ -31,7 +25,7 @@ const App: React.FC = () => {
         (async () => {
           canvasRendered.current = true;
           engine.current = new BABYLON.Engine(canvasRef.current, true);
-          scene.current = await displayScreen(engine.current);
+          scene.current = await homeScene(engine.current);
 
           engine.current.runRenderLoop(() => {
             scene.current!.render();
@@ -41,6 +35,7 @@ const App: React.FC = () => {
           setIsLoading(false);
 
           return () => {
+            canvasRendered.current = false;
             engine.current!.stopRenderLoop();
             window.removeEventListener("resize", () =>
               engine.current!.resize()
@@ -58,7 +53,6 @@ const App: React.FC = () => {
 
   return (
     <div id="app">
-      <canvas ref={canvasRef} className="canvasDisplay screen"></canvas>
       <Routes>
         <Route
           path="/"
@@ -93,6 +87,7 @@ const App: React.FC = () => {
           }
         /> */}
       </Routes>
+      <canvas ref={canvasRef}></canvas>
     </div>
   );
 };

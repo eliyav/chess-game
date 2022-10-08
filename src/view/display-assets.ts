@@ -10,10 +10,12 @@ import { CustomGameScene } from "./game-assets";
 import { AbstractMesh } from "babylonjs";
 import { createMeshMaterials } from "./materials";
 
+const startingPostion = 35;
+const endingPosition = -75;
+
 export const displayAssets = async (scene: CustomGameScene) => {
   const materials = createMeshMaterials(scene);
   let boardMesh = board;
-
   let boardPieces = [king, queen, knight, bishop, rook, pawn];
 
   const loadedBoardMeshes = await BABYLON.SceneLoader.ImportMeshAsync(
@@ -38,7 +40,7 @@ export const displayAssets = async (scene: CustomGameScene) => {
     finalMesh.name = name;
     finalMesh.color = color;
     (finalMesh.scalingDeterminant = 40),
-      (finalMesh.position.y = 17),
+      (finalMesh.position.y = startingPostion),
       (finalMesh.position.x = 10),
       finalMesh.color === "White"
         ? (finalMesh.material = materials.white)
@@ -83,17 +85,17 @@ export const displayAssets = async (scene: CustomGameScene) => {
     requestAnimationFrame(() => {
       piecesMeshes.forEach((mesh) => {
         mesh.position.y -= mesh.speed!;
-        if (mesh.position.y < -15) {
+        if (mesh.position.y < endingPosition) {
           resetMesh(mesh);
         }
         boardClone!.rotate(
           new BABYLON.Vector3(0, 1, 0),
-          0.001,
+          0.0008,
           BABYLON.Space.LOCAL
         );
         boardClone2!.rotate(
-          new BABYLON.Vector3(0, 1, 0),
-          0.002,
+          new BABYLON.Vector3(0.6, 1, 0.5),
+          0.0005,
           BABYLON.Space.LOCAL
         );
 
@@ -126,7 +128,7 @@ function calcRandomNumber() {
 function resetMesh(piece: DisplayMesh) {
   piece.speed = Math.random() * 0.1;
   piece.position.z = calcRandomZ();
-  piece.position.y = 20;
+  piece.position.y = startingPostion;
   piece.rotationIndex = calcRandomNumber();
   piece.rotationIndex2 = calcRandomNumber();
   piece.rotationIndex3 = calcRandomNumber();
