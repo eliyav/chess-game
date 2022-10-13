@@ -1,4 +1,5 @@
 import React from "react";
+import { SvgGithub } from "../component/svg/svg-github";
 
 const menuItems = ["Login", "Play"];
 
@@ -8,7 +9,12 @@ const menuItems = ["Login", "Play"];
 export const Home: React.FC = () => {
   return (
     <div className="home screen">
-      <h1 className="home-title">3D CHESS</h1>
+      <h1 className="home-title">
+        <div className="home-icons">
+          <SvgGithub />
+        </div>
+        3D CHESS
+      </h1>
       <div className="menu">
         {menuItems.map((item) => (
           <div className="menu-item">

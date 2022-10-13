@@ -101,6 +101,22 @@ canvas {
   text-align: center;
   background: rgba(1, 1, 1, 0.3);
   color: whitesmoke;
+  user-select: none;
+}
+
+.home-icons {
+  position: absolute;
+  top: 0px;
+  right: 10px;
+  margin: 5px 5px;
+}
+.svg-icon {
+  background-color: white;
+  border-radius: 8px;
+}
+
+.svg-icon:hover {
+  opacity: 0.8;
 }
 
 .menu {
