@@ -2,26 +2,16 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 interface MatchBtnProps {
-  name: string;
+  text: string;
   path: string;
-  description: string;
-  onSelect: () => void;
 }
 
-export const MatchButton: React.FC<MatchBtnProps> = ({
-  name,
-  path,
-  description,
-  onSelect,
-}) => {
+export const MatchButton: React.FC<MatchBtnProps> = ({ text, path }) => {
   return (
-    <>
+    <div className="menu-item">
       <Link to={path}>
-        <button className="btn" onClick={onSelect}>
-          {name}
-        </button>
+        <button className="menu-btn">{text}</button>
       </Link>
-      <p>{description}</p>
-    </>
+    </div>
   );
 };

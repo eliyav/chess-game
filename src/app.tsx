@@ -6,6 +6,7 @@ import { useAuthentication } from "./hooks/use-authentication";
 import { Home } from "./routes/home";
 import { homeScene } from "./view/home-scene";
 import { CustomGameScene } from "./view/game-assets";
+import { Matches } from "./routes/matches";
 
 // const [currentUser, setCurrentUser] = useState<UserData>();
 // const [socketConnection, setSocketConnection] = useState<any>();
@@ -58,7 +59,8 @@ const App: React.FC = () => {
           path="/"
           element={isLoading ? <LoadingScreen text="..." /> : <Home />}
         />
-        {/* <Route path="/match" element={<Matches />}>
+        <Route path="/match" element={<Matches />} />
+        {/* 
           <Route path="/match/offline-lobby" element={<OfflineLobby />} />
           <Route
             path="/match/online-lobby"

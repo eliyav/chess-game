@@ -1,10 +1,11 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { SvgGithub } from "../component/svg/svg-github";
 
-const menuItems = ["Login", "Play"];
-
-//add to the play button
-// background: #007e008f;
+const menuItems = [
+  { text: "Login", path: "" },
+  { text: "Play", path: "/match" },
+];
 
 export const Home: React.FC = () => {
   return (
@@ -16,9 +17,11 @@ export const Home: React.FC = () => {
         3D CHESS
       </h1>
       <div className="menu">
-        {menuItems.map((item) => (
+        {menuItems.map(({ path, text }) => (
           <div className="menu-item">
-            <button>{item}</button>
+            <Link to={path}>
+              <button className="menu-btn">{text}</button>
+            </Link>
           </div>
         ))}
       </div>

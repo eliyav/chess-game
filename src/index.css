@@ -27,7 +27,7 @@ body {
   --primary-background: #333333;
   --primary-color: #e9e9e9;
   --primary-alt-color: #8b8b8b;
-  --primary-font: sans-serif;
+  --primary-font: Ubuntu;
 }
 #root {
   height: 100%;
@@ -53,6 +53,21 @@ canvas {
   outline: none;
   height: 100%;
   width: 100%;
+}
+
+.sub-title {
+  text-align: center;
+  background: red;
+  padding: 0.3em;
+  margin: 0.25em;
+  font-size: 3.5em;
+  background: rgba(1, 1, 1, 0.3);
+  user-select: none;
+}
+
+.match-btns {
+  position: absolute;
+  bottom: 0;
 }
 
 /* Loading */
@@ -88,20 +103,17 @@ canvas {
 
 .home {
   background-color: transparent;
-  font-family: Ubuntu;
 }
 
 .home-title {
-  display: block;
-  font-family: inherit;
   font-size: 4em;
   margin-top: 0.5em;
   padding: 0.5em;
   text-shadow: 2px 2px black;
   text-align: center;
   background: rgba(1, 1, 1, 0.3);
-  color: whitesmoke;
   user-select: none;
+  color: whitesmoke;
 }
 
 .home-icons {
@@ -120,7 +132,7 @@ canvas {
 }
 
 .menu {
-  position: inherit;
+  position: absolute;
   bottom: 0;
   margin: 50px 0px;
   width: 100%;
@@ -131,24 +143,34 @@ canvas {
   margin: 20px 0px;
 }
 
-.menu-item button {
-  width: 250px;
-  max-width: 75vw;
+.menu-btn {
+  width: 350px;
+  max-width: 85vw;
   border-radius: 6px;
   background: rgba(1, 1, 1, 0.3);
   box-shadow: 0px 0px 5px 0.5px white;
   color: white;
   font-family: inherit;
   font-style: italic;
-  font-size: 45px;
+  font-size: 40px;
   text-align: center;
-  transition: width 0.25s;
-  padding: 0.25em;
+  padding: 0.25em 0em;
   backdrop-filter: blur(5px);
+  margin-top: 0.75em;
+  user-select: none;
 }
 
-.menu-item button:hover {
-  border: 1px solid yellow;
+.menu-btn:hover {
+  box-shadow: 0px 0px 5px 0.5px yellow;
+}
+
+.return-btn {
+  width: 50px;
+  user-select: none;
+}
+
+.return-btn:hover {
+  opacity: 0.5;
 }
 
 /* Game Overlay-------------------  */
@@ -258,12 +280,6 @@ canvas {
 
 .promotion-wrapper .selection {
   width: 50%;
-}
-
-.selections p {
-  font-size: 1.5em;
-  padding: 0.3em 0.1em;
-  padding-bottom: 2em;
 }
 
 .red {
