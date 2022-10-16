@@ -7,6 +7,8 @@ import { Home } from "./routes/home";
 import { homeScene } from "./view/home-scene";
 import { CustomGameScene } from "./view/game-assets";
 import { Matches } from "./routes/matches";
+import { OfflineLobby } from "./routes/offline-lobby";
+import { Lobby } from "./routes/lobby";
 
 // const [currentUser, setCurrentUser] = useState<UserData>();
 // const [socketConnection, setSocketConnection] = useState<any>();
@@ -18,7 +20,11 @@ const App: React.FC = () => {
   const canvasRendered = useRef(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engine = useRef<BABYLON.Engine>();
-  const scene = useRef<CustomGameScene>();
+  const scenes = useRef<CustomGameScene[]>([]);
+  const [activeScene, setActiveScene] = useState<number>(0);
+  //Create Game
+  //Create Match Manager
+  //Create Scene Manager
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -26,10 +32,10 @@ const App: React.FC = () => {
         (async () => {
           canvasRendered.current = true;
           engine.current = new BABYLON.Engine(canvasRef.current, true);
-          scene.current = await homeScene(engine.current);
+          scenes.current.push(await homeScene(engine.current));
 
           engine.current.runRenderLoop(() => {
-            scene.current!.render();
+            scenes.current![activeScene].render();
           });
 
           window.addEventListener("resize", () => engine.current!.resize());
@@ -59,10 +65,9 @@ const App: React.FC = () => {
           path="/"
           element={isLoading ? <LoadingScreen text="..." /> : <Home />}
         />
-        <Route path="/match" element={<Matches />} />
-        {/* 
-          <Route path="/match/offline-lobby" element={<OfflineLobby />} />
-          <Route
+        <Route path="/lobby" element={<Lobby />} />
+        {/* <Route path="/match/offline-lobby" element={<OfflineLobby />} /> */}
+        {/* <Rou
             path="/match/online-lobby"
             element={
               <OnlineLobby
@@ -70,7 +75,6 @@ const App: React.FC = () => {
                 userName={currentUser?.name}
               />
             }
-          />
           <Route
             path="/match/join-lobby"
             element={
@@ -79,7 +83,9 @@ const App: React.FC = () => {
                 userName={currentUser?.name}
               />
             }
-          />
+          /> */}
+        {/* 
+
         </Route>
         <Route path="/offline-game" element={<OfflineGameView />} />
         <Route

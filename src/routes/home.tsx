@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { SvgGithub } from "../component/svg/svg-github";
 
 const menuItems = [
-  { text: "Login", path: "" },
-  { text: "Play", path: "/match" },
+  // { text: "Login", path: "" },
+  { text: "Play", path: "/lobby" },
 ];
 
 export const Home: React.FC = () => {

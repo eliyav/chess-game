@@ -1,32 +1,28 @@
-export type State = {
-  currentPlayer: string,
-}
-
-export interface Data {
+interface Data {
   boardSize: number;
   columnNames: string[][];
   teams: string[];
   pieces: string[];
   movement: number[];
-  initialState: State;
+  current: { player: string };
   pieceInitialPoints: PieceInitialPoints[][];
   gridInitialPoints: PieceInitialPoints[][];
 }
 
 export interface PieceInitialPoints {
-  name: string,
-  color: string,
-  points: Point[]
+  name: string;
+  color: string;
+  points: Point[];
 }
 
-const chessData: Data = {
+export const chessData: Data = {
   boardSize: 8,
   columnNames: [["a"], ["b"], ["c"], ["d"], ["e"], ["f"], ["g"], ["h"]],
   teams: ["White", "Black"],
   pieces: ["Pawn", "Rook", "Bishop", "Knight", "King", "Queen"],
   movement: [1, 2, 3, 4, 5, 6, 7],
-  initialState: {
-    currentPlayer: "White",
+  current: {
+    player: "White",
   },
   pieceInitialPoints: [
     [

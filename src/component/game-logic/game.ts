@@ -1,37 +1,22 @@
 import * as gameHelpers from "../../helper/game-helpers";
 import * as movementHelpers from "../../helper/movement-helpers";
-import { setPieces, createGrid, Square } from "../../helper/board-helpers";
 import {
   TurnHistory,
   LocationsInfo,
   undoUpdateLocation,
 } from "../../helper/game-helpers";
 import Board from "./board";
-import { Data, State } from "./chess-data-import";
 import GamePiece, { Move } from "./game-piece";
 
 class Game {
-  state: State;
-  teams: string[];
-  turnCounter: number;
   board: Board;
-  moves: Point[];
   annotations: string[];
   turnHistory: TurnHistory[];
-  gameStarted: boolean;
-  endMatch: () => void;
 
-  constructor(chessData: Data, endMatch: () => void) {
-    this.state = chessData.initialState;
-    this.teams = chessData.teams;
-    this.board = new Board(chessData);
-    this.moves = [];
+  constructor() {
+    this.board = new Board();
     this.annotations = [];
     this.turnHistory = [];
-    this.turnCounter = 1;
-    this.setBoard();
-    this.gameStarted = false;
-    this.endMatch = endMatch;
   }
 
   playerMove(originPoint: Point, targetPoint: Point): TurnHistory | boolean {
@@ -108,12 +93,12 @@ class Game {
       locationsInfo;
     const castling =
       originPiece!.name === "King" &&
-      originPiece!.color === this.state.currentPlayer;
+      originPiece!.color === this.current.player;
     let castling2 = false;
     if (targetPiece !== undefined) {
       castling2 =
         targetPiece.name === "Rook" &&
-        targetPiece.color === this.state.currentPlayer;
+        targetPiece.color === this.current.player;
       if (castling && castling2) {
         const a = gameHelpers.getX(originPoint);
         const b = gameHelpers.getX(targetPoint);
@@ -247,12 +232,12 @@ class Game {
         if (currentPlayer) {
           return (
             square.on!.name === "King" &&
-            square.on!.color === this.state.currentPlayer
+            square.on!.color === this.current.player
           );
         } else {
           return (
             square.on!.name === "King" &&
-            square.on!.color !== this.state.currentPlayer
+            square.on!.color !== this.current.player
           );
         }
       });
@@ -266,9 +251,9 @@ class Game {
     const piecesArray = this.board.grid.flat().filter((square) => {
       if (square.on !== undefined) {
         if (currentPlayer) {
-          return square.on.color === this.state.currentPlayer;
+          return square.on.color === this.current.player;
         } else {
-          return square.on.color !== this.state.currentPlayer;
+          return square.on.color !== this.current.player;
         }
       }
     });
@@ -357,7 +342,7 @@ class Game {
         resolve[0] ? movesObj.push(resolve[1]) : null;
       }
     };
-    const playersRooks = this.findPieces("Rook", this.state.currentPlayer);
+    const playersRooks = this.findPieces("Rook", this.current.player);
     if (playersRooks) {
       playersRooks.forEach((square) => {
         checkCastlingMove(piece!, square.on!);
@@ -427,55 +412,10 @@ class Game {
     return returnResult;
   }
 
-  changePlayer() {
-    this.state.currentPlayer =
-      this.state.currentPlayer === this.teams[0]
-        ? this.teams[1]
-        : this.teams[0];
-  }
-
-  switchTurn() {
-    this.turnCounter++;
-    this.changePlayer();
-    return this.isCheckmate() ? this.endMatch() : null;
-  }
-
-  undoTurn() {
-    const lastTurn = this.turnHistory.at(-1);
-    if (lastTurn !== undefined) {
-      lastTurn.originPiece!.moveCounter === 1
-        ? (lastTurn.originPiece!.moved = false)
-        : null;
-      lastTurn.originPiece!.moveCounter--;
-      lastTurn.castling
-        ? lastTurn.castling.forEach((square) => (square.on = undefined))
-        : null;
-      lastTurn.originSquare.on = lastTurn.originPiece;
-      lastTurn.originPiece!.point = lastTurn.origin;
-      lastTurn.targetSquare.on = lastTurn.targetPiece;
-      this.turnHistory.length = this.turnHistory.length - 1;
-      this.annotations.length = this.annotations.length - 1;
-      this.turnCounter--;
-      this.changePlayer();
-    }
-  }
-
-  setBoard() {
-    setPieces(
-      this.board.grid,
-      this.board.pieceInitialPoints,
-      this.board.movementArray
-    );
-  }
-
   resetGame() {
-    this.board.grid = createGrid(this.board.boardSize, this.board.columnNames);
-    this.setBoard();
-    this.state.currentPlayer = this.teams[0];
+    this.board.resetBoard();
     this.annotations = [];
     this.turnHistory = [];
-    this.turnCounter = 1;
-    this.gameStarted = true;
   }
 
   annotate(result: TurnHistory) {
@@ -504,21 +444,6 @@ class Game {
       isCheck ? (finalString = `${finalString}+`) : null;
     }
     return finalString;
-  }
-
-  resetMoves() {
-    this.moves.length = 0;
-  }
-
-  loadGame(options: any) {
-    this.state = options.state;
-    this.teams = options.teams;
-    this.turnCounter = options.turnCounter;
-    this.annotations = options.annotations;
-    this.turnHistory = options.turnHistory;
-    this.gameStarted = options.gameStarted;
-    this.turnCounter = options.turnCounter;
-    this.setBoard();
   }
 }
 
