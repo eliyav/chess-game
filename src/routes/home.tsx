@@ -1,11 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { SvgGithub } from "../component/svg/svg-github";
+import { SvgGithub } from "../svg-components/svg-github";
 
-const menuItems = [
-  // { text: "Login", path: "" },
-  { text: "Play", path: "/lobby" },
-];
+const menuItems = [{ text: "Play", path: "/lobby" }];
 
 export const Home: React.FC = () => {
   return (
@@ -17,8 +14,8 @@ export const Home: React.FC = () => {
         3D CHESS
       </h1>
       <div className="menu">
-        {menuItems.map(({ path, text }) => (
-          <div className="menu-item">
+        {menuItems.map(({ path, text }, idx) => (
+          <div className="menu-item" key={idx}>
             <Link to={path}>
               <button className="menu-btn">{text}</button>
             </Link>

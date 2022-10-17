@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as BABYLON from "babylonjs";
 import { Route, Routes, useLocation } from "react-router-dom";
-import LoadingScreen from "./component/loading-screen";
+import LoadingScreen from "./components/loading-screen";
 import { useAuthentication } from "./hooks/use-authentication";
 import { Home } from "./routes/home";
 import { homeScene } from "./view/home-scene";
 import { CustomGameScene } from "./view/game-assets";
-import { Matches } from "./routes/matches";
-import { OfflineLobby } from "./routes/offline-lobby";
 import { Lobby } from "./routes/lobby";
+import { Match } from "./components/match";
+import { SceneManager } from "./components/scene-manager";
 
 // const [currentUser, setCurrentUser] = useState<UserData>();
 // const [socketConnection, setSocketConnection] = useState<any>();
@@ -17,44 +17,31 @@ import { Lobby } from "./routes/lobby";
 
 const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const canvasRendered = useRef(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const engine = useRef<BABYLON.Engine>();
-  const scenes = useRef<CustomGameScene[]>([]);
-  const [activeScene, setActiveScene] = useState<number>(0);
-  //Create Game
-  //Create Match Manager
+  const sceneManager = useRef<SceneManager>();
   //Create Scene Manager
+  //Create Controller
 
   useEffect(() => {
-    if (canvasRef.current) {
-      if (!canvasRendered.current) {
-        (async () => {
-          canvasRendered.current = true;
-          engine.current = new BABYLON.Engine(canvasRef.current, true);
-          scenes.current.push(await homeScene(engine.current));
+    if (canvasRef.current && !sceneManager.current) {
+      (async () => {
+        sceneManager.current = new SceneManager(canvasRef.current!);
+        await sceneManager.current.init();
+        window.addEventListener("resize", () => sceneManager.current?.resize());
+        setIsLoading(false);
 
-          engine.current.runRenderLoop(() => {
-            scenes.current![activeScene].render();
-          });
+        return () => {
+          sceneManager.current?.stopRender();
+          window.removeEventListener("resize", () =>
+            sceneManager.current?.resize()
+          );
+        };
 
-          window.addEventListener("resize", () => engine.current!.resize());
-          setIsLoading(false);
-
-          return () => {
-            canvasRendered.current = false;
-            engine.current!.stopRenderLoop();
-            window.removeEventListener("resize", () =>
-              engine.current!.resize()
-            );
-          };
-
-          //   const { gameScreen } = await import("./view/game-screen");
-          //   sceneRef.current = await gameScreen(
-          //     canvasRef.current!,
-          //     engineRef.current!
-        })();
-      }
+        //   const { gameScreen } = await import("./view/game-screen");
+        //   sceneRef.current = await gameScreen(
+        //     canvasRef.current!,
+        //     engineRef.current!
+      })();
     }
   }, [canvasRef.current]);
 

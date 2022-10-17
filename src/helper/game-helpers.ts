@@ -1,5 +1,5 @@
-import { Square } from "../component/game-logic/board";
-import GamePiece from "../component/game-logic/game-piece";
+import { Square } from "../components/game-logic/board";
+import GamePiece from "../components/game-logic/game-piece";
 
 export interface TurnHistory {
   result: boolean;

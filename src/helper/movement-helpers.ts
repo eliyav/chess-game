@@ -3,8 +3,8 @@ import {
   isEnPassantAvailable,
   doMovesMatch,
 } from "./game-helpers";
-import { Square } from "./board-helpers";
-import GamePiece, { Move } from "../component/game-logic/game-piece";
+import { Square } from "../components/game-logic/board";
+import GamePiece, { Move } from "../components/game-logic/game-piece";
 
 type MovesObj = {
   up?: Point[];

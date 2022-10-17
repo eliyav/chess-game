@@ -2,7 +2,7 @@ import { TurnHistory } from "../helper/game-helpers";
 import { Timer } from "../timer/timer";
 import Game from "./game-logic/game";
 
-class Match {
+export class Match {
   game: Game;
   matchDetails: {
     current: { player: { id: string }; moves: never[] };
