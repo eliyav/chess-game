@@ -1,4 +1,4 @@
-import { Square } from "./board-helpers";
+import { Square } from "../component/game-logic/board";
 import GamePiece from "../component/game-logic/game-piece";
 
 export interface TurnHistory {
@@ -13,7 +13,7 @@ export interface TurnHistory {
   targetPiece: GamePiece | undefined;
   originSquare: Square;
   targetSquare: Square;
-  promotion?: string | undefined;
+  promotion: boolean;
   turn?: number;
 }
 
@@ -35,7 +35,7 @@ const generateTurnHistory = (
   type: string,
   LocationsInfo: LocationsInfo,
   options: {
-    promotion?: string;
+    promotion: boolean;
     enPassant?: EnPassantResult;
     enPassantPiece?: GamePiece | undefined;
     lastTurnHistorySquare?: Square;
@@ -66,6 +66,7 @@ const generateTurnHistory = (
       targetPiece: options.enPassantPiece,
       originSquare: LocationsInfo.originSquare,
       targetSquare: options.lastTurnHistorySquare!,
+      promotion: options.promotion,
     };
   } else if (type === "castling") {
     return {
@@ -79,6 +80,7 @@ const generateTurnHistory = (
       targetPiece: LocationsInfo.targetPiece,
       originSquare: LocationsInfo.originSquare,
       targetSquare: LocationsInfo.targetSquare,
+      promotion: options.promotion,
     };
   }
 };

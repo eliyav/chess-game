@@ -6,7 +6,6 @@ import * as icons from "../component/game-overlay/overlay-icons";
 import { createView, CanvasView } from "../view/create-view";
 import { MenuOverlay } from "../component/game-overlay/menu-overlay";
 import LoadingScreen from "../component/loading-screen";
-import OfflineMatch from "../component/offline-match";
 import initCanvasInput from "../view/canvas-input";
 import { TurnHistory } from "../helper/game-helpers";
 import EventEmitter from "../events/event-emitter";

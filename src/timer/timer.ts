@@ -1,5 +1,5 @@
 export class Timer {
-  state: { currentPlayer: string };
+  currentPlayer: { id: string };
   gameTime: number;
   timer1: { time: number };
   timer2: { time: number };
@@ -8,12 +8,8 @@ export class Timer {
   pause: () => void;
   resume: () => void;
   currentTimer: () => { time: number };
-  constructor(
-    time: number,
-    gameState: { currentPlayer: string },
-    endMatch: () => void
-  ) {
-    this.state = gameState;
+  constructor(time: number, player: { id: string }, endMatch: () => void) {
+    this.currentPlayer = player;
     this.gameTime = time * 60;
     this.timer1 = { time: this.gameTime / 2 };
     this.timer2 = { time: this.gameTime / 2 };
@@ -21,7 +17,7 @@ export class Timer {
     this.pause = () => (this.paused = true);
     this.resume = () => (this.paused = false);
     this.currentTimer = () =>
-      this.state.currentPlayer === "White" ? this.timer1 : this.timer2;
+      this.currentPlayer.id === "White" ? this.timer1 : this.timer2;
     this.endMatch = endMatch;
   }
 

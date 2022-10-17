@@ -5,34 +5,20 @@ import {
   LocationsInfo,
   undoUpdateLocation,
 } from "../../helper/game-helpers";
-import Board from "./board";
+import Board, { Square } from "./board";
 import GamePiece, { Move } from "./game-piece";
 
 class Game {
   board: Board;
   annotations: string[];
   turnHistory: TurnHistory[];
+  currentPlayer: { id: string };
 
-  constructor() {
+  constructor(currentPlayer: { id: string }) {
     this.board = new Board();
     this.annotations = [];
     this.turnHistory = [];
-  }
-
-  playerMove(originPoint: Point, targetPoint: Point): TurnHistory | boolean {
-    const resolve = this.resolveMove(originPoint, targetPoint);
-    if (typeof resolve !== "boolean") {
-      resolve.result
-        ? (() => {
-            resolve.turn = this.turnCounter;
-            const annotation = this.annotate(resolve);
-            this.annotations.push(annotation);
-            this.turnHistory.push(resolve);
-          })()
-        : null;
-      return resolve;
-    }
-    return false;
+    this.currentPlayer = currentPlayer;
   }
 
   resolveMove(originPoint: Point, targetPoint: Point): TurnHistory | boolean {
@@ -40,16 +26,25 @@ class Game {
     //Resolve a castling Move
     const castlingResult = this.resolveCastling(locationsInfo);
     if (castlingResult) {
+      const annotation = this.annotate(castlingResult);
+      this.annotations.push(annotation);
+      this.turnHistory.push(castlingResult);
       return castlingResult;
     }
     //Resolve a EnPassant Move
     const enPassantResult = this.resolveEnPassant(locationsInfo);
     if (enPassantResult) {
+      const annotation = this.annotate(enPassantResult);
+      this.annotations.push(annotation);
+      this.turnHistory.push(enPassantResult);
       return enPassantResult;
     }
     //Resolve a standard movement/capture move
     const standardResult = this.resolveStandard(locationsInfo);
     if (standardResult) {
+      const annotation = this.annotate(standardResult);
+      this.annotations.push(annotation);
+      this.turnHistory.push(standardResult);
       return standardResult;
     }
 
@@ -62,7 +57,7 @@ class Game {
     if (this.canValidMoveResolve(locationsInfo)) {
       originPiece!.update();
       //Once move resolved check if pawn promotion is relevant
-      const promotion = originPiece!.checkPromotion(locationsInfo);
+      const promotion = originPiece!.checkPromotion();
       return gameHelpers.generateTurnHistory("standard", locationsInfo, {
         promotion,
       });
@@ -70,7 +65,7 @@ class Game {
   }
 
   resolveEnPassant(locationsInfo: LocationsInfo) {
-    const { targetPoint } = locationsInfo;
+    const { originPiece, targetPoint } = locationsInfo;
     const lastTurnHistory = this.turnHistory[this.turnHistory.length - 1];
     const enPassant = gameHelpers.isEnPassantAvailable(lastTurnHistory);
     if (enPassant.result) {
@@ -78,10 +73,12 @@ class Game {
         if (this.canValidMoveResolve(locationsInfo)) {
           const enPassantPiece = lastTurnHistory.targetSquare.on;
           lastTurnHistory.targetSquare.on = undefined;
+          const promotion = originPiece!.checkPromotion();
           return gameHelpers.generateTurnHistory("enPassant", locationsInfo, {
             enPassant,
             enPassantPiece,
             lastTurnHistorySquare: lastTurnHistory.targetSquare,
+            promotion,
           });
         }
       }
@@ -93,21 +90,23 @@ class Game {
       locationsInfo;
     const castling =
       originPiece!.name === "King" &&
-      originPiece!.color === this.current.player;
+      originPiece!.color === this.currentPlayer.id;
     let castling2 = false;
     if (targetPiece !== undefined) {
       castling2 =
         targetPiece.name === "Rook" &&
-        targetPiece.color === this.current.player;
+        targetPiece.color === this.currentPlayer.id;
       if (castling && castling2) {
         const a = gameHelpers.getX(originPoint);
         const b = gameHelpers.getX(targetPoint);
         let c = a - b;
         c < 0 ? (c = 1) : (c = -1);
         const castlingResult = castlingMove(c, locationsInfo, this.board.grid);
+        const promotion = originPiece!.checkPromotion();
         return gameHelpers.generateTurnHistory("castling", locationsInfo, {
           direction: c,
           castlingResult,
+          promotion,
         });
       }
     }
@@ -232,12 +231,12 @@ class Game {
         if (currentPlayer) {
           return (
             square.on!.name === "King" &&
-            square.on!.color === this.current.player
+            square.on!.color === this.currentPlayer.id
           );
         } else {
           return (
             square.on!.name === "King" &&
-            square.on!.color !== this.current.player
+            square.on!.color !== this.currentPlayer.id
           );
         }
       });
@@ -251,9 +250,9 @@ class Game {
     const piecesArray = this.board.grid.flat().filter((square) => {
       if (square.on !== undefined) {
         if (currentPlayer) {
-          return square.on.color === this.current.player;
+          return square.on.color === this.currentPlayer.id;
         } else {
-          return square.on.color !== this.current.player;
+          return square.on.color !== this.currentPlayer.id;
         }
       }
     });
@@ -306,10 +305,7 @@ class Game {
   }
 
   isCheckmate() {
-    //Is called after turn switch, checks if player is even in check before testing for checkmate
-    if (this.isChecked(true)) {
-      return this.simulateCheckmate() ? true : false;
-    }
+    return this.simulateCheckmate() ? true : false;
   }
 
   simulateCheckmate() {
@@ -342,7 +338,7 @@ class Game {
         resolve[0] ? movesObj.push(resolve[1]) : null;
       }
     };
-    const playersRooks = this.findPieces("Rook", this.current.player);
+    const playersRooks = this.findPieces("Rook", this.currentPlayer.id);
     if (playersRooks) {
       playersRooks.forEach((square) => {
         checkCastlingMove(piece!, square.on!);
@@ -412,14 +408,15 @@ class Game {
     return returnResult;
   }
 
-  resetGame() {
+  resetGame(player: { id: string }) {
     this.board.resetBoard();
+    this.currentPlayer = player;
     this.annotations = [];
     this.turnHistory = [];
   }
 
   annotate(result: TurnHistory) {
-    let finalString;
+    let annotation;
     const type = result.type;
     const promotion = result.promotion;
     const pieceName = result.originPiece!.name;
@@ -427,23 +424,22 @@ class Game {
     const isCapturing = result.targetPiece !== undefined ? true : false;
     const symbol = result.originPiece?.getSymbol();
     if (type === "castling") {
-      finalString = result.direction === 1 ? "O-O" : "O-O-O";
-    } else if (promotion !== undefined) {
-      finalString = `${square}=${symbol}`;
-    } else {
-      if (isCapturing) {
-        if (pieceName === "Pawn") {
-          finalString = `${result.originSquare.square.charAt(0)}x${square}`;
-        } else {
-          finalString = `${symbol}x${square}`;
-        }
+      annotation = result.direction === 1 ? "O-O" : "O-O-O";
+    } else if (promotion) {
+      annotation = `${square}=${symbol}`;
+    } else if (isCapturing) {
+      if (pieceName === "Pawn") {
+        annotation = `${result.originSquare.square.charAt(0)}x${square}`;
       } else {
-        finalString = `${symbol}${square}`;
+        annotation = `${symbol}x${square}`;
       }
-      const isCheck = this.isChecked(false);
-      isCheck ? (finalString = `${finalString}+`) : null;
+    } else {
+      annotation = `${symbol}${square}`;
     }
-    return finalString;
+    const isCheck = this.isChecked(false);
+    if (isCheck) annotation = `${annotation}+`;
+
+    return annotation;
   }
 }
 

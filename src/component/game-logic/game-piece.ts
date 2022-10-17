@@ -1,5 +1,3 @@
-import { LocationsInfo } from "../../helper/game-helpers";
-
 class GamePiece {
   name: string;
   color: string;
@@ -19,34 +17,35 @@ class GamePiece {
     this.direction = this.color === "White" ? 1 : -1;
   }
 
+  resetPieceMovement() {
+    if (this.moveCounter === 1) this.moved = false;
+    this.moveCounter--;
+  }
+
   update() {
     this.moved ? null : (this.moved = true);
     this.moveCounter++;
   }
 
-  checkPromotion(locationsInfo: LocationsInfo) {
+  checkPromotion() {
     if (this.name === "Pawn" && (this.point[1] === 0 || this.point[1] === 7)) {
-      return "";
+      return true;
     }
+    return false;
   }
 
   getSymbol() {
     switch (this.name) {
       case "King":
         return "K";
-        break;
       case "Queen":
         return "Q";
-        break;
       case "Knight":
         return "N";
-        break;
       case "Bishop":
         return "B";
-        break;
       case "Rook":
         return "R";
-        break;
       default:
         return "";
     }

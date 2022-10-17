@@ -1,74 +1,98 @@
+import { TurnHistory } from "../helper/game-helpers";
+import { Timer } from "../timer/timer";
 import Game from "./game-logic/game";
 
 class Match {
   game: Game;
-  currentMatch: {
-    current: { player: string };
+  matchDetails: {
+    current: { player: { id: string }; moves: never[] };
     teams: string[];
-    moves: never[];
     turn: number;
   };
-  matchStarted: boolean;
-  constructor() {
-    this.matchStarted = false;
-    this.game = new Game();
-    this.currentMatch = this.setMatch();
+  isActive: boolean;
+  timer: Timer;
+
+  constructor(time = 0, endMatch: () => void) {
+    this.isActive = false;
+    this.matchDetails = this.setMatch();
+    this.game = new Game(this.matchDetails.current.player);
+    //Refactor timer
+    this.timer = new Timer(
+      time,
+      this.matchDetails.current.player,
+      this.endMatch.bind(this)
+    );
   }
 
   setMatch() {
     const matchDefaults = {
-      current: { player: "White" },
+      current: { player: { id: "White" }, moves: [] },
       teams: ["White", "Black"],
-      moves: [],
       turn: 1,
     };
     return matchDefaults;
   }
 
   nextTurn() {
-    this.currentMatch.turn++;
-    this.currentMatch.current.player = this.switchPlayer();
-    return this.game.isCheckmate() ? this.endMatch() : null;
+    this.matchDetails.turn++;
+    this.matchDetails.current.player.id = this.switchPlayer();
+    if (this.game.isCheckmate()) return this.endMatch();
   }
 
   switchPlayer() {
-    return this.currentMatch.turn % 2
-      ? this.currentMatch.teams[0]
-      : this.currentMatch.teams[1];
+    return this.matchDetails.turn % 2
+      ? this.matchDetails.teams[0]
+      : this.matchDetails.teams[1];
   }
 
   resetMatch() {
-    this.matchStarted = false;
-    this.game.resetGame();
-    this.currentMatch = {};
+    this.isActive = false;
+    this.matchDetails = this.setMatch();
+    this.game.resetGame(this.matchDetails.current.player);
+    this.timer.resetTimers();
   }
 
-  endMatch() {
-    const winningTeam =
-      offlineMatch.current?.game.state.currentPlayer ===
-      offlineMatch.current?.game.teams[0]
-        ? offlineMatch.current?.game.teams[1]
-        : offlineMatch.current?.game.teams[0];
-    offlineEmitter.current?.emit("end-match", winningTeam);
+  startMatch() {
+    this.isActive = true;
+    this.timer.startTimer();
+  }
+
+  takeTurn(originPoint: Point, targetPoint: Point): TurnHistory | boolean {
+    const resolve = this.game.resolveMove(originPoint, targetPoint);
+    if (resolve) {
+      this.nextTurn();
+      return resolve;
+    }
+    return false;
   }
 
   undoTurn() {
-    const lastTurn = this.turnHistory.at(-1);
+    const lastTurn = this.game.turnHistory.at(-1);
     if (lastTurn !== undefined) {
-      lastTurn.originPiece!.moveCounter === 1
-        ? (lastTurn.originPiece!.moved = false)
-        : null;
-      lastTurn.originPiece!.moveCounter--;
-      lastTurn.castling
-        ? lastTurn.castling.forEach((square) => (square.on = undefined))
-        : null;
-      lastTurn.originSquare.on = lastTurn.originPiece;
-      lastTurn.originPiece!.point = lastTurn.origin;
-      lastTurn.targetSquare.on = lastTurn.targetPiece;
-      this.turnHistory.length = this.turnHistory.length - 1;
-      this.annotations.length = this.annotations.length - 1;
-      this.turnCounter--;
-      this.changePlayer();
+      if (lastTurn.originPiece) {
+        lastTurn.originPiece.resetPieceMovement();
+        if (lastTurn.castling)
+          lastTurn.castling.forEach((square) => (square.on = undefined));
+
+        lastTurn.originSquare.on = lastTurn.originPiece;
+        lastTurn.originPiece.point = lastTurn.origin;
+        lastTurn.targetSquare.on = lastTurn.targetPiece;
+        this.game.turnHistory.length = this.game.turnHistory.length - 1;
+        this.game.annotations.length = this.game.annotations.length - 1;
+        this.matchDetails.turn--;
+        this.switchPlayer();
+      }
     }
+  }
+
+  //Have end match func be an input
+  endMatch() {
+    this.isActive = false;
+    // const winningTeam =
+    //   offlineMatch.current?.game.state.currentPlayer ===
+    //   offlineMatch.current?.game.teams[0]
+    //     ? offlineMatch.current?.game.teams[1]
+    //     : offlineMatch.current?.game.teams[0];
+    // offlineEmitter.current?.emit("end-match", winningTeam);
   }
 }
