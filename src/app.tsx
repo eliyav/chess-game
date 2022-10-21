@@ -1,14 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import * as BABYLON from "babylonjs";
 import { Route, Routes, useLocation } from "react-router-dom";
 import LoadingScreen from "./components/loading-screen";
 import { useAuthentication } from "./hooks/use-authentication";
 import { Home } from "./routes/home";
-import { homeScene } from "./view/home-scene";
-import { CustomGameScene } from "./view/game-assets";
 import { Lobby } from "./routes/lobby";
-import { Match } from "./components/match";
 import { SceneManager } from "./components/scene-manager";
+import { GameScreen } from "./routes/game-screen";
 
 // const [currentUser, setCurrentUser] = useState<UserData>();
 // const [socketConnection, setSocketConnection] = useState<any>();
@@ -19,8 +16,6 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneManager = useRef<SceneManager>();
-  //Create Scene Manager
-  //Create Controller
 
   useEffect(() => {
     if (canvasRef.current && !sceneManager.current) {
@@ -36,11 +31,6 @@ const App: React.FC = () => {
             sceneManager.current?.resize()
           );
         };
-
-        //   const { gameScreen } = await import("./view/game-screen");
-        //   sceneRef.current = await gameScreen(
-        //     canvasRef.current!,
-        //     engineRef.current!
       })();
     }
   }, [canvasRef.current]);
@@ -53,7 +43,10 @@ const App: React.FC = () => {
           element={isLoading ? <LoadingScreen text="..." /> : <Home />}
         />
         <Route path="/lobby" element={<Lobby />} />
-        {/* <Route path="/match/offline-lobby" element={<OfflineLobby />} /> */}
+        <Route
+          path="/game"
+          element={<GameScreen sceneManager={sceneManager.current!} />}
+        />
         {/* <Rou
             path="/match/online-lobby"
             element={
@@ -74,7 +67,6 @@ const App: React.FC = () => {
         {/* 
 
         </Route>
-        <Route path="/offline-game" element={<OfflineGameView />} />
         <Route
           path="/online-game"
           element={

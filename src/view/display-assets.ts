@@ -6,14 +6,18 @@ import bishop from "../../assets/pieces/bishopv3.gltf";
 import knight from "../../assets/pieces/knightv3.gltf";
 import rook from "../../assets/pieces/rookv3.gltf";
 import pawn from "../../assets/pieces/pawnv3.gltf";
-import { CustomGameScene } from "./game-assets";
+import { CustomScene } from "./game-assets";
 import { AbstractMesh } from "babylonjs";
 import { createMeshMaterials } from "./materials";
+import { SceneTypes } from "../components/scene-manager";
 
 const startingPostion = 35;
 const endingPosition = -75;
 
-export const displayAssets = async (scene: CustomGameScene) => {
+export const displayAssets = async (
+  scene: CustomScene,
+  activeScene: { id: SceneTypes }
+) => {
   const materials = createMeshMaterials(scene);
   let boardMesh = board;
   let boardPieces = [king, queen, knight, bishop, rook, pawn];
@@ -81,7 +85,7 @@ export const displayAssets = async (scene: CustomGameScene) => {
   let beta = Math.PI / 1.5;
   let gamma = Math.PI / 1;
 
-  const animateDistance = () => {
+  const animateDistance = (activeScene: { id: SceneTypes }) => {
     requestAnimationFrame(() => {
       piecesMeshes.forEach((mesh) => {
         mesh.position.y -= mesh.speed!;
@@ -109,10 +113,10 @@ export const displayAssets = async (scene: CustomGameScene) => {
           BABYLON.Space.LOCAL
         );
       });
-      animateDistance();
+      if (activeScene.id === "home") animateDistance(activeScene);
     });
   };
-  animateDistance();
+  animateDistance(activeScene);
 };
 
 function calcRandomZ() {

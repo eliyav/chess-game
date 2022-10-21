@@ -1,10 +1,10 @@
 import { findIndex, findPosition } from "../../helper/canvas-helpers";
 import { doMovesMatch, TurnHistory } from "../../helper/game-helpers";
-import { CustomGameScene } from "../game-assets";
+import { CustomScene } from "../game-assets";
 import { createMeshMaterials } from "../materials";
 
 export default function calcTurnAnimation(
-  gameScene: CustomGameScene,
+  gameScene: CustomScene,
   originPoint: Point,
   targetPoint: Point,
   turnHistory: TurnHistory

@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { SvgGithub } from "../svg-components/svg-github";
 
-const menuItems = [{ text: "Play", path: "/lobby" }];
+const menuItems = [{ text: "Play", path: "/game" }];
 
 export const Home: React.FC = () => {
   return (

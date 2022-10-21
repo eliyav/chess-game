@@ -111,7 +111,7 @@ export const gameAssets = async (scene: Scene) => {
   return { piecesMeshes, boardMeshes, animations };
 };
 
-export interface CustomGameScene extends Scene {
+export interface CustomScene extends Scene {
   finalMeshes?: {
     piecesMeshes: ChessPieceMesh[];
     boardMeshes: AbstractMesh[];

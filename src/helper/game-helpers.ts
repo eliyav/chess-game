@@ -14,6 +14,7 @@ export interface TurnHistory {
   originSquare: Square;
   targetSquare: Square;
   promotion: boolean;
+  promotedPiece?: string;
   turn?: number;
 }
 

@@ -1,13 +1,13 @@
 import Game from "../components/game-logic/game";
 import { Material } from "babylonjs/Materials/material";
-import { ChessPieceMesh, CustomGameScene } from "../view/game-assets";
+import { ChessPieceMesh, CustomScene } from "../view/game-assets";
 import { Move } from "../components/game-logic/game-piece";
 
 const displayPieceMoves = (
   mesh: ChessPieceMesh,
   currentMove: Point[],
   game: Game,
-  gameScene: CustomGameScene
+  gameScene: CustomScene
 ) => {
   const piece = game.lookupPiece(
     findIndex([mesh.position.z, mesh.position.x], true)
@@ -21,7 +21,7 @@ const displayPieceMoves = (
   });
 };
 
-const displayMovementSquares = (move: Move, gameScene: CustomGameScene) => {
+const displayMovementSquares = (move: Move, gameScene: CustomScene) => {
   const [point, type] = move;
   const plane: any = BABYLON.MeshBuilder.CreatePlane(`plane`, {
     width: 2.5,
@@ -34,7 +34,7 @@ const displayMovementSquares = (move: Move, gameScene: CustomGameScene) => {
   gameScene.meshesToRender!.push(plane);
 };
 
-const displayPieceMarker = (move: Point, gameScene: CustomGameScene) => {
+const displayPieceMarker = (move: Point, gameScene: CustomScene) => {
   let type = "piece";
   const torus: any = BABYLON.MeshBuilder.CreateTorus("torus", {
     diameter: 2.6,
@@ -55,7 +55,7 @@ const matLookupTable: { [key: string]: string } = {
   piece: "greenMat",
 };
 
-const findMaterial = (moveType: string, gameScene: CustomGameScene) => {
+const findMaterial = (moveType: string, gameScene: CustomScene) => {
   const lookupValue = matLookupTable[moveType];
   const material = gameScene.materials.find(
     (mat: Material) => mat.id === lookupValue

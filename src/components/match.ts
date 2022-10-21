@@ -2,17 +2,19 @@ import { TurnHistory } from "../helper/game-helpers";
 import { Timer } from "../timer/timer";
 import Game from "./game-logic/game";
 
+//Refactor
+//End Match might need to be in constructor
 export class Match {
   game: Game;
   matchDetails: {
-    current: { player: { id: string }; moves: never[] };
+    current: { player: { id: string }; moves: Point[] };
     teams: string[];
     turn: number;
   };
   isActive: boolean;
   timer: Timer;
 
-  constructor(time = 0, endMatch: () => void) {
+  constructor(time = 0) {
     this.isActive = false;
     this.matchDetails = this.setMatch();
     this.game = new Game(this.matchDetails.current.player);
@@ -35,14 +37,16 @@ export class Match {
 
   nextTurn() {
     this.matchDetails.turn++;
-    this.matchDetails.current.player.id = this.switchPlayer();
+    this.switchPlayer();
     if (this.game.isCheckmate()) return this.endMatch();
   }
 
   switchPlayer() {
-    return this.matchDetails.turn % 2
-      ? this.matchDetails.teams[0]
-      : this.matchDetails.teams[1];
+    const player =
+      this.matchDetails.turn % 2
+        ? this.matchDetails.teams[0]
+        : this.matchDetails.teams[1];
+    this.matchDetails.current.player.id = player;
   }
 
   resetMatch() {
@@ -82,7 +86,13 @@ export class Match {
         this.matchDetails.turn--;
         this.switchPlayer();
       }
+      return true;
     }
+    return false;
+  }
+
+  resetMoves() {
+    this.matchDetails.current.moves = [];
   }
 
   //Have end match func be an input
