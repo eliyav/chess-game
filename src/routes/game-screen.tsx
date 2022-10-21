@@ -6,6 +6,8 @@ import { matchController } from "../components/match-logic/match-controller";
 import { SceneManager } from "../components/scene-manager";
 import LoadingScreen from "../components/loading-screen";
 import PromotionModal from "../components/modals/promotion-modal";
+import { RequestModal } from "../components/modals/request-modal";
+import { TimerOverlay } from "../components/match-logic/timer-overlay";
 
 export const GameScreen: React.FC<{
   sceneManager: SceneManager;
@@ -19,12 +21,21 @@ export const GameScreen: React.FC<{
   } | null>(null);
   const sceneManagerRef = useRef(sceneManager);
   const loadInitiated = useRef(false);
-  const matchRef = useRef(new Match(0));
+  const matchRef = useRef(new Match(0.3, endMatch));
   const matchControlRef = useRef(
     matchController(matchRef.current, sceneManager)
   );
   const { current: match } = matchRef;
   const { current: matchControl } = matchControlRef;
+
+  function endMatch() {
+    match.isActive = false;
+    const winningTeam =
+      match.matchDetails.player.id === match.matchDetails.teams[0]
+        ? match.matchDetails.teams[1]
+        : match.matchDetails.teams[0];
+    matchControl.emit("end-match", winningTeam);
+  }
 
   useEffect(() => {
     if (!loadInitiated.current) {
@@ -98,19 +109,14 @@ export const GameScreen: React.FC<{
           }}
         />
       ) : null}
-      {/* {gameLoaded && (
-        <TimerOverlay
-          timer={offlineMatch.current?.timer!}
-          state={offlineMatch.current?.game.state!}
-        />
-      )} */}
-      {/* {request ? (
+      {request ? (
         <RequestModal
           question={request.question}
           onConfirm={request.onConfirm}
           onReject={request.onReject}
         />
-      ) : null} */}
+      ) : null}
+      {matchReady && <TimerOverlay timer={match.timer} />}
     </>
   );
 };

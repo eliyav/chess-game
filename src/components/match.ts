@@ -1,36 +1,38 @@
 import { TurnHistory } from "../helper/game-helpers";
-import { Timer } from "../timer/timer";
+import { Timer } from "./match-logic/timer";
 import Game from "./game-logic/game";
 
-//Refactor
-//End Match might need to be in constructor
 export class Match {
   game: Game;
   matchDetails: {
-    current: { player: { id: string }; moves: Point[] };
     teams: string[];
     turn: number;
+    player: { id: string };
+    moves: Point[];
   };
   isActive: boolean;
   timer: Timer;
+  endMatch: () => void;
 
-  constructor(time = 0) {
+  constructor(time = 0, endMatch: () => void) {
     this.isActive = false;
     this.matchDetails = this.setMatch();
-    this.game = new Game(this.matchDetails.current.player);
+    this.game = new Game(this.matchDetails.player);
+    this.endMatch = endMatch;
     //Refactor timer
     this.timer = new Timer(
       time,
-      this.matchDetails.current.player,
+      this.matchDetails.player,
       this.endMatch.bind(this)
     );
   }
 
   setMatch() {
     const matchDefaults = {
-      current: { player: { id: "White" }, moves: [] },
       teams: ["White", "Black"],
       turn: 1,
+      player: { id: "White" },
+      moves: [],
     };
     return matchDefaults;
   }
@@ -46,14 +48,13 @@ export class Match {
       this.matchDetails.turn % 2
         ? this.matchDetails.teams[0]
         : this.matchDetails.teams[1];
-    this.matchDetails.current.player.id = player;
+    this.matchDetails.player.id = player;
   }
 
   resetMatch() {
-    this.isActive = false;
     this.matchDetails = this.setMatch();
-    this.game.resetGame(this.matchDetails.current.player);
-    this.timer.resetTimers();
+    this.game.resetGame(this.matchDetails.player);
+    this.timer.resetTimers(this.matchDetails.player);
   }
 
   startMatch() {
@@ -92,17 +93,6 @@ export class Match {
   }
 
   resetMoves() {
-    this.matchDetails.current.moves = [];
-  }
-
-  //Have end match func be an input
-  endMatch() {
-    this.isActive = false;
-    // const winningTeam =
-    //   offlineMatch.current?.game.state.currentPlayer ===
-    //   offlineMatch.current?.game.teams[0]
-    //     ? offlineMatch.current?.game.teams[1]
-    //     : offlineMatch.current?.game.teams[0];
-    // offlineEmitter.current?.emit("end-match", winningTeam);
+    this.matchDetails.moves = [];
   }
 }

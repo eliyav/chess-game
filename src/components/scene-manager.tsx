@@ -98,7 +98,7 @@ export class SceneManager {
       const mesh: ChessPieceMesh = pickResult.pickedMesh;
       const isCompleteMove = this.gameInput(mesh, match);
       if (isCompleteMove) {
-        const [originPoint, targetPoint] = match.matchDetails.current.moves;
+        const [originPoint, targetPoint] = match.matchDetails.moves;
         this.updateMeshesRender(match.game);
         const resolved = match.takeTurn(originPoint, targetPoint);
         if (typeof resolved !== "boolean" && resolved.result) {
@@ -111,10 +111,8 @@ export class SceneManager {
 
   gameInput(mesh: ChessPieceMesh, match: Match) {
     const {
-      current: {
-        moves,
-        player: { id: currentPlayer },
-      },
+      moves,
+      player: { id: currentPlayer },
     } = match.matchDetails;
     const currentMove = moves;
     const { game } = match;
