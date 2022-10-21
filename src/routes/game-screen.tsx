@@ -36,6 +36,7 @@ export const GameScreen: React.FC<{
         matchControl.on("promotion-selections", () => {
           setTimeout(() => setPromotion(true), 1000);
         });
+
         matchControl.on("end-match", (winningTeam: string) => {
           sceneManagerRef.current.gameScreen!.detachControl();
           setRequest({

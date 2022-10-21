@@ -14,13 +14,9 @@ export const matchController = (
     "resolveMove",
     (originPoint: Point, targetPoint: Point, history: TurnHistory) => {
       sceneManager.turnAnimation(originPoint, targetPoint, history);
-      if (history.promotion === undefined) {
-        match.switchPlayer();
-        sceneManager.rotateCamera(match.game);
-      } else {
-        //Handle Promotion Event
-        emitter.emit("promotion-selections");
-      }
+      if (history.promotion) return emitter.emit("promotion-selections");
+      match.switchPlayer();
+      sceneManager.rotateCamera(match.game);
     }
   );
 
@@ -41,7 +37,7 @@ export const matchController = (
       annotations[annotations.length - 1] = `${square}${symbol}`;
       sceneManager.updateMeshesRender(match.game);
       match.switchPlayer();
-      sceneManager.gameScreen!.attachControl();
+      sceneManager.rotateCamera(match.game);
     }
   });
 
