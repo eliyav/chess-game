@@ -25,25 +25,24 @@ const App: React.FC = () => {
   return (
     <div id="app">
       <canvas ref={canvasRef}></canvas>
-      <Routes>
-        <Route
-          path="/"
-          element={isLoading ? <LoadingScreen text="..." /> : <Home />}
-        />
-        <Route path="/lobby" element={<Lobby />} />
-        <Route
-          path="/game"
-          element={
-            sceneManagerRef.current ? (
-              <GameView sceneManager={sceneManagerRef.current} />
-            ) : (
-              <div className="loadingContainer">
-                <LoadingScreen text="..." />
-              </div>
-            )
-          }
-        />
-      </Routes>
+      {!isLoading ? (
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/lobby" element={<Lobby />} />
+          <Route
+            path="/game"
+            element={
+              sceneManagerRef.current && (
+                <GameView sceneManager={sceneManagerRef.current} />
+              )
+            }
+          />
+        </Routes>
+      ) : (
+        <div className="loadingContainer">
+          <LoadingScreen text="..." />
+        </div>
+      )}
     </div>
   );
 };
