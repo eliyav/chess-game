@@ -1,5 +1,5 @@
 import React from "react";
-import { IconsIndex } from "~/src/routes/game-screen";
+import { IconsIndex } from "~/src/routes/game-view";
 import OverlaySelection from "./menu-overlay-selection";
 
 interface MenuOverlayProps {

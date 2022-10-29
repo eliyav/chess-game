@@ -6,25 +6,28 @@ import { Match } from "../components/match";
 import { SceneManager } from "../components/scene-manager";
 import { Controller } from "../components/match-logic/controller";
 
-export const GameScreen: React.FC<{
+export const GameView: React.FC<{
   sceneManager: SceneManager;
-  match: Match;
-  controller: Controller;
-}> = ({ sceneManager, match, controller }) => {
-  const [matchReady, setMatchReady] = useState(false);
+}> = ({ sceneManager }) => {
+  const [viewReady, setViewReady] = useState(false);
   const loadInitiated = useRef(false);
+  const match = useRef(new Match()).current;
+  const controller = useRef(new Controller(sceneManager, match)).current;
 
   useEffect(() => {
     if (!loadInitiated.current) {
       loadInitiated.current = true;
-      (async () => {
-        await controller.prepGame(sceneManager, match);
-        setMatchReady(true);
-      })();
+      initView();
+
+      async function initView() {
+        //Prep state controlling functions helpers here and pass through prepGame into resolve input function
+        await controller.prepView();
+        setViewReady(true);
+      }
     }
   }, [sceneManager]);
 
-  if (!matchReady)
+  if (!viewReady)
     return (
       <div className="loadingContainer">
         <LoadingScreen text="..." />
@@ -34,7 +37,7 @@ export const GameScreen: React.FC<{
   //Game Overlay
   return (
     <>
-      {matchReady && (
+      {viewReady && (
         <MenuOverlay
           items={[
             {

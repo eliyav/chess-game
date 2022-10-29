@@ -6,35 +6,106 @@ import {
 import { doMovesMatch, TurnHistory } from "../../helper/game-helpers";
 import calcTurnAnimation from "../../view/animation/turn-animation";
 import { ChessPieceMesh } from "../../view/game-assets";
-import Game from "../game-logic/game";
 import { Match } from "../match";
 import { SceneManager } from "../scene-manager";
 
 //Create the controller upon entering /game, save match and scene as keys
 export class Controller {
-  async prepGame(sceneManager: SceneManager, match: Match) {
-    await sceneManager.loadGame();
-    this.initGameInput(sceneManager, match);
-    this.prepGameScreen(sceneManager, match.game);
-    match.startMatch();
+  sceneManager: SceneManager;
+  match: Match;
+
+  constructor(sceneManager: SceneManager, match: Match) {
+    this.sceneManager = sceneManager;
+    this.match = match;
   }
 
-  resolveMove(
-    originPoint: Point,
-    targetPoint: Point,
-    history: TurnHistory,
-    sceneManager: SceneManager,
-    match: Match
-  ) {
-    this.turnAnimation(sceneManager, originPoint, targetPoint, history);
+  async prepView() {
+    await this.sceneManager.loadGame();
+    this.initGameInput();
+    this.prepGameScreen();
+    this.match.startMatch();
+  }
+
+  initGameInput() {
+    this.sceneManager.gameScreen!.onPointerDown = async (
+      e: any,
+      pickResult: any
+    ) => {
+      this.resolveInput(pickResult);
+    };
+  }
+
+  prepGameScreen(team?: string) {
+    this.sceneManager.homeScreen?.detachControl();
+    this.updateMeshesRender();
+    this.resetCamera(team);
+    this.sceneManager.gameScreen?.attachControl();
+  }
+
+  resolveInput(pickResult: any) {
+    if (pickResult.pickedMesh !== null) {
+      const mesh: ChessPieceMesh = pickResult.pickedMesh;
+      const isCompleteMove = this.gameInput(mesh);
+      if (isCompleteMove) {
+        const [originPoint, targetPoint] = this.match.current.moves;
+        this.updateMeshesRender();
+        const resolved = this.match.takeTurn(originPoint, targetPoint);
+        if (typeof resolved !== "boolean" && resolved.result) {
+          this.resolveMove(originPoint, targetPoint, resolved);
+        }
+        this.match.resetMoves();
+      }
+    }
+  }
+
+  resolveMove(originPoint: Point, targetPoint: Point, history: TurnHistory) {
+    this.turnAnimation(originPoint, targetPoint, history);
     if (history.promotion) return; //callback(); //promotion selections
-    match.switchPlayer();
-    this.rotateCamera(match.game, sceneManager);
+    this.match.switchPlayer();
+    this.rotateCamera();
   }
 
-  rotateCamera(game: Game, sceneManager: SceneManager) {
-    let currentPlayer = game.currentPlayer.id;
-    let camera: any = sceneManager.gameScreen!.cameras[0];
+  turnAnimation(
+    ...props: [originPoint: Point, targetPoint: Point, turnHistory: TurnHistory]
+  ) {
+    return calcTurnAnimation(this.sceneManager.gameScreen!, ...props);
+  }
+
+  updateMeshesRender() {
+    //Clears old meshes/memory usage
+    !this.sceneManager.gameScreen?.meshesToRender
+      ? (this.sceneManager.gameScreen!.meshesToRender = [])
+      : null;
+    if (this.sceneManager.gameScreen?.meshesToRender.length) {
+      for (
+        let i = 0;
+        i < this.sceneManager.gameScreen?.meshesToRender.length;
+        i++
+      ) {
+        const mesh = this.sceneManager.gameScreen?.meshesToRender[i];
+        this.sceneManager.gameScreen?.removeMesh(mesh);
+        mesh.dispose();
+      }
+      this.sceneManager.gameScreen!.meshesToRender = [];
+    }
+    //Final Piece Mesh List
+    const meshesList = this.sceneManager.gameScreen!.finalMeshes!.piecesMeshes;
+    //For each active piece, creates a mesh clone and places on board
+    this.match.game.allPieces().forEach((square) => {
+      const { name, color, point } = square.on!;
+      const foundMesh = meshesList.find(
+        (mesh: any) => mesh.name === name && mesh.color === color
+      );
+      const clone = foundMesh!.clone(name, null);
+      [clone!.position.z, clone!.position.x] = findPosition(point, true);
+      clone!.isVisible = true;
+      this.sceneManager.gameScreen?.meshesToRender!.push(clone!);
+    });
+  }
+
+  rotateCamera() {
+    let currentPlayer = this.match.game.currentPlayer.id;
+    let camera: any = this.sceneManager.gameScreen!.cameras[0];
     let alpha = camera.alpha;
     let ratio;
     let subtractedRatio;
@@ -102,15 +173,10 @@ export class Controller {
     animateCameraRotation(currentPlayer);
   }
 
-  updateGameView(game: Game, sceneManager: SceneManager) {
-    this.updateMeshesRender(game, sceneManager);
-    this.rotateCamera(game, sceneManager);
-  }
-
-  resetCamera(sceneManager: SceneManager, game: Game, team?: string) {
-    let camera: any = sceneManager.gameScreen?.cameras[0];
+  resetCamera(team?: string) {
+    let camera: any = this.sceneManager.gameScreen?.cameras[0];
     if (!team) {
-      game.currentPlayer.id === "White"
+      this.match.game.currentPlayer.id === "White"
         ? setToWhitePlayer()
         : setToBlackPlayer();
     } else {
@@ -129,68 +195,24 @@ export class Controller {
     }
   }
 
-  resolveInput(match: Match, sceneManager: SceneManager, pickResult: any) {
-    if (pickResult.pickedMesh !== null) {
-      const mesh: ChessPieceMesh = pickResult.pickedMesh;
-      const isCompleteMove = this.gameInput(mesh, match, sceneManager);
-      if (isCompleteMove) {
-        const [originPoint, targetPoint] = match.current.moves;
-        this.updateMeshesRender(match.game, sceneManager);
-        const resolved = match.takeTurn(originPoint, targetPoint);
-        if (typeof resolved !== "boolean" && resolved.result) {
-          this.resolveMove(
-            originPoint,
-            targetPoint,
-            resolved,
-            sceneManager,
-            match
-          );
-        }
-        match.resetMoves();
-      }
-    }
-  }
-  updateMeshesRender(game: Game, sceneManager: SceneManager) {
-    //Clears old meshes/memory usage
-    !sceneManager.gameScreen?.meshesToRender
-      ? (sceneManager.gameScreen!.meshesToRender = [])
-      : null;
-    if (sceneManager.gameScreen?.meshesToRender.length) {
-      for (let i = 0; i < sceneManager.gameScreen?.meshesToRender.length; i++) {
-        const mesh = sceneManager.gameScreen?.meshesToRender[i];
-        sceneManager.gameScreen?.removeMesh(mesh);
-        mesh.dispose();
-      }
-      sceneManager.gameScreen!.meshesToRender = [];
-    }
-    //Final Piece Mesh List
-    const meshesList = sceneManager.gameScreen!.finalMeshes!.piecesMeshes;
-    //For each active piece, creates a mesh clone and places on board
-    game.allPieces().forEach((square) => {
-      const { name, color, point } = square.on!;
-      const foundMesh = meshesList.find(
-        (mesh: any) => mesh.name === name && mesh.color === color
-      );
-      const clone = foundMesh!.clone(name, null);
-      [clone!.position.z, clone!.position.x] = findPosition(point, true);
-      clone!.isVisible = true;
-      sceneManager.gameScreen?.meshesToRender!.push(clone!);
-    });
-  }
-
-  gameInput(mesh: ChessPieceMesh, match: Match, sceneManager: SceneManager) {
+  gameInput(mesh: ChessPieceMesh) {
     const {
       moves,
       player: { id: currentPlayer },
-    } = match.current;
+    } = this.match.current;
     const currentMove = moves;
-    const { game } = match;
+    const { game } = this.match;
     //If mesh
     if (mesh) {
       if (currentMove.length === 0) {
         if (mesh.color === currentPlayer) {
           //If no current move has been selected, and mesh belongs to current player
-          displayPieceMoves(mesh, currentMove, game, sceneManager.gameScreen!);
+          displayPieceMoves(
+            mesh,
+            currentMove,
+            game,
+            this.sceneManager.gameScreen!
+          );
         }
       } else if (mesh.color === currentPlayer) {
         //If there is already a mesh selected, and you select another of your own meshes
@@ -201,7 +223,7 @@ export class Controller {
         if (originalPiece === newPiece) {
           //If both selected pieces are the same, reset current move
           currentMove.length = 0;
-          this.updateMeshesRender(game, sceneManager);
+          this.updateMeshesRender();
         } else {
           if (newPiece.name === "Rook" && originalPiece.name === "King") {
             //Checks for castling
@@ -213,23 +235,23 @@ export class Controller {
             } else {
               //If rook is selected second and not castling, show rooks moves
               currentMove.length = 0;
-              this.updateMeshesRender(game, sceneManager);
+              this.updateMeshesRender();
               displayPieceMoves(
                 mesh,
                 currentMove,
                 game,
-                sceneManager.gameScreen!
+                this.sceneManager.gameScreen!
               );
             }
           } else {
             //If second selected piece is not a castling piece
             currentMove.length = 0;
-            this.updateMeshesRender(game, sceneManager);
+            this.updateMeshesRender();
             displayPieceMoves(
               mesh,
               currentMove,
               game,
-              sceneManager.gameScreen!
+              this.sceneManager.gameScreen!
             );
           }
         }
@@ -251,29 +273,6 @@ export class Controller {
       //If complete move return true
       return currentMove.length === 2 ? true : false;
     }
-  }
-
-  prepGameScreen(sceneManager: SceneManager, game: Game, team?: string) {
-    sceneManager.homeScreen?.detachControl();
-    this.updateMeshesRender(game, sceneManager);
-    this.resetCamera(sceneManager, game, team);
-    sceneManager.gameScreen?.attachControl();
-  }
-
-  turnAnimation(
-    sceneManager: SceneManager,
-    ...props: [originPoint: Point, targetPoint: Point, turnHistory: TurnHistory]
-  ) {
-    return calcTurnAnimation(sceneManager.gameScreen!, ...props);
-  }
-
-  initGameInput(sceneManager: SceneManager, match: Match) {
-    sceneManager.gameScreen!.onPointerDown = async (
-      e: any,
-      pickResult: any
-    ) => {
-      this.resolveInput(match, sceneManager, pickResult);
-    };
   }
 }
 
