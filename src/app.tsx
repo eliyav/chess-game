@@ -45,7 +45,7 @@ const App: React.FC = () => {
         <Route path="/lobby" element={<Lobby />} />
         <Route
           path="/game"
-          element={<GameScreen sceneManager={sceneManager.current!} />}
+          element={<GameScreen sceneManager={sceneManager} />}
         />
         {/* <Rou
             path="/match/online-lobby"

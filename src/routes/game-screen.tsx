@@ -10,7 +10,7 @@ import { RequestModal } from "../components/modals/request-modal";
 import { TimerOverlay } from "../components/match-logic/timer-overlay";
 
 export const GameScreen: React.FC<{
-  sceneManager: SceneManager;
+  sceneManager: React.MutableRefObject<SceneManager | undefined>;
 }> = ({ sceneManager }) => {
   const [matchReady, setMatchReady] = useState(false);
   const [promotion, setPromotion] = useState(false);
@@ -19,15 +19,13 @@ export const GameScreen: React.FC<{
     onConfirm: () => void;
     onReject: () => void;
   } | null>(null);
-  const sceneManagerRef = useRef(sceneManager);
   const loadInitiated = useRef(false);
-  const matchRef = useRef(new Match(0.3, endMatch));
+  const matchRef = useRef(new Match(0, endMatch));
   const matchControlRef = useRef(
-    matchController(matchRef.current, sceneManager)
+    matchController(matchRef.current, sceneManager.current!)
   );
   const { current: match } = matchRef;
   const { current: matchControl } = matchControlRef;
-
   function endMatch() {
     match.isActive = false;
     const winningTeam =
@@ -38,32 +36,34 @@ export const GameScreen: React.FC<{
   }
 
   useEffect(() => {
-    if (!loadInitiated.current) {
-      (async () => {
-        loadInitiated.current = true;
-        await sceneManagerRef.current.loadGame(match, matchControl, false);
-        match.startMatch();
+    if (sceneManager.current !== undefined) {
+      if (!loadInitiated.current) {
+        (async () => {
+          loadInitiated.current = true;
+          await sceneManager.current!.loadGame(match, matchControl, false);
+          match.startMatch();
 
-        matchControl.on("promotion-selections", () => {
-          setTimeout(() => setPromotion(true), 1000);
-        });
-
-        matchControl.on("end-match", (winningTeam: string) => {
-          sceneManagerRef.current.gameScreen!.detachControl();
-          setRequest({
-            question: `${winningTeam} team has won!, Would you like to play another game?`,
-            onConfirm: () => {
-              match.resetMatch();
-              sceneManager.prepGameScreen(match.game);
-              setRequest(null);
-            },
-            onReject: () => {
-              setRequest(null);
-            },
+          matchControl.on("promotion-selections", () => {
+            setTimeout(() => setPromotion(true), 1000);
           });
-        });
-        setMatchReady(true);
-      })();
+
+          matchControl.on("end-match", (winningTeam: string) => {
+            sceneManager.current!.gameScreen!.detachControl();
+            setRequest({
+              question: `${winningTeam} team has won!, Would you like to play another game?`,
+              onConfirm: () => {
+                match.resetMatch();
+                sceneManager.current!.prepGameScreen(match.game);
+                setRequest(null);
+              },
+              onReject: () => {
+                setRequest(null);
+              },
+            });
+          });
+          setMatchReady(true);
+        })();
+      }
     }
   }, []);
 

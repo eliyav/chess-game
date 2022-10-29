@@ -19,7 +19,6 @@ export class Match {
     this.matchDetails = this.setMatch();
     this.game = new Game(this.matchDetails.player);
     this.endMatch = endMatch;
-    //Refactor timer
     this.timer = new Timer(
       time,
       this.matchDetails.player,
