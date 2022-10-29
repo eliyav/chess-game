@@ -1,36 +1,28 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import LoadingScreen from "./components/loading-screen";
-import { useAuthentication } from "./hooks/use-authentication";
 import { Home } from "./routes/home";
 import { Lobby } from "./routes/lobby";
 import { SceneManager } from "./components/scene-manager";
 import { GameScreen } from "./routes/game-screen";
-
-// const [currentUser, setCurrentUser] = useState<UserData>();
-// const [socketConnection, setSocketConnection] = useState<any>();
-// const [user, isAuthenticated] = useAuthentication(setCurrentUser);
-// const location = useLocation();
+import { Match } from "./components/match";
+import { Controller } from "./components/match-logic/controller";
 
 const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const sceneManager = useRef<SceneManager>();
+  const sceneManagerRef = useRef<SceneManager>();
+  const controllerRef = useRef(new Controller());
+  const matchRef = useRef(new Match());
 
   useEffect(() => {
-    if (canvasRef.current && !sceneManager.current) {
+    if (canvasRef.current && !sceneManagerRef.current) {
       (async () => {
-        sceneManager.current = new SceneManager(canvasRef.current!);
-        await sceneManager.current.init();
-        window.addEventListener("resize", () => sceneManager.current?.resize());
+        sceneManagerRef.current = new SceneManager(canvasRef.current!);
+        await sceneManagerRef.current.init();
         setIsLoading(false);
 
-        return () => {
-          sceneManager.current?.stopRender();
-          window.removeEventListener("resize", () =>
-            sceneManager.current?.resize()
-          );
-        };
+        return () => sceneManagerRef.current?.stopRender();
       })();
     }
   }, [canvasRef.current]);
@@ -45,7 +37,19 @@ const App: React.FC = () => {
         <Route path="/lobby" element={<Lobby />} />
         <Route
           path="/game"
-          element={<GameScreen sceneManager={sceneManager} />}
+          element={
+            sceneManagerRef.current ? (
+              <GameScreen
+                sceneManager={sceneManagerRef.current}
+                match={matchRef.current}
+                controller={controllerRef.current}
+              />
+            ) : (
+              <div className="loadingContainer">
+                <LoadingScreen text="..." />
+              </div>
+            )
+          }
         />
         {/* <Rou
             path="/match/online-lobby"
@@ -86,3 +90,17 @@ export interface UserData {
   picture: string;
   name: string;
 }
+
+// function endMatch() {
+
+//   const winningTeam =
+//     match.matchDetails.player.id === match.matchDetails.teams[0]
+//       ? match.matchDetails.teams[1]
+//       : match.matchDetails.teams[0];
+//   matchControl.emit("end-match", winningTeam);
+// }
+
+// const [currentUser, setCurrentUser] = useState<UserData>();
+// const [socketConnection, setSocketConnection] = useState<any>();
+// const [user, isAuthenticated] = useAuthentication(setCurrentUser);
+// const location = useLocation();

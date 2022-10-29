@@ -4,7 +4,6 @@ export class Timer {
   timer1: { time: number };
   timer2: { time: number };
   paused: boolean;
-  endMatch: () => void;
   pause: () => void;
   resume: () => void;
   currentTimer: () => { time: number };
@@ -18,7 +17,6 @@ export class Timer {
     this.resume = () => (this.paused = false);
     this.currentTimer = () =>
       this.currentPlayer.id === "White" ? this.timer1 : this.timer2;
-    this.endMatch = endMatch;
   }
 
   toggleTimer = () => {
@@ -33,18 +31,12 @@ export class Timer {
           timer.time = this.padZero(timer.time - 1);
           if (!timer.time) {
             clearInterval(intervalId);
-            this.endOfMatch();
+            // this.endOfMatch(); end of Match
           }
         }
       }, 1000);
     }
   };
-
-  endOfMatch() {
-    setTimeout(() => {
-      this.endMatch();
-    }, 500);
-  }
 
   getCurrentPlayer() {
     return this.currentPlayer.id;

@@ -4,26 +4,18 @@ import Game from "./game-logic/game";
 
 export class Match {
   game: Game;
-  matchDetails: {
+  current: {
     teams: string[];
     turn: number;
     player: { id: string };
     moves: Point[];
+    isActive: boolean;
   };
-  isActive: boolean;
-  timer: Timer;
-  endMatch: () => void;
 
-  constructor(time = 0, endMatch: () => void) {
-    this.isActive = false;
-    this.matchDetails = this.setMatch();
-    this.game = new Game(this.matchDetails.player);
-    this.endMatch = endMatch;
-    this.timer = new Timer(
-      time,
-      this.matchDetails.player,
-      this.endMatch.bind(this)
-    );
+  constructor() {
+    this.current = this.setMatch();
+    this.game = new Game(this.current.player);
+    // this.timer = new Timer(time, this.matchDetails.player);
   }
 
   setMatch() {
@@ -32,33 +24,32 @@ export class Match {
       turn: 1,
       player: { id: "White" },
       moves: [],
+      isActive: false,
     };
     return matchDefaults;
   }
 
   nextTurn() {
-    this.matchDetails.turn++;
+    this.current.turn++;
     this.switchPlayer();
-    if (this.game.isCheckmate()) return this.endMatch();
+    if (this.game.isCheckmate()) return; //On end match return true/false
   }
 
   switchPlayer() {
     const player =
-      this.matchDetails.turn % 2
-        ? this.matchDetails.teams[0]
-        : this.matchDetails.teams[1];
-    this.matchDetails.player.id = player;
+      this.current.turn % 2 ? this.current.teams[0] : this.current.teams[1];
+    this.current.player.id = player;
   }
 
   resetMatch() {
-    this.matchDetails = this.setMatch();
-    this.game.resetGame(this.matchDetails.player);
-    this.timer.resetTimers(this.matchDetails.player);
+    this.current = this.setMatch();
+    this.game.resetGame(this.current.player);
+    // this.timer.resetTimers(this.data.player);
   }
 
   startMatch() {
-    this.isActive = true;
-    this.timer.startTimer();
+    this.current.isActive = true;
+    // this.timer.startTimer();
   }
 
   takeTurn(originPoint: Point, targetPoint: Point): TurnHistory | boolean {
@@ -83,7 +74,7 @@ export class Match {
         lastTurn.targetSquare.on = lastTurn.targetPiece;
         this.game.turnHistory.length = this.game.turnHistory.length - 1;
         this.game.annotations.length = this.game.annotations.length - 1;
-        this.matchDetails.turn--;
+        this.current.turn--;
         this.switchPlayer();
       }
       return true;
@@ -92,6 +83,6 @@ export class Match {
   }
 
   resetMoves() {
-    this.matchDetails.moves = [];
+    this.current.moves = [];
   }
 }
