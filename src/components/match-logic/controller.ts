@@ -54,11 +54,6 @@ export class Controller {
     this.sceneManager.gameScreen?.attachControl();
   }
 
-  resetMatch() {
-    this.match.resetMatch();
-    this.prepGameScreen();
-  }
-
   resolveInput(pickResult: any) {
     if (pickResult.pickedMesh !== null) {
       const mesh: ChessPieceMesh = pickResult.pickedMesh;
@@ -68,7 +63,7 @@ export class Controller {
         const validTurn = this.match.takeTurn(originPoint, targetPoint);
         if (validTurn) {
           this.turnAnimation(originPoint, targetPoint, validTurn);
-          const nextTurn = this.resolveMove();
+          const nextTurn = this.match.nextTurn();
           if (validTurn.promotion) this.eventHandlers.promote();
           if (!nextTurn) this.eventHandlers.endMatch();
         }
@@ -80,10 +75,9 @@ export class Controller {
     }
   }
 
-  resolveMove() {
-    const nextTurn = this.match.nextTurn();
-    if (nextTurn) return true;
-    return false;
+  resetMatch() {
+    this.match.resetMatch();
+    this.prepGameScreen();
   }
 
   turnAnimation(
