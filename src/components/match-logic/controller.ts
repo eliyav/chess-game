@@ -210,13 +210,11 @@ export class Controller {
     function setToWhitePlayer() {
       camera.alpha = Math.PI;
       camera.beta = Math.PI / 4;
-      camera.radius = 70;
     }
 
     function setToBlackPlayer() {
       camera.alpha = 0;
       camera.beta = Math.PI / 4;
-      camera.radius = 70;
     }
   }
 

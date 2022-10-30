@@ -13,12 +13,12 @@ export const gameScene = async (
     "camera",
     Math.PI,
     Math.PI / 4,
-    70,
+    40,
     new BABYLON.Vector3(0, 0, 0),
     scene
   );
   camera.lowerRadiusLimit = 25;
-  camera.upperRadiusLimit = 200;
+  camera.upperRadiusLimit = 50;
   camera.attachControl(canvas, true);
 
   const light = new BABYLON.HemisphericLight(
