@@ -43,7 +43,7 @@ export class Controller {
       e: any,
       pickResult: any
     ) => {
-      this.resolveInput(pickResult);
+      this.handleInput(pickResult);
     };
   }
 
@@ -54,7 +54,7 @@ export class Controller {
     this.sceneManager.gameScreen?.attachControl();
   }
 
-  resolveInput(pickResult: any) {
+  handleInput(pickResult: any) {
     if (pickResult.pickedMesh !== null) {
       const mesh: ChessPieceMesh = pickResult.pickedMesh;
       const isCompleteMove = this.gameInput(mesh);
@@ -71,6 +71,16 @@ export class Controller {
         this.rotateCamera();
 
         this.match.resetMoves();
+      }
+    }
+  }
+
+  undoMove() {
+    if (this.match.current.isActive) {
+      const isValidUndo = this.match.undoTurn();
+      if (isValidUndo) {
+        this.updateMeshesRender();
+        this.rotateCamera();
       }
     }
   }
@@ -308,19 +318,3 @@ export class Controller {
     }
   }
 }
-
-// boardReset(match: Match, sceneManager: SceneManager) {
-//   match.resetMatch();
-//   sceneManager.prepGameScreen(match.game);
-// }
-
-// undoMove(match: Match, sceneManager: SceneManager) {
-//   if (match.current.isActive) {
-//     const undo = match.undoTurn();
-//     if (undo) sceneManager.updateGameView(match.game);
-//   }
-// }
-
-// resetCamera(match: Match, sceneManager: SceneManager) {
-//   sceneManager.resetCamera(match.game);
-// }

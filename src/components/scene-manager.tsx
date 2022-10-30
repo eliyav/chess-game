@@ -30,8 +30,10 @@ export class SceneManager {
   }
 
   async loadHome() {
+    if (this.gameScreen) this.gameScreen.detachControl();
     const homeScreen = await homeScene(this.engine, this.activeScene);
     this.homeScreen = homeScreen;
+    this.activeScene.id = "home";
   }
 
   async loadGame() {

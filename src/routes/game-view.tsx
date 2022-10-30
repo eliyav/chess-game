@@ -7,18 +7,17 @@ import { SceneManager } from "../components/scene-manager";
 import { Controller } from "../components/match-logic/controller";
 import { Message, MessageModal } from "../components/modals/message-modal";
 import PromotionModal from "../components/modals/promotion-modal";
+import { useNavigate } from "react-router-dom";
 
 export const GameView: React.FC<{
   sceneManager: SceneManager;
 }> = ({ sceneManager }) => {
-  // matchControl.on("promotion-selections", () => {
-  // });
   const [viewReady, setViewReady] = useState(false);
   const [message, setMessage] = useState<Message | null>(null);
   const [promotion, setPromotion] = useState(false);
   const loadInitiated = useRef(false);
   const match = useRef(new Match()).current;
-
+  const navigate = useNavigate();
   const gameEventHandlers = {
     endMatch,
     promote,
@@ -75,25 +74,22 @@ export const GameView: React.FC<{
           items={[
             {
               text: "home",
-              onClick: () => {},
+              onClick: () => {
+                sceneManager.loadHome();
+                navigate("/");
+              },
             },
             {
               text: "restart",
-              onClick: () => {
-                console.log("board reset");
-              },
+              onClick: () => controller.resetMatch(),
             },
             {
               text: "undo",
-              onClick: () => {
-                console.log("undo move");
-              },
+              onClick: () => controller.undoMove(),
             },
             {
               text: "camera",
-              onClick: () => {
-                console.log("reset camera");
-              },
+              onClick: () => controller.resetCamera(),
             },
             // {
             //   text: "pause",
@@ -119,10 +115,9 @@ export const GameView: React.FC<{
           }}
         />
       )}
+      {/* {matchReady && <TimerOverlay timer={match.timer} />} */}
     </>
   );
 };
 
 export type IconsIndex = typeof icons;
-
-// {matchReady && <TimerOverlay timer={match.timer} />}
