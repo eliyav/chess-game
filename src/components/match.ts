@@ -32,7 +32,8 @@ export class Match {
   nextTurn() {
     this.current.turn++;
     this.switchPlayer();
-    if (this.game.isCheckmate()) return; //On end match return true/false
+    if (this.game.isCheckmate()) return false;
+    return true;
   }
 
   switchPlayer() {
@@ -52,13 +53,8 @@ export class Match {
     // this.timer.startTimer();
   }
 
-  takeTurn(originPoint: Point, targetPoint: Point): TurnHistory | boolean {
-    const resolve = this.game.resolveMove(originPoint, targetPoint);
-    if (resolve) {
-      this.nextTurn();
-      return resolve;
-    }
-    return false;
+  takeTurn(originPoint: Point, targetPoint: Point) {
+    return this.game.resolveMove(originPoint, targetPoint);
   }
 
   undoTurn() {
@@ -84,5 +80,13 @@ export class Match {
 
   resetMoves() {
     this.current.moves = [];
+  }
+
+  getWinningTeam() {
+    const team =
+      this.current.player.id === this.current.teams[0]
+        ? this.current.teams[1]
+        : this.current.teams[0];
+    return team;
   }
 }

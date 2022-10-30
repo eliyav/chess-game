@@ -6,17 +6,29 @@ import {
 import { doMovesMatch, TurnHistory } from "../../helper/game-helpers";
 import calcTurnAnimation from "../../view/animation/turn-animation";
 import { ChessPieceMesh } from "../../view/game-assets";
+import GamePiece from "../game-logic/game-piece";
 import { Match } from "../match";
 import { SceneManager } from "../scene-manager";
 
-//Create the controller upon entering /game, save match and scene as keys
 export class Controller {
   sceneManager: SceneManager;
   match: Match;
+  eventHandlers: {
+    endMatch: () => void;
+    promote: () => void;
+  };
 
-  constructor(sceneManager: SceneManager, match: Match) {
+  constructor(
+    sceneManager: SceneManager,
+    match: Match,
+    eventHandlers: {
+      endMatch: () => void;
+      promote: () => void;
+    }
+  ) {
     this.sceneManager = sceneManager;
     this.match = match;
+    this.eventHandlers = eventHandlers;
   }
 
   async prepView() {
@@ -42,27 +54,36 @@ export class Controller {
     this.sceneManager.gameScreen?.attachControl();
   }
 
+  resetMatch() {
+    this.match.resetMatch();
+    this.prepGameScreen();
+  }
+
   resolveInput(pickResult: any) {
     if (pickResult.pickedMesh !== null) {
       const mesh: ChessPieceMesh = pickResult.pickedMesh;
       const isCompleteMove = this.gameInput(mesh);
       if (isCompleteMove) {
         const [originPoint, targetPoint] = this.match.current.moves;
-        this.updateMeshesRender();
-        const resolved = this.match.takeTurn(originPoint, targetPoint);
-        if (typeof resolved !== "boolean" && resolved.result) {
-          this.resolveMove(originPoint, targetPoint, resolved);
+        const validTurn = this.match.takeTurn(originPoint, targetPoint);
+        if (validTurn) {
+          this.turnAnimation(originPoint, targetPoint, validTurn);
+          const nextTurn = this.resolveMove();
+          if (validTurn.promotion) this.eventHandlers.promote();
+          if (!nextTurn) this.eventHandlers.endMatch();
         }
+        this.updateMeshesRender();
+        this.rotateCamera();
+
         this.match.resetMoves();
       }
     }
   }
 
-  resolveMove(originPoint: Point, targetPoint: Point, history: TurnHistory) {
-    this.turnAnimation(originPoint, targetPoint, history);
-    if (history.promotion) return; //callback(); //promotion selections
-    this.match.switchPlayer();
-    this.rotateCamera();
+  resolveMove() {
+    const nextTurn = this.match.nextTurn();
+    if (nextTurn) return true;
+    return false;
   }
 
   turnAnimation(
@@ -274,32 +295,25 @@ export class Controller {
       return currentMove.length === 2 ? true : false;
     }
   }
-}
 
-// selectedPromotionPiece(
-//   selection: string,
-//   match: Match,
-//   sceneManager: SceneManager
-// ) {
-//   const turnHistory = match.game.turnHistory.at(-1);
-//   if (turnHistory !== undefined) {
-//     const square = turnHistory.targetSquare.square;
-//     turnHistory.promotedPiece = selection;
-//     const { color, point, movement } = turnHistory.originPiece!;
-//     turnHistory.targetSquare.on = new GamePiece(
-//       selection,
-//       color,
-//       point,
-//       movement
-//     );
-//     const symbol = turnHistory.targetSquare.on.getSymbol();
-//     const annotations = match.game.annotations;
-//     annotations[annotations.length - 1] = `${square}${symbol}`;
-//     sceneManager.updateMeshesRender(match.game);
-//     match.switchPlayer();
-//     sceneManager.rotateCamera(match.game);
-//   }
-// }
+  setPromotionPiece(selection: string) {
+    const turnHistory = this.match.game.turnHistory.at(-1);
+    if (turnHistory !== undefined) {
+      const square = turnHistory.targetSquare.square;
+      turnHistory.promotedPiece = selection;
+      const { color, point, movement } = turnHistory.originPiece!;
+      turnHistory.targetSquare.on = new GamePiece(
+        selection,
+        color,
+        point,
+        movement
+      );
+      const symbol = turnHistory.targetSquare.on.getSymbol();
+      const annotations = this.match.game.annotations;
+      annotations[annotations.length - 1] = `${square}${symbol}`;
+    }
+  }
+}
 
 // boardReset(match: Match, sceneManager: SceneManager) {
 //   match.resetMatch();

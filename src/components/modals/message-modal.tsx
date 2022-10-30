@@ -1,17 +1,25 @@
 import React from "react";
 
-interface MessageProps {
-  text: string | undefined;
-  onConfirm: (() => void) | undefined;
-}
+export type Message = {
+  question: string;
+  onConfirm: () => void;
+  onReject: () => void;
+};
 
-export const MessageModal: React.FC<MessageProps> = (props) => {
+export const MessageModal: React.FC<Message> = ({
+  onConfirm,
+  onReject,
+  question,
+}) => {
   return (
     <div className="message-wrapper">
       <div className="message">
-        <p className="text">{props.text}</p>
-        <button className="confirm" onClick={props.onConfirm}>
-          Confirm
+        <p className="text">{question}</p>
+        <button className="confirm" onClick={onConfirm}>
+          Yes
+        </button>
+        <button className="reject" onClick={onReject}>
+          No
         </button>
       </div>
     </div>

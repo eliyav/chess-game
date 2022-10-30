@@ -5,14 +5,47 @@ import { MenuOverlay } from "../components/game-overlay/menu-overlay";
 import { Match } from "../components/match";
 import { SceneManager } from "../components/scene-manager";
 import { Controller } from "../components/match-logic/controller";
+import { Message, MessageModal } from "../components/modals/message-modal";
+import PromotionModal from "../components/modals/promotion-modal";
 
 export const GameView: React.FC<{
   sceneManager: SceneManager;
 }> = ({ sceneManager }) => {
+  // matchControl.on("promotion-selections", () => {
+  // });
   const [viewReady, setViewReady] = useState(false);
+  const [message, setMessage] = useState<Message | null>(null);
+  const [promotion, setPromotion] = useState(false);
   const loadInitiated = useRef(false);
   const match = useRef(new Match()).current;
-  const controller = useRef(new Controller(sceneManager, match)).current;
+
+  const gameEventHandlers = {
+    endMatch,
+    promote,
+  };
+
+  const controller = useRef(
+    new Controller(sceneManager, match, gameEventHandlers)
+  ).current;
+
+  function endMatch() {
+    const winningTeam = match.getWinningTeam();
+    sceneManager.gameScreen!.detachControl();
+    setMessage({
+      question: `${winningTeam} team has won!, Would you like to play another game?`,
+      onConfirm: () => {
+        controller.resetMatch();
+        setMessage(null);
+      },
+      onReject: () => {
+        setMessage(null);
+      },
+    });
+  }
+
+  function promote() {
+    setPromotion(true);
+  }
 
   useEffect(() => {
     if (!loadInitiated.current) {
@@ -70,45 +103,26 @@ export const GameView: React.FC<{
           icons={icons}
         />
       )}
+      {message && (
+        <MessageModal
+          question={message.question}
+          onConfirm={message.onConfirm}
+          onReject={message.onReject}
+        />
+      )}
+      {promotion && (
+        <PromotionModal
+          submitSelection={(e) => {
+            controller.setPromotionPiece(e.target.innerText);
+            controller.updateMeshesRender();
+            setPromotion(false);
+          }}
+        />
+      )}
     </>
   );
 };
 
 export type IconsIndex = typeof icons;
-
-// matchControl.on("promotion-selections", () => {
-//   setTimeout(() => setPromotion(true), 1000);
-// });
-
-// matchControl.on("end-match", (winningTeam: string) => {
-//   sceneManager.current!.gameScreen!.detachControl();
-//   setRequest({
-//     question: `${winningTeam} team has won!, Would you like to play another game?`,
-//     onConfirm: () => {
-//       match.resetMatch();
-//       sceneManager.current!.prepGameScreen(match.game);
-//       setRequest(null);
-//     },
-//     onReject: () => {
-//       setRequest(null);
-//     },
-//   });
-// });
-
-// {promotion ? (
-//   <PromotionModal
-//     submitSelection={(e) => {
-//       matchControl.emit("selected-promotion-piece", e.target.innerText);
-//       setPromotion(false);
-//     }}
-//   />
-// ) : null}
-// {request ? (
-//   <RequestModal
-//     question={request.question}
-//     onConfirm={request.onConfirm}
-//     onReject={request.onReject}
-//   />
-// ) : null}
 
 // {matchReady && <TimerOverlay timer={match.timer} />}

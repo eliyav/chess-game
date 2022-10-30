@@ -21,7 +21,7 @@ class Game {
     this.currentPlayer = currentPlayer;
   }
 
-  resolveMove(originPoint: Point, targetPoint: Point): TurnHistory | boolean {
+  resolveMove(originPoint: Point, targetPoint: Point): TurnHistory | false {
     const locationsInfo = this.getLocationsInfo(originPoint, targetPoint);
     //Resolve a castling Move
     const castlingResult = this.resolveCastling(locationsInfo);
