@@ -372,4 +372,53 @@ canvas {
   background-repeat: no-repeat;
 }
 
-/*  -------------------  */
+/* -------------------  */
+/* Lobby */
+.lobby {
+  text-align: center;
+}
+
+.label {
+  background: rgba(255, 255, 255, 0.9);
+  color: black;
+  margin: 1em;
+  padding: 0.25em;
+  border-radius: 5px;
+  box-shadow: 0px 0px 5px black;
+}
+
+.selections {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.selection {
+  flex-basis: 40%;
+  background: rgba(1, 1, 1, 0.8);
+  border: 1px solid whitesmoke;
+  height: 75px;
+  line-height: 75px;
+  border-radius: 5px;
+  font-size: 1.2em;
+}
+
+.highlight {
+  background-color: rgba(0, 150, 0, 0.9);
+}
+
+.clock-selections {
+  background: rgba(1, 1, 1, 0.8);
+  padding: 1em;
+  border-top: 1px solid whitesmoke;
+  border-bottom: 1px solid whitesmoke;
+}
+
+.clock-selections .time-display {
+  margin-top: 1em;
+  font-size: 1.2em;
+}
+
+.slider {
+  width: 80%;
+}
