@@ -381,7 +381,7 @@ canvas {
 .label {
   background: rgba(255, 255, 255, 0.9);
   color: black;
-  margin: 1em;
+  margin: 0.5em 0 0 0;
   padding: 0.25em;
   border-radius: 5px;
   box-shadow: 0px 0px 5px black;
@@ -390,28 +390,24 @@ canvas {
 .selections {
   display: flex;
   justify-content: center;
-  gap: 10px;
 }
 
 .selection {
-  flex-basis: 40%;
+  flex-grow: 1;
   background: rgba(1, 1, 1, 0.8);
-  border: 1px solid whitesmoke;
   height: 75px;
   line-height: 75px;
-  border-radius: 5px;
   font-size: 1.2em;
 }
 
 .highlight {
   background-color: rgba(0, 150, 0, 0.9);
+  border: 1px solid white;
 }
 
 .clock-selections {
   background: rgba(1, 1, 1, 0.8);
   padding: 1em;
-  border-top: 1px solid whitesmoke;
-  border-bottom: 1px solid whitesmoke;
 }
 
 .clock-selections .time-display {
