@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { WebSocketClient } from "../websocket";
+import { Room, WebSocketClient } from "../websocket";
 
 export const Lobby: React.FC<{
   webSocketClient: WebSocketClient;
 }> = ({ webSocketClient }) => {
   const [mode, setMode] = useState<"online" | "offline">("offline");
   const [time, setTime] = useState("0");
-  const [room, setRoom] = useState<{} | null>(null);
+  const [room, setRoom] = useState<Room | null>(null);
 
   useEffect(() => {
-    if (mode === "online") webSocketClient.makeRoom(time);
+    if (mode === "online") setRoom(webSocketClient.makeRoom(time));
   }, [mode]);
 
   return (
@@ -47,15 +47,17 @@ export const Lobby: React.FC<{
         <h2 className="label">Opponent</h2>
         {mode === "offline" && (
           <div className="selections">
-            <div className={`selection ${opponent === "human" && "highlight"}`}>
-              Human
-            </div>
-            {/* <div className="selection">{"Bot (Coming Soon)"}</div> */}
+            <div className={`selection ${"highlight"}`}>Human</div>
           </div>
         )}
         {mode === "online" && (
           <div className="selections">
-            <div className={`selection highlight"}`}>{"Lobby Opponent"}</div>
+            <div className={`selection highlight"}`}>
+              {room?.players.player1.name}
+            </div>
+            <div className={`selection highlight"}`}>
+              {room?.players.player2.name}
+            </div>
           </div>
         )}
       </div>
