@@ -1,59 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Socket } from "socket.io-client";
-import { DefaultEventsMap } from "socket.io/dist/typed-events";
+import { WebSocketClient } from "../websocket";
 
 export const Lobby: React.FC<{
-  socket: Socket<DefaultEventsMap, DefaultEventsMap>;
-}> = ({ socket }) => {
-  const [mode, setMode] = useState<LobbyModes>("offline");
-  const [opponent, setOpponent] = useState("human");
+  webSocketClient: WebSocketClient;
+}> = ({ webSocketClient }) => {
+  const [mode, setMode] = useState<"online" | "offline">("offline");
   const [time, setTime] = useState("0");
-  const [lobbySettings, setLobbySettings] = useState<LobbySettings>({
-    lobbyKey: null,
-    hostName: "Host123",
-    opponentName: "Waiting...",
-    time: 0,
-    firstMove: "Game Host",
-  });
+  const [room, setRoom] = useState<{} | null>(null);
 
   useEffect(() => {
-    socket.on("room-info", (settings: LobbySettings) => {
-      console.log(settings);
-      setLobbySettings(settings);
-    });
-    return () => {
-      socket.off("room-info");
-    };
-  }, []);
-
-  useEffect(() => {
-    if (mode === "online") socket.emit("create-lobby", lobbySettings);
+    if (mode === "online") webSocketClient.makeRoom(time);
   }, [mode]);
-
-  useEffect(() => {
-    if (lobbySettings.lobbyKey) socket.emit("update-lobby", { lobbySettings });
-  }, [lobbySettings]);
 
   return (
     <div className="lobby screen">
       <h1 className="sub-title">Lobby</h1>;
       <div className="lobby-modes">
         <h2 className="label">Join Lobby</h2>
-        <input
-          type="text"
-          placeholder="Enter here"
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              const lobbyCode = e.currentTarget.value;
-              socket.emit("join-lobby", {
-                lobbeyKey: lobbyCode,
-                name: "Opponent",
-              });
-              e.currentTarget.value = "";
-            }
-          }}
-        ></input>
+        <input type="text" placeholder="Enter here"></input>
       </div>
       <div className="lobby-modes">
         <h2 className="label">Mode</h2>
@@ -75,7 +40,7 @@ export const Lobby: React.FC<{
       {mode === "online" && (
         <div className="lobby-code">
           <h2 className="label">Invite Code</h2>
-          <p className="selection">{lobbySettings.lobbyKey ?? "..."}</p>
+          <p className="selection">{"Lobby Key"}</p>
         </div>
       )}
       <div className="opponent">
@@ -90,10 +55,7 @@ export const Lobby: React.FC<{
         )}
         {mode === "online" && (
           <div className="selections">
-            <div className={`selection highlight"}`}>
-              {lobbySettings.opponentName}
-            </div>
-            {/* <div className="selection">{"Bot (Coming Soon)"}</div> */}
+            <div className={`selection highlight"}`}>{"Lobby Opponent"}</div>
           </div>
         )}
       </div>
@@ -121,13 +83,3 @@ export const Lobby: React.FC<{
     </div>
   );
 };
-
-type LobbyModes = "offline" | "online";
-
-export interface LobbySettings {
-  lobbyKey: string | null;
-  hostName: string;
-  opponentName: string;
-  time: number;
-  firstMove: string;
-}
