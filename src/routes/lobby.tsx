@@ -1,65 +1,52 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Room, WebSocketClient } from "../websocket";
+import { LobbyInfo, WebSocketClient } from "../websocket";
 
 export const Lobby: React.FC<{
   webSocketClient: WebSocketClient;
 }> = ({ webSocketClient }) => {
-  const [mode, setMode] = useState<"online" | "offline">("offline");
-  const [time, setTime] = useState("0");
-  const [room, setRoom] = useState<Room | null>(null);
+  const [lobby, setLobby] = useState<LobbyInfo>();
+  const lobbyRequested = useRef(false)
 
   useEffect(() => {
-    if (mode === "online") setRoom(webSocketClient.makeRoom(time));
-  }, [mode]);
+    if(!lobby && lobbyRequested.current === false){
+      lobbyRequested.current = true;
+      webSocketClient.createLobby("username");
+    }
+  }, [])
 
-  return (
+  useEffect(() => {
+    if(!webSocketClient.socket.hasListeners("lobby-info")){
+      webSocketClient.socket.on("lobby-info", (lobby) => {
+        console.log(lobby)
+        setLobby(lobby)
+      })
+    }
+  }, [])
+
+  return ( 
     <div className="lobby screen">
       <h1 className="sub-title">Lobby</h1>;
       <div className="lobby-modes">
         <h2 className="label">Join Lobby</h2>
         <input type="text" placeholder="Enter here"></input>
       </div>
-      <div className="lobby-modes">
-        <h2 className="label">Mode</h2>
-        <div className="selections">
-          <div
-            onClick={() => setMode("offline")}
-            className={`selection ${mode === "offline" && "highlight"}`}
-          >
-            Offline
-          </div>
-          <div
-            className={`selection ${mode === "online" && "highlight"}`}
-            onClick={() => setMode("online")}
-          >
-            Online
-          </div>
-        </div>
+      {lobby && 
+      <div>
+      <div className="lobby-code">
+        <h2 className="label">Invite Code</h2>
+        <p className="selection">{lobby.lobbyKey}</p>
       </div>
-      {mode === "online" && (
-        <div className="lobby-code">
-          <h2 className="label">Invite Code</h2>
-          <p className="selection">{"Lobby Key"}</p>
+      <div className="players">
+        <h2 className="label">Players</h2>
+        <div className="selections">
+          <div className={`selection highlight"}`}>
+            {lobby.players.player1.name}
+          </div>
+          <div className={`selection highlight"}`}>
+            {lobby.players.player2.name}
+          </div>
         </div>
-      )}
-      <div className="opponent">
-        <h2 className="label">Opponent</h2>
-        {mode === "offline" && (
-          <div className="selections">
-            <div className={`selection ${"highlight"}`}>Human</div>
-          </div>
-        )}
-        {mode === "online" && (
-          <div className="selections">
-            <div className={`selection highlight"}`}>
-              {room?.players.player1.name}
-            </div>
-            <div className={`selection highlight"}`}>
-              {room?.players.player2.name}
-            </div>
-          </div>
-        )}
       </div>
       <div className="clock">
         <h2 className="label">Clock</h2>
@@ -72,9 +59,11 @@ export const Lobby: React.FC<{
             max="60"
             step="5"
             defaultValue="0"
-            onChange={(e) => setTime(e.currentTarget.value)}
-          ></input>
-          <p className="time-display">{time === "0" ? "No Limit" : time}</p>
+            onChange={(e) => webSocketClient.updateTime(lobby.lobbyKey, e.currentTarget.value)}
+            ></input>
+          <p className="time-display">
+            {lobby.time === "0" ? "No Limit" : lobby.time}
+          </p>
         </div>
       </div>
       <div className="menu">
@@ -82,6 +71,8 @@ export const Lobby: React.FC<{
           <button className="menu-btn">Start</button>
         </Link>
       </div>
+      </div>
+      }
     </div>
   );
 };

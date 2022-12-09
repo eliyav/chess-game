@@ -63,21 +63,31 @@ setInterval(() => {
 
 setInterval(() => {
   console.log(lobbyLog);
-}, 2000);
+}, 5000);
 
 io.on("connection", (socket) => {
-  socket.on("create-lobby", (lobbySettings) => {
-    const lobbyKey = generateKey();
-    socket.join(lobbyKey);
+  socket.on("create-lobby", (userName) => {
+    let lobbyKey = generateKey();
+    while (lobbyLog.has(lobbyKey)) {
+      lobbyKey = generateKey();
+    }
     const lobby = {
-      lobbyKey: lobbyKey,
-      hostName: lobbySettings.hostName,
-      opponentName: "Waiting...",
-      time: 0,
-      firstMove: "Game Host",
+      lobbyKey,
+      players: {
+        player1: { name: userName[0], color: "White" },
+        player2: { name: "", color: "Black" },
+      },
+      time: "0",
     };
     lobbyLog.set(lobbyKey, lobby);
-    socket.emit("room-info", lobbyLog.get(lobbyKey));
+    socket.join(lobbyKey);
+    socket.emit("lobby-info", lobbyLog.get(lobbyKey));
+  });
+
+  socket.on("update-lobby-time", ([lobbyKey, time]) => {
+    const lobby = lobbyLog.get(lobbyKey);
+    lobby.time = time;
+    socket.emit("lobby-info", lobbyLog.get(lobbyKey));
   });
 
   socket.on("get-room-info", (lobbyKey) => {

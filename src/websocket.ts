@@ -2,7 +2,7 @@ import { io, Socket } from "socket.io-client";
 
 export class WebSocketClient {
   socket: Socket;
-  room: Room | null;
+  room: LobbyInfo | null;
 
   constructor() {
     this.socket = io(`ws://${window.location.host}`, {
@@ -11,26 +11,26 @@ export class WebSocketClient {
     this.room = null;
   }
 
-  makeRoom(time: string) {
-    const room: Room = {
-      roomKey: null,
-      players: {
-        player1: { name: "Eliya", color: "White" },
-        player2: { name: "Waiting...", color: "Black" },
-      },
-      firstMove: "player1",
-      time,
-    };
-    this.room = room;
-    return room;
+  createLobby(username: string) {
+    this.socket.emit("create-lobby", [username])
   }
+
+  roomInfo() {
+    return { ...this.room };
+  }
+  makeRoom() {}
   joinRoom() {}
   updateRoom() {}
   sendRequest() {}
+  updateTime(lobbyKey: string, time: string) {
+    this.socket.emit("update-lobby-time", [lobbyKey, time])
+  }
+  assignRoomCode() {}
+  attachListeners() {}
 }
 
-export interface Room {
-  roomKey: string | null;
+export interface LobbyInfo {
+  lobbyKey: string;
   players: Players;
   firstMove: string;
   time: string;
