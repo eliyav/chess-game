@@ -27,28 +27,20 @@ class Game {
   turn(originPoint: Point, targetPoint: Point): TurnHistory | false {
     const locationsInfo = this.getLocationsInfo(originPoint, targetPoint);
     //Resolve a castling Move
-    const castlingResult = this.resolveCastling(locationsInfo);
-
-    if (castlingResult) {
-      const annotation = this.annotate(castlingResult);
-      this.saveHistory(castlingResult, annotation);
-      return castlingResult;
+    const possibleMoves = [
+      this.resolveCastling,
+      this.resolveEnPassant,
+      this.resolveStandard,
+    ];
+    for (let i = 0; i < possibleMoves.length; i++) {
+      const move = possibleMoves[i];
+      const result = move(locationsInfo);
+      if (result) {
+        const annotation = this.annotate(result);
+        this.saveHistory(result, annotation);
+        return result;
+      }
     }
-    //Resolve a EnPassant Move
-    const enPassantResult = this.resolveEnPassant(locationsInfo);
-    if (enPassantResult) {
-      const annotation = this.annotate(enPassantResult);
-      this.saveHistory(enPassantResult, annotation);
-      return enPassantResult;
-    }
-    //Resolve a standard movement/capture move
-    const standardResult = this.resolveStandard(locationsInfo);
-    if (standardResult) {
-      const annotation = this.annotate(standardResult);
-      this.saveHistory(standardResult, annotation);
-      return standardResult;
-    }
-
     return false;
   }
 
