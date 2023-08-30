@@ -1,6 +1,6 @@
 import { TurnHistory } from "../helper/game-helpers";
 import { Timer } from "./match-logic/timer";
-import Game from "./game-logic/game";
+import Game from "./chess-game-logic/game";
 
 export class Match {
   game: Game;
@@ -54,11 +54,11 @@ export class Match {
   }
 
   takeTurn(originPoint: Point, targetPoint: Point) {
-    return this.game.resolveMove(originPoint, targetPoint);
+    return this.game.turn(originPoint, targetPoint);
   }
 
   undoTurn() {
-    const lastTurn = this.game.turnHistory.at(-1);
+    const lastTurn = this.game.history.turns.turn.at(-1);
     if (lastTurn !== undefined) {
       if (lastTurn.originPiece) {
         lastTurn.originPiece.resetPieceMovement();
@@ -68,8 +68,10 @@ export class Match {
         lastTurn.originSquare.on = lastTurn.originPiece;
         lastTurn.originPiece.point = lastTurn.origin;
         lastTurn.targetSquare.on = lastTurn.targetPiece;
-        this.game.turnHistory.length = this.game.turnHistory.length - 1;
-        this.game.annotations.length = this.game.annotations.length - 1;
+        this.game.history.turns.turn.length =
+          this.game.history.turns.turn.length - 1;
+        this.game.history.turns.annotations.length =
+          this.game.history.turns.annotations.length - 1;
         this.current.turn--;
         this.switchPlayer();
       }

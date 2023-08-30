@@ -10,41 +10,42 @@ import GamePiece, { Move } from "./game-piece";
 
 class Game {
   board: Board;
-  annotations: string[];
-  turnHistory: TurnHistory[];
-  currentPlayer: { id: string };
+  history: { turns: TurnHistory[]; annotations: string[] } = {
+    turns: [],
+    annotations: [],
+  };
 
-  constructor(currentPlayer: { id: string }) {
+  constructor() {
     this.board = new Board();
-    this.annotations = [];
-    this.turnHistory = [];
-    this.currentPlayer = currentPlayer;
   }
 
-  resolveMove(originPoint: Point, targetPoint: Point): TurnHistory | false {
+  saveHistory(turnHistory: TurnHistory, annotation: string) {
+    this.history.turns.push(turnHistory);
+    this.history.annotations.push(annotation);
+  }
+
+  turn(originPoint: Point, targetPoint: Point): TurnHistory | false {
     const locationsInfo = this.getLocationsInfo(originPoint, targetPoint);
     //Resolve a castling Move
     const castlingResult = this.resolveCastling(locationsInfo);
+
     if (castlingResult) {
       const annotation = this.annotate(castlingResult);
-      this.annotations.push(annotation);
-      this.turnHistory.push(castlingResult);
+      this.saveHistory(castlingResult, annotation);
       return castlingResult;
     }
     //Resolve a EnPassant Move
     const enPassantResult = this.resolveEnPassant(locationsInfo);
     if (enPassantResult) {
       const annotation = this.annotate(enPassantResult);
-      this.annotations.push(annotation);
-      this.turnHistory.push(enPassantResult);
+      this.saveHistory(enPassantResult, annotation);
       return enPassantResult;
     }
     //Resolve a standard movement/capture move
     const standardResult = this.resolveStandard(locationsInfo);
     if (standardResult) {
       const annotation = this.annotate(standardResult);
-      this.annotations.push(annotation);
-      this.turnHistory.push(standardResult);
+      this.saveHistory(standardResult, annotation);
       return standardResult;
     }
 
@@ -66,7 +67,7 @@ class Game {
 
   resolveEnPassant(locationsInfo: LocationsInfo) {
     const { originPiece, targetPoint } = locationsInfo;
-    const lastTurnHistory = this.turnHistory[this.turnHistory.length - 1];
+    const lastTurnHistory = this.history.turns[this.history.turns.length - 1];
     const enPassant = gameHelpers.isEnPassantAvailable(lastTurnHistory);
     if (enPassant.result) {
       if (gameHelpers.doMovesMatch(enPassant.enPassantPoint, targetPoint)) {
@@ -141,7 +142,7 @@ class Game {
 
   calculateAvailableMoves(piece: GamePiece, flag = false): Move[] {
     let availableMoves: Move[] = [];
-    let lastTurnHistory = this.turnHistory[this.turnHistory.length - 1];
+    let lastTurnHistory = this.history.turns[this.history.turns.length - 1];
     switch (piece.name) {
       case "Pawn":
         availableMoves = movementHelpers.calcPawnMoves(
@@ -411,8 +412,8 @@ class Game {
   resetGame(player: { id: string }) {
     this.board.resetBoard();
     this.currentPlayer = player;
-    this.annotations = [];
-    this.turnHistory = [];
+    this.history.annotations = [];
+    this.history.turns = [];
   }
 
   annotate(result: TurnHistory) {

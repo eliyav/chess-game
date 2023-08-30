@@ -6,7 +6,7 @@ import {
 import { doMovesMatch, TurnHistory } from "../../helper/game-helpers";
 import calcTurnAnimation from "../../view/animation/turn-animation";
 import { ChessPieceMesh } from "../../view/game-assets";
-import GamePiece from "../game-logic/game-piece";
+import GamePiece from "../chess-game-logic/game-piece";
 import { Match } from "../match";
 import { SceneManager } from "../scene-manager";
 
@@ -299,7 +299,7 @@ export class Controller {
   }
 
   setPromotionPiece(selection: string) {
-    const turnHistory = this.match.game.turnHistory.at(-1);
+    const turnHistory = this.match.game.history.turns.turn.at(-1);
     if (turnHistory !== undefined) {
       const square = turnHistory.targetSquare.square;
       turnHistory.promotedPiece = selection;
@@ -311,7 +311,7 @@ export class Controller {
         movement
       );
       const symbol = turnHistory.targetSquare.on.getSymbol();
-      const annotations = this.match.game.annotations;
+      const annotations = this.match.game.history.turns.annotations;
       annotations[annotations.length - 1] = `${square}${symbol}`;
     }
   }
