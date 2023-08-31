@@ -6,7 +6,7 @@ import {
   undoUpdateLocation,
 } from "../../helper/game-helpers";
 import Board, { Square } from "./board";
-import GamePiece, { Move } from "./game-piece";
+import GamePiece from "./game-piece";
 
 class Game {
   board: Board;
@@ -437,3 +437,5 @@ class Game {
 }
 
 export default Game;
+
+export type Move = [Point, string];

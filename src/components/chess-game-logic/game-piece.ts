@@ -2,17 +2,17 @@ class GamePiece {
   name: string;
   color: string;
   point: Point;
-  movement: number[];
   moved: boolean;
   moveCounter: number;
   direction: number;
+  movement: number[];
 
-  constructor(name: string, color: string, point: Point, movement: number[]) {
+  constructor(name: string, color: string, point: Point) {
     this.name = name;
     this.color = color;
     this.point = point;
-    this.movement = movement;
     this.moved = false;
+    this.movement = [1, 2, 3, 4, 5, 6, 7];
     this.moveCounter = 0;
     this.direction = this.color === "White" ? 1 : -1;
   }
@@ -51,7 +51,5 @@ class GamePiece {
     }
   }
 }
-
-export type Move = [Point, string];
 
 export default GamePiece;
