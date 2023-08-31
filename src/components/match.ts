@@ -1,6 +1,6 @@
 import { TurnHistory } from "../helper/game-helpers";
 import { Timer } from "./match-logic/timer";
-import Game from "./chess-game-logic/game";
+import Game from "../../server/chess-game-logic/game";
 
 export class Match {
   game: Game;

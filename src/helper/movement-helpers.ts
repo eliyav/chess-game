@@ -3,8 +3,8 @@ import {
   isEnPassantAvailable,
   doMovesMatch,
 } from "./game-helpers";
-import { Square } from "../components/chess-game-logic/board";
-import GamePiece, { Move } from "../components/chess-game-logic/game-piece";
+import { Square } from "../../server/chess-game-logic/board";
+import GamePiece, { Move } from "../../server/chess-game-logic/game-piece";
 
 type MovesObj = {
   up?: Point[];

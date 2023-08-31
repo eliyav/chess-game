@@ -6,7 +6,7 @@ import {
 import { doMovesMatch, TurnHistory } from "../../helper/game-helpers";
 import calcTurnAnimation from "../../view/animation/turn-animation";
 import { ChessPieceMesh } from "../../view/game-assets";
-import GamePiece from "../chess-game-logic/game-piece";
+import GamePiece from "../../../server/chess-game-logic/game-piece";
 import { Match } from "../match";
 import { SceneManager } from "../scene-manager";
 

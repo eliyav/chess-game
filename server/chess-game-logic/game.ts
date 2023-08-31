@@ -1,10 +1,10 @@
-import * as gameHelpers from "../../helper/game-helpers";
-import * as movementHelpers from "../../helper/movement-helpers";
+import * as gameHelpers from "../../src/helper/game-helpers";
+import * as movementHelpers from "../../src/helper/movement-helpers";
 import {
   TurnHistory,
   LocationsInfo,
   undoUpdateLocation,
-} from "../../helper/game-helpers";
+} from "../../src/helper/game-helpers";
 import Board, { Square } from "./board";
 import GamePiece from "./game-piece";
 
