@@ -1,0 +1,42 @@
+{
+  "name": "@sample/app",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "npm run bundle:prod",
+    "bundle:prod": "webpack --mode production",
+    "bundle:dev": "webpack --mode development --devtool source-map",
+    "test": "node --test --enable-source-maps",
+    "start": "webpack serve --mode development --open",
+    "prepack": "npm run build"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "dependencies": {
+    "@sample/components": "^1.0.0",
+    "sanitize.css": "^13.0.0"
+  },
+  "files": [
+    "dist",
+    "src",
+    "!dist/test",
+    "!dist/tsconfig.tsbuildinfo",
+    "!src/tsconfig.json"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:wixplosives/sample-monorepo.git",
+    "directory": "packages/app"
+  },
+  "private": true,
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "name": "@sample/server",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "test": "node --test --enable-source-maps",
+    "start": "node --enable-source-maps ./dist/server-main.js"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "dependencies": {
+    "@sample/app": "^1.0.0",
+    "compression": "^1.7.4",
+    "express": "^4.19.2"
+  },
+  "files": [
+    "dist",
+    "src",
+    "!dist/test",
+    "!dist/tsconfig.tsbuildinfo",
+    "!src/tsconfig.json"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:wixplosives/sample-monorepo.git",
+    "directory": "packages/server"
+  },
+  "private": true,
+  "publishConfig": {
+    "access": "public"
+  }
+}

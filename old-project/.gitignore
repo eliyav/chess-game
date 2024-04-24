@@ -1,9 +1,3 @@
-# IDEs
-.idea
-.vscode
-
-# Below is a copy of https://github.com/github/gitignore/blob/HEAD/Node.gitignore
-
 # Logs
 logs
 *.log
@@ -95,7 +89,6 @@ out
 
 # Nuxt.js build / generate output
 .nuxt
-dist
 
 # Gatsby files
 .cache/
@@ -127,6 +120,7 @@ dist
 
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
+.vscode
 
 # yarn v2
 .yarn/cache
@@ -134,3 +128,6 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+dist
+notes
