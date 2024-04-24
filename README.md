@@ -13,11 +13,9 @@
 - [Node.js](https://nodejs.org/en)
 - [Express.js](https://expressjs.com)
 - [Socket.io](https://socket.io)
-- [MongoDB](https://www.mongodb.com/)
 - [TypeScript](https://www.typescriptlang.org)
 - [Webpack](https://webpack.js.org/)
 - [React Router](https://reactrouter.com/)
-- [Auth0](https://auth0.com/)
 
 <!-- GETTING STARTED -->
 
@@ -41,17 +39,19 @@ Install the latest node package manager before installing dependencies
    git clone https://github.com/eliyav/chess-game.git
    ```
 2. Install NPM packages
+
    ```sh
    npm install
    ```
 
 3. Static serve the app on http://localhost:3000/
+
    ```js
    npm start
    ```
-   
+
    OR
-   
+
    Start express backend on http://localhost:8080/
 
    ```js
@@ -64,23 +64,8 @@ This project is meant to be played. If you are having fun playing chess it is be
 
 ## Roadmap
 
-- [x] Create working offline mode
-- [x] Implement back-end to enable websockets
-- [x] Create online matches
-  - [x] Create p2p interaction
-  - [In Progress] Fix game time sync
-- [x] Update game mesh models
-- [x] Implement React.js
-- [x] Add Game start options
-- [x] Implement MongoDB - Save & Load games
-- [x] Add Authorization/Login
-- [In Progress] Add Friends List
-- [In Progress] Add Chat
-- [x] Add animations
-- [] Add AI opponent
-- [] Add automation tests
-- [] Add Ranking Algorithim and search
-- [] More will be added.
+- [x] Refactor old codebase
+- [] Figure out rest of roadmap after
 
 See the [Projects tasks](https://github.com/eliyav/chess-game/projects/1) for a full list of tasks.
 

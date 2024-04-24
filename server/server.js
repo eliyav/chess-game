@@ -1,7 +1,6 @@
 require("dotenv").config();
 const express = require("express");
 const socketIO = require("socket.io");
-// const { Mongo } = require("./mongoDB/mongo.js");
 const { expressjwt: jwt } = require("express-jwt");
 const jwks = require("jwks-rsa");
 const path = require("path");
@@ -9,8 +8,7 @@ const compression = require("compression");
 
 const app = express();
 const port = process.env.PORT || 8080;
-//MongoDB
-// const mongo = new Mongo();
+
 //#region Middleware
 const verifyJwt = jwt({
   secret: jwks.expressJwtSecret({
@@ -195,14 +193,3 @@ io.on("connection", (socket) => {
     return key.join("");
   }
 });
-
-// app.post("/login", async (req, res) => {
-//   const body = JSON.parse(req.body);
-//   const user = await mongo.findUser({ email: body.user.email });
-//   if (!user) {
-//     const { insertedId } = await mongo.createUser(body.user);
-//     const user = await mongo.findUser({ _id: insertedId });
-//     return res.json(user);
-//   }
-//   return res.json(user);
-// });
