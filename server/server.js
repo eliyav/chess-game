@@ -1,4 +1,3 @@
-require("dotenv").config();
 const express = require("express");
 const socketIO = require("socket.io");
 const { expressjwt: jwt } = require("express-jwt");
