@@ -1,49 +1,38 @@
 {
-  "name": "sample-monorepo",
+  "name": "chess-game",
+  "version": "1.0.0",
   "type": "module",
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
-    "clean": "rimraf -g \"./packages/*/dist\"",
-    "build": "tsc --build",
-    "lint": "eslint .",
-    "pretest": "npm run lint && npm run build",
-    "test": "npm run test:only",
-    "test:only": "node --test --enable-source-maps",
-    "start": "npm run start:client",
-    "start:client": "npm run -w @sample/app start",
-    "prestart:server": "npm run -w @sample/app bundle:prod",
-    "start:server": "npm run -w @sample/server start",
-    "prettify": "prettier . --write"
+    "clean": "node -e \"fs.rmSync('dist', {recursive: true, force: true})\"",
+    "prebuild": "npm run clean",
+    "build": "npm run copy:public && npm run build:client && npm run build:server",
+    "build:client": "esbuild src/client.tsx --bundle --outdir=dist/client --target=es2022 --minify",
+    "build:server": "esbuild src/server.ts --bundle --outdir=dist/server --packages=external --platform=node --minify --format=esm",
+    "watch:client": "npm run copy:public && npm run build:client -- --watch",
+    "watch:server": "npm run build:server -- --watch",
+    "start": "concurrently --kill-others \"npm:watch:client\" \"npm:server\"",
+    "server": "concurrently --kill-others \"npm:watch:server\" \"nodemon dist/server/server.js\" ",
+    "copy:public": "node -e \"fs.cpSync('public', 'dist/client', {recursive: true})\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "Eliya Vahl",
+  "license": "MIT",
+  "description": "3D Chess Game",
+  "dependencies": {
+    "express": "^4.19.2",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
   },
   "devDependencies": {
-    "@types/compression": "^1.7.5",
     "@types/express": "^4.17.21",
-    "@types/node": "20",
-    "@types/react": "^18.2.79",
-    "@types/react-dom": "^18.2.25",
-    "@typescript-eslint/eslint-plugin": "^7.7.1",
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-no-only-tests": "^3.1.0",
-    "eslint-plugin-react": "^7.34.1",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "html-webpack-plugin": "^5.6.0",
-    "prettier": "^3.2.5",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "rimraf": "^5.0.5",
-    "source-map-loader": "^5.0.0",
-    "typescript": "~5.4.5",
-    "webpack": "^5.91.0",
-    "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^5.0.4"
+    "@types/node": "^20.12.7",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "concurrently": "^8.2.2",
+    "esbuild": "^0.20.2",
+    "nodemon": "^3.1.0",
+    "typescript": "~5.4.5"
   },
-  "engines": {
-    "node": ">=20",
-    "npm": ">=8"
-  },
-  "license": "MIT",
-  "private": true
+  "prettier": {}
 }
