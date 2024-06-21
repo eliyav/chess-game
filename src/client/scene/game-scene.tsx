@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
+import boardUrl from "../../meshes/board.gltf";
 
 const GameScene: React.FC = () => {
   const sceneRef = useRef<HTMLDivElement>(null);
@@ -29,7 +30,7 @@ const GameScene: React.FC = () => {
 
     // Load the GLTF model
     const loader = new GLTFLoader();
-    loader.load("./meshes/board.gltf", (gltf) => {
+    loader.load(boardUrl, (gltf) => {
       scene.add(gltf.scene);
     });
 
