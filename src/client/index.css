@@ -1,17 +1,3 @@
-@font-face {
-  font-family: Ubuntu;
-  src: url("../assets/fonts/ubuntu/Ubuntu-Regular.ttf");
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: Ubuntu;
-  src: url("../assets/fonts/ubuntu/Ubuntu-Italic.ttf");
-  font-weight: normal;
-  font-style: italic;
-}
-
 * {
   padding: 0;
   margin: 0;
@@ -27,8 +13,8 @@ body {
   --primary-background: #333333;
   --primary-color: #e9e9e9;
   --primary-alt-color: #8b8b8b;
-  --primary-font: Ubuntu;
 }
+
 #root {
   height: 100%;
   color: var(--primary-color);
@@ -344,7 +330,7 @@ canvas {
 
 .red {
   background-color: red;
-  background-image: url(../assets/promotion-choices/rook-choice.png);
+  background-image: url(../../assets/promotion-choices/rook-choice.png);
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -352,21 +338,21 @@ canvas {
 
 .blue {
   background-color: blue;
-  background-image: url(../assets/promotion-choices/bishop-choice.png);
+  background-image: url(../../assets/promotion-choices/bishop-choice.png);
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
 }
 .green {
   background-color: green;
-  background-image: url(../assets/promotion-choices/knight-choice.png);
+  background-image: url(../../assets/promotion-choices/knight-choice.png);
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
 }
 .yellow {
   background-color: yellow;
-  background-image: url(../assets/promotion-choices/queen-choice.png);
+  background-image: url(../../assets/promotion-choices/queen-choice.png);
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;

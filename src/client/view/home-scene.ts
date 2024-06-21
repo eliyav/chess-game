@@ -1,6 +1,6 @@
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
-import space from "../../assets/space.webp";
+import space from "../../../assets/space.webp";
 import { CustomScene } from "./game-assets";
 import { Scene } from "babylonjs/scene";
 import { ChessPieceMesh } from "./game-assets";

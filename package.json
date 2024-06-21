@@ -3,28 +3,31 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/main.js",
+  "type": "module",
   "scripts": {
-    "build": "webpack",
-    "prod": "webpack --mode=production",
-    "watch": "webpack --watch",
-    "dev": "webpack serve --open",
-    "start": "node server/server.js",
-    "servermon": "nodemon server/server.js"
+    "clean": "node -e \"fs.rmSync('dist', {recursive: true, force: true})\"",
+    "prebuild": "npm run clean",
+    "build": "npm run copy:public && npm run build:client && npm run build:server",
+    "build:client": "esbuild src/client/index.tsx --bundle --outdir=dist/client --target=es2022 --loader:.gltf=file --loader:.png=file --loader:.webp=file --format=esm --sourcemap",
+    "build:server": "esbuild src/server/index.ts --bundle --outdir=dist/server --packages=external --platform=node --minify --format=esm",
+    "watch:client": "npm run build:client -- --watch",
+    "watch:server": "npm run build:server -- --watch",
+    "nodemon:server": "nodemon dist/server/index.js",
+    "prestart": "npm run build",
+    "start": "concurrently --names client,server,nodemon -c auto --kill-others \"npm:watch:client\" \"npm:watch:server\" \"npm:nodemon:server\"",
+    "copy:public": "node -e \"fs.cpSync('public', 'dist/client', {recursive: true})\"",
+    "typecheck": "tsc --noEmit"
   },
   "browserslist": [
     "last 1 Chrome version"
   ],
-  "author": "",
+  "author": "Eliya Vahl",
   "license": "ISC",
   "dependencies": {
-    "@auth0/auth0-react": "^1.10.2",
     "babylonjs": "^5.13.3",
     "babylonjs-loaders": "^5.13.3",
     "compression": "^1.7.4",
     "express": "^4.18.1",
-    "express-jwt": "^7.7.5",
-    "jwks-rsa": "^2.1.4",
-    "mongodb": "^4.7.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.3.0",
@@ -32,20 +35,13 @@
     "socket.io-client": "^4.5.1"
   },
   "devDependencies": {
+    "@types/compression": "^1.7.5",
     "@types/node": "^18.0.0",
     "@types/react": "^18.0.14",
     "@types/react-dom": "^18.0.5",
-    "@types/webpack": "^5.28.0",
-    "compression-webpack-plugin": "^10.0.0",
-    "css-loader": "^6.7.1",
+    "concurrently": "^8.2.2",
     "dotenv": "^16.0.1",
-    "html-webpack-plugin": "^5.5.0",
-    "mini-css-extract-plugin": "^2.6.1",
-    "ts-loader": "^9.3.1",
-    "typescript": "^4.7.4",
-    "webpack": "^5.73.0",
-    "webpack-cli": "^4.10.0",
-    "webpack-dev-middleware": "^5.3.3",
-    "webpack-dev-server": "^4.9.3"
+    "esbuild": "^0.21.5",
+    "typescript": "^4.7.4"
   }
 }

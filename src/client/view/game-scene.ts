@@ -1,5 +1,5 @@
 import * as BABYLON from "babylonjs";
-import space from "../../assets/space.webp";
+import space from "../../../assets/space.webp";
 import { gameAssets } from "./game-assets";
 import { createMovementMaterials } from "./materials";
 import { CustomScene } from "./game-assets";

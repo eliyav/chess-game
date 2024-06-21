@@ -1,59 +1,29 @@
-require("dotenv").config();
-const express = require("express");
-// const { Mongo } = require("./mongoDB/mongo.js");
-const { expressjwt: jwt } = require("express-jwt");
-const jwks = require("jwks-rsa");
-const path = require("path");
-const compression = require("compression");
+import express from "express";
+import path from "path";
+import compression from "compression";
+import { Server } from "socket.io";
+import { fileURLToPath } from "url";
+
+const clientPath = fileURLToPath(new URL("../client", import.meta.url));
 
 const app = express();
 const port = process.env.PORT || 8080;
-//MongoDB
-// const mongo = new Mongo();
-//#region Middleware
-const verifyJwt = jwt({
-  secret: jwks.expressJwtSecret({
-    cache: false,
-    rateLimit: true,
-    jwksRequestsPerMinute: 5,
-    jwksUri: process.env.JWKS_URI,
-  }),
-  audience: process.env.JWKS_AUDIENCE,
-  issuer: process.env.JWKS_ISSUER,
-  algorithms: ["RS256"],
-}).unless({ path: ["/", "/favicon.ico"] });
+
 app.use(compression());
-app.use(express.static(path.join(__dirname, "../dist")));
+app.use(express.static(clientPath));
 app.get("*", function (req, res) {
-  res.sendFile(path.join(__dirname, "../dist/", "index.html"));
+  res.sendFile(path.join(clientPath, "index.html"));
 });
-app.use(verifyJwt);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.text());
-app.use((error, req, res, next) => {
-  const status = error.status || 500;
-  const message = error.message || "Internal server error";
-  res.status(status).send(message);
-});
-//#endregion
 
 const server = app.listen(port, function () {
   console.log(`Example app listening on port ${port}!\n`);
 });
 
-// app.post("/login", async (req, res) => {
-//   const body = JSON.parse(req.body);
-//   const user = await mongo.findUser({ email: body.user.email });
-//   if (!user) {
-//     const { insertedId } = await mongo.createUser(body.user);
-//     const user = await mongo.findUser({ _id: insertedId });
-//     return res.json(user);
-//   }
-//   return res.json(user);
-// });
 const lobbyLog = new Map();
-//Activate Sockets
-const io = require("socket.io")(server);
+
+const io = new Server(server);
 setInterval(() => {
   const socketedRooms = io.sockets.adapter.rooms;
   for (let lobbyKey of lobbyLog.keys()) {
@@ -110,7 +80,7 @@ io.on("connection", (socket) => {
 
   socket.on("start-match", (lobbyKey, firstMove) => {
     const clients = io.sockets.adapter.rooms.get(lobbyKey);
-    const serializedSet = [...clients.keys()];
+    const serializedSet = clients ? [...clients.keys()] : [];
     if (serializedSet.length === 2) {
       socket.to(lobbyKey).emit("start-match", lobbyKey, firstMove);
       socket.emit("message", "Match started!");
@@ -184,7 +154,7 @@ io.on("connection", (socket) => {
   function generateKey() {
     let chars = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
     let key = [];
-    for (i = 0; i < 5; i++) {
+    for (let i = 0; i < 5; i++) {
       let num = Math.floor(Math.random() * 10);
       let char = chars[num];
       key[i] = char;

@@ -1,11 +1,11 @@
 import * as BABYLON from "babylonjs";
-import board from "../../assets/board.gltf";
-import king from "../../assets/pieces/kingv3.gltf";
-import queen from "../../assets/pieces/queenv3.gltf";
-import bishop from "../../assets/pieces/bishopv3.gltf";
-import knight from "../../assets/pieces/knightv3.gltf";
-import rook from "../../assets/pieces/rookv3.gltf";
-import pawn from "../../assets/pieces/pawnv3.gltf";
+import board from "../../../assets/board.gltf";
+import king from "../../../assets/pieces/kingv3.gltf";
+import queen from "../../../assets/pieces/queenv3.gltf";
+import bishop from "../../../assets/pieces/bishopv3.gltf";
+import knight from "../../../assets/pieces/knightv3.gltf";
+import rook from "../../../assets/pieces/rookv3.gltf";
+import pawn from "../../../assets/pieces/pawnv3.gltf";
 import { CustomScene } from "./game-assets";
 import { AbstractMesh } from "babylonjs";
 import { createMeshMaterials } from "./materials";
