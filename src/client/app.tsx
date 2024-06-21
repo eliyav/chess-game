@@ -5,6 +5,7 @@ import LobbySelection from "./views/lobby/lobby";
 import OfflineLobby from "./views/lobby/offline-lobby";
 import OnlineLobby from "./views/lobby/online-lobby";
 import ErrorPage from "./views/error-page";
+import Match from "./views/match";
 
 const router = createBrowserRouter([
   {
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
         element: <OnlineLobby />,
       },
     ],
+  },
+  {
+    path: "/match",
+    element: <Match />,
   },
   {
     path: "*",
