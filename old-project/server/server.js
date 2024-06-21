@@ -1,25 +1,39 @@
-import express from "express";
-import path from "path";
-import compression from "compression";
-import { Server } from "socket.io";
-import { fileURLToPath } from "node:url";
-import path from "path";
-
-const clientPath = fileURLToPath(new URL("../client", import.meta.url));
+const express = require("express");
+const socketIO = require("socket.io");
+const { expressjwt: jwt } = require("express-jwt");
+const jwks = require("jwks-rsa");
+const path = require("path");
+const compression = require("compression");
 
 const app = express();
-
 const port = process.env.PORT || 8080;
 
+//#region Middleware
+const verifyJwt = jwt({
+  secret: jwks.expressJwtSecret({
+    cache: false,
+    rateLimit: true,
+    jwksRequestsPerMinute: 5,
+    jwksUri: process.env.JWKS_URI,
+  }),
+  audience: process.env.JWKS_AUDIENCE,
+  issuer: process.env.JWKS_ISSUER,
+  algorithms: ["RS256"],
+}).unless({ path: ["/", "/favicon.ico"] });
 app.use(compression());
-
-app.use(express.static(clientPath));
+app.use(express.static(path.join(__dirname, "../dist")));
 app.get("*", function (req, res) {
-  res.sendFile(path.join(clientPath, "index.html"));
+  res.sendFile(path.join(__dirname, "../dist/", "index.html"));
 });
-
+app.use(verifyJwt);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.text());
+app.use((error, req, res, next) => {
+  const status = error.status || 500;
+  const message = error.message || "Internal server error";
+  res.status(status).send(message);
+});
+//#endregion
 
 const server = app.listen(port, function () {
   console.log(`Example app listening on port ${port}!\n`);
@@ -27,7 +41,6 @@ const server = app.listen(port, function () {
 
 const lobbyLog = new Map();
 
-const io = new Server(server);
 setInterval(() => {
   const socketedRooms = io.sockets.adapter.rooms;
   for (let lobbyKey of lobbyLog.keys()) {
@@ -37,21 +50,34 @@ setInterval(() => {
 
 setInterval(() => {
   console.log(lobbyLog);
-}, 2000);
+}, 5000);
 
+const io = socketIO(server);
+
+//Activate Sockets
 io.on("connection", (socket) => {
-  socket.on("create-lobby", (lobbySettings) => {
-    const lobbyKey = generateKey();
-    socket.join(lobbyKey);
+  socket.on("create-lobby", (userName) => {
+    let lobbyKey = generateKey();
+    while (lobbyLog.has(lobbyKey)) {
+      lobbyKey = generateKey();
+    }
     const lobby = {
-      lobbyKey: lobbyKey,
-      hostName: lobbySettings.hostName,
-      opponentName: "Waiting...",
-      time: 0,
-      firstMove: "Game Host",
+      lobbyKey,
+      players: {
+        player1: { name: userName[0], color: "White" },
+        player2: { name: "", color: "Black" },
+      },
+      time: "0",
     };
     lobbyLog.set(lobbyKey, lobby);
-    socket.emit("room-info", lobbyLog.get(lobbyKey));
+    socket.join(lobbyKey);
+    socket.emit("lobby-info", lobbyLog.get(lobbyKey));
+  });
+
+  socket.on("update-lobby-time", ([lobbyKey, time]) => {
+    const lobby = lobbyLog.get(lobbyKey);
+    lobby.time = time;
+    socket.emit("lobby-info", lobbyLog.get(lobbyKey));
   });
 
   socket.on("get-room-info", (lobbyKey) => {
@@ -84,7 +110,7 @@ io.on("connection", (socket) => {
 
   socket.on("start-match", (lobbyKey, firstMove) => {
     const clients = io.sockets.adapter.rooms.get(lobbyKey);
-    const serializedSet = clients ? [...clients.keys()] : [];
+    const serializedSet = [...clients.keys()];
     if (serializedSet.length === 2) {
       socket.to(lobbyKey).emit("start-match", lobbyKey, firstMove);
       socket.emit("message", "Match started!");
@@ -158,12 +184,11 @@ io.on("connection", (socket) => {
   function generateKey() {
     let chars = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
     let key = [];
-    for (let i = 0; i < 5; i++) {
+    for (i = 0; i < 5; i++) {
       let num = Math.floor(Math.random() * 10);
       let char = chars[num];
       key[i] = char;
     }
     return key.join("");
   }
-
 });
