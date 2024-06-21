@@ -1,18 +1,18 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import Home from "./views/home";
+import Lobby from "./views/lobby";
 
-interface Props {
-  // Define your component props here
-}
+interface Props {}
 
 const App: React.FC<Props> = () => {
-  // Component logic goes here
-
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-    </Routes>
+    <div className="app">
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/lobby" element={<Lobby />} />
+      </Routes>
+    </div>
   );
 };
 
