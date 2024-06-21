@@ -1,17 +1,40 @@
 import React from "react";
-import { Route, Routes } from "react-router-dom";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Home from "./views/home";
-import Lobby from "./views/lobby";
+import LobbySelection from "./views/lobby/lobby";
+import OfflineLobby from "./views/lobby/offline-lobby";
+import OnlineLobby from "./views/lobby/online-lobby";
+import ErrorPage from "./views/error-page";
 
-interface Props {}
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Home />,
+  },
+  {
+    path: "/lobby",
+    element: <LobbySelection />,
+    children: [
+      {
+        path: "offline",
+        element: <OfflineLobby />,
+      },
+      {
+        path: "online",
+        element: <OnlineLobby />,
+      },
+    ],
+  },
+  {
+    path: "*",
+    element: <ErrorPage message="Oops, not a valid route!" />,
+  },
+]);
 
-const App: React.FC<Props> = () => {
+const App: React.FC = () => {
   return (
     <div className="app">
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/lobby" element={<Lobby />} />
-      </Routes>
+      <RouterProvider router={router} />
     </div>
   );
 };
