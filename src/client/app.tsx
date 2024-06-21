@@ -1,47 +1,62 @@
-import React from "react";
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import Home from "./views/home";
-import LobbySelection from "./views/lobby/lobby";
-import OfflineLobby from "./views/lobby/offline-lobby";
-import OnlineLobby from "./views/lobby/online-lobby";
-import ErrorPage from "./views/error-page";
-import Match from "./views/match";
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Home />,
-  },
-  {
-    path: "/lobby",
-    element: <LobbySelection />,
-    children: [
-      {
-        path: "offline",
-        element: <OfflineLobby />,
-      },
-      {
-        path: "online",
-        element: <OnlineLobby />,
-      },
-    ],
-  },
-  {
-    path: "/match",
-    element: <Match />,
-  },
-  {
-    path: "*",
-    element: <ErrorPage message="Oops, not a valid route!" />,
-  },
-]);
+import React, { useEffect, useRef, useState } from "react";
+import { Route, Routes } from "react-router-dom";
+import LoadingScreen from "./components/loading-screen";
+import { Home } from "./routes/home";
+import { Lobby } from "./routes/lobby";
+import { SceneManager } from "./components/scene-manager";
+import { GameView } from "./routes/game-view";
+import { io } from "socket.io-client";
 
 const App: React.FC = () => {
+  const [socket, setSocket] = useState(
+    io(`ws://${window.location.host}`, {
+      transports: ["websocket"],
+    })
+  );
+  const [isLoading, setIsLoading] = useState(true);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const sceneManagerRef = useRef<SceneManager>();
+
+  useEffect(() => {
+    if (canvasRef.current && !sceneManagerRef.current) {
+      initScene();
+      async function initScene() {
+        sceneManagerRef.current = new SceneManager(canvasRef.current!);
+        await sceneManagerRef.current.init();
+        setIsLoading(false);
+      }
+    }
+  }, [canvasRef.current]);
+
   return (
-    <div className="app">
-      <RouterProvider router={router} />
+    <div id="app">
+      <canvas ref={canvasRef}></canvas>
+      {!isLoading ? (
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/lobby" element={<Lobby socket={socket} />} />
+          <Route
+            path="/game"
+            element={
+              sceneManagerRef.current && (
+                <GameView sceneManager={sceneManagerRef.current} />
+              )
+            }
+          />
+        </Routes>
+      ) : (
+        <div className="loadingContainer">
+          <LoadingScreen text="..." />
+        </div>
+      )}
     </div>
   );
 };
 
 export default App;
+
+export interface UserData {
+  [key: string]: string;
+  picture: string;
+  name: string;
+}

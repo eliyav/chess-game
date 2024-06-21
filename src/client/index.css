@@ -1,3 +1,405 @@
-:root {
-  color-scheme: dark;
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
 }
+
+html,
+body {
+  height: 100%;
+}
+
+:root {
+  --primary-background: #333333;
+  --primary-color: #e9e9e9;
+  --primary-alt-color: #8b8b8b;
+}
+
+#root {
+  height: 100%;
+  color: var(--primary-color);
+  font-family: var(--primary-font);
+}
+
+#app {
+  height: 100%;
+}
+
+.screen {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background: transparent;
+  position: absolute;
+}
+
+canvas {
+  position: fixed;
+  z-index: 0;
+  display: block;
+  outline: none;
+  height: 100%;
+  width: 100%;
+}
+
+.sub-title {
+  text-align: center;
+  background: red;
+  padding: 0.3em;
+  margin: 0.25em;
+  font-size: 3.5em;
+  background: rgba(1, 1, 1, 0.3);
+  user-select: none;
+}
+
+.match-btns {
+  position: absolute;
+  bottom: 0;
+}
+
+/* Loading */
+.loading {
+  display: flex;
+  background-color: rgb(0, 0, 0);
+  z-index: 2;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading > p {
+  color: white;
+  font-size: 2em;
+  letter-spacing: 0.5em;
+  font-family: fantasy;
+  animation: loadingAnimation;
+  animation-duration: 0.75s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+@keyframes loadingAnimation {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 0.2;
+  }
+}
+/* Home Screen-------------------  */
+
+.home {
+  background-color: transparent;
+}
+
+.home-title {
+  font-size: 4em;
+  margin-top: 0.5em;
+  padding: 0.5em;
+  text-shadow: 2px 2px black;
+  text-align: center;
+  background: rgba(1, 1, 1, 0.3);
+  user-select: none;
+  color: whitesmoke;
+}
+
+.home-icons {
+  position: absolute;
+  top: 0px;
+  right: 10px;
+  margin: 5px 5px;
+}
+.svg-icon {
+  background-color: white;
+  border-radius: 8px;
+}
+
+.svg-icon:hover {
+  opacity: 0.8;
+}
+
+.menu {
+  position: absolute;
+  bottom: 0;
+  margin: 50px 0px;
+  width: 100%;
+  text-align: center;
+}
+
+.menu-item {
+  margin: 20px 0px;
+}
+
+.menu-btn {
+  width: 350px;
+  max-width: 85vw;
+  border-radius: 6px;
+  background: rgba(1, 1, 1, 0.3);
+  box-shadow: 0px 0px 5px 0.5px white;
+  color: white;
+  font-family: inherit;
+  font-style: italic;
+  font-size: 40px;
+  text-align: center;
+  padding: 0.25em 0em;
+  backdrop-filter: blur(5px);
+  margin-top: 0.75em;
+  user-select: none;
+}
+
+.menu-btn:hover {
+  box-shadow: 0px 0px 5px 0.5px yellow;
+}
+
+.return-btn {
+  width: 50px;
+  user-select: none;
+}
+
+.return-btn:hover {
+  opacity: 0.5;
+}
+
+/* Game Overlay-------------------  */
+.menu-overlay {
+  z-index: 2;
+  position: absolute;
+  top: 0;
+  min-width: 300px;
+  width: 100%;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  height: 3.5rem;
+  background-color: transparent;
+  text-align: center;
+  pointer-events: none;
+}
+
+.menu-overlay > .item {
+  color: black;
+  background-color: rgba(245, 245, 245, 0.5);
+  font-weight: bold;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  border: 0.1rem white solid;
+  padding: 0.1rem;
+  font-size: 0.9rem;
+  pointer-events: auto;
+  min-width: 70px;
+  flex-grow: 1;
+}
+
+.menu-overlay > .item > img {
+  display: block;
+  height: 60%;
+  object-fit: contain;
+  margin: auto;
+  pointer-events: none;
+  background-color: transparent;
+}
+
+.menu-overlay > .item:hover {
+  transform: scale(0.95);
+  background-color: gainsboro;
+}
+
+.timer {
+  position: absolute;
+  display: flex;
+  width: 100%;
+  margin: auto;
+  background-color: rgba(255, 255, 255, 0.5);
+  justify-content: space-around;
+  text-align: center;
+  bottom: 0;
+  z-index: 1;
+}
+
+.playerTimer {
+  flex-grow: 1;
+  max-width: 30%;
+}
+
+.active-player {
+  animation-name: flash;
+  animation-duration: 1.5s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+@keyframes flash {
+  from {
+    background-color: rgba(255, 0, 0, 1);
+  }
+  to {
+    background-color: rgba(255, 0, 0, 0.5);
+  }
+}
+
+.timer > .playerTimer > img {
+  height: 1.8rem;
+  object-fit: contain;
+  display: inline;
+  padding: 0 0.2rem;
+  background-color: transparent;
+}
+
+.timer > .playerTimer > div {
+  background-color: transparent;
+  color: black;
+  display: inline-block;
+  padding: 0.1rem;
+  font-weight: bold;
+  font-style: oblique;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+}
+
+/* Message Request -------------------  */
+.message-wrapper {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5em;
+  z-index: 3;
+}
+
+.message-wrapper .message {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(rgba(30, 143, 255, 0.7), rgba(0, 0, 0, 1));
+  text-align: center;
+  border: 0.25rem inset whitesmoke;
+  color: black;
+}
+
+.message .text {
+  width: 100%;
+  background-color: rgba(245, 245, 245, 0.685);
+  margin: 1rem;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  font-size: 1.5rem;
+  padding: 0.2rem;
+  border-radius: 0.5rem;
+  font-weight: bold;
+}
+
+.message button {
+  color: black;
+  font-size: 1.75rem;
+  padding: 0.1rem 1rem;
+  border-radius: 1rem;
+  margin: 1rem;
+  border: 0.25rem solid black;
+}
+
+.message button:hover {
+  transform: scale(0.9);
+  background-color: rgb(238, 224, 153);
+}
+
+.message .confirm {
+  background-color: rgba(0, 255, 0, 0.7);
+}
+
+.message .reject {
+  background-color: rgba(255, 0, 0, 0.7);
+}
+
+/* Promotion Modal-------------------  */
+.promotion-wrapper {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  z-index: 3;
+}
+
+.promotion-wrapper .selection {
+  width: 50%;
+}
+
+.red {
+  background-color: red;
+  background-image: url(../../assets/promotion-choices/rook-choice.png);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.blue {
+  background-color: blue;
+  background-image: url(../../assets/promotion-choices/bishop-choice.png);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.green {
+  background-color: green;
+  background-image: url(../../assets/promotion-choices/knight-choice.png);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.yellow {
+  background-color: yellow;
+  background-image: url(../../assets/promotion-choices/queen-choice.png);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+/* -------------------  */
+/* Lobby */
+.lobby {
+  text-align: center;
+}
+
+.label {
+  background: rgba(255, 255, 255, 0.9);
+  color: black;
+  margin: 0.5em 0 0 0;
+  padding: 0.25em;
+  border-radius: 5px;
+  box-shadow: 0px 0px 5px black;
+}
+
+.selections {
+  display: flex;
+  justify-content: center;
+}
+
+.selection {
+  flex-grow: 1;
+  background: rgba(1, 1, 1, 0.8);
+  height: 75px;
+  line-height: 75px;
+  font-size: 1.2em;
+}
+
+.highlight {
+  background-color: rgba(0, 150, 0, 0.9);
+  border: 1px solid white;
+}
+
+.clock-selections {
+  background: rgba(1, 1, 1, 0.8);
+  padding: 1em;
+}
+
+.clock-selections .time-display {
+  margin-top: 1em;
+  font-size: 1.2em;
+}
+
+.slider {
+  width: 80%;
