@@ -3,13 +3,12 @@ import path from "path";
 import compression from "compression";
 import { Server } from "socket.io";
 import { fileURLToPath } from "node:url";
-import path from "path";
 
 const clientPath = fileURLToPath(new URL("../client", import.meta.url));
 
 const app = express();
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 3000;
 
 app.use(compression());
 
@@ -165,5 +164,4 @@ io.on("connection", (socket) => {
     }
     return key.join("");
   }
-
 });
