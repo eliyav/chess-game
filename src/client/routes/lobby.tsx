@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Socket } from "socket.io-client";
-import { DefaultEventsMap } from "socket.io/dist/typed-events";
 
 export const Lobby: React.FC<{
-  socket: Socket<DefaultEventsMap, DefaultEventsMap>;
+  socket: Socket;
 }> = ({ socket }) => {
   const [mode, setMode] = useState<LobbyModes>("offline");
   const [opponent, setOpponent] = useState("human");
