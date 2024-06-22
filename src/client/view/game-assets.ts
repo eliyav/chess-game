@@ -1,4 +1,11 @@
-import * as BABYLON from "babylonjs";
+import "@babylonjs/loaders/glTF";
+import { Scene } from "@babylonjs/core/scene.js";
+import { ISceneLoaderAsyncResult } from "@babylonjs/core/Loading/sceneLoader";
+import { AssetContainer } from "@babylonjs/core/assetContainer";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { createMeshMaterials } from "./materials";
+import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
 import board from "../../../assets/board.gltf";
 import king from "../../../assets/pieces/kingv3.gltf";
 import queen from "../../../assets/pieces/queenv3.gltf";
@@ -6,11 +13,6 @@ import bishop from "../../../assets/pieces/bishopv3.gltf";
 import knight from "../../../assets/pieces/knightv3.gltf";
 import rook from "../../../assets/pieces/rookv3.gltf";
 import pawn from "../../../assets/pieces/pawnv3.gltf";
-import { createMeshMaterials } from "./materials";
-import { Scene } from "babylonjs/scene";
-import { ISceneLoaderAsyncResult } from "babylonjs/Loading/sceneLoader";
-import { AbstractMesh } from "babylonjs/Meshes/abstractMesh";
-import { AssetContainer } from "babylonjs";
 import pawnAnimation from "../../../assets/piece-animations/pawn-animation.gltf";
 import rookAnimation from "../../../assets/piece-animations/rook-animation.gltf";
 import bishopAnimation from "../../../assets/piece-animations/bishop-animation.gltf";
@@ -23,44 +25,42 @@ export const gameAssets = async (scene: Scene) => {
   let meshesToLoad = [king, queen, knight, bishop, rook, pawn];
 
   const loadedBoardMesh: ISceneLoaderAsyncResult =
-    await BABYLON.SceneLoader.ImportMeshAsync("", board, "");
+    await SceneLoader.ImportMeshAsync("", board, "");
 
   const loadedMeshes: ISceneLoaderAsyncResult[] = await Promise.all(
-    meshesToLoad.map((mesh) =>
-      BABYLON.SceneLoader.ImportMeshAsync("", mesh, "")
-    )
+    meshesToLoad.map((mesh) => SceneLoader.ImportMeshAsync("", mesh, ""))
   );
 
   const loadedPawnAnimation: ISceneLoaderAsyncResult =
-    await BABYLON.SceneLoader.ImportMeshAsync("", pawnAnimation, "");
+    await SceneLoader.ImportMeshAsync("", pawnAnimation, "");
 
   loadedPawnAnimation.animationGroups.forEach((animation) => {
     animation.loopAnimation = false;
   });
 
   const loadedRookAnimation: ISceneLoaderAsyncResult =
-    await BABYLON.SceneLoader.ImportMeshAsync("", rookAnimation, "");
+    await SceneLoader.ImportMeshAsync("", rookAnimation, "");
 
   loadedRookAnimation.animationGroups.forEach((animation) => {
     animation.loopAnimation = false;
   });
 
   const loadedBishopAnimation: ISceneLoaderAsyncResult =
-    await BABYLON.SceneLoader.ImportMeshAsync("", bishopAnimation, "");
+    await SceneLoader.ImportMeshAsync("", bishopAnimation, "");
 
   loadedBishopAnimation.animationGroups.forEach((animation) => {
     animation.loopAnimation = false;
   });
 
   const loadedKnightAnimation: ISceneLoaderAsyncResult =
-    await BABYLON.SceneLoader.ImportMeshAsync("", knightAnimation, "");
+    await SceneLoader.ImportMeshAsync("", knightAnimation, "");
 
   loadedKnightAnimation.animationGroups.forEach((animation) => {
     animation.loopAnimation = false;
   });
 
   const loadedQueenAnimation: ISceneLoaderAsyncResult =
-    await BABYLON.SceneLoader.ImportMeshAsync("", queenAnimation, "");
+    await SceneLoader.ImportMeshAsync("", queenAnimation, "");
 
   loadedQueenAnimation.animationGroups.forEach((animation) => {
     animation.loopAnimation = false;
@@ -85,7 +85,7 @@ export const gameAssets = async (scene: Scene) => {
     (finalMesh.isVisible = false), (finalMesh.scalingDeterminant = 50);
     finalMesh.position.y = 0.5;
     finalMesh.name === "Knight" && finalMesh.color === "White"
-      ? (finalMesh.rotation = new BABYLON.Vector3(0, Math.PI, 0))
+      ? (finalMesh.rotation = new Vector3(0, Math.PI, 0))
       : null;
     finalMesh.color === "White"
       ? (finalMesh.material = materials.white)

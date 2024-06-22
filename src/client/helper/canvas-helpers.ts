@@ -1,5 +1,7 @@
 import Game from "../components/game-logic/game";
-import { Material } from "babylonjs/Materials/material";
+import { Material } from "@babylonjs/core/Materials/material";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
 import { ChessPieceMesh, CustomScene } from "../view/game-assets";
 import { Move } from "../components/game-logic/game-piece";
 
@@ -23,20 +25,20 @@ const displayPieceMoves = (
 
 const displayMovementSquares = (move: Move, gameScene: CustomScene) => {
   const [point, type] = move;
-  const plane: any = BABYLON.MeshBuilder.CreatePlane(`plane`, {
+  const plane: any = MeshBuilder.CreatePlane(`plane`, {
     width: 2.5,
     height: 2.5,
   });
   [plane.position.z, plane.position.x] = findPosition(point, false);
   plane.position.y += 0.52;
-  plane.rotation = new BABYLON.Vector3(Math.PI / 2, 0, 0);
+  plane.rotation = new Vector3(Math.PI / 2, 0, 0);
   plane.material = findMaterial(type, gameScene);
   gameScene.meshesToRender!.push(plane);
 };
 
 const displayPieceMarker = (move: Point, gameScene: CustomScene) => {
   let type = "piece";
-  const torus: any = BABYLON.MeshBuilder.CreateTorus("torus", {
+  const torus: any = MeshBuilder.CreateTorus("torus", {
     diameter: 2.6,
     thickness: 0.2,
     tessellation: 16,

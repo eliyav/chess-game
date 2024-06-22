@@ -1,4 +1,8 @@
-import * as BABYLON from "babylonjs";
+import "@babylonjs/loaders/glTF";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
+import { Space } from "@babylonjs/core/Maths/math.axis";
 import board from "../../../assets/board.gltf";
 import king from "../../../assets/pieces/kingv3.gltf";
 import queen from "../../../assets/pieces/queenv3.gltf";
@@ -7,7 +11,6 @@ import knight from "../../../assets/pieces/knightv3.gltf";
 import rook from "../../../assets/pieces/rookv3.gltf";
 import pawn from "../../../assets/pieces/pawnv3.gltf";
 import { CustomScene } from "./game-assets";
-import { AbstractMesh } from "babylonjs";
 import { createMeshMaterials } from "./materials";
 import { SceneTypes } from "../components/scene-manager";
 
@@ -22,16 +25,14 @@ export const displayAssets = async (
   let boardMesh = board;
   let boardPieces = [king, queen, knight, bishop, rook, pawn];
 
-  const loadedBoardMeshes = await BABYLON.SceneLoader.ImportMeshAsync(
+  const loadedBoardMeshes = await SceneLoader.ImportMeshAsync(
     "",
     boardMesh,
     "",
     scene
   );
   const loadedPiecesMeshes = await Promise.all(
-    boardPieces.map((mesh) =>
-      BABYLON.SceneLoader.ImportMeshAsync("", mesh, "", scene)
-    )
+    boardPieces.map((mesh) => SceneLoader.ImportMeshAsync("", mesh, "", scene))
   );
 
   const rotationArray = [-5, -4, -3, -2, -1, 1, 2, 3, 4, 5];
@@ -76,10 +77,10 @@ export const displayAssets = async (
   });
 
   //Back/UP/Side
-  boardClone!.rotation = new BABYLON.Vector3(0.2, 0, 0);
-  boardClone!.position = new BABYLON.Vector3(10, 0, -10);
-  boardClone2!.position = new BABYLON.Vector3(30, -30, 30);
-  boardClone2!.rotation = new BABYLON.Vector3(-0.2, 0, 0.8);
+  boardClone!.rotation = new Vector3(0.2, 0, 0);
+  boardClone!.position = new Vector3(10, 0, -10);
+  boardClone2!.position = new Vector3(30, -30, 30);
+  boardClone2!.rotation = new Vector3(-0.2, 0, 0.8);
 
   let alpha = Math.PI / 2;
   let beta = Math.PI / 1.5;
@@ -92,25 +93,17 @@ export const displayAssets = async (
         if (mesh.position.y < endingPosition) {
           resetMesh(mesh);
         }
-        boardClone!.rotate(
-          new BABYLON.Vector3(0, 1, 0),
-          0.0008,
-          BABYLON.Space.LOCAL
-        );
-        boardClone2!.rotate(
-          new BABYLON.Vector3(0.6, 1, 0.5),
-          0.0005,
-          BABYLON.Space.LOCAL
-        );
+        boardClone!.rotate(new Vector3(0, 1, 0), 0.0008, Space.LOCAL);
+        boardClone2!.rotate(new Vector3(0.6, 1, 0.5), 0.0005, Space.LOCAL);
 
         mesh.rotate(
-          new BABYLON.Vector3(
+          new Vector3(
             alpha * rotationArray[mesh.rotationIndex!],
             beta * rotationArray[mesh.rotationIndex2!],
             gamma * rotationArray[mesh.rotationIndex3!]
           ),
           (3 * Math.PI) / 500,
-          BABYLON.Space.LOCAL
+          Space.LOCAL
         );
       });
       if (activeScene.id === "home") animateDistance(activeScene);

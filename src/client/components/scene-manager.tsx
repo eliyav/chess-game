@@ -1,12 +1,12 @@
-import * as BABYLON from "babylonjs";
 import { homeScene } from "../view/home-scene";
 import { CustomScene } from "../view/game-assets";
+import { Engine } from "@babylonjs/core/Engines/engine";
 
 export type SceneTypes = "home" | "game";
 
 export class SceneManager {
   canvasRef: HTMLCanvasElement;
-  engine: BABYLON.Engine;
+  engine: Engine;
   homeScreen: CustomScene | null;
   gameScreen: CustomScene | null;
   isInitDone: boolean;
@@ -14,7 +14,7 @@ export class SceneManager {
 
   constructor(canvasRef: HTMLCanvasElement) {
     this.canvasRef = canvasRef;
-    this.engine = new BABYLON.Engine(canvasRef, true);
+    this.engine = new Engine(canvasRef, true);
     this.activeScene = { id: "home" };
     this.homeScreen = null;
     this.gameScreen = null;

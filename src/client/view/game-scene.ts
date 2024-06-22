@@ -1,4 +1,13 @@
-import * as BABYLON from "babylonjs";
+import { Scene } from "@babylonjs/core/scene.js";
+import { Engine } from "@babylonjs/core/Engines/engine";
+import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera.js";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
+import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight.js";
+import { SpotLight } from "@babylonjs/core/Lights/spotLight.js";
+import { PhotoDome } from "@babylonjs/core/Helpers/photoDome.js";
+import { Color3 } from "@babylonjs/core/Maths/math.color.js";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { AssetContainer } from "@babylonjs/core/assetContainer";
 import space from "../../../assets/space.webp";
 import { gameAssets } from "./game-assets";
 import { createMovementMaterials } from "./materials";
@@ -6,64 +15,55 @@ import { CustomScene } from "./game-assets";
 
 export const gameScene = async (
   canvas: HTMLCanvasElement,
-  engine: BABYLON.Engine
+  engine: Engine
 ): Promise<CustomScene> => {
-  const scene: CustomScene = new BABYLON.Scene(engine);
-  const camera = new BABYLON.ArcRotateCamera(
+  const scene: CustomScene = new Scene(engine);
+  const camera = new ArcRotateCamera(
     "camera",
     Math.PI,
     Math.PI / 4,
     70,
-    new BABYLON.Vector3(0, 0, 0),
+    new Vector3(0, 0, 0),
     scene
   );
   camera.lowerRadiusLimit = 25;
   camera.upperRadiusLimit = 70;
   camera.attachControl(canvas, true);
 
-  const light = new BABYLON.HemisphericLight(
-    "light",
-    new BABYLON.Vector3(0, 100, 0),
-    scene
-  );
+  const light = new HemisphericLight("light", new Vector3(0, 100, 0), scene);
   light.intensity = 0.8;
 
-  const light2 = new BABYLON.SpotLight(
+  const light2 = new SpotLight(
     "spotLight",
-    new BABYLON.Vector3(0, 20, 30),
-    new BABYLON.Vector3(0, 0, -30),
+    new Vector3(0, 20, 30),
+    new Vector3(0, 0, -30),
     90,
     1,
     scene
   );
   light2.intensity = 0.8;
-  light2.diffuse = new BABYLON.Color3(0, 0, 0);
+  light2.diffuse = new Color3(0, 0, 0);
 
-  const light3 = new BABYLON.SpotLight(
+  const light3 = new SpotLight(
     "spotLight2",
-    new BABYLON.Vector3(0, 20, -30),
-    new BABYLON.Vector3(0, 0, 30),
+    new Vector3(0, 20, -30),
+    new Vector3(0, 0, 30),
     90,
     1,
     scene
   );
   light3.intensity = 0.8;
-  light3.diffuse = new BABYLON.Color3(0, 0, 0);
+  light3.diffuse = new Color3(0, 0, 0);
 
-  const photoDome = new BABYLON.PhotoDome(
-    "spaceDome",
-    space,
-    { size: 500 },
-    scene
-  );
-  photoDome.rotation = new BABYLON.Vector3(0, 1, 1.5);
+  const photoDome = new PhotoDome("spaceDome", space, { size: 500 }, scene);
+  photoDome.rotation = new Vector3(0, 1, 1.5);
 
   createMovementMaterials(scene);
   scene.finalMeshes = await gameAssets(scene);
 
   //#region Animations
   //Pawn Animations
-  const pawnAnimationContainer = new BABYLON.AssetContainer(scene);
+  const pawnAnimationContainer = new AssetContainer(scene);
 
   scene.finalMeshes?.animations?.Pawn.meshes.forEach((mesh) =>
     pawnAnimationContainer!.meshes.push(mesh)
@@ -77,7 +77,7 @@ export const gameScene = async (
   pawnAnimationContainer.removeAllFromScene();
 
   // Rook Animations
-  const rookAnimationContainer = new BABYLON.AssetContainer(scene);
+  const rookAnimationContainer = new AssetContainer(scene);
 
   scene.finalMeshes?.animations?.Rook.meshes.forEach((mesh) =>
     rookAnimationContainer!.meshes.push(mesh)
@@ -89,7 +89,7 @@ export const gameScene = async (
   rookAnimationContainer.removeAllFromScene();
 
   // Bishop Animations
-  const bishopAnimationContainer = new BABYLON.AssetContainer(scene);
+  const bishopAnimationContainer = new AssetContainer(scene);
 
   scene.finalMeshes?.animations?.Bishop.meshes.forEach((mesh) =>
     bishopAnimationContainer!.meshes.push(mesh)
@@ -101,7 +101,7 @@ export const gameScene = async (
   bishopAnimationContainer.removeAllFromScene();
 
   // Knight Animations
-  const knightAnimationContainer = new BABYLON.AssetContainer(scene);
+  const knightAnimationContainer = new AssetContainer(scene);
 
   scene.finalMeshes?.animations?.Knight.meshes.forEach((mesh) =>
     knightAnimationContainer!.meshes.push(mesh)
@@ -113,7 +113,7 @@ export const gameScene = async (
   knightAnimationContainer.removeAllFromScene();
 
   // Queen Animations
-  const queenAnimationContainer = new BABYLON.AssetContainer(scene);
+  const queenAnimationContainer = new AssetContainer(scene);
 
   scene.finalMeshes?.animations?.Queen.meshes.forEach((mesh) =>
     queenAnimationContainer!.meshes.push(mesh)
@@ -136,9 +136,9 @@ export const gameScene = async (
 
   scene.finalMeshes?.boardMeshes.forEach((mesh, idx) => {
     if (idx === 2) {
-      const material = new BABYLON.StandardMaterial("light", scene);
-      material.diffuseColor = new BABYLON.Color3(0.01, 0.01, 0.01);
-      material.specularColor = new BABYLON.Color3(0.01, 0.01, 0.01);
+      const material = new StandardMaterial("light", scene);
+      material.diffuseColor = new Color3(0.01, 0.01, 0.01);
+      material.specularColor = new Color3(0.01, 0.01, 0.01);
       mesh.material = material;
     }
   });
