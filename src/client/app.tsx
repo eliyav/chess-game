@@ -5,14 +5,11 @@ import { Home } from "./routes/home";
 import { Lobby } from "./routes/lobby";
 import { SceneManager } from "./components/scene-manager";
 import { GameView } from "./routes/game-view";
-import { io } from "socket.io-client";
+import type { Socket } from "socket.io-client";
 
-const App: React.FC = () => {
-  const [socket, setSocket] = useState(
-    io(`ws://${window.location.host}`, {
-      transports: ["websocket"],
-    })
-  );
+const App: React.FC<{
+  websocket: Socket;
+}> = ({ websocket }) => {
   const [isLoading, setIsLoading] = useState(true);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneManagerRef = useRef<SceneManager>();
@@ -34,7 +31,7 @@ const App: React.FC = () => {
       {!isLoading ? (
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/lobby" element={<Lobby socket={socket} />} />
+          <Route path="/lobby" element={<Lobby socket={websocket} />} />
           <Route
             path="/game"
             element={
