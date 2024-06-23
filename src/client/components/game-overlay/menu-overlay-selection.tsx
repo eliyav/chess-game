@@ -1,5 +1,5 @@
 import React from "react";
-import { IconsIndex } from "~/src/routes/game-view";
+import { IconsIndex } from "../../routes/game-view.js";
 
 interface SelectionProps {
   item: { text: keyof IconsIndex; onClick: () => void };
