@@ -13,7 +13,7 @@ import { SceneTypes } from "../components/scene-manager";
 
 export const homeScene = async (
   engine: Engine,
-  activeScene: { id: SceneTypes }
+  activeScene: { id: keyof SceneTypes }
 ): Promise<CustomScene> => {
   const scene: CustomScene = new Scene(engine);
   const camera = new ArcRotateCamera(

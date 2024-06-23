@@ -2,6 +2,7 @@ import { findIndex, findPosition } from "../../helper/canvas-helpers";
 import { doMovesMatch, TurnHistory } from "../../helper/game-helpers";
 import { CustomScene } from "../game-assets";
 import { createMeshMaterials } from "../materials";
+import { Animation } from "@babylonjs/core/Animations/animation.js";
 
 export default function calcTurnAnimation(
   gameScene: CustomScene,
@@ -54,30 +55,30 @@ export default function calcTurnAnimation(
 
     const frameRate = 1;
 
-    const myAnimX = new BABYLON.Animation(
+    const myAnimX = new Animation(
       "moveSquares",
       "position.x",
       frameRate,
-      BABYLON.Animation.ANIMATIONTYPE_FLOAT,
-      BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
+      Animation.ANIMATIONTYPE_FLOAT,
+      Animation.ANIMATIONLOOPMODE_CONSTANT,
       false
     );
 
-    const myAnimY = new BABYLON.Animation(
+    const myAnimY = new Animation(
       "moveSquares",
       "position.z",
       frameRate,
-      BABYLON.Animation.ANIMATIONTYPE_FLOAT,
-      BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
+      Animation.ANIMATIONTYPE_FLOAT,
+      Animation.ANIMATIONLOOPMODE_CONSTANT,
       false
     );
 
-    const myAnimZ = new BABYLON.Animation(
+    const myAnimZ = new Animation(
       "moveSquares",
       "position.y",
       frameRate,
-      BABYLON.Animation.ANIMATIONTYPE_FLOAT,
-      BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
+      Animation.ANIMATIONTYPE_FLOAT,
+      Animation.ANIMATIONLOOPMODE_CONSTANT,
       false
     );
 

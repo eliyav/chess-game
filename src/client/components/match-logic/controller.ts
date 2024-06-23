@@ -39,7 +39,7 @@ export class Controller {
   }
 
   initGameInput() {
-    this.sceneManager.gameScreen!.onPointerDown = async (
+    this.sceneManager.scenes.game!.onPointerDown = async (
       e: any,
       pickResult: any
     ) => {
@@ -48,10 +48,10 @@ export class Controller {
   }
 
   prepGameScreen(team?: string) {
-    this.sceneManager.homeScreen?.detachControl();
+    this.sceneManager.scenes.home?.detachControl();
     this.updateMeshesRender();
     this.resetCamera(team);
-    this.sceneManager.gameScreen?.attachControl();
+    this.sceneManager.scenes.game?.attachControl();
   }
 
   handleInput(pickResult: any) {
@@ -93,28 +93,28 @@ export class Controller {
   turnAnimation(
     ...props: [originPoint: Point, targetPoint: Point, turnHistory: TurnHistory]
   ) {
-    return calcTurnAnimation(this.sceneManager.gameScreen!, ...props);
+    return calcTurnAnimation(this.sceneManager.scenes.game!, ...props);
   }
 
   updateMeshesRender() {
     //Clears old meshes/memory usage
-    !this.sceneManager.gameScreen?.meshesToRender
-      ? (this.sceneManager.gameScreen!.meshesToRender = [])
+    !this.sceneManager.scenes.game?.meshesToRender
+      ? (this.sceneManager.scenes.game!.meshesToRender = [])
       : null;
-    if (this.sceneManager.gameScreen?.meshesToRender.length) {
+    if (this.sceneManager.scenes.game?.meshesToRender.length) {
       for (
         let i = 0;
-        i < this.sceneManager.gameScreen?.meshesToRender.length;
+        i < this.sceneManager.scenes.game?.meshesToRender.length;
         i++
       ) {
-        const mesh = this.sceneManager.gameScreen?.meshesToRender[i];
-        this.sceneManager.gameScreen?.removeMesh(mesh);
+        const mesh = this.sceneManager.scenes.game?.meshesToRender[i];
+        this.sceneManager.scenes.game?.removeMesh(mesh);
         mesh.dispose();
       }
-      this.sceneManager.gameScreen!.meshesToRender = [];
+      this.sceneManager.scenes.game!.meshesToRender = [];
     }
     //Final Piece Mesh List
-    const meshesList = this.sceneManager.gameScreen!.finalMeshes!.piecesMeshes;
+    const meshesList = this.sceneManager.scenes.game!.finalMeshes!.piecesMeshes;
     //For each active piece, creates a mesh clone and places on board
     this.match.game.allPieces().forEach((square) => {
       const { name, color, point } = square.on!;
@@ -124,13 +124,13 @@ export class Controller {
       const clone = foundMesh!.clone(name, null);
       [clone!.position.z, clone!.position.x] = findPosition(point, true);
       clone!.isVisible = true;
-      this.sceneManager.gameScreen?.meshesToRender!.push(clone!);
+      this.sceneManager.scenes.game?.meshesToRender!.push(clone!);
     });
   }
 
   rotateCamera() {
     let currentPlayer = this.match.game.currentPlayer.id;
-    let camera: any = this.sceneManager.gameScreen!.cameras[0];
+    let camera: any = this.sceneManager.scenes.game!.cameras[0];
     let alpha = camera.alpha;
     let ratio;
     let subtractedRatio;
@@ -199,7 +199,7 @@ export class Controller {
   }
 
   resetCamera(team?: string) {
-    let camera: any = this.sceneManager.gameScreen?.cameras[0];
+    let camera: any = this.sceneManager.scenes.game?.cameras[0];
     if (!team) {
       this.match.game.currentPlayer.id === "White"
         ? setToWhitePlayer()
@@ -234,7 +234,7 @@ export class Controller {
             mesh,
             currentMove,
             game,
-            this.sceneManager.gameScreen!
+            this.sceneManager.scenes.game!
           );
         }
       } else if (mesh.color === currentPlayer) {
@@ -263,7 +263,7 @@ export class Controller {
                 mesh,
                 currentMove,
                 game,
-                this.sceneManager.gameScreen!
+                this.sceneManager.scenes.game!
               );
             }
           } else {
@@ -274,7 +274,7 @@ export class Controller {
               mesh,
               currentMove,
               game,
-              this.sceneManager.gameScreen!
+              this.sceneManager.scenes.game!
             );
           }
         }

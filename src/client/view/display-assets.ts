@@ -19,7 +19,7 @@ const endingPosition = -75;
 
 export const displayAssets = async (
   scene: CustomScene,
-  activeScene: { id: SceneTypes }
+  activeScene: { id: keyof SceneTypes }
 ) => {
   const materials = createMeshMaterials(scene);
   let boardMesh = board;
@@ -86,7 +86,7 @@ export const displayAssets = async (
   let beta = Math.PI / 1.5;
   let gamma = Math.PI / 1;
 
-  const animateDistance = (activeScene: { id: SceneTypes }) => {
+  const animateDistance = (activeScene: { id: keyof SceneTypes }) => {
     requestAnimationFrame(() => {
       piecesMeshes.forEach((mesh) => {
         mesh.position.y -= mesh.speed!;

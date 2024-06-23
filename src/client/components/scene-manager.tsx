@@ -2,64 +2,63 @@ import { homeScene } from "../view/home-scene";
 import { CustomScene } from "../view/game-assets";
 import { Engine } from "@babylonjs/core/Engines/engine";
 
-export type SceneTypes = "home" | "game";
+export type SceneTypes = {
+  home?: CustomScene;
+  game?: CustomScene;
+};
 
 export class SceneManager {
-  canvasRef: HTMLCanvasElement;
+  canvas: HTMLCanvasElement;
   engine: Engine;
-  homeScreen: CustomScene | null;
-  gameScreen: CustomScene | null;
-  isInitDone: boolean;
-  activeScene: { id: SceneTypes };
+  scenes: SceneTypes;
+  activeScene: keyof SceneTypes;
 
-  constructor(canvasRef: HTMLCanvasElement) {
-    this.canvasRef = canvasRef;
-    this.engine = new Engine(canvasRef, true);
-    this.activeScene = { id: "home" };
-    this.homeScreen = null;
-    this.gameScreen = null;
-    this.isInitDone = false;
-    this.init();
+  constructor({ canvas }: { canvas: HTMLCanvasElement }) {
+    this.canvas = canvas;
+    this.engine = new Engine(canvas, true);
+    this.scenes = {};
+    this.activeScene = "home";
   }
 
-  async init() {
-    await this.loadHome();
+  public init() {
+    this.loadHome();
     this.render();
-
-    window.addEventListener("resize", () => this.resize());
+    window.addEventListener("resize", () => this.engine.resize());
   }
 
-  async loadHome() {
-    if (this.gameScreen) this.gameScreen.detachControl();
-    const homeScreen = await homeScene(this.engine, this.activeScene);
-    this.homeScreen = homeScreen;
-    this.activeScene.id = "home";
+  public async loadHome() {
+    const homeScreen = await homeScene(this.engine, { id: this.activeScene });
+    this.scenes.home = homeScreen;
+    this.setScene("home");
   }
 
-  async loadGame() {
+  public async loadGame() {
     const { gameScene } = await import("../view/game-scene");
-    this.gameScreen = await gameScene(this.canvasRef, this.engine);
-    this.activeScene.id = "game";
+    this.scenes.game = await gameScene(this.canvas, this.engine);
+    this.setScene("game");
   }
 
-  render() {
+  public switchScene(scene: keyof SceneTypes) {
+    const currentScene = this.getScene();
+    if (currentScene) {
+      currentScene.detachControl();
+    }
+    this.setScene(scene);
+  }
+
+  private setScene(scene: keyof SceneTypes) {
+    this.activeScene = scene;
+  }
+
+  private getScene() {
+    return this.scenes[this.activeScene];
+  }
+
+  private render() {
     this.engine.runRenderLoop(() => {
-      switch (this.activeScene.id) {
-        case "home":
-          this.homeScreen?.render();
-          break;
-        case "game":
-          this.gameScreen!.render();
-          break;
-      }
+      const scene = this.getScene();
+      if (!scene) return;
+      scene.render();
     });
-  }
-
-  stopRender() {
-    this.engine.stopRenderLoop();
-  }
-
-  resize() {
-    this.engine.resize();
   }
 }

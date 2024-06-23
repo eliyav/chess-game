@@ -29,7 +29,7 @@ export const GameView: React.FC<{
 
   function endMatch() {
     const winningTeam = match.getWinningTeam();
-    sceneManager.gameScreen!.detachControl();
+    sceneManager.scenes.game!.detachControl();
     setMessage({
       question: `${winningTeam} team has won!, Would you like to play another game?`,
       onConfirm: () => {
@@ -75,7 +75,7 @@ export const GameView: React.FC<{
             {
               text: "home",
               onClick: () => {
-                sceneManager.loadHome();
+                sceneManager.switchScene("home");
                 navigate("/");
               },
             },

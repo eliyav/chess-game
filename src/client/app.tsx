@@ -16,12 +16,11 @@ const App: React.FC<{
 
   useEffect(() => {
     if (canvasRef.current && !sceneManagerRef.current) {
-      initScene();
-      async function initScene() {
-        sceneManagerRef.current = new SceneManager(canvasRef.current!);
-        await sceneManagerRef.current.init();
-        setIsLoading(false);
-      }
+      sceneManagerRef.current = new SceneManager({
+        canvas: canvasRef.current,
+      });
+      sceneManagerRef.current.init();
+      setIsLoading(false);
     }
   }, [canvasRef.current]);
 

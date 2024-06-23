@@ -12,6 +12,8 @@ import space from "../../../assets/space.webp";
 import { gameAssets } from "./game-assets";
 import { createMovementMaterials } from "./materials";
 import { CustomScene } from "./game-assets";
+import "@babylonjs/core/Animations/animatable.js";
+import "@babylonjs/core/Culling/ray.js";
 
 export const gameScene = async (
   canvas: HTMLCanvasElement,
