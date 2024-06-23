@@ -34,10 +34,6 @@ setInterval(() => {
   }
 }, 10000);
 
-setInterval(() => {
-  console.log(lobbyLog);
-}, 2000);
-
 io.on("connection", (socket) => {
   socket.on("create-lobby", (lobbySettings) => {
     const lobbyKey = generateKey();
