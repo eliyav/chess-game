@@ -51,9 +51,3 @@ const App: React.FC<{
 };
 
 export default App;
-
-export interface UserData {
-  [key: string]: string;
-  picture: string;
-  name: string;
-}
