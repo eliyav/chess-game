@@ -66,7 +66,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("update-lobby", ({ lobbySettings }) => {
-    console.log(lobbySettings);
     lobbyLog.set(lobbySettings.lobbyKey, lobbySettings);
     socket
       .to(lobbySettings.lobbyKey)

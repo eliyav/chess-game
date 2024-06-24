@@ -18,7 +18,6 @@ export const Lobby: React.FC<{
 
   useEffect(() => {
     socket.on("room-info", (settings: LobbySettings) => {
-      console.log(settings);
       setLobbySettings(settings);
     });
     return () => {
