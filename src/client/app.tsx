@@ -10,41 +10,35 @@ import type { Socket } from "socket.io-client";
 const App: React.FC<{
   websocket: Socket;
 }> = ({ websocket }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const sceneManagerRef = useRef<SceneManager>();
+  const [isInitialized, setIsInitialized] = useState(false);
+  const canvas = useRef<HTMLCanvasElement>(null);
+  const sceneManager = useRef<SceneManager>();
 
   useEffect(() => {
-    if (canvasRef.current && !sceneManagerRef.current) {
-      sceneManagerRef.current = new SceneManager({
-        canvas: canvasRef.current,
-      });
-      sceneManagerRef.current.init();
-      setIsLoading(false);
+    if (canvas.current && !sceneManager.current) {
+      sceneManager.current = new SceneManager({
+        canvas: canvas.current,
+      }).init();
+      setIsInitialized(true);
     }
-  }, [canvasRef.current]);
+  }, [canvas.current, sceneManager.current]);
 
   return (
     <div id="app">
-      <canvas ref={canvasRef}></canvas>
-      {!isLoading ? (
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/lobby" element={<Lobby socket={websocket} />} />
-          <Route
-            path="/game"
-            element={
-              sceneManagerRef.current && (
-                <GameView sceneManager={sceneManagerRef.current} />
-              )
-            }
-          />
-        </Routes>
-      ) : (
-        <div className="loadingContainer">
-          <LoadingScreen text="..." />
-        </div>
-      )}
+      <canvas ref={canvas} style={{ backgroundColor: "black" }}></canvas>
+      {!isInitialized && <LoadingScreen text="..." />}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/lobby" element={<Lobby socket={websocket} />} />
+        <Route
+          path="/game"
+          element={
+            sceneManager.current && (
+              <GameView sceneManager={sceneManager.current} />
+            )
+          }
+        />
+      </Routes>
     </div>
   );
 };

@@ -28,6 +28,7 @@ export class SceneManager {
     this.loadScene(Scenes.HOME);
     this.render();
     window.addEventListener("resize", () => this.engine.resize());
+    return this;
   }
 
   public async loadScene(scene: Scenes) {
