@@ -9,11 +9,11 @@ import space from "../../../assets/space.webp";
 import { CustomScene } from "./game-assets";
 import { ChessPieceMesh } from "./game-assets";
 import { displayAssets } from "./display-assets";
-import { SceneTypes } from "../components/scene-manager";
+import { Scenes } from "../components/scene-manager";
 
 export const homeScene = async (
   engine: Engine,
-  activeScene: { id: keyof SceneTypes }
+  activeScene: { id: Scenes }
 ): Promise<CustomScene> => {
   const scene: CustomScene = new Scene(engine);
   const camera = new ArcRotateCamera(

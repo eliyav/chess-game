@@ -12,14 +12,14 @@ import rook from "../../../assets/pieces/rookv3.gltf";
 import pawn from "../../../assets/pieces/pawnv3.gltf";
 import { CustomScene } from "./game-assets";
 import { createMeshMaterials } from "./materials";
-import { SceneTypes } from "../components/scene-manager";
+import { Scenes } from "../components/scene-manager";
 
 const startingPostion = 35;
 const endingPosition = -75;
 
 export const displayAssets = async (
   scene: CustomScene,
-  activeScene: { id: keyof SceneTypes }
+  activeScene: { id: Scenes }
 ) => {
   const materials = createMeshMaterials(scene);
   let boardMesh = board;
@@ -86,7 +86,7 @@ export const displayAssets = async (
   let beta = Math.PI / 1.5;
   let gamma = Math.PI / 1;
 
-  const animateDistance = (activeScene: { id: keyof SceneTypes }) => {
+  const animateDistance = (activeScene: { id: Scenes }) => {
     requestAnimationFrame(() => {
       piecesMeshes.forEach((mesh) => {
         mesh.position.y -= mesh.speed!;
@@ -106,7 +106,7 @@ export const displayAssets = async (
           Space.LOCAL
         );
       });
-      if (activeScene.id === "home") animateDistance(activeScene);
+      if (activeScene.id === "HOME") animateDistance(activeScene);
     });
   };
   animateDistance(activeScene);

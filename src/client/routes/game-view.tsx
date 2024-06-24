@@ -3,7 +3,7 @@ import * as icons from "../components/game-overlay/overlay-icons";
 import LoadingScreen from "../components/loading-screen";
 import { MenuOverlay } from "../components/game-overlay/menu-overlay";
 import { Match } from "../components/match";
-import { SceneManager } from "../components/scene-manager";
+import { SceneManager, Scenes } from "../components/scene-manager";
 import { Controller } from "../components/match-logic/controller";
 import { Message, MessageModal } from "../components/modals/message-modal";
 import PromotionModal from "../components/modals/promotion-modal";
@@ -29,7 +29,7 @@ export const GameView: React.FC<{
 
   function endMatch() {
     const winningTeam = match.getWinningTeam();
-    sceneManager.scenes.game!.detachControl();
+    sceneManager.scenes.GAME!.detachControl();
     setMessage({
       question: `${winningTeam} team has won!, Would you like to play another game?`,
       onConfirm: () => {
@@ -75,7 +75,7 @@ export const GameView: React.FC<{
             {
               text: "home",
               onClick: () => {
-                sceneManager.switchScene("home");
+                sceneManager.switchScene(Scenes.HOME);
                 navigate("/");
               },
             },

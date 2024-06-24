@@ -8,7 +8,7 @@ import calcTurnAnimation from "../../view/animation/turn-animation";
 import { ChessPieceMesh } from "../../view/game-assets";
 import GamePiece from "../game-logic/game-piece";
 import { Match } from "../match";
-import { SceneManager } from "../scene-manager";
+import { SceneManager, Scenes } from "../scene-manager";
 
 export class Controller {
   sceneManager: SceneManager;
@@ -32,14 +32,14 @@ export class Controller {
   }
 
   async prepView() {
-    await this.sceneManager.loadGame();
+    await this.sceneManager.loadScene(Scenes.GAME);
     this.initGameInput();
     this.prepGameScreen();
     this.match.startMatch();
   }
 
   initGameInput() {
-    this.sceneManager.scenes.game!.onPointerDown = async (
+    this.sceneManager.scenes.GAME!.onPointerDown = async (
       e: any,
       pickResult: any
     ) => {
@@ -48,10 +48,10 @@ export class Controller {
   }
 
   prepGameScreen(team?: string) {
-    this.sceneManager.scenes.home?.detachControl();
+    this.sceneManager.scenes.HOME?.detachControl();
     this.updateMeshesRender();
     this.resetCamera(team);
-    this.sceneManager.scenes.game?.attachControl();
+    this.sceneManager.scenes.GAME?.attachControl();
   }
 
   handleInput(pickResult: any) {
@@ -93,28 +93,28 @@ export class Controller {
   turnAnimation(
     ...props: [originPoint: Point, targetPoint: Point, turnHistory: TurnHistory]
   ) {
-    return calcTurnAnimation(this.sceneManager.scenes.game!, ...props);
+    return calcTurnAnimation(this.sceneManager.scenes.GAME!, ...props);
   }
 
   updateMeshesRender() {
     //Clears old meshes/memory usage
-    !this.sceneManager.scenes.game?.meshesToRender
-      ? (this.sceneManager.scenes.game!.meshesToRender = [])
+    !this.sceneManager.scenes.GAME?.meshesToRender
+      ? (this.sceneManager.scenes.GAME!.meshesToRender = [])
       : null;
-    if (this.sceneManager.scenes.game?.meshesToRender.length) {
+    if (this.sceneManager.scenes.GAME?.meshesToRender.length) {
       for (
         let i = 0;
-        i < this.sceneManager.scenes.game?.meshesToRender.length;
+        i < this.sceneManager.scenes.GAME?.meshesToRender.length;
         i++
       ) {
-        const mesh = this.sceneManager.scenes.game?.meshesToRender[i];
-        this.sceneManager.scenes.game?.removeMesh(mesh);
+        const mesh = this.sceneManager.scenes.GAME?.meshesToRender[i];
+        this.sceneManager.scenes.GAME?.removeMesh(mesh);
         mesh.dispose();
       }
-      this.sceneManager.scenes.game!.meshesToRender = [];
+      this.sceneManager.scenes.GAME!.meshesToRender = [];
     }
     //Final Piece Mesh List
-    const meshesList = this.sceneManager.scenes.game!.finalMeshes!.piecesMeshes;
+    const meshesList = this.sceneManager.scenes.GAME!.finalMeshes!.piecesMeshes;
     //For each active piece, creates a mesh clone and places on board
     this.match.game.allPieces().forEach((square) => {
       const { name, color, point } = square.on!;
@@ -124,13 +124,13 @@ export class Controller {
       const clone = foundMesh!.clone(name, null);
       [clone!.position.z, clone!.position.x] = findPosition(point, true);
       clone!.isVisible = true;
-      this.sceneManager.scenes.game?.meshesToRender!.push(clone!);
+      this.sceneManager.scenes.GAME?.meshesToRender!.push(clone!);
     });
   }
 
   rotateCamera() {
     let currentPlayer = this.match.game.currentPlayer.id;
-    let camera: any = this.sceneManager.scenes.game!.cameras[0];
+    let camera: any = this.sceneManager.scenes.GAME!.cameras[0];
     let alpha = camera.alpha;
     let ratio;
     let subtractedRatio;
@@ -199,7 +199,7 @@ export class Controller {
   }
 
   resetCamera(team?: string) {
-    let camera: any = this.sceneManager.scenes.game?.cameras[0];
+    let camera: any = this.sceneManager.scenes.GAME?.cameras[0];
     if (!team) {
       this.match.game.currentPlayer.id === "White"
         ? setToWhitePlayer()
@@ -234,7 +234,7 @@ export class Controller {
             mesh,
             currentMove,
             game,
-            this.sceneManager.scenes.game!
+            this.sceneManager.scenes.GAME!
           );
         }
       } else if (mesh.color === currentPlayer) {
@@ -263,7 +263,7 @@ export class Controller {
                 mesh,
                 currentMove,
                 game,
-                this.sceneManager.scenes.game!
+                this.sceneManager.scenes.GAME!
               );
             }
           } else {
@@ -274,7 +274,7 @@ export class Controller {
               mesh,
               currentMove,
               game,
-              this.sceneManager.scenes.game!
+              this.sceneManager.scenes.GAME!
             );
           }
         }
