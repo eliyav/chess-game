@@ -10,8 +10,9 @@ import PromotionModal from "../components/modals/promotion-modal";
 import { useNavigate } from "react-router-dom";
 
 export const GameView: React.FC<{
-  sceneManager: SceneManager;
+  sceneManager?: SceneManager;
 }> = ({ sceneManager }) => {
+  if (!sceneManager) return null;
   const [viewReady, setViewReady] = useState(false);
   const [message, setMessage] = useState<Message | null>(null);
   const [promotion, setPromotion] = useState(false);
@@ -29,7 +30,7 @@ export const GameView: React.FC<{
 
   function endMatch() {
     const winningTeam = match.getWinningTeam();
-    sceneManager.scenes.GAME!.detachControl();
+    sceneManager?.scenes.GAME!.detachControl();
     setMessage({
       question: `${winningTeam} team has won!, Would you like to play another game?`,
       onConfirm: () => {

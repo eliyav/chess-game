@@ -1,7 +1,6 @@
 import React from "react";
 import * as ReactDOMClient from "react-dom/client";
 import App from "./app";
-import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import { io } from "socket.io-client";
 
@@ -14,8 +13,6 @@ const root = ReactDOMClient.createRoot(container);
 
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <App websocket={websocket} />
-    </BrowserRouter>
+    <App websocket={websocket} />
   </React.StrictMode>
 );

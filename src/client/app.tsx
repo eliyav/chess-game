@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, BrowserRouter } from "react-router-dom";
 import LoadingScreen from "./components/loading-screen";
 import { Home } from "./routes/home";
 import { Lobby } from "./routes/lobby";
@@ -27,18 +27,16 @@ const App: React.FC<{
     <div id="app">
       <canvas ref={canvas} style={{ backgroundColor: "black" }}></canvas>
       {!isInitialized && <LoadingScreen text="..." />}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/lobby" element={<Lobby socket={websocket} />} />
-        <Route
-          path="/game"
-          element={
-            sceneManager.current && (
-              <GameView sceneManager={sceneManager.current} />
-            )
-          }
-        />
-      </Routes>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/lobby" element={<Lobby socket={websocket} />} />
+          <Route
+            path="/game"
+            element={<GameView sceneManager={sceneManager.current} />}
+          />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 };
