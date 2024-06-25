@@ -5,7 +5,7 @@ import { SvgGithub } from "../svg-components/svg-github";
 export const Home: React.FC = () => {
   return (
     <div className="home screen">
-      <div className="header">
+      <div className="header glass-dark">
         <h1 className="title">3D CHESS</h1>
         <p className="description">Play for free!</p>
       </div>
@@ -13,7 +13,7 @@ export const Home: React.FC = () => {
         <SvgGithub className="svg-icon" />
       </div>
       <div className="footer">
-        <Link className={"btn"} to="/lobby">
+        <Link className={"btn glass-light"} to="/lobby">
           Play
         </Link>
       </div>
