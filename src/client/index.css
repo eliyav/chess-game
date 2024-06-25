@@ -134,6 +134,7 @@ canvas {
     font-size: 40px;
     padding: 0.25em 0em;
     margin: 2em auto;
+    text-decoration: none;
     &:hover {
       box-shadow: 0px 0px 5px 0.5px lightblue;
     }

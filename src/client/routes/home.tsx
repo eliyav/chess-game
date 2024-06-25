@@ -1,10 +1,8 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { SvgGithub } from "../svg-components/svg-github";
 
 export const Home: React.FC = () => {
-  const navigate = useNavigate();
-
   return (
     <div className="home screen">
       <div className="header">
@@ -15,9 +13,9 @@ export const Home: React.FC = () => {
         <SvgGithub className="svg-icon" />
       </div>
       <div className="footer">
-        <button onClick={() => navigate("/lobby")} className="btn">
+        <Link className={"btn"} to="/lobby">
           Play
-        </button>
+        </Link>
       </div>
     </div>
   );
