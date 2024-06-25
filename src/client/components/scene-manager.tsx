@@ -2,25 +2,25 @@ import { homeScene } from "../view/home-scene";
 import { CustomScene } from "../view/game-assets";
 import { Engine } from "@babylonjs/core/Engines/engine";
 
-export enum Scenes {
-  HOME = "HOME",
-  GAME = "GAME",
+export const enum Scenes {
+  HOME,
+  GAME,
 }
 
 export type ScenesDict = {
-  [key in Scenes]: CustomScene | null;
+  [key in Scenes]?: CustomScene | null;
 };
 
 export class SceneManager {
-  canvas: HTMLCanvasElement;
-  engine: Engine;
-  scenes: ScenesDict;
-  activeScene: Scenes;
+  private canvas: HTMLCanvasElement;
+  private engine: Engine;
+  private scenes: ScenesDict;
+  private activeScene: Scenes;
 
   constructor({ canvas }: { canvas: HTMLCanvasElement }) {
     this.canvas = canvas;
     this.engine = new Engine(canvas, true);
-    this.scenes = { HOME: null, GAME: null };
+    this.scenes = {};
     this.activeScene = Scenes.HOME;
   }
 
@@ -32,9 +32,9 @@ export class SceneManager {
   }
 
   public async loadScene(scene: Scenes) {
-    if (scene === "HOME") {
+    if (scene === Scenes.HOME) {
       await this.loadHome();
-    } else if (scene === "GAME") {
+    } else if (scene === Scenes.GAME) {
       await this.loadGame();
     }
     this.switchScene(scene);
@@ -48,29 +48,34 @@ export class SceneManager {
     this.setScene(scene);
   }
 
+  public getScene(scene?: Scenes) {
+    return this.scenes[scene || this.activeScene]!;
+  }
+
   private async loadHome() {
     const homeScreen = await homeScene(this.engine, {
       id: this.activeScene,
     });
-    this.scenes.HOME = homeScreen;
+    this.scenes[Scenes.HOME] = homeScreen;
   }
 
   private async loadGame() {
     const { gameScene } = await import("../view/game-scene");
-    this.scenes.GAME = await gameScene(this.canvas, this.engine);
+    this.scenes[Scenes.GAME] = await gameScene(this.canvas, this.engine);
   }
 
   private setScene(scene: Scenes) {
     this.activeScene = scene;
-  }
-
-  private getScene() {
-    return this.scenes[this.activeScene];
+    const currentScene = this.getScene();
+    if (currentScene) {
+      currentScene.attachControl();
+    }
   }
 
   private render() {
     this.engine.runRenderLoop(() => {
       const scene = this.getScene();
+      console.log(scene);
       if (!scene) return;
       scene.render();
     });

@@ -30,7 +30,7 @@ export const GameView: React.FC<{
 
   function endMatch() {
     const winningTeam = match.getWinningTeam();
-    sceneManager?.scenes.GAME!.detachControl();
+    sceneManager?.getScene()!.detachControl();
     setMessage({
       question: `${winningTeam} team has won!, Would you like to play another game?`,
       onConfirm: () => {

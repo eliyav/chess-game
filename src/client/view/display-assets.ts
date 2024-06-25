@@ -106,7 +106,7 @@ export const displayAssets = async (
           Space.LOCAL
         );
       });
-      if (activeScene.id === "HOME") animateDistance(activeScene);
+      if (activeScene.id === Scenes.HOME) animateDistance(activeScene);
     });
   };
   animateDistance(activeScene);

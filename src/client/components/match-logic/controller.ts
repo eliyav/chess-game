@@ -6,6 +6,7 @@ import {
 import { doMovesMatch, TurnHistory } from "../../helper/game-helpers";
 import calcTurnAnimation from "../../view/animation/turn-animation";
 import { ChessPieceMesh } from "../../view/game-assets";
+import { gameScene } from "../../view/game-scene";
 import GamePiece from "../game-logic/game-piece";
 import { Match } from "../match";
 import { SceneManager, Scenes } from "../scene-manager";
@@ -39,7 +40,7 @@ export class Controller {
   }
 
   initGameInput() {
-    this.sceneManager.scenes.GAME!.onPointerDown = async (
+    this.sceneManager.getScene().onPointerDown = async (
       e: any,
       pickResult: any
     ) => {
@@ -48,10 +49,8 @@ export class Controller {
   }
 
   prepGameScreen(team?: string) {
-    this.sceneManager.scenes.HOME?.detachControl();
     this.updateMeshesRender();
     this.resetCamera(team);
-    this.sceneManager.scenes.GAME?.attachControl();
   }
 
   handleInput(pickResult: any) {
@@ -93,28 +92,24 @@ export class Controller {
   turnAnimation(
     ...props: [originPoint: Point, targetPoint: Point, turnHistory: TurnHistory]
   ) {
-    return calcTurnAnimation(this.sceneManager.scenes.GAME!, ...props);
+    const gameScene = this.sceneManager.getScene();
+    return calcTurnAnimation(gameScene, ...props);
   }
 
   updateMeshesRender() {
+    const gameScene = this.sceneManager.getScene();
     //Clears old meshes/memory usage
-    !this.sceneManager.scenes.GAME?.meshesToRender
-      ? (this.sceneManager.scenes.GAME!.meshesToRender = [])
-      : null;
-    if (this.sceneManager.scenes.GAME?.meshesToRender.length) {
-      for (
-        let i = 0;
-        i < this.sceneManager.scenes.GAME?.meshesToRender.length;
-        i++
-      ) {
-        const mesh = this.sceneManager.scenes.GAME?.meshesToRender[i];
-        this.sceneManager.scenes.GAME?.removeMesh(mesh);
+    !gameScene.meshesToRender ? (gameScene.meshesToRender = []) : null;
+    if (gameScene.meshesToRender.length) {
+      for (let i = 0; i < gameScene.meshesToRender.length; i++) {
+        const mesh = gameScene.meshesToRender[i];
+        gameScene.removeMesh(mesh);
         mesh.dispose();
       }
-      this.sceneManager.scenes.GAME!.meshesToRender = [];
+      gameScene.meshesToRender = [];
     }
     //Final Piece Mesh List
-    const meshesList = this.sceneManager.scenes.GAME!.finalMeshes!.piecesMeshes;
+    const meshesList = gameScene.finalMeshes!.piecesMeshes;
     //For each active piece, creates a mesh clone and places on board
     this.match.game.allPieces().forEach((square) => {
       const { name, color, point } = square.on!;
@@ -124,13 +119,14 @@ export class Controller {
       const clone = foundMesh!.clone(name, null);
       [clone!.position.z, clone!.position.x] = findPosition(point, true);
       clone!.isVisible = true;
-      this.sceneManager.scenes.GAME?.meshesToRender!.push(clone!);
+      gameScene.meshesToRender!.push(clone!);
     });
   }
 
   rotateCamera() {
+    const gameScene = this.sceneManager.getScene();
     let currentPlayer = this.match.game.currentPlayer.id;
-    let camera: any = this.sceneManager.scenes.GAME!.cameras[0];
+    let camera: any = gameScene.cameras[0];
     let alpha = camera.alpha;
     let ratio;
     let subtractedRatio;
@@ -199,7 +195,8 @@ export class Controller {
   }
 
   resetCamera(team?: string) {
-    let camera: any = this.sceneManager.scenes.GAME?.cameras[0];
+    const gameScene = this.sceneManager.getScene();
+    let camera: any = gameScene.cameras[0];
     if (!team) {
       this.match.game.currentPlayer.id === "White"
         ? setToWhitePlayer()
@@ -219,6 +216,7 @@ export class Controller {
   }
 
   gameInput(mesh: ChessPieceMesh) {
+    const gameScene = this.sceneManager.getScene();
     const {
       moves,
       player: { id: currentPlayer },
@@ -230,12 +228,7 @@ export class Controller {
       if (currentMove.length === 0) {
         if (mesh.color === currentPlayer) {
           //If no current move has been selected, and mesh belongs to current player
-          displayPieceMoves(
-            mesh,
-            currentMove,
-            game,
-            this.sceneManager.scenes.GAME!
-          );
+          displayPieceMoves(mesh, currentMove, game, gameScene);
         }
       } else if (mesh.color === currentPlayer) {
         //If there is already a mesh selected, and you select another of your own meshes
@@ -259,23 +252,13 @@ export class Controller {
               //If rook is selected second and not castling, show rooks moves
               currentMove.length = 0;
               this.updateMeshesRender();
-              displayPieceMoves(
-                mesh,
-                currentMove,
-                game,
-                this.sceneManager.scenes.GAME!
-              );
+              displayPieceMoves(mesh, currentMove, game, gameScene);
             }
           } else {
             //If second selected piece is not a castling piece
             currentMove.length = 0;
             this.updateMeshesRender();
-            displayPieceMoves(
-              mesh,
-              currentMove,
-              game,
-              this.sceneManager.scenes.GAME!
-            );
+            displayPieceMoves(mesh, currentMove, game, gameScene);
           }
         }
       } else if (mesh.color && mesh.color !== currentPlayer) {
