@@ -1,6 +1,6 @@
 import React from "react";
 
-export const SvgGithub: React.FC = () => {
+export const SvgGithub: React.FC<{ className?: string }> = ({ className }) => {
   return (
     <a
       title="Github Repo"
@@ -8,7 +8,7 @@ export const SvgGithub: React.FC = () => {
       target="_blank"
     >
       <svg
-        className="svg-icon"
+        className={className ? className : ""}
         xmlns="http://www.w3.org/2000/svg"
         width="24"
         height="24"

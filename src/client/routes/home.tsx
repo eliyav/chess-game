@@ -1,26 +1,23 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { SvgGithub } from "../svg-components/svg-github";
 
-const menuItems = [{ text: "Play", path: "/lobby" }];
-
 export const Home: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="home screen">
-      <h1 className="home-title">
-        <div className="home-icons">
-          <SvgGithub />
-        </div>
-        3D CHESS
-      </h1>
-      <div className="menu">
-        {menuItems.map(({ path, text }, idx) => (
-          <div className="menu-item" key={idx}>
-            <Link to={path}>
-              <button className="menu-btn">{text}</button>
-            </Link>
-          </div>
-        ))}
+      <div className="header">
+        <h1 className="title">3D CHESS</h1>
+        <p className="description">Play for free!</p>
+      </div>
+      <div className="icons">
+        <SvgGithub className="svg-icon" />
+      </div>
+      <div className="footer">
+        <button onClick={() => navigate("/lobby")} className="btn">
+          Play
+        </button>
       </div>
     </div>
   );
