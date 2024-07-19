@@ -14,8 +14,8 @@ body {
   --primary-background: #333333;
   --primary-color: #e9e9e9;
   --primary-alt-color: #8b8b8b;
-  --primary-dark-opaque: rgba(0, 0, 0, 0.4);
-  --primary-light-opaque: rgba(255, 255, 255, 0.3);
+  --primary-dark-opaque: rgba(0, 0, 0, 0.8);
+  --primary-light-opaque: rgba(255, 255, 255, 0.8);
 }
 
 #root {
@@ -42,16 +42,6 @@ canvas {
   outline: none;
   height: 100%;
   width: 100%;
-}
-
-.sub-title {
-  text-align: center;
-  background: red;
-  padding: 0.3em;
-  margin: 0.25em;
-  font-size: 3.5em;
-  background: var(--primary-dark-opaque);
-  user-select: none;
 }
 
 .match-btns {
@@ -90,21 +80,32 @@ canvas {
 }
 /* Home Screen-------------------  */
 
-.home {
-  background-color: transparent;
+.header {
+  user-select: none;
+  text-align: center;
+  margin-top: 3em;
+  padding: 0.5em;
+  font-size: 1.5em;
+}
 
-  .header {
-    user-select: none;
-    text-align: center;
-  }
+.sub-title {
+  text-align: center;
+  margin: 1em auto;
+  padding: 0.25em;
+  max-width: clamp(250px, 80vw, 500px);
+}
+
+.home {
   .title {
-    font-size: 4em;
-    margin-top: 2em;
-    padding: 0.5em;
+    font-size: 3em;
+    font-weight: bold;
+    font-style: italic;
+    padding-bottom: 0.5em;
   }
+
   .description {
     font-style: italic;
-    font-size: 1.5em;
+    font-size: 1.25em;
     padding-bottom: 0.5em;
   }
   .icons {
@@ -112,13 +113,15 @@ canvas {
     top: 1em;
     right: 1em;
   }
-  .footer {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    text-align: center;
-    user-select: none;
-  }
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  user-select: none;
+
   .btn {
     display: block;
     width: 350px;
@@ -156,14 +159,6 @@ canvas {
   border-radius: 8px;
   &:hover {
     opacity: 0.8;
-  }
-}
-
-.menu-btn .return-btn {
-  width: 50px;
-  user-select: none;
-  &:hover {
-    opacity: 0.5;
   }
 }
 
@@ -367,47 +362,28 @@ canvas {
 
 /* -------------------  */
 /* Lobby */
-.lobby {
-  text-align: center;
-}
-
-.label {
-  background: rgba(255, 255, 255, 0.9);
-  color: black;
-  margin: 0.5em 0 0 0;
-  padding: 0.25em;
-  border-radius: 5px;
-  box-shadow: 0px 0px 5px black;
-}
 
 .selections {
   display: flex;
   justify-content: center;
+  gap: 1em;
+  flex-wrap: wrap;
 }
 
-.selection {
-  flex-grow: 1;
-  background: rgba(1, 1, 1, 0.8);
-  height: 75px;
-  line-height: 75px;
-  font-size: 1.2em;
+.selections > button {
+  padding: 0.5em 1em;
+  font-size: 1.25em;
+  font-weight: bold;
+  border-radius: 15%;
+  border: 1px solid white;
 }
 
 .highlight {
   background-color: rgba(0, 150, 0, 0.9);
-  border: 1px solid white;
+  border: 2px solid lightblue !important;
 }
 
-.clock-selections {
-  background: rgba(1, 1, 1, 0.8);
-  padding: 1em;
-}
-
-.clock-selections .time-display {
+/* Margins */
+.mt-1 {
   margin-top: 1em;
-  font-size: 1.2em;
-}
-
-.slider {
-  width: 80%;
 }
