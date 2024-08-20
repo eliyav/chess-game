@@ -8,7 +8,7 @@
     "clean": "node -e \"fs.rmSync('dist', {recursive: true, force: true})\"",
     "prebuild": "npm run clean",
     "build": "npm run copy:public && npm run build:client && npm run build:server",
-    "build:client": "esbuild src/client/index.tsx --bundle --splitting --outdir=dist/client --target=es2022 --loader:.gltf=file --loader:.png=file --loader:.webp=file --format=esm --sourcemap",
+    "build:client": "esbuild src/client/index.tsx --bundle --splitting --outdir=dist/client --target=es2022 --loader:.svg=file --loader:.gltf=file --loader:.png=file --loader:.webp=file --format=esm --sourcemap",
     "build:server": "esbuild src/server/index.ts --bundle --outdir=dist/server --packages=external --platform=node --minify --format=esm",
     "watch:client": "npm run build:client -- --watch",
     "watch:server": "npm run build:server -- --watch",
