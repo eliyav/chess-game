@@ -1,15 +1,19 @@
 import React from "react";
-const svgUrl = new URL("../../../assets/icons/back-icon.svg", import.meta.url);
+import backSvg from "../../../../assets/icons/back-icon.svg";
 
 export const BackButton: React.FC<{
   onClick: () => void;
-}> = ({ onClick }) => {
+  size?: number;
+  customClass?: string;
+}> = ({ onClick, size, customClass }) => {
   return (
     <img
-      className="return-btn"
+      className={`return-btn ${customClass ?? ""}`}
       onClick={() => onClick()}
-      src={svgUrl.href}
+      src={backSvg}
       alt="Back Button"
+      width={size}
+      height={size}
     />
   );
 };
