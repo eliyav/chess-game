@@ -1,100 +1,45 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React from "react";
 import { Socket } from "socket.io-client";
+import { LobbySettings } from "../../routes/lobby";
+import { Clock } from "../buttons/clock";
 
 export const OnlineLobby: React.FC<{
   socket: Socket;
-}> = ({ socket }) => {
-  const [mode, setMode] = useState<LobbyModes>("offline");
-  const [opponent, setOpponent] = useState("human");
-  const [time, setTime] = useState("0");
-  const [lobbySettings, setLobbySettings] = useState<LobbySettings>({
-    lobbyKey: null,
-    hostName: "Host123",
-    opponentName: "Waiting...",
-    time: 0,
-    firstMove: "Game Host",
-  });
+  lobby: LobbySettings;
+  setTime: (time: number) => void;
+}> = ({ socket, lobby, setTime }) => {
+  // useEffect(() => {
+  //   socket.on("room-info", (settings: LobbySettings) => {
+  //     setLobbySettings(settings);
+  //   });
+  //   return () => {
+  //     socket.off("room-info");
+  //   };
+  // }, []);
 
-  useEffect(() => {
-    socket.on("room-info", (settings: LobbySettings) => {
-      setLobbySettings(settings);
-    });
-    return () => {
-      socket.off("room-info");
-    };
-  }, []);
+  // useEffect(() => {
+  //   if (mode === "online") socket.emit("create-lobby", lobbySettings);
+  // }, []);
 
-  useEffect(() => {
-    if (mode === "online") socket.emit("create-lobby", lobbySettings);
-  }, [mode]);
-
-  useEffect(() => {
-    if (lobbySettings.lobbyKey) socket.emit("update-lobby", { lobbySettings });
-  }, [lobbySettings]);
+  // useEffect(() => {
+  //   if (lobbySettings.lobbyKey) socket.emit("update-lobby", { lobbySettings });
+  // }, [lobbySettings]);
 
   return (
     <div>
       <div className="lobby-code">
-        <div>
-          <h2 className="label">Join Lobby</h2>
-          <input
-            type="text"
-            placeholder="Enter here"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                const lobbyCode = e.currentTarget.value;
-                socket.emit("join-lobby", {
-                  lobbeyKey: lobbyCode,
-                  name: "Opponent",
-                });
-                e.currentTarget.value = "";
-              }
-            }}
-          ></input>
-        </div>
-        <h2 className="label">Invite Code</h2>
-        <p className="selection">{lobbySettings.lobbyKey ?? "..."}</p>
+        <h2 className="sub-title glass-dark">Invite Code</h2>
+        <p>
+          <span>{lobby.key ?? "..."}</span>
+        </p>
       </div>
-      <div className="opponent">
-        <h2 className="label">Opponent</h2>
-        <div className="selections">
-          <div className={`selection highlight"}`}>
-            {lobbySettings.opponentName}
-          </div>
-        </div>
+      <h2 className="sub-title glass-dark">Players</h2>
+      <div className="selections">
+        {lobby.players.map((player) => (
+          <button>{player}</button>
+        ))}
       </div>
-      <div className="clock">
-        <h2 className="label">Clock</h2>
-        <div className="clock-selections">
-          <input
-            className="slider"
-            name="time"
-            type="range"
-            min="0"
-            max="60"
-            step="5"
-            defaultValue="0"
-            onChange={(e) => setTime(e.currentTarget.value)}
-          ></input>
-          <p className="time-display">{time === "0" ? "No Limit" : time}</p>
-        </div>
-      </div>
-      <div className="menu">
-        <Link to={"/game"}>
-          <button className="menu-btn">Start</button>
-        </Link>
-      </div>
+      <Clock time={lobby.time} setTime={setTime} />
     </div>
   );
 };
-
-type LobbyModes = "offline" | "online";
-
-export interface LobbySettings {
-  lobbyKey: string | null;
-  hostName: string;
-  opponentName: string;
-  time: number;
-  firstMove: string;
-}

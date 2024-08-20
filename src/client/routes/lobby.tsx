@@ -1,18 +1,20 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import { OfflineLobby } from "../components/lobbys/offline-lobby";
+import { OnlineLobby } from "../components/lobbys/online-lobby";
+import { BackButton } from "../components/buttons/back-button";
 
 export const Lobby: React.FC<{
   socket: Socket;
 }> = ({ socket }) => {
+  const navigate = useNavigate();
+
   const [lobby, setLobby] = useState<LobbySettings>({
     mode: LOBBY.OFFLINE,
-    lobbyKey: null,
-    hostName: "Host123",
-    opponentName: "Waiting...",
+    key: null,
     time: 0,
-    firstMove: "Game Host",
+    players: [],
   });
 
   const updateLobby = useCallback(
@@ -25,30 +27,35 @@ export const Lobby: React.FC<{
   return (
     <div className="lobby screen">
       <div className="header glass-dark">
+        <BackButton
+          customClass={"bottom-left"}
+          size={30}
+          onClick={() => navigate(-1)}
+        />
         <h1>Lobby</h1>
       </div>
       <div className="selections mt-1">
-        <button
-          onClick={() => updateLobby("mode", LOBBY.OFFLINE)}
-          className={`glass-light ${
-            lobby.mode === LOBBY.OFFLINE && "highlight"
-          }`}
-        >
-          Offline
-        </button>
-        <button
-          className={`glass-light ${
-            lobby.mode === LOBBY.ONLINE && "highlight"
-          }`}
-          onClick={() => updateLobby("mode", LOBBY.ONLINE)}
-        >
-          Online
-        </button>
+        {Object.values(LOBBY).map((mode) => (
+          <button
+            key={mode}
+            onClick={() => setLobby(createLobby(mode))}
+            className={`glass-light ${lobby.mode === mode && "highlight"}`}
+          >
+            {mode}
+          </button>
+        ))}
       </div>
       {lobby.mode === LOBBY.OFFLINE && (
         <OfflineLobby
           time={lobby.time}
           setTime={(time) => updateLobby("time", time)}
+        />
+      )}
+      {lobby.mode === LOBBY.ONLINE && (
+        <OnlineLobby
+          lobby={lobby}
+          setTime={(time) => updateLobby("time", time)}
+          socket={socket}
         />
       )}
       <div className="footer">
@@ -60,16 +67,23 @@ export const Lobby: React.FC<{
   );
 };
 
-const enum LOBBY {
-  ONLINE,
-  OFFLINE,
+enum LOBBY {
+  OFFLINE = "Offline",
+  ONLINE = "Online",
 }
 
 export interface LobbySettings {
-  mode: LOBBY;
-  lobbyKey: string | null;
-  hostName: string;
-  opponentName: string;
+  mode: string | LOBBY;
+  key: string | null;
+  players: string[];
   time: number;
-  firstMove: string;
+}
+
+function createLobby(mode: string | LOBBY) {
+  return {
+    mode,
+    key: null,
+    players: [],
+    time: 0,
+  };
 }
