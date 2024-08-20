@@ -9,13 +9,7 @@ export const Lobby: React.FC<{
   socket: Socket;
 }> = ({ socket }) => {
   const navigate = useNavigate();
-
-  const [lobby, setLobby] = useState<LobbySettings>({
-    mode: LOBBY.OFFLINE,
-    key: null,
-    time: 0,
-    players: [],
-  });
+  const [lobby, setLobby] = useState<LobbySettings>(createLobby(LOBBY.OFFLINE));
 
   const updateLobby = useCallback(
     <KEY extends keyof LobbySettings>(key: KEY, value: LobbySettings[KEY]) => {
