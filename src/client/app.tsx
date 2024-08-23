@@ -12,16 +12,14 @@ const App: React.FC<{
 }> = ({ websocket }) => {
   const [isInitialized, setIsInitialized] = useState(false);
   const canvas = useRef<HTMLCanvasElement>(null);
-  const sceneManager = useRef<SceneManager>();
+  const sceneManager = useRef<SceneManager>(new SceneManager());
 
   useEffect(() => {
-    if (canvas.current && !sceneManager.current) {
-      sceneManager.current = new SceneManager({
-        canvas: canvas.current,
-      }).init();
+    if (canvas.current) {
+      sceneManager.current.init({ canvas: canvas.current });
       setIsInitialized(true);
     }
-  }, [canvas.current, sceneManager.current]);
+  }, [canvas.current, sceneManager.current, setIsInitialized]);
 
   return (
     <div id="app">
@@ -33,7 +31,11 @@ const App: React.FC<{
           <Route path="/lobby" element={<Lobby socket={websocket} />} />
           <Route
             path="/game"
-            element={<GameView sceneManager={sceneManager.current} />}
+            element={
+              sceneManager.current ? (
+                <GameView sceneManager={sceneManager.current} />
+              ) : null
+            }
           />
         </Routes>
       </BrowserRouter>

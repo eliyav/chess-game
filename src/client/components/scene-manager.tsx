@@ -12,32 +12,28 @@ export type ScenesDict = {
 };
 
 export class SceneManager {
-  private canvas: HTMLCanvasElement;
-  private engine: Engine;
+  private canvas?: HTMLCanvasElement;
+  private engine?: Engine;
   private scenes: ScenesDict;
   private activeScene: Scenes;
+  private initialized: boolean;
 
-  constructor({ canvas }: { canvas: HTMLCanvasElement }) {
-    this.canvas = canvas;
-    this.engine = new Engine(canvas, true);
+  constructor() {
+    this.initialized = false;
     this.scenes = {};
     this.activeScene = Scenes.HOME;
   }
 
-  public init() {
-    this.loadScene(Scenes.HOME);
+  public init({ canvas }: { canvas: HTMLCanvasElement }) {
+    if (this.initialized) return this;
+    this.initialized = true;
+    this.canvas = canvas;
+    this.engine = new Engine(canvas, true);
+    this.loadHome(this.engine);
     this.render();
-    window.addEventListener("resize", () => this.engine.resize());
+    window.addEventListener("resize", () => this.engine!.resize());
+    this.loadGame(this.canvas, this.engine);
     return this;
-  }
-
-  public async loadScene(scene: Scenes) {
-    if (scene === Scenes.HOME) {
-      await this.loadHome();
-    } else if (scene === Scenes.GAME) {
-      await this.loadGame();
-    }
-    this.switchScene(scene);
   }
 
   public switchScene(scene: Scenes) {
@@ -52,16 +48,16 @@ export class SceneManager {
     return this.scenes[scene || this.activeScene]!;
   }
 
-  private async loadHome() {
-    const homeScreen = await homeScene(this.engine, {
+  private async loadHome(engine: Engine) {
+    const homeScreen = await homeScene(engine, {
       id: this.activeScene,
     });
     this.scenes[Scenes.HOME] = homeScreen;
   }
 
-  private async loadGame() {
+  private async loadGame(canvas: HTMLCanvasElement, engine: Engine) {
     const { gameScene } = await import("../view/game-scene");
-    this.scenes[Scenes.GAME] = await gameScene(this.canvas, this.engine);
+    this.scenes[Scenes.GAME] = await gameScene(canvas, engine);
   }
 
   private setScene(scene: Scenes) {
@@ -73,9 +69,9 @@ export class SceneManager {
   }
 
   private render() {
+    if (!this.engine) return;
     this.engine.runRenderLoop(() => {
       const scene = this.getScene();
-      console.log(scene);
       if (!scene) return;
       scene.render();
     });

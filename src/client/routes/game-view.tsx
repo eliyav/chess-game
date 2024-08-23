@@ -10,96 +10,63 @@ import PromotionModal from "../components/modals/promotion-modal";
 import { useNavigate } from "react-router-dom";
 
 export const GameView: React.FC<{
-  sceneManager?: SceneManager;
+  sceneManager: SceneManager;
 }> = ({ sceneManager }) => {
-  if (!sceneManager) return null;
-  const [viewReady, setViewReady] = useState(false);
+  const navigate = useNavigate();
   const [message, setMessage] = useState<Message | null>(null);
   const [promotion, setPromotion] = useState(false);
-  const loadInitiated = useRef(false);
   const match = useRef(new Match()).current;
-  const navigate = useNavigate();
-  const gameEventHandlers = {
-    endMatch,
-    promote,
-  };
-
   const controller = useRef(
-    new Controller(sceneManager, match, gameEventHandlers)
+    new Controller(sceneManager, match, {
+      promote: () => setPromotion(true),
+      endMatch: () => {
+        const winningTeam = match.getWinningTeam();
+        sceneManager?.getScene()!.detachControl();
+        setMessage({
+          question: `${winningTeam} team has won!, Would you like to play another game?`,
+          onConfirm: () => {
+            controller.resetMatch();
+            setMessage(null);
+          },
+          onReject: () => {
+            setMessage(null);
+          },
+        });
+      },
+    })
   ).current;
-
-  function endMatch() {
-    const winningTeam = match.getWinningTeam();
-    sceneManager?.getScene()!.detachControl();
-    setMessage({
-      question: `${winningTeam} team has won!, Would you like to play another game?`,
-      onConfirm: () => {
-        controller.resetMatch();
-        setMessage(null);
-      },
-      onReject: () => {
-        setMessage(null);
-      },
-    });
-  }
-
-  function promote() {
-    setPromotion(true);
-  }
-
-  useEffect(() => {
-    if (!loadInitiated.current) {
-      loadInitiated.current = true;
-      initView();
-
-      async function initView() {
-        //Prep state controlling functions helpers here and pass through prepGame into resolve input function
-        await controller.prepView();
-        setViewReady(true);
-      }
-    }
-  }, [sceneManager]);
-
-  if (!viewReady)
-    return (
-      <div className="loadingContainer">
-        <LoadingScreen text="..." />
-      </div>
-    );
 
   //Game Overlay
   return (
     <>
-      {viewReady && (
-        <MenuOverlay
-          items={[
-            {
-              text: "home",
-              onClick: () => {
-                sceneManager.switchScene(Scenes.HOME);
-                navigate("/");
-              },
+      <MenuOverlay
+        items={[
+          {
+            text: "home",
+            onClick: () => {
+              sceneManager.switchScene(Scenes.HOME);
+              navigate("/");
             },
-            {
-              text: "restart",
-              onClick: () => controller.resetMatch(),
-            },
-            {
-              text: "undo",
-              onClick: () => controller.undoMove(),
-            },
-            {
-              text: "camera",
-              onClick: () => controller.resetCamera(),
-            },
-            // {
-            //   text: "pause",
-            //   onClick: () => match.timer.toggleTimer(),
-            // },
-          ]}
-          icons={icons}
-        />
-      )}
+          },
+          {
+            text: "restart",
+            onClick: () => controller.resetMatch(),
+          },
+          {
+            text: "undo",
+            onClick: () => controller.undoMove(),
+          },
+          {
+            text: "camera",
+            onClick: () => controller.resetCamera(),
+          },
+          // {
+          //   text: "pause",
+          //   onClick: () => match.timer.toggleTimer(),
+          // },
+        ]}
+        icons={icons}
+      />
       {message && (
         <MessageModal
           question={message.question}

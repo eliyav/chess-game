@@ -30,16 +30,18 @@ export class Controller {
     this.sceneManager = sceneManager;
     this.match = match;
     this.eventHandlers = eventHandlers;
+    this.prepView();
   }
 
   async prepView() {
-    await this.sceneManager.loadScene(Scenes.GAME);
+    this.sceneManager.switchScene(Scenes.GAME);
     this.initGameInput();
     this.prepGameScreen();
-    this.match.startMatch();
+    // this.match.startMatch();
   }
 
   initGameInput() {
+    if (this.sceneManager.getScene().onPointerDown) return;
     this.sceneManager.getScene().onPointerDown = async (
       e: any,
       pickResult: any
@@ -99,7 +101,7 @@ export class Controller {
   updateMeshesRender() {
     const gameScene = this.sceneManager.getScene();
     //Clears old meshes/memory usage
-    !gameScene.meshesToRender ? (gameScene.meshesToRender = []) : null;
+    if (gameScene.meshesToRender === undefined) gameScene.meshesToRender = [];
     if (gameScene.meshesToRender.length) {
       for (let i = 0; i < gameScene.meshesToRender.length; i++) {
         const mesh = gameScene.meshesToRender[i];
