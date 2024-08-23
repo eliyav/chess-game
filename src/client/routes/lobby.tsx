@@ -34,6 +34,7 @@ export const Lobby: React.FC<{
             key={mode}
             onClick={() => setLobby(createLobby(mode))}
             className={`glass-light ${lobby.mode === mode && "highlight"}`}
+            disabled={lobby.mode === mode}
           >
             {mode}
           </button>

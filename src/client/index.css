@@ -379,12 +379,15 @@ canvas {
   font-size: 1.25em;
   font-weight: bold;
   border-radius: 15%;
-  border: 1px solid white;
+  border: 2px solid white;
 }
 
-.highlight {
-  background-color: rgba(0, 150, 0, 0.9);
-  border: 2px solid lightblue !important;
+button.highlight {
+  border: 2px solid rgba(0, 150, 0, 0.9);
+}
+
+.highlight:disabled {
+  color: black;
 }
 
 /* Margins */
