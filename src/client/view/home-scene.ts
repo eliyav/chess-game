@@ -1,5 +1,4 @@
 import { Scene } from "@babylonjs/core/scene.js";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh.js";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera.js";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
@@ -7,7 +6,6 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight.js";
 import { PhotoDome } from "@babylonjs/core/Helpers/photoDome.js";
 import space from "../../../assets/space.webp";
 import { CustomScene } from "./game-assets";
-import { ChessPieceMesh } from "./game-assets";
 import { displayAssets } from "./display-assets";
 import { Scenes } from "../components/scene-manager";
 
@@ -33,11 +31,3 @@ export const homeScene = async (
 
   return scene;
 };
-
-export interface DisplayScene extends Scene {
-  finalMeshes?: {
-    piecesMeshes: ChessPieceMesh[];
-    boardMeshes: AbstractMesh[];
-  };
-  meshesToRender?: AbstractMesh[];
-}

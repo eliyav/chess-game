@@ -1,19 +1,16 @@
-import { Scene } from "@babylonjs/core/scene.js";
-import { Engine } from "@babylonjs/core/Engines/engine";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera.js";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
+import "@babylonjs/core/Culling/ray.js";
+import { Engine } from "@babylonjs/core/Engines/engine";
+import { PhotoDome } from "@babylonjs/core/Helpers/photoDome.js";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight.js";
 import { SpotLight } from "@babylonjs/core/Lights/spotLight.js";
-import { PhotoDome } from "@babylonjs/core/Helpers/photoDome.js";
 import { Color3 } from "@babylonjs/core/Maths/math.color.js";
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { AssetContainer } from "@babylonjs/core/assetContainer";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
+import { Scene } from "@babylonjs/core/scene.js";
 import space from "../../../assets/space.webp";
-import { gameAssets } from "./game-assets";
+import { createAnimations } from "./animation/create-animations";
+import { CustomScene, gameAssets } from "./game-assets";
 import { createMovementMaterials } from "./materials";
-import { CustomScene } from "./game-assets";
-import "@babylonjs/core/Animations/animatable.js";
-import "@babylonjs/core/Culling/ray.js";
 
 export const gameScene = async (
   canvas: HTMLCanvasElement,
@@ -62,88 +59,7 @@ export const gameScene = async (
 
   createMovementMaterials(scene);
   scene.finalMeshes = await gameAssets(scene);
-
-  //#region Animations
-  //Pawn Animations
-  const pawnAnimationContainer = new AssetContainer(scene);
-
-  scene.finalMeshes?.animations?.Pawn.meshes.forEach((mesh) =>
-    pawnAnimationContainer!.meshes.push(mesh)
-  );
-
-  scene.finalMeshes?.animations?.Pawn.animationGroups.forEach((anim) =>
-    pawnAnimationContainer!.animationGroups.push(anim)
-  );
-
-  // pawnAnimationContainer.meshes.forEach(mesh => mesh.)
-  pawnAnimationContainer.removeAllFromScene();
-
-  // Rook Animations
-  const rookAnimationContainer = new AssetContainer(scene);
-
-  scene.finalMeshes?.animations?.Rook.meshes.forEach((mesh) =>
-    rookAnimationContainer!.meshes.push(mesh)
-  );
-  scene.finalMeshes?.animations?.Rook.animationGroups.forEach((anim) =>
-    rookAnimationContainer!.animationGroups.push(anim)
-  );
-
-  rookAnimationContainer.removeAllFromScene();
-
-  // Bishop Animations
-  const bishopAnimationContainer = new AssetContainer(scene);
-
-  scene.finalMeshes?.animations?.Bishop.meshes.forEach((mesh) =>
-    bishopAnimationContainer!.meshes.push(mesh)
-  );
-  scene.finalMeshes?.animations?.Bishop.animationGroups.forEach((anim) =>
-    bishopAnimationContainer!.animationGroups.push(anim)
-  );
-
-  bishopAnimationContainer.removeAllFromScene();
-
-  // Knight Animations
-  const knightAnimationContainer = new AssetContainer(scene);
-
-  scene.finalMeshes?.animations?.Knight.meshes.forEach((mesh) =>
-    knightAnimationContainer!.meshes.push(mesh)
-  );
-  scene.finalMeshes?.animations?.Knight.animationGroups.forEach((anim) =>
-    knightAnimationContainer!.animationGroups.push(anim)
-  );
-
-  knightAnimationContainer.removeAllFromScene();
-
-  // Queen Animations
-  const queenAnimationContainer = new AssetContainer(scene);
-
-  scene.finalMeshes?.animations?.Queen.meshes.forEach((mesh) =>
-    queenAnimationContainer!.meshes.push(mesh)
-  );
-  scene.finalMeshes?.animations?.Queen.animationGroups.forEach((anim) =>
-    queenAnimationContainer!.animationGroups.push(anim)
-  );
-
-  queenAnimationContainer.removeAllFromScene();
-
-  //#endregion
-
-  scene.animationsContainer = {
-    Pawn: pawnAnimationContainer,
-    Bishop: bishopAnimationContainer,
-    Rook: rookAnimationContainer,
-    Knight: knightAnimationContainer,
-    Queen: queenAnimationContainer,
-  };
-
-  scene.finalMeshes?.boardMeshes.forEach((mesh, idx) => {
-    if (idx === 2) {
-      const material = new StandardMaterial("light", scene);
-      material.diffuseColor = new Color3(0.01, 0.01, 0.01);
-      material.specularColor = new Color3(0.01, 0.01, 0.01);
-      mesh.material = material;
-    }
-  });
+  scene.animationsContainer = await createAnimations(scene);
 
   return scene;
 };
