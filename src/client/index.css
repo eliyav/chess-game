@@ -390,6 +390,22 @@ button.highlight {
   color: black;
 }
 
+.lobby-code p {
+  text-align: center;
+}
+
+.lobby-code span {
+  font-size: 1.2em;
+  padding: 0.5em;
+  background-color: #333333;
+  border-radius: 0.25em;
+}
+
+.lobby-code span:hover {
+  background-color: #444444;
+  cursor: pointer;
+}
+
 /* Margins */
 .mt-1 {
   margin-top: 1em;

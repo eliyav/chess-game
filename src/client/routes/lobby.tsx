@@ -32,7 +32,13 @@ export const Lobby: React.FC<{
         {Object.values(LOBBY).map((mode) => (
           <button
             key={mode}
-            onClick={() => setLobby(createLobby(mode))}
+            onClick={() => {
+              const lobbyOptions = createLobby(mode);
+              setLobby(lobbyOptions);
+              if (mode === LOBBY.ONLINE) {
+                socket.emit("create-lobby", lobbyOptions);
+              }
+            }}
             className={`glass-light ${lobby.mode === mode && "highlight"}`}
             disabled={lobby.mode === mode}
           >
@@ -47,11 +53,7 @@ export const Lobby: React.FC<{
         />
       )}
       {lobby.mode === LOBBY.ONLINE && (
-        <OnlineLobby
-          lobby={lobby}
-          setTime={(time) => updateLobby("time", time)}
-          socket={socket}
-        />
+        <OnlineLobby lobby={lobby} updateLobby={updateLobby} socket={socket} />
       )}
       <div className="footer">
         <Link to="/game" state={lobby} className={"btn glass-light"}>

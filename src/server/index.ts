@@ -3,6 +3,7 @@ import path from "path";
 import compression from "compression";
 import { Server } from "socket.io";
 import { fileURLToPath } from "node:url";
+import { LobbySettings } from "../client/routes/lobby";
 
 const clientPath = fileURLToPath(new URL("../client", import.meta.url));
 
@@ -36,17 +37,16 @@ setInterval(() => {
 
 io.on("connection", (socket) => {
   socket.on("create-lobby", (lobbySettings) => {
-    const lobbyKey = generateKey();
-    socket.join(lobbyKey);
-    const lobby = {
-      lobbyKey: lobbyKey,
-      hostName: lobbySettings.hostName,
-      opponentName: "Waiting...",
+    const key = generateKey();
+    const lobby: LobbySettings = {
+      mode: lobbySettings.mode,
+      key,
+      players: ["Host", "Waiting..."],
       time: 0,
-      firstMove: "Game Host",
     };
-    lobbyLog.set(lobbyKey, lobby);
-    socket.emit("room-info", lobbyLog.get(lobbyKey));
+    socket.join(key);
+    lobbyLog.set(key, lobby);
+    socket.emit("room-info", lobbyLog.get(key));
   });
 
   socket.on("get-room-info", (lobbyKey) => {
@@ -65,11 +65,11 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("update-lobby", ({ lobbySettings }) => {
-    lobbyLog.set(lobbySettings.lobbyKey, lobbySettings);
-    socket
-      .to(lobbySettings.lobbyKey)
-      .emit("room-info", lobbyLog.get(lobbySettings.lobbyKey));
+  socket.on("update-lobby", ({ lobby }: { lobby: LobbySettings }) => {
+    if (lobby.key) {
+      lobbyLog.set(lobby.key, lobby);
+      socket.to(lobby.key).emit("room-info", lobbyLog.get(lobby.key));
+    }
   });
 
   socket.on("resolvedTurn", ({ originPoint, targetPoint, lobbyKey }) => {
