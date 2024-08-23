@@ -29,10 +29,10 @@ export class SceneManager {
     this.initialized = true;
     this.canvas = canvas;
     this.engine = new Engine(canvas, true);
-    this.loadHome(this.engine);
+    this.loadHome();
     this.render();
-    window.addEventListener("resize", () => this.engine!.resize());
-    this.loadGame(this.canvas, this.engine);
+    window.addEventListener("resize", () => this.engine?.resize());
+    this.loadGame();
     return this;
   }
 
@@ -44,28 +44,30 @@ export class SceneManager {
     this.setScene(scene);
   }
 
-  public getScene(scene?: Scenes) {
-    return this.scenes[scene || this.activeScene]!;
-  }
-
-  private async loadHome(engine: Engine) {
-    const homeScreen = await homeScene(engine, {
-      id: this.activeScene,
-    });
-    this.scenes[Scenes.HOME] = homeScreen;
-  }
-
-  private async loadGame(canvas: HTMLCanvasElement, engine: Engine) {
-    const { gameScene } = await import("../view/game-scene");
-    this.scenes[Scenes.GAME] = await gameScene(canvas, engine);
-  }
-
   private setScene(scene: Scenes) {
     this.activeScene = scene;
     const currentScene = this.getScene();
     if (currentScene) {
       currentScene.attachControl();
     }
+  }
+
+  public getScene(scene?: Scenes) {
+    return this.scenes[scene || this.activeScene]!;
+  }
+
+  private async loadHome() {
+    if (!this.engine) return;
+    const homeScreen = await homeScene(this.engine, {
+      id: this.activeScene,
+    });
+    this.scenes[Scenes.HOME] = homeScreen;
+  }
+
+  private async loadGame() {
+    if (!this.canvas || !this.engine) return;
+    const { gameScene } = await import("../view/game-scene");
+    this.scenes[Scenes.GAME] = await gameScene(this.canvas, this.engine);
   }
 
   private render() {
