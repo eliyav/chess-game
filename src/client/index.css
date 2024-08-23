@@ -138,7 +138,7 @@ canvas {
     font-weight: bold;
     font-size: 40px;
     padding: 0.25em 0em;
-    margin: 2em auto;
+    margin: 1em auto;
     text-decoration: none;
     &:hover {
       box-shadow: 0px 0px 5px 0.5px lightblue;
@@ -404,6 +404,24 @@ button.highlight {
 .lobby-code span:hover {
   background-color: #444444;
   cursor: pointer;
+}
+
+#join-lobby {
+  text-align: center;
+}
+
+#join-lobby input {
+  font-size: 1.25em;
+  padding: 0.5em;
+  border-radius: 0.25em;
+  border: 1.5px solid var(--primary-background);
+  width: 30%;
+}
+
+#join-lobby button {
+  font-size: 1.25em;
+  padding: 0.5em 1em;
+  border: 1.5px solid var(--primary-background);
 }
 
 /* Margins */

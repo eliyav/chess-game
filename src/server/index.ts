@@ -53,12 +53,15 @@ io.on("connection", (socket) => {
     io.to(lobbyKey).emit("room-info", lobbyLog.get(lobbyKey));
   });
 
-  socket.on("join-lobby", ({ lobbyKey, name }) => {
+  socket.on("join-lobby", ({ lobbyKey }) => {
     const lobbyExists = lobbyLog.has(lobbyKey);
     if (lobbyExists) {
       socket.join(lobbyKey);
       const lobby = lobbyLog.get(lobbyKey);
-      lobbyLog.set(lobbyKey, { ...lobby, opponentName: name });
+      lobbyLog.set(lobbyKey, {
+        ...lobby,
+        players: ["Host", "Guest"],
+      });
       io.to(lobbyKey).emit("room-info", lobbyLog.get(lobbyKey));
     } else {
       socket.emit("message", "No Such Lobby Exists");

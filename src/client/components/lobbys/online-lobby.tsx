@@ -26,6 +26,23 @@ export const OnlineLobby: React.FC<{
   return (
     <div>
       <div className="lobby-code">
+        <h2 className="sub-title glass-dark">Join Lobby</h2>
+        <div id="join-lobby" className="mt-1">
+          <div className="selections">
+            <input id="join-lobby-input" type="text"></input>
+            <button
+              className="glass-light"
+              onClick={() => {
+                const lobbyKey = document.getElementById(
+                  "join-lobby-input"
+                ) as HTMLInputElement;
+                socket.emit("join-lobby", { lobbyKey: lobbyKey.value });
+              }}
+            >
+              Join
+            </button>
+          </div>
+        </div>
         <h2 className="sub-title glass-dark">Invite Code</h2>
         <p>
           <span
