@@ -1,6 +1,6 @@
+import { Color4, GlowLayer, Nullable } from "@babylonjs/core";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera.js";
 import { Engine } from "@babylonjs/core/Engines/engine";
-import { PhotoDome } from "@babylonjs/core/Helpers/photoDome.js";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight.js";
 import {
   ISceneLoaderAsyncResult,
@@ -9,6 +9,7 @@ import {
 import { Material } from "@babylonjs/core/Materials/material";
 import { Space } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Scene } from "@babylonjs/core/scene.js";
 import "@babylonjs/loaders/glTF";
 import board from "../../../assets/board.gltf";
@@ -18,12 +19,10 @@ import knight from "../../../assets/pieces/knightv3.gltf";
 import pawn from "../../../assets/pieces/pawnv3.gltf";
 import queen from "../../../assets/pieces/queenv3.gltf";
 import rook from "../../../assets/pieces/rookv3.gltf";
-import space from "../../../assets/space.webp";
-import { CustomScene } from "../components/scene-manager";
-import { createMeshMaterials } from "./materials";
 import { DisplayMesh } from "../components/scene-entities/display-mesh";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { Nullable } from "@babylonjs/core";
+import { CustomScene } from "../components/scene-manager";
+import { createCelestialSphere } from "./celestial-shere/celestial-sphere";
+import { createMeshMaterials } from "./materials";
 
 export const createHomeScene = async (
   engine: Engine
@@ -40,7 +39,8 @@ export const createHomeScene = async (
   camera.useFramingBehavior = false;
 
   new HemisphericLight("light", new Vector3(0, 1, 0), scene);
-  new PhotoDome("spaceDome", space, { size: 250 }, scene);
+
+  createCelestialSphere(scene);
 
   const materials = createMeshMaterials(scene);
 

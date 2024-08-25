@@ -64,7 +64,7 @@ export class DisplayMesh {
     if (this.mesh.position.y < this.endingPosition) {
       this.mesh.position.z = calcRandomZ();
       this.mesh.position.y = STARTING_Y_POSITION;
-      this.speed = Math.random() * 0.1;
+      this.speed = Math.random();
       this.rotationIndex = [
         calcRandomNumber(),
         calcRandomNumber(),
@@ -75,7 +75,7 @@ export class DisplayMesh {
 }
 
 function calcRandomZ() {
-  const pos = Math.random() > 0.5 ? 1 : -15;
+  const pos = Math.random() > 0.5 ? 30 : -30;
   return Math.random() * pos;
 }
 

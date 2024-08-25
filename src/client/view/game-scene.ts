@@ -1,15 +1,14 @@
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera.js";
 import "@babylonjs/core/Culling/ray.js";
 import { Engine } from "@babylonjs/core/Engines/engine";
-import { PhotoDome } from "@babylonjs/core/Helpers/photoDome.js";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight.js";
 import { SpotLight } from "@babylonjs/core/Lights/spotLight.js";
 import { Color3 } from "@babylonjs/core/Maths/math.color.js";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
 import { Scene } from "@babylonjs/core/scene.js";
-import space from "../../../assets/space.webp";
 import { GameScene } from "../components/scene-manager";
 import { createAnimations } from "./animation/create-animations";
+import { createCelestialSphere } from "./celestial-shere/celestial-sphere";
 import { gameAssets } from "./game-assets";
 import { createMovementMaterials } from "./materials";
 
@@ -55,9 +54,7 @@ export const gameScene = async (
   light3.intensity = 0.8;
   light3.diffuse = new Color3(0, 0, 0);
 
-  const photoDome = new PhotoDome("spaceDome", space, { size: 500 }, scene);
-  photoDome.rotation = new Vector3(0, 1, 1.5);
-
+  createCelestialSphere(scene);
   createMovementMaterials(scene);
 
   const gameScene = {
