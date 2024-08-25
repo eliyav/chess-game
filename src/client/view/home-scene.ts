@@ -2,10 +2,13 @@ import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera.js";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { PhotoDome } from "@babylonjs/core/Helpers/photoDome.js";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight.js";
-import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
+import {
+  ISceneLoaderAsyncResult,
+  SceneLoader,
+} from "@babylonjs/core/Loading/sceneLoader";
+import { Material } from "@babylonjs/core/Materials/material";
 import { Space } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Scene } from "@babylonjs/core/scene.js";
 import "@babylonjs/loaders/glTF";
 import board from "../../../assets/board.gltf";
@@ -18,11 +21,13 @@ import rook from "../../../assets/pieces/rookv3.gltf";
 import space from "../../../assets/space.webp";
 import { CustomScene } from "../components/scene-manager";
 import { createMeshMaterials } from "./materials";
+import { DisplayMesh } from "../components/scene-entities/display-mesh";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { Nullable } from "@babylonjs/core";
 
-const startingPostion = 35;
-const endingPosition = -75;
-
-export const homeScene = async (engine: Engine): Promise<CustomScene<{}>> => {
+export const createHomeScene = async (
+  engine: Engine
+): Promise<CustomScene<{}>> => {
   const scene = new Scene(engine);
   const camera = new ArcRotateCamera(
     "camera",
@@ -38,89 +43,43 @@ export const homeScene = async (engine: Engine): Promise<CustomScene<{}>> => {
   new PhotoDome("spaceDome", space, { size: 250 }, scene);
 
   const materials = createMeshMaterials(scene);
-  let boardMesh = board;
-  let boardPieces = [king, queen, knight, bishop, rook, pawn];
 
-  const loadedBoardMeshes = await SceneLoader.ImportMeshAsync(
+  const importedBoardMesh = await SceneLoader.ImportMeshAsync(
     "",
-    boardMesh,
+    board,
     "",
     scene
   );
-  const loadedPiecesMeshes = await Promise.all(
-    boardPieces.map((mesh) => SceneLoader.ImportMeshAsync("", mesh, "", scene))
+  const importedPiecesMeshes = await Promise.all(
+    [king, queen, knight, bishop, rook, pawn].map((mesh) =>
+      SceneLoader.ImportMeshAsync("", mesh, "", scene)
+    )
   );
 
-  const rotationArray = [-5, -4, -3, -2, -1, 1, 2, 3, 4, 5];
+  const displayedMeshes: DisplayMesh[] = [];
 
-  const piecesMeshes: DisplayMesh[] = [];
+  for (let i = 0; i < 6; i++) {
+    createDisplayPieces({
+      finalArray: displayedMeshes,
+      meshes: importedPiecesMeshes,
+      materials: [materials.white, materials.black],
+    });
+  }
 
-  const loadMeshSettings = (mesh: any, color: string) => {
-    const name: string = mesh.meshes[1].id;
-    let finalMesh: DisplayMesh = mesh.meshes[1].clone(name, null)!;
-    finalMesh.name = name;
-    finalMesh.color = color;
-    (finalMesh.scalingDeterminant = 40),
-      (finalMesh.position.y = startingPostion),
-      (finalMesh.position.x = 10),
-      finalMesh.color === "White"
-        ? (finalMesh.material = materials.white)
-        : (finalMesh.material = materials.black);
-    finalMesh.speed = Math.random() * 0.6;
-    finalMesh.position.z = calcRandomZ();
-    finalMesh.rotationIndex = calcRandomNumber();
-    finalMesh.rotationIndex2 = calcRandomNumber();
-    finalMesh.rotationIndex3 = calcRandomNumber();
-    piecesMeshes.push(finalMesh);
-  };
-
-  loadedPiecesMeshes.forEach((mesh) => {
-    loadMeshSettings(mesh, "White");
-    loadMeshSettings(mesh, "Black");
-  });
-
-  loadedBoardMeshes.meshes.forEach((mesh, idx) => {
-    if (idx !== 1) {
-      mesh.material = materials.board;
-    }
-  });
-
-  const boardClone = loadedBoardMeshes.meshes[0].clone("Board", null);
-  const boardClone2 = loadedBoardMeshes.meshes[0].clone("Board2", null);
-
-  loadedBoardMeshes.meshes.forEach((mesh) => {
-    mesh.isVisible = false;
-  });
-
-  //Back/UP/Side
-  boardClone!.rotation = new Vector3(0.2, 0, 0);
-  boardClone!.position = new Vector3(10, 0, -10);
-  boardClone2!.position = new Vector3(30, -30, 30);
-  boardClone2!.rotation = new Vector3(-0.2, 0, 0.8);
-
-  let alpha = Math.PI / 2;
-  let beta = Math.PI / 1.5;
-  let gamma = Math.PI / 1;
+  const [boardMesh, boardClone] = createDisplayBoard(
+    importedBoardMesh,
+    materials.board
+  );
 
   const requestAnimation = () => {
     requestAnimationFrame(() => {
-      piecesMeshes.forEach((mesh) => {
-        mesh.position.y -= mesh.speed!;
-        if (mesh.position.y < endingPosition) {
-          resetMesh(mesh);
-        }
-        boardClone!.rotate(new Vector3(0, 1, 0), 0.0008, Space.LOCAL);
-        boardClone2!.rotate(new Vector3(0.6, 1, 0.5), 0.0005, Space.LOCAL);
+      boardMesh.rotate(new Vector3(0, -1, 0), 0.004, Space.LOCAL);
+      if (boardClone) {
+        boardClone.rotate(new Vector3(0, 1, 0), 0.008, Space.LOCAL);
+      }
 
-        mesh.rotate(
-          new Vector3(
-            alpha * rotationArray[mesh.rotationIndex!],
-            beta * rotationArray[mesh.rotationIndex2!],
-            gamma * rotationArray[mesh.rotationIndex3!]
-          ),
-          (3 * Math.PI) / 500,
-          Space.LOCAL
-        );
+      displayedMeshes.forEach((mesh) => {
+        mesh.animate();
       });
     });
   };
@@ -134,30 +93,50 @@ export const homeScene = async (engine: Engine): Promise<CustomScene<{}>> => {
   };
 };
 
-function calcRandomZ() {
-  const pos = Math.random() > 0.5 ? -1 : 1;
-  const distance = 13;
-  return Math.random() * distance * pos;
+function createDisplayPieces({
+  finalArray,
+  meshes,
+  materials,
+}: {
+  finalArray: DisplayMesh[];
+  meshes: ISceneLoaderAsyncResult[];
+  materials: Material[];
+}) {
+  meshes.forEach((mesh) => {
+    try {
+      const name: string = mesh.meshes[1].id;
+      const clone1 = new DisplayMesh({
+        material: materials[0],
+        mesh: mesh.meshes[1].clone(name, null),
+      });
+      const clone2 = new DisplayMesh({
+        material: materials[1],
+        mesh: mesh.meshes[1].clone(name, null),
+      });
+      finalArray.push(clone1);
+      finalArray.push(clone2);
+    } catch (e) {
+      console.log(e);
+    }
+  });
 }
 
-function calcRandomNumber() {
-  return Math.floor(Math.random() * 10);
-}
-
-function resetMesh(piece: DisplayMesh) {
-  piece.speed = Math.random() * 0.1;
-  piece.position.z = calcRandomZ();
-  piece.position.y = startingPostion;
-  piece.rotationIndex = calcRandomNumber();
-  piece.rotationIndex2 = calcRandomNumber();
-  piece.rotationIndex3 = calcRandomNumber();
-}
-
-interface DisplayMesh extends AbstractMesh {
-  name: string;
-  color: string;
-  speed: number;
-  rotationIndex: number;
-  rotationIndex2: number;
-  rotationIndex3: number;
+function createDisplayBoard(
+  board: ISceneLoaderAsyncResult,
+  material: Material
+): [AbstractMesh, Nullable<AbstractMesh>] {
+  board.meshes.forEach((mesh, idx) => {
+    if (idx !== 1) {
+      mesh.material = material;
+    }
+  });
+  const boardMesh = board.meshes[0];
+  const boardClone = boardMesh.clone("Board", null);
+  boardMesh.position = new Vector3(30, -30, 30);
+  boardMesh.rotation = new Vector3(-1.5, 0, 0.5);
+  if (boardClone) {
+    boardClone.position = new Vector3(10, 0, -10);
+    boardClone.rotation = new Vector3(0.2, 0, 0);
+  }
+  return [boardMesh, boardClone];
 }

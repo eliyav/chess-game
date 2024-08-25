@@ -1,4 +1,4 @@
-import { homeScene } from "../view/home-scene";
+import { createHomeScene } from "../view/home-scene";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { AnimationContainer } from "../view/animation/create-animations";
@@ -51,7 +51,7 @@ export class SceneManager {
     this.engine = new Engine(canvas, true);
     this.scenes = {};
     this.activeSceneId = Scenes.HOME;
-    this.loadHome({ setInitialized });
+    this.initHomeScene({ setInitialized });
     this.render();
     window.addEventListener("resize", () => this.engine?.resize());
     this.loadGame();
@@ -81,8 +81,12 @@ export class SceneManager {
     return this.scenes?.[scene];
   }
 
-  private async loadHome({ setInitialized }: { setInitialized: () => void }) {
-    const homeScreen = await homeScene(this.engine);
+  private async initHomeScene({
+    setInitialized,
+  }: {
+    setInitialized: () => void;
+  }) {
+    const homeScreen = await createHomeScene(this.engine);
     this.scenes[Scenes.HOME] = homeScreen;
     setInitialized();
   }

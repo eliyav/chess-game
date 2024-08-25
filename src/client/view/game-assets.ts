@@ -6,7 +6,7 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { Scene } from "@babylonjs/core/scene.js";
+import { Scene } from "@babylonjs/core/scene";
 import "@babylonjs/loaders/glTF";
 import board from "../../../assets/board.gltf";
 import bishop from "../../../assets/pieces/bishopv3.gltf";
@@ -15,10 +15,10 @@ import knight from "../../../assets/pieces/knightv3.gltf";
 import pawn from "../../../assets/pieces/pawnv3.gltf";
 import queen from "../../../assets/pieces/queenv3.gltf";
 import rook from "../../../assets/pieces/rookv3.gltf";
-import type { AnimationContainer } from "./animation/create-animations";
+import { ChessPieceMesh } from "../components/scene-manager";
 import { createMeshMaterials } from "./materials";
 
-export const gameAssets = async (scene: Custom<{ id: 1 }>) => {
+export const gameAssets = async (scene: Scene) => {
   const materials = createMeshMaterials(scene);
   //Game Scene
   let meshesToLoad = [king, queen, knight, bishop, rook, pawn];
