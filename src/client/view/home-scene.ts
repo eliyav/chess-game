@@ -18,6 +18,7 @@ import rook from "../../../assets/pieces/rookv3.gltf";
 import space from "../../../assets/space.webp";
 import { createMeshMaterials } from "./materials";
 import { CustomScene } from "../components/scene-manager";
+import { makeAsyncFunction } from "@babylonjs/core";
 
 const startingPostion = 35;
 const endingPosition = -75;
@@ -124,6 +125,8 @@ export const homeScene = async (engine: Engine): Promise<CustomScene<{}>> => {
       });
     });
   };
+
+  await scene.whenReadyAsync();
 
   return {
     scene,
