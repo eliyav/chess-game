@@ -16,9 +16,8 @@ import pawn from "../../../assets/pieces/pawnv3.gltf";
 import queen from "../../../assets/pieces/queenv3.gltf";
 import rook from "../../../assets/pieces/rookv3.gltf";
 import space from "../../../assets/space.webp";
-import { createMeshMaterials } from "./materials";
 import { CustomScene } from "../components/scene-manager";
-import { makeAsyncFunction } from "@babylonjs/core";
+import { createMeshMaterials } from "./materials";
 
 const startingPostion = 35;
 const endingPosition = -75;
