@@ -1,13 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
-import * as icons from "../components/game-overlay/overlay-icons";
-import LoadingScreen from "../components/loading-screen";
+import React, { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { MenuOverlay } from "../components/game-overlay/menu-overlay";
+import * as icons from "../components/game-overlay/overlay-icons";
 import { Match } from "../components/match";
-import { SceneManager, Scenes } from "../components/scene-manager";
 import { Controller } from "../components/match-logic/controller";
 import { Message, MessageModal } from "../components/modals/message-modal";
 import PromotionModal from "../components/modals/promotion-modal";
-import { useNavigate } from "react-router-dom";
+import { SceneManager, Scenes } from "../components/scene-manager";
 
 export const GameView: React.FC<{
   sceneManager: SceneManager;

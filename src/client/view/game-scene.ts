@@ -8,15 +8,16 @@ import { Color3 } from "@babylonjs/core/Maths/math.color.js";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
 import { Scene } from "@babylonjs/core/scene.js";
 import space from "../../../assets/space.webp";
+import { GameScene } from "../components/scene-manager";
 import { createAnimations } from "./animation/create-animations";
-import { CustomScene, gameAssets } from "./game-assets";
+import { gameAssets } from "./game-assets";
 import { createMovementMaterials } from "./materials";
 
 export const gameScene = async (
   canvas: HTMLCanvasElement,
   engine: Engine
-): Promise<CustomScene> => {
-  const scene: CustomScene = new Scene(engine);
+): Promise<GameScene> => {
+  const scene = new Scene(engine);
   const camera = new ArcRotateCamera(
     "camera",
     Math.PI,
@@ -58,8 +59,15 @@ export const gameScene = async (
   photoDome.rotation = new Vector3(0, 1, 1.5);
 
   createMovementMaterials(scene);
-  scene.finalMeshes = await gameAssets(scene);
-  scene.animationsContainer = await createAnimations(scene);
 
-  return scene;
+  const gameScene = {
+    scene: scene,
+    custom: {
+      finalMeshes: await gameAssets(scene),
+      animationsContainer: await createAnimations(scene),
+      meshesToRender: [],
+    },
+  };
+
+  return gameScene;
 };

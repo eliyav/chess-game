@@ -18,7 +18,7 @@ import rook from "../../../assets/pieces/rookv3.gltf";
 import type { AnimationContainer } from "./animation/create-animations";
 import { createMeshMaterials } from "./materials";
 
-export const gameAssets = async (scene: Scene) => {
+export const gameAssets = async (scene: Custom<{ id: 1 }>) => {
   const materials = createMeshMaterials(scene);
   //Game Scene
   let meshesToLoad = [king, queen, knight, bishop, rook, pawn];
@@ -76,17 +76,3 @@ export const gameAssets = async (scene: Scene) => {
 
   return { piecesMeshes, boardMeshes };
 };
-
-export interface CustomScene extends Scene {
-  finalMeshes?: {
-    piecesMeshes: ChessPieceMesh[];
-    boardMeshes: AbstractMesh[];
-  };
-  meshesToRender?: AbstractMesh[];
-  animationsContainer?: AnimationContainer;
-}
-
-export interface ChessPieceMesh extends AbstractMesh {
-  name: string;
-  color?: string;
-}

@@ -1,6 +1,22 @@
 import { homeScene } from "../view/home-scene";
-import { CustomScene } from "../view/game-assets";
 import { Engine } from "@babylonjs/core/Engines/engine";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { AnimationContainer } from "../view/animation/create-animations";
+import { Scene } from "@babylonjs/core/scene";
+
+export interface CustomScene<T> {
+  scene: Scene;
+  custom: T;
+}
+
+export type GameScene = CustomScene<{
+  finalMeshes: {
+    piecesMeshes: ChessPieceMesh[];
+    boardMeshes: AbstractMesh[];
+  };
+  meshesToRender: AbstractMesh[];
+  animationsContainer: AnimationContainer;
+}>;
 
 export const enum Scenes {
   HOME,
@@ -8,8 +24,14 @@ export const enum Scenes {
 }
 
 export type ScenesDict = {
-  [key in Scenes]?: CustomScene | null;
+  [Scenes.HOME]?: CustomScene<{}>;
+  [Scenes.GAME]?: GameScene;
 };
+
+export interface ChessPieceMesh extends AbstractMesh {
+  name: string;
+  color?: string;
+}
 
 export class SceneManager {
   private canvas?: HTMLCanvasElement;
@@ -75,7 +97,7 @@ export class SceneManager {
     this.engine.runRenderLoop(() => {
       const scene = this.getScene();
       if (!scene) return;
-      scene.render();
+      scene.scene.render();
     });
   }
 }
