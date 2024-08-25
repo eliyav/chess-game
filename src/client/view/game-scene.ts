@@ -61,8 +61,8 @@ export const gameScene = async (
   createMovementMaterials(scene);
 
   const gameScene = {
-    scene: scene,
-    custom: {
+    scene,
+    data: {
       finalMeshes: await gameAssets(scene),
       animationsContainer: await createAnimations(scene),
       meshesToRender: [],

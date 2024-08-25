@@ -4,10 +4,10 @@ import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { AnimationContainer } from "../view/animation/create-animations";
 import { Scene } from "@babylonjs/core/scene";
 
-export interface CustomScene<T> {
+export type CustomScene<T> = {
   scene: Scene;
-  custom: T;
-}
+  data: T;
+};
 
 export type GameScene = CustomScene<{
   finalMeshes: {
@@ -34,68 +34,55 @@ export interface ChessPieceMesh extends AbstractMesh {
 }
 
 export class SceneManager {
-  private canvas?: HTMLCanvasElement;
-  private engine?: Engine;
+  private canvas: HTMLCanvasElement;
+  private engine: Engine;
   private scenes: ScenesDict;
-  private activeScene: Scenes;
-  private initialized: boolean;
+  private activeSceneId: Scenes;
 
-  constructor() {
-    this.initialized = false;
-    this.scenes = {};
-    this.activeScene = Scenes.HOME;
-  }
-
-  public init({ canvas }: { canvas: HTMLCanvasElement }) {
-    if (this.initialized) return this;
-    this.initialized = true;
+  constructor({ canvas }: { canvas: HTMLCanvasElement }) {
     this.canvas = canvas;
     this.engine = new Engine(canvas, true);
+    this.scenes = {};
+    this.activeSceneId = Scenes.HOME;
     this.loadHome();
     this.render();
     window.addEventListener("resize", () => this.engine?.resize());
     this.loadGame();
-    return this;
   }
 
   public switchScene(scene: Scenes) {
-    const currentScene = this.getScene();
+    const currentScene = this.getScene(scene);
     if (currentScene) {
-      currentScene.detachControl();
+      currentScene.scene.detachControl();
     }
     this.setScene(scene);
   }
 
   private setScene(scene: Scenes) {
-    this.activeScene = scene;
-    const currentScene = this.getScene();
+    this.activeSceneId = scene;
+    const currentScene = this.getScene(scene);
     if (currentScene) {
-      currentScene.attachControl();
+      currentScene.scene.attachControl();
     }
   }
 
-  public getScene(scene?: Scenes) {
-    return this.scenes[scene || this.activeScene]!;
+  public getScene<T extends Scenes>(scene: T): ScenesDict[T] | undefined {
+    return this.scenes?.[scene];
   }
 
   private async loadHome() {
-    if (!this.engine) return;
-    const homeScreen = await homeScene(this.engine, {
-      id: this.activeScene,
-    });
+    const homeScreen = await homeScene(this.engine);
     this.scenes[Scenes.HOME] = homeScreen;
   }
 
   private async loadGame() {
-    if (!this.canvas || !this.engine) return;
     const { gameScene } = await import("../view/game-scene");
     this.scenes[Scenes.GAME] = await gameScene(this.canvas, this.engine);
   }
 
   private render() {
-    if (!this.engine) return;
     this.engine.runRenderLoop(() => {
-      const scene = this.getScene();
+      const scene = this.scenes?.[this.activeSceneId];
       if (!scene) return;
       scene.scene.render();
     });

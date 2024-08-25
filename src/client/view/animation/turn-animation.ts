@@ -1,16 +1,16 @@
+import { GameScene } from "../../components/scene-manager";
 import { findIndex, findPosition } from "../../helper/canvas-helpers";
 import { doMovesMatch, TurnHistory } from "../../helper/game-helpers";
-import { CustomScene } from "../game-assets";
 import { createMeshMaterials } from "../materials";
 import { Animation } from "@babylonjs/core/Animations/animation.js";
 
 export default function calcTurnAnimation(
-  gameScene: CustomScene,
+  gameScene: GameScene,
   originPoint: Point,
   targetPoint: Point,
   turnHistory: TurnHistory
 ) {
-  const materials = createMeshMaterials(gameScene);
+  const materials = createMeshMaterials(gameScene.scene);
 
   const movingMesh = findMeshFromPoint(originPoint);
   const targetMesh = findMeshFromPoint(targetPoint);
@@ -131,7 +131,7 @@ export default function calcTurnAnimation(
     mesh.animations.push(myAnimX);
     mesh.animations.push(myAnimY);
 
-    gameScene.beginAnimation(mesh, 0, frameRate, false);
+    gameScene.scene.beginAnimation(mesh, 0, frameRate, false);
   }
 
   function pieceBreakAnimation(resolved: TurnHistory) {
@@ -144,7 +144,7 @@ export default function calcTurnAnimation(
       const team = resolved.targetPiece?.color;
       let newTargetPoint = resolved.targetPiece?.point!;
 
-      const targetMesh = gameScene.meshesToRender?.find((mesh) => {
+      const targetMesh = gameScene.data.meshesToRender.find((mesh) => {
         const meshPoint = findIndex([mesh.position.z, mesh.position.x], true);
         return doMovesMatch(meshPoint, newTargetPoint);
       });
@@ -188,14 +188,14 @@ export default function calcTurnAnimation(
   }
 
   function findMeshFromPoint(point: Point) {
-    return gameScene.meshesToRender?.find((mesh) => {
+    return gameScene.data.meshesToRender.find((mesh) => {
       const meshPoint = findIndex([mesh.position.z, mesh.position.x], true);
       return doMovesMatch(meshPoint, point);
     })!;
   }
 
   function removeMesh(mesh: any) {
-    gameScene.removeMesh(mesh);
+    gameScene.scene.removeMesh(mesh);
     mesh.dispose();
   }
 }

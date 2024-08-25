@@ -12,14 +12,14 @@ const App: React.FC<{
 }> = ({ websocket }) => {
   const [isInitialized, setIsInitialized] = useState(false);
   const canvas = useRef<HTMLCanvasElement>(null);
-  const sceneManager = useRef<SceneManager>(new SceneManager());
+  const sceneManager = useRef<SceneManager>();
 
   useEffect(() => {
-    if (canvas.current) {
-      sceneManager.current.init({ canvas: canvas.current });
+    if (canvas.current && !sceneManager.current) {
+      sceneManager.current = new SceneManager({ canvas: canvas.current });
       setIsInitialized(true);
     }
-  }, [canvas.current, sceneManager.current, setIsInitialized]);
+  }, [canvas.current, setIsInitialized]);
 
   return (
     <div id="app">

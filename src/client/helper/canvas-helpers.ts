@@ -2,14 +2,14 @@ import Game from "../components/game-logic/game";
 import { Material } from "@babylonjs/core/Materials/material";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
-import { ChessPieceMesh, CustomScene } from "../view/game-assets";
 import { Move } from "../components/game-logic/game-piece";
+import { ChessPieceMesh, GameScene } from "../components/scene-manager";
 
 const displayPieceMoves = (
   mesh: ChessPieceMesh,
   currentMove: Point[],
   game: Game,
-  gameScene: CustomScene
+  gameScene: GameScene
 ) => {
   const piece = game.lookupPiece(
     findIndex([mesh.position.z, mesh.position.x], true)
@@ -23,7 +23,7 @@ const displayPieceMoves = (
   });
 };
 
-const displayMovementSquares = (move: Move, gameScene: CustomScene) => {
+const displayMovementSquares = (move: Move, gameScene: GameScene) => {
   const [point, type] = move;
   const plane: any = MeshBuilder.CreatePlane(`plane`, {
     width: 2.5,
@@ -33,10 +33,10 @@ const displayMovementSquares = (move: Move, gameScene: CustomScene) => {
   plane.position.y += 0.52;
   plane.rotation = new Vector3(Math.PI / 2, 0, 0);
   plane.material = findMaterial(type, gameScene);
-  gameScene.meshesToRender!.push(plane);
+  gameScene.data.meshesToRender.push(plane);
 };
 
-const displayPieceMarker = (move: Point, gameScene: CustomScene) => {
+const displayPieceMarker = (move: Point, gameScene: GameScene) => {
   let type = "piece";
   const torus: any = MeshBuilder.CreateTorus("torus", {
     diameter: 2.6,
@@ -46,7 +46,7 @@ const displayPieceMarker = (move: Point, gameScene: CustomScene) => {
   [torus.position.z, torus.position.x] = findPosition(move, false); //Z is X ---- X is Y
   torus.position.y += 0.51;
   torus.material = findMaterial(type, gameScene);
-  gameScene.meshesToRender!.push(torus);
+  gameScene.data.meshesToRender.push(torus);
 };
 
 const matLookupTable: { [key: string]: string } = {
@@ -57,9 +57,9 @@ const matLookupTable: { [key: string]: string } = {
   piece: "greenMat",
 };
 
-const findMaterial = (moveType: string, gameScene: CustomScene) => {
+const findMaterial = (moveType: string, gameScene: GameScene) => {
   const lookupValue = matLookupTable[moveType];
-  const material = gameScene.materials.find(
+  const material = gameScene.scene.materials.find(
     (mat: Material) => mat.id === lookupValue
   );
   return material;

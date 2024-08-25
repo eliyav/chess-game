@@ -5,10 +5,9 @@ import {
 } from "../../helper/canvas-helpers";
 import { doMovesMatch, TurnHistory } from "../../helper/game-helpers";
 import calcTurnAnimation from "../../view/animation/turn-animation";
-import { ChessPieceMesh } from "../../view/game-assets";
 import GamePiece from "../game-logic/game-piece";
 import { Match } from "../match";
-import { SceneManager, Scenes } from "../scene-manager";
+import { ChessPieceMesh, SceneManager, Scenes } from "../scene-manager";
 
 export class Controller {
   sceneManager: SceneManager;
@@ -39,10 +38,9 @@ export class Controller {
   }
 
   gameInputHandler() {
-    this.sceneManager.getScene().onPointerDown = async (
-      e: any,
-      pickResult: any
-    ) => {
+    const gameScene = this.sceneManager.getScene(Scenes.GAME);
+    if (!gameScene) return;
+    gameScene.scene.onPointerDown = async (e: any, pickResult: any) => {
       if (pickResult.pickedMesh !== null) {
         const mesh: ChessPieceMesh = pickResult.pickedMesh;
         const isCompleteMove = this.gameInput(mesh);
@@ -65,7 +63,8 @@ export class Controller {
   }
 
   gameInput(mesh: ChessPieceMesh) {
-    const gameScene = this.sceneManager.getScene();
+    const gameScene = this.sceneManager.getScene(Scenes.GAME);
+    if (!gameScene) return;
     const {
       moves,
       player: { id: currentPlayer },
@@ -153,24 +152,25 @@ export class Controller {
   turnAnimation(
     ...props: [originPoint: Point, targetPoint: Point, turnHistory: TurnHistory]
   ) {
-    const gameScene = this.sceneManager.getScene();
+    const gameScene = this.sceneManager.getScene(Scenes.GAME);
+    if (!gameScene) return;
     return calcTurnAnimation(gameScene, ...props);
   }
 
   updateMeshesRender() {
-    const gameScene = this.sceneManager.getScene();
+    const gameScene = this.sceneManager.getScene(Scenes.GAME);
+    if (!gameScene) return;
     //Clears old meshes/memory usage
-    if (gameScene.meshesToRender === undefined) gameScene.meshesToRender = [];
-    if (gameScene.meshesToRender.length) {
-      for (let i = 0; i < gameScene.meshesToRender.length; i++) {
-        const mesh = gameScene.meshesToRender[i];
-        gameScene.removeMesh(mesh);
+    if (gameScene.data.meshesToRender.length) {
+      for (let i = 0; i < gameScene.data.meshesToRender.length; i++) {
+        const mesh = gameScene.data.meshesToRender[i];
+        gameScene.scene.removeMesh(mesh);
         mesh.dispose();
       }
-      gameScene.meshesToRender = [];
+      gameScene.data.meshesToRender = [];
     }
     //Final Piece Mesh List
-    const meshesList = gameScene.finalMeshes!.piecesMeshes;
+    const meshesList = gameScene.data.finalMeshes.piecesMeshes;
     //For each active piece, creates a mesh clone and places on board
     this.match.game.allPieces().forEach((square) => {
       const { name, color, point } = square.on!;
@@ -180,14 +180,15 @@ export class Controller {
       const clone = foundMesh!.clone(name, null);
       [clone!.position.z, clone!.position.x] = findPosition(point, true);
       clone!.isVisible = true;
-      gameScene.meshesToRender!.push(clone!);
+      gameScene.data.meshesToRender.push(clone!);
     });
   }
 
   rotateCamera() {
-    const gameScene = this.sceneManager.getScene();
+    const gameScene = this.sceneManager.getScene(Scenes.GAME);
+    if (!gameScene) return;
     let currentPlayer = this.match.game.currentPlayer.id;
-    let camera: any = gameScene.cameras[0];
+    let camera: any = gameScene.scene.cameras[0];
     let alpha = camera.alpha;
     let ratio;
     let subtractedRatio;
@@ -256,8 +257,9 @@ export class Controller {
   }
 
   resetCamera(team?: string) {
-    const gameScene = this.sceneManager.getScene();
-    let camera: any = gameScene.cameras[0];
+    const gameScene = this.sceneManager.getScene(Scenes.GAME);
+    if (!gameScene) return;
+    let camera: any = gameScene?.scene.cameras[0];
     if (!team) {
       this.match.game.currentPlayer.id === "White"
         ? setToWhitePlayer()
