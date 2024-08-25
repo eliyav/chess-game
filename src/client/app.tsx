@@ -16,8 +16,10 @@ const App: React.FC<{
 
   useEffect(() => {
     if (canvas.current && !sceneManager.current) {
-      sceneManager.current = new SceneManager({ canvas: canvas.current });
-      setIsInitialized(true);
+      sceneManager.current = new SceneManager({
+        canvas: canvas.current,
+        setInitialized: () => setIsInitialized(true),
+      });
     }
   }, [canvas.current, setIsInitialized]);
 

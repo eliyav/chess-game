@@ -40,12 +40,18 @@ export class SceneManager {
   private scenes: ScenesDict;
   private activeSceneId: Scenes;
 
-  constructor({ canvas }: { canvas: HTMLCanvasElement }) {
+  constructor({
+    canvas,
+    setInitialized,
+  }: {
+    canvas: HTMLCanvasElement;
+    setInitialized: () => void;
+  }) {
     this.canvas = canvas;
     this.engine = new Engine(canvas, true);
     this.scenes = {};
     this.activeSceneId = Scenes.HOME;
-    this.loadHome();
+    this.loadHome({ setInitialized });
     this.render();
     window.addEventListener("resize", () => this.engine?.resize());
     this.loadGame();
@@ -75,9 +81,10 @@ export class SceneManager {
     return this.scenes?.[scene];
   }
 
-  private async loadHome() {
+  private async loadHome({ setInitialized }: { setInitialized: () => void }) {
     const homeScreen = await homeScene(this.engine);
     this.scenes[Scenes.HOME] = homeScreen;
+    setInitialized();
   }
 
   private async loadGame() {
@@ -87,7 +94,7 @@ export class SceneManager {
 
   private render() {
     this.engine.runRenderLoop(() => {
-      const scene = this.scenes?.[this.activeSceneId];
+      const scene = this.scenes[this.activeSceneId];
       if (!scene) return;
       scene.requestAnimation?.();
       scene.scene.render();
