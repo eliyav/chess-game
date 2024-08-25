@@ -56,9 +56,14 @@ export const Lobby: React.FC<{
         <OnlineLobby lobby={lobby} updateLobby={updateLobby} socket={socket} />
       )}
       <div className="footer">
-        <Link to="/game" state={lobby} className={"btn glass-light"}>
+        <button
+          className={"btn glass-light"}
+          onClick={() => {
+            navigate("/lobby", { state: lobby });
+          }}
+        >
           Start
-        </Link>
+        </button>
       </div>
     </div>
   );
