@@ -7,6 +7,7 @@ import { Scene } from "@babylonjs/core/scene";
 export type CustomScene<T> = {
   scene: Scene;
   data: T;
+  requestAnimation?: () => void;
 };
 
 export type GameScene = CustomScene<{
@@ -51,10 +52,7 @@ export class SceneManager {
   }
 
   public switchScene(scene: Scenes) {
-    const currentScene = this.getScene(scene);
-    if (currentScene) {
-      currentScene.scene.detachControl();
-    }
+    this.detachScene(this.activeSceneId);
     this.setScene(scene);
   }
 
@@ -63,6 +61,13 @@ export class SceneManager {
     const currentScene = this.getScene(scene);
     if (currentScene) {
       currentScene.scene.attachControl();
+    }
+  }
+
+  private detachScene(scene: Scenes) {
+    const currentScene = this.getScene(scene);
+    if (currentScene) {
+      currentScene.scene.detachControl();
     }
   }
 
@@ -84,6 +89,7 @@ export class SceneManager {
     this.engine.runRenderLoop(() => {
       const scene = this.scenes?.[this.activeSceneId];
       if (!scene) return;
+      scene.requestAnimation?.();
       scene.scene.render();
     });
   }

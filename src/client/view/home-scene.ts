@@ -102,7 +102,7 @@ export const homeScene = async (engine: Engine): Promise<CustomScene<{}>> => {
   let beta = Math.PI / 1.5;
   let gamma = Math.PI / 1;
 
-  const animateDistance = () => {
+  const requestAnimation = () => {
     requestAnimationFrame(() => {
       piecesMeshes.forEach((mesh) => {
         mesh.position.y -= mesh.speed!;
@@ -122,14 +122,13 @@ export const homeScene = async (engine: Engine): Promise<CustomScene<{}>> => {
           Space.LOCAL
         );
       });
-      animateDistance();
     });
   };
-  animateDistance();
 
   return {
     scene,
     data: {},
+    requestAnimation,
   };
 };
 
