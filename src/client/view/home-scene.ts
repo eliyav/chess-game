@@ -84,6 +84,10 @@ export const createHomeScene = async (
     });
   };
 
+  scene.onPrePointerObservable.add((pointerInfo) => {
+    pointerInfo.skipOnPointerObservable = true;
+  });
+
   await scene.whenReadyAsync();
 
   return {
