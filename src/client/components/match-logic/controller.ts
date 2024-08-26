@@ -1,3 +1,4 @@
+import { PickingInfo } from "@babylonjs/core/Collisions/pickingInfo";
 import {
   displayPieceMoves,
   findIndex,
@@ -7,7 +8,9 @@ import { doMovesMatch, TurnHistory } from "../../helper/game-helpers";
 import calcTurnAnimation from "../../view/animation/turn-animation";
 import GamePiece from "../game-logic/game-piece";
 import { Match } from "../match";
-import { ChessPieceMesh, SceneManager, Scenes } from "../scene-manager";
+import { SceneManager, Scenes } from "../scene-manager";
+import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
+import type { ChessPieceMesh } from "../../view/game-assets";
 
 export class Controller {
   sceneManager: SceneManager;
@@ -40,10 +43,13 @@ export class Controller {
   gameInputHandler() {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
-    gameScene.scene.onPointerDown = async (e: any, pickResult: any) => {
-      if (pickResult.pickedMesh !== null) {
-        const mesh: ChessPieceMesh = pickResult.pickedMesh;
-        const isCompleteMove = this.gameInput(mesh);
+    gameScene.scene.onPointerDown = async (
+      e: IPointerEvent,
+      pickResult: PickingInfo
+    ) => {
+      const pickedMesh = pickResult.pickedMesh;
+      if (pickedMesh !== null) {
+        const isCompleteMove = this.gameInput(pickedMesh);
         if (isCompleteMove) {
           const [originPoint, targetPoint] = this.match.current.moves;
           const validTurn = this.match.takeTurn(originPoint, targetPoint);
@@ -74,11 +80,11 @@ export class Controller {
     //If mesh
     if (mesh) {
       if (currentMove.length === 0) {
-        if (mesh.color === currentPlayer) {
+        if (mesh.metadata && mesh.metadata.color === currentPlayer) {
           //If no current move has been selected, and mesh belongs to current player
           displayPieceMoves(mesh, currentMove, game, gameScene);
         }
-      } else if (mesh.color === currentPlayer) {
+      } else if (mesh.metadata && mesh.metadata.color === currentPlayer) {
         //If there is already a mesh selected, and you select another of your own meshes
         const originalPiece = game.lookupPiece(currentMove[0])!;
         const newPiece = game.lookupPiece(
@@ -109,7 +115,7 @@ export class Controller {
             displayPieceMoves(mesh, currentMove, game, gameScene);
           }
         }
-      } else if (mesh.color && mesh.color !== currentPlayer) {
+      } else if (mesh.metadata && mesh.metadata.color !== currentPlayer) {
         //If second selection is an enemy mesh, calculate move of original piece and push move if matches
         const opponentsPiece = game.lookupPiece(
           findIndex([mesh.position.z, mesh.position.x], true)
@@ -169,18 +175,18 @@ export class Controller {
       }
       gameScene.data.meshesToRender = [];
     }
-    //Final Piece Mesh List
-    const meshesList = gameScene.data.finalMeshes.piecesMeshes;
     //For each active piece, creates a mesh clone and places on board
     this.match.game.allPieces().forEach((square) => {
       const { name, color, point } = square.on!;
-      const foundMesh = meshesList.find(
-        (mesh: any) => mesh.name === name && mesh.color === color
+      const foundMesh = gameScene.scene.meshes.find(
+        (mesh) => mesh.name === name && mesh.metadata.color === color
       );
-      const clone = foundMesh!.clone(name, null);
-      [clone!.position.z, clone!.position.x] = findPosition(point, true);
-      clone!.isVisible = true;
-      gameScene.data.meshesToRender.push(clone!);
+      if (!foundMesh) return;
+      const clone = foundMesh.clone(name, null);
+      if (!clone) return;
+      [clone.position.z, clone.position.x] = findPosition(point, true);
+      clone.isVisible = true;
+      gameScene.data.meshesToRender.push(clone);
     });
   }
 

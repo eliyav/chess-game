@@ -15,57 +15,25 @@ import knight from "../../../assets/pieces/knightv3.gltf";
 import pawn from "../../../assets/pieces/pawnv3.gltf";
 import queen from "../../../assets/pieces/queenv3.gltf";
 import rook from "../../../assets/pieces/rookv3.gltf";
-import { ChessPieceMesh } from "../components/scene-manager";
 import { createMeshMaterials } from "./materials";
+import { Material } from "@babylonjs/core";
 
-export const gameAssets = async (scene: Scene) => {
+export const loadGameAssets = async (scene: Scene) => {
   const materials = createMeshMaterials(scene);
-  //Game Scene
-  let meshesToLoad = [king, queen, knight, bishop, rook, pawn];
+  const meshesToLoad = [king, queen, knight, bishop, rook, pawn];
 
   const loadedBoardMesh: ISceneLoaderAsyncResult =
     await SceneLoader.ImportMeshAsync("", board, "");
 
-  const loadedMeshes: ISceneLoaderAsyncResult[] = await Promise.all(
+  const loadedPieceMeshes: ISceneLoaderAsyncResult[] = await Promise.all(
     meshesToLoad.map((mesh) => SceneLoader.ImportMeshAsync("", mesh, ""))
   );
-
-  const piecesMeshes: ChessPieceMesh[] = [];
-  const boardMeshes: AbstractMesh[] = [];
-
-  const loadMeshSettings = (mesh: any, color: string) => {
-    const name: string = mesh.meshes[1].id;
-    let finalMesh: ChessPieceMesh = mesh.meshes[1].clone(name, null)!;
-    finalMesh.name = name;
-    finalMesh.color = color;
-    finalMesh.isPickable = true;
-    (finalMesh.isVisible = false), (finalMesh.scalingDeterminant = 50);
-    finalMesh.position.y = 0.5;
-    finalMesh.name === "Knight" && finalMesh.color === "White"
-      ? (finalMesh.rotation = new Vector3(0, Math.PI, 0))
-      : null;
-    finalMesh.color === "White"
-      ? (finalMesh.material = materials.white)
-      : (finalMesh.material = materials.black);
-
-    return piecesMeshes.push(finalMesh);
-  };
-
-  //Sort the loaded meshes
-  loadedMeshes.forEach((mesh) => {
-    loadMeshSettings(mesh, "White");
-    loadMeshSettings(mesh, "Black");
-  });
 
   loadedBoardMesh.meshes.forEach((mesh, idx) => {
     mesh.isPickable = false;
     if (idx !== 1) {
       mesh.material = materials.board;
     }
-    boardMeshes.push(mesh);
-  });
-
-  boardMeshes.forEach((mesh, idx) => {
     if (idx === 2) {
       const material = new StandardMaterial("light", scene);
       material.diffuseColor = new Color3(0.01, 0.01, 0.01);
@@ -74,5 +42,75 @@ export const gameAssets = async (scene: Scene) => {
     }
   });
 
-  return { piecesMeshes, boardMeshes };
+  const piecesMeshes: ChessPieceMesh[] = [];
+
+  configureChessPieces({
+    finalArray: piecesMeshes,
+    meshes: loadedPieceMeshes,
+    materials: [materials.white, materials.black],
+  });
+
+  return piecesMeshes;
 };
+
+type ChessPieceMetaData = {
+  color: "White" | "Black";
+};
+
+export type ChessPieceMesh = AbstractMesh & { metadata: ChessPieceMetaData };
+
+function configureChessPieces({
+  finalArray,
+  meshes,
+  materials,
+}: {
+  finalArray: ChessPieceMesh[];
+  meshes: ISceneLoaderAsyncResult[];
+  materials: Material[];
+}) {
+  meshes.forEach((mesh) => {
+    try {
+      const name: string = mesh.meshes[1].id;
+      const clone = mesh.meshes[1].clone(name, null);
+      if (clone) {
+        finalArray.push(
+          configure({
+            mesh: clone,
+            material: materials[0],
+            metadata: { color: "White" },
+          })
+        );
+      }
+      const clone2 = mesh.meshes[1].clone(name, null);
+      if (clone2) {
+        finalArray.push(
+          configure({
+            mesh: clone2,
+            material: materials[1],
+            metadata: { color: "Black" },
+          })
+        );
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  });
+}
+
+function configure({
+  mesh,
+  material,
+  metadata,
+}: {
+  mesh: AbstractMesh;
+  material: Material;
+  metadata: ChessPieceMetaData;
+}): ChessPieceMesh {
+  mesh.metadata = metadata;
+  mesh.isPickable = true;
+  mesh.isVisible = false;
+  mesh.scalingDeterminant = 50;
+  mesh.position.y = 0.5;
+  mesh.material = material;
+  return mesh;
+}

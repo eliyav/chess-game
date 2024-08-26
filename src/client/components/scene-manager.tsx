@@ -1,8 +1,8 @@
-import { createHomeScene } from "../view/home-scene";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { AnimationContainer } from "../view/animation/create-animations";
 import { Scene } from "@babylonjs/core/scene";
+import { AnimationContainer } from "../view/animation/create-animations";
+import { createHomeScene } from "../view/home-scene";
 
 export type CustomScene<T> = {
   scene: Scene;
@@ -10,10 +10,6 @@ export type CustomScene<T> = {
 };
 
 export type GameScene = CustomScene<{
-  finalMeshes: {
-    piecesMeshes: ChessPieceMesh[];
-    boardMeshes: AbstractMesh[];
-  };
   meshesToRender: AbstractMesh[];
   animationsContainer: AnimationContainer;
 }>;
@@ -27,11 +23,6 @@ export type ScenesDict = {
   [Scenes.HOME]?: CustomScene<{}>;
   [Scenes.GAME]?: GameScene;
 };
-
-export interface ChessPieceMesh extends AbstractMesh {
-  name: string;
-  color?: string;
-}
 
 export class SceneManager {
   private canvas: HTMLCanvasElement;
@@ -53,7 +44,7 @@ export class SceneManager {
     this.initHomeScene({ setInitialized });
     this.render();
     window.addEventListener("resize", () => this.engine?.resize());
-    this.loadGame();
+    this.initGameScene();
   }
 
   public switchScene(scene: Scenes) {
@@ -90,7 +81,7 @@ export class SceneManager {
     setInitialized();
   }
 
-  private async loadGame() {
+  private async initGameScene() {
     const { gameScene } = await import("../view/game-scene");
     this.scenes[Scenes.GAME] = await gameScene(this.canvas, this.engine);
   }

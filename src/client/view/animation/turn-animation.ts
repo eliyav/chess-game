@@ -154,7 +154,7 @@ export default function calcTurnAnimation(
       const [z, x] = findPosition(newTargetPoint, true);
       duplicate(
         //@ts-ignore
-        gameScene.animationsContainer![name],
+        gameScene.data.animationsContainer[name],
         z,
         x,
         team?.toLocaleLowerCase(),

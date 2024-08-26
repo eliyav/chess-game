@@ -1,9 +1,10 @@
-import Game from "../components/game-logic/game";
 import { Material } from "@babylonjs/core/Materials/material";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import Game from "../components/game-logic/game";
 import { Move } from "../components/game-logic/game-piece";
-import { ChessPieceMesh, GameScene } from "../components/scene-manager";
+import { GameScene } from "../components/scene-manager";
+import type { ChessPieceMesh } from "../view/game-assets";
 
 const displayPieceMoves = (
   mesh: ChessPieceMesh,

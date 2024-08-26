@@ -9,7 +9,7 @@ import { Scene } from "@babylonjs/core/scene.js";
 import { GameScene } from "../components/scene-manager";
 import { createAnimations } from "./animation/create-animations";
 import { createCelestialSphere } from "./celestial-shere/celestial-sphere";
-import { gameAssets } from "./game-assets";
+import { loadGameAssets } from "./game-assets";
 import { createMovementMaterials } from "./materials";
 
 export const gameScene = async (
@@ -57,10 +57,11 @@ export const gameScene = async (
   createCelestialSphere(scene);
   createMovementMaterials(scene);
 
+  await loadGameAssets(scene);
+
   const gameScene = {
     scene,
     data: {
-      finalMeshes: await gameAssets(scene),
       animationsContainer: await createAnimations(scene),
       meshesToRender: [],
     },
