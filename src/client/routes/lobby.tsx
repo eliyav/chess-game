@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useCallback, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
+import { BackButton } from "../components/buttons/back-button";
 import { OfflineLobby } from "../components/lobbys/offline-lobby";
 import { OnlineLobby } from "../components/lobbys/online-lobby";
-import { BackButton } from "../components/buttons/back-button";
 
 export const Lobby: React.FC<{
   socket: Socket;
@@ -59,7 +59,7 @@ export const Lobby: React.FC<{
         <button
           className={"btn glass-light"}
           onClick={() => {
-            navigate("/lobby", { state: lobby });
+            navigate("/game", { state: lobby });
           }}
         >
           Start
