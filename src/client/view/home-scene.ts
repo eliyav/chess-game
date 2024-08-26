@@ -71,7 +71,7 @@ export const createHomeScene = async (
     materials.board
   );
 
-  const requestAnimation = () => {
+  function requestAnimation() {
     boardMesh.rotate(new Vector3(0, -1, 0), 0.004, Space.LOCAL);
     if (boardClone) {
       boardClone.rotate(new Vector3(0, 1, 0), 0.008, Space.LOCAL);
@@ -80,10 +80,14 @@ export const createHomeScene = async (
     displayedMeshes.forEach((mesh) => {
       mesh.animate();
     });
-  };
+  }
 
   scene.onPrePointerObservable.add((pointerInfo) => {
     pointerInfo.skipOnPointerObservable = true;
+  });
+
+  scene.onBeforeRenderObservable.add(() => {
+    requestAnimation();
   });
 
   await scene.whenReadyAsync();
@@ -91,7 +95,6 @@ export const createHomeScene = async (
   return {
     scene,
     data: {},
-    requestAnimation,
   };
 };
 

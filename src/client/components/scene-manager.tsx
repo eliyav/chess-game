@@ -7,7 +7,6 @@ import { Scene } from "@babylonjs/core/scene";
 export type CustomScene<T> = {
   scene: Scene;
   data: T;
-  requestAnimation?: () => void;
 };
 
 export type GameScene = CustomScene<{
@@ -100,7 +99,6 @@ export class SceneManager {
     this.engine.runRenderLoop(() => {
       const scene = this.scenes[this.activeSceneId];
       if (!scene) return;
-      scene.requestAnimation?.();
       scene.scene.render();
     });
   }
