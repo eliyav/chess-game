@@ -72,15 +72,13 @@ export const createHomeScene = async (
   );
 
   const requestAnimation = () => {
-    requestAnimationFrame(() => {
-      boardMesh.rotate(new Vector3(0, -1, 0), 0.004, Space.LOCAL);
-      if (boardClone) {
-        boardClone.rotate(new Vector3(0, 1, 0), 0.008, Space.LOCAL);
-      }
+    boardMesh.rotate(new Vector3(0, -1, 0), 0.004, Space.LOCAL);
+    if (boardClone) {
+      boardClone.rotate(new Vector3(0, 1, 0), 0.008, Space.LOCAL);
+    }
 
-      displayedMeshes.forEach((mesh) => {
-        mesh.animate();
-      });
+    displayedMeshes.forEach((mesh) => {
+      mesh.animate();
     });
   };
 
