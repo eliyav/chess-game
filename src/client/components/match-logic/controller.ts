@@ -54,15 +54,13 @@ export class Controller {
           const [originPoint, targetPoint] = this.match.current.moves;
           const validTurn = this.match.takeTurn(originPoint, targetPoint);
           if (validTurn) {
-            this.turnAnimation(originPoint, targetPoint, validTurn);
+            this.turnAnimation(validTurn);
             const nextTurn = this.match.nextTurn();
             if (validTurn.promotion) this.eventHandlers.promote();
             if (!nextTurn) this.eventHandlers.endMatch();
+          } else {
+            this.onMoveSuccess();
           }
-          this.updateMeshesRender();
-          this.rotateCamera();
-
-          this.match.resetMoves();
         }
       }
     };
@@ -140,6 +138,12 @@ export class Controller {
     this.resetCamera(team);
   }
 
+  onMoveSuccess() {
+    this.updateMeshesRender();
+    this.rotateCamera();
+    this.match.resetMoves();
+  }
+
   undoMove() {
     if (this.match.current.isActive) {
       const isValidUndo = this.match.undoTurn();
@@ -155,12 +159,24 @@ export class Controller {
     this.prepGameScreen();
   }
 
-  turnAnimation(
-    ...props: [originPoint: Point, targetPoint: Point, turnHistory: TurnHistory]
-  ) {
+  turnAnimation(turnHistory: TurnHistory) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
-    return calcTurnAnimation(gameScene, ...props);
+    return calcTurnAnimation({
+      gameScene,
+      onMoveSuccess: this.onMoveSuccess.bind(this),
+      findMeshFromPoint: this.findMeshFromPoint.bind(this),
+      turnHistory,
+    });
+  }
+
+  findMeshFromPoint(point: Point) {
+    const gameScene = this.sceneManager.getScene(Scenes.GAME);
+    if (!gameScene) return;
+    return gameScene.data.meshesToRender.find((mesh) => {
+      const meshPoint = findIndex([mesh.position.z, mesh.position.x], true);
+      return doMovesMatch(meshPoint, point);
+    })!;
   }
 
   updateMeshesRender() {
