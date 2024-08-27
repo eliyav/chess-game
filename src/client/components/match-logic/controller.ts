@@ -11,6 +11,7 @@ import { Match } from "../match";
 import { SceneManager, Scenes } from "../scene-manager";
 import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
 import type { ChessPieceMesh } from "../../view/game-assets";
+import type { Nullable } from "@babylonjs/core/types";
 
 export class Controller {
   sceneManager: SceneManager;
@@ -43,12 +44,12 @@ export class Controller {
   gameInputHandler() {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
-    gameScene.scene.onPointerDown = async (
+    gameScene.scene.onPointerUp = async (
       e: IPointerEvent,
-      pickResult: PickingInfo
+      pickResult: Nullable<PickingInfo>
     ) => {
-      const pickedMesh = pickResult.pickedMesh;
-      if (pickedMesh !== null) {
+      const pickedMesh = pickResult?.pickedMesh;
+      if (pickedMesh !== null && pickedMesh !== undefined) {
         const isCompleteMove = this.gameInput(pickedMesh);
         if (isCompleteMove) {
           const [originPoint, targetPoint] = this.match.current.moves;
@@ -176,7 +177,7 @@ export class Controller {
     return gameScene.data.meshesToRender.find((mesh) => {
       const meshPoint = findIndex([mesh.position.z, mesh.position.x], true);
       return doMovesMatch(meshPoint, point);
-    })!;
+    });
   }
 
   updateMeshesRender() {
