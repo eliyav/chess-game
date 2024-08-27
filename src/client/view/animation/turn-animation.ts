@@ -1,8 +1,9 @@
+import { AbstractMesh, AssetContainer } from "@babylonjs/core";
+import { Animation } from "@babylonjs/core/Animations/animation.js";
+import GamePiece from "../../components/game-logic/game-piece";
 import { GameScene } from "../../components/scene-manager";
 import { findIndex, findPosition } from "../../helper/canvas-helpers";
 import { doMovesMatch, TurnHistory } from "../../helper/game-helpers";
-import { createMeshMaterials } from "../materials";
-import { Animation } from "@babylonjs/core/Animations/animation.js";
 
 export default function calcTurnAnimation(
   gameScene: GameScene,
@@ -10,8 +11,6 @@ export default function calcTurnAnimation(
   targetPoint: Point,
   turnHistory: TurnHistory
 ) {
-  const materials = createMeshMaterials(gameScene.scene);
-
   const movingMesh = findMeshFromPoint(originPoint);
   const targetMesh = findMeshFromPoint(targetPoint);
 
@@ -25,7 +24,14 @@ export default function calcTurnAnimation(
       : animateMovement(movingMesh, true);
   }
   //Animate Target Piece breaking animation
-  pieceBreakAnimation(turnHistory);
+  if (
+    turnHistory.targetPiece &&
+    (turnHistory.type === "standard" || turnHistory.type === "enPassant")
+  ) {
+    pieceBreakAnimation({
+      target: turnHistory.targetPiece,
+    });
+  }
 
   function animateMovement(mesh: any, slide: boolean) {
     let position;
@@ -134,56 +140,54 @@ export default function calcTurnAnimation(
     gameScene.scene.beginAnimation(mesh, 0, frameRate, false);
   }
 
-  function pieceBreakAnimation(resolved: TurnHistory) {
-    if (
-      (resolved.type === "standard" && resolved.targetPiece) ||
-      resolved.type === "enPassant"
-    ) {
-      //Look up animation group based on piece breaking,
-      const name = resolved.targetPiece?.name;
-      const team = resolved.targetPiece?.color;
-      let newTargetPoint = resolved.targetPiece?.point!;
+  function pieceBreakAnimation({ target }: { target: GamePiece }) {
+    //Look up animation group based on piece breaking,
+    const { name, color: team, point } = target;
+    const targetMesh = gameScene.data.meshesToRender.find((mesh) => {
+      const meshPoint = findIndex([mesh.position.z, mesh.position.x], true);
+      return doMovesMatch(meshPoint, point);
+    });
 
-      const targetMesh = gameScene.data.meshesToRender.find((mesh) => {
-        const meshPoint = findIndex([mesh.position.z, mesh.position.x], true);
-        return doMovesMatch(meshPoint, newTargetPoint);
-      });
-
-      removeMesh(targetMesh);
-
-      const [z, x] = findPosition(newTargetPoint, true);
-      duplicate(
-        //@ts-ignore
-        gameScene.data.animationsContainer[name],
-        z,
-        x,
-        team?.toLocaleLowerCase(),
-        2000
-      );
+    if (targetMesh) {
+      gameScene.scene.removeMesh(targetMesh);
     }
-    //Function to play the full animation and then dispose resources
-    //@ts-ignore
-    function duplicate(container, z, x, team, delay) {
-      let entries = container.instantiateModelsToScene();
-      entries.rootNodes.forEach((mesh: any) =>
-        mesh
-          .getChildMeshes()
-          //@ts-ignore
-          .forEach((mesh2: any) => (mesh2.material = materials[team]))
-      );
-      for (var node of entries.rootNodes) {
-        node.position.y = 0.4;
-        node.position.x = -x;
-        node.position.z = z;
-      }
+    const animationContainer = gameScene.data.animationsContainer[name];
+    animatePieceBreak({
+      container: animationContainer,
+      point,
+      team,
+    });
+  }
 
-      for (var group of entries.animationGroups) {
-        group.play();
-      }
-
-      setTimeout(() => {
-        entries.rootNodes[0].dispose();
-      }, delay);
+  function animatePieceBreak({
+    container,
+    point,
+    team,
+  }: {
+    container: AssetContainer;
+    point: Point;
+    team: string;
+  }) {
+    const [z, x] = findPosition(point, true);
+    const material = gameScene.scene.getMaterialByName(
+      team.toLocaleLowerCase()
+    );
+    const entries = container.instantiateModelsToScene();
+    const LastAnimation = entries.animationGroups.at(-1);
+    if (LastAnimation) {
+      LastAnimation.onAnimationGroupEndObservable.addOnce(() => {
+        entries.dispose();
+      });
+    }
+    entries.rootNodes.forEach((node) => {
+      const mesh = node as AbstractMesh;
+      mesh.getChildMeshes().forEach((mesh) => (mesh.material = material));
+      mesh.position.y = 0.4;
+      mesh.position.x = -x;
+      mesh.position.z = z;
+    });
+    for (const group of entries.animationGroups) {
+      group.play();
     }
   }
 
@@ -192,10 +196,5 @@ export default function calcTurnAnimation(
       const meshPoint = findIndex([mesh.position.z, mesh.position.x], true);
       return doMovesMatch(meshPoint, point);
     })!;
-  }
-
-  function removeMesh(mesh: any) {
-    gameScene.scene.removeMesh(mesh);
-    mesh.dispose();
   }
 }

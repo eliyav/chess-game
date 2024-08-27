@@ -10,7 +10,7 @@ import { GameScene } from "../components/scene-manager";
 import { createAnimations } from "./animation/create-animations";
 import { createCelestialSphere } from "./celestial-shere/celestial-sphere";
 import { loadGameAssets } from "./game-assets";
-import { createMovementMaterials } from "./materials";
+import { createMeshMaterials, createMovementMaterials } from "./materials";
 
 export const gameScene = async (
   canvas: HTMLCanvasElement,
@@ -56,14 +56,15 @@ export const gameScene = async (
 
   createCelestialSphere(scene);
   createMovementMaterials(scene);
+  createMeshMaterials(scene);
 
   await loadGameAssets(scene);
 
   const gameScene = {
     scene,
     data: {
-      animationsContainer: await createAnimations(scene),
       meshesToRender: [],
+      animationsContainer: await createAnimations(scene),
     },
   };
 

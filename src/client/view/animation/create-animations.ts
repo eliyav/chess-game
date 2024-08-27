@@ -1,15 +1,12 @@
-import {
-  ISceneLoaderAsyncResult,
-  SceneLoader,
-} from "@babylonjs/core/Loading/sceneLoader";
-import pawnAnimation from "../../../../assets/piece-animations/pawn-animation.gltf";
-import rookAnimation from "../../../../assets/piece-animations/rook-animation.gltf";
+import "@babylonjs/core/Animations/animatable.js";
+import { AssetContainer } from "@babylonjs/core/assetContainer";
+import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
+import { Scene } from "@babylonjs/core/scene";
 import bishopAnimation from "../../../../assets/piece-animations/bishop-animation.gltf";
 import knightAnimation from "../../../../assets/piece-animations/knight-animation.gltf";
+import pawnAnimation from "../../../../assets/piece-animations/pawn-animation.gltf";
 import queenAnimation from "../../../../assets/piece-animations/queen-animation.gltf";
-import { AssetContainer } from "@babylonjs/core/assetContainer";
-import { Scene } from "@babylonjs/core/scene";
-import "@babylonjs/core/Animations/animatable.js";
+import rookAnimation from "../../../../assets/piece-animations/rook-animation.gltf";
 
 const animationsGltf = [
   { id: "Pawn", animation: pawnAnimation },
@@ -20,34 +17,22 @@ const animationsGltf = [
 ];
 
 export async function createAnimations(scene: Scene) {
-  const animationPromises = animationsGltf.map((piece) => {
-    return SceneLoader.ImportMeshAsync("", piece.animation, "");
-  });
-  const loadedAnimations = await Promise.all(animationPromises);
-  loadedAnimations.forEach((animation) => {
-    animation.animationGroups.forEach((group) => {
-      group.loopAnimation = false;
-    });
-  });
-  const animations = animationsGltf.reduce<
-    Record<string, ISceneLoaderAsyncResult>
-  >((acc, curr, idx) => {
-    acc[curr.id] = loadedAnimations[idx];
-    return acc;
-  }, {});
-
-  const animationsContainer = Object.entries(
-    animations
-  ).reduce<AnimationContainer>((acc, [key, value]) => {
-    const container = new AssetContainer(scene);
-    value.meshes.forEach((mesh) => container.meshes.push(mesh));
-    value.animationGroups.forEach((anim) =>
-      container.animationGroups.push(anim)
-    );
-    container.removeAllFromScene();
-    acc[key] = container;
-    return acc;
-  }, {});
+  const loadedAnimations = await Promise.all(
+    animationsGltf.map(async (piece) => {
+      return SceneLoader.ImportMeshAsync("", piece.animation, "");
+    })
+  );
+  const animationsContainer = loadedAnimations.reduce<AnimationContainer>(
+    (acc, animation, i) => {
+      const container = new AssetContainer(scene);
+      container.meshes.push(...animation.meshes);
+      container.animationGroups.push(...animation.animationGroups);
+      container.removeAllFromScene();
+      acc[animationsGltf[i].id] = container;
+      return acc;
+    },
+    {}
+  );
 
   return animationsContainer;
 }

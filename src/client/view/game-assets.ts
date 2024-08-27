@@ -112,5 +112,8 @@ function configure({
   mesh.scalingDeterminant = 50;
   mesh.position.y = 0.5;
   mesh.material = material;
+  if (mesh.name === "Knight" && mesh.metadata.color === "White") {
+    mesh.rotation = new Vector3(0, Math.PI, 0);
+  }
   return mesh;
 }
