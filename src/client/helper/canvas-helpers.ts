@@ -88,17 +88,23 @@ const findByPoint = ({
   point: Point;
   externalMesh: boolean;
 }) => {
-  const [x, y] = point;
-  const map = get === "index" ? pointIndexMap : pointPositionMap;
-  const positionX = map.get(x);
-  const positionY = map.get(y);
-  if (!positionX || !positionY) {
-    throw new Error("Invalid position");
+  try {
+    const [x, y] = point;
+    const map = get === "index" ? pointIndexMap : pointPositionMap;
+    const positionX = map.get(x);
+    const positionY = map.get(y);
+    if (!positionX || !positionY) {
+      throw new Error("Invalid position");
+    }
+    //External Meshes have flipped Y coordinates on canvas from blender import
+    const finalY = externalMesh ? positionY.externalY : positionY.y;
+    const result: Point = [positionX.x, finalY];
+    return result;
+  } catch (error) {
+    console.error(error);
+    //# Refactor this error handling
+    return point;
   }
-  //External Meshes have flipped Y coordinates on canvas from blender import
-  const finalY = externalMesh ? positionY.externalY : positionY.y;
-  const result: Point = [positionX.x, finalY];
-  return result;
 };
 
 export { displayPieceMoves, findByPoint };
