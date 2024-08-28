@@ -1,5 +1,4 @@
 import { PickingInfo } from "@babylonjs/core/Collisions/pickingInfo";
-import { displayPieceMoves, findByPoint } from "../../helper/canvas-helpers";
 import { doMovesMatch, TurnHistory } from "../../helper/game-helpers";
 import calcTurnAnimation from "../../view/animation/turn-animation";
 import GamePiece from "../game-logic/game-piece";
@@ -8,6 +7,7 @@ import { SceneManager, Scenes } from "../scene-manager";
 import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
 import type { ChessPieceMesh } from "../../view/game-assets";
 import type { Nullable } from "@babylonjs/core/types";
+import { displayPieceMoves, findByPoint } from "../../view/scene-helpers";
 
 export class Controller {
   sceneManager: SceneManager;
@@ -74,10 +74,22 @@ export class Controller {
     const { game } = this.match;
     //If mesh
     if (mesh) {
+      //This was in displayPieceMoves, but moved here to avoid duplicate code
+
       if (currentMove.length === 0) {
         if (mesh.metadata && mesh.metadata.color === currentPlayer) {
+          const piece = game.lookupPiece(
+            findByPoint({
+              get: "index",
+              point: [mesh.position.z, mesh.position.x],
+              externalMesh: true,
+            })
+          );
+          if (!piece) return false;
+          const movesToDisplay = game.getValidMoves(piece);
           //If no current move has been selected, and mesh belongs to current player
-          displayPieceMoves(mesh, currentMove, game, gameScene);
+          currentMove.push(piece.point);
+          displayPieceMoves({ piece, moves: movesToDisplay, gameScene });
         }
       } else if (mesh.metadata && mesh.metadata.color === currentPlayer) {
         //If there is already a mesh selected, and you select another of your own meshes
@@ -105,13 +117,33 @@ export class Controller {
               //If rook is selected second and not castling, show rooks moves
               currentMove.length = 0;
               this.updateMeshesRender();
-              displayPieceMoves(mesh, currentMove, game, gameScene);
+              const piece = game.lookupPiece(
+                findByPoint({
+                  get: "index",
+                  point: [mesh.position.z, mesh.position.x],
+                  externalMesh: true,
+                })
+              );
+              if (!piece) return false;
+              const movesToDisplay = game.getValidMoves(piece);
+              currentMove.push(piece.point);
+              displayPieceMoves({ piece, moves: movesToDisplay, gameScene });
             }
           } else {
             //If second selected piece is not a castling piece
             currentMove.length = 0;
             this.updateMeshesRender();
-            displayPieceMoves(mesh, currentMove, game, gameScene);
+            const piece = game.lookupPiece(
+              findByPoint({
+                get: "index",
+                point: [mesh.position.z, mesh.position.x],
+                externalMesh: true,
+              })
+            );
+            if (!piece) return false;
+            const movesToDisplay = game.getValidMoves(piece);
+            currentMove.push(piece.point);
+            displayPieceMoves({ piece, moves: movesToDisplay, gameScene });
           }
         }
       } else if (mesh.metadata && mesh.metadata.color !== currentPlayer) {

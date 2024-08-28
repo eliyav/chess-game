@@ -3,7 +3,7 @@ import { Animation } from "@babylonjs/core/Animations/animation.js";
 import GamePiece from "../../components/game-logic/game-piece";
 import { GameScene } from "../../components/scene-manager";
 import { doMovesMatch, TurnHistory } from "../../helper/game-helpers";
-import { findByPoint } from "../../helper/canvas-helpers";
+import { findByPoint } from "../scene-helpers";
 
 export default function calcTurnAnimation({
   gameScene,

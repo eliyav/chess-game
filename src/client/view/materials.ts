@@ -3,26 +3,41 @@ import { Scene } from "@babylonjs/core/scene.js";
 import { FresnelParameters } from "@babylonjs/core/Materials/fresnelParameters.js";
 import { Color3 } from "@babylonjs/core/Maths/math.color.js";
 
+const materials = [
+  {
+    name: "piece",
+    diffuseColor: new Color3(0, 1, 0.2),
+    specularColor: new Color3(0.15, 0.15, 0.15),
+  },
+  {
+    name: "movement",
+    diffuseColor: new Color3(1, 0.64, 0),
+    specularColor: new Color3(0.15, 0.15, 0.15),
+  },
+  {
+    name: "capture",
+    diffuseColor: new Color3(1, 0, 0),
+    specularColor: new Color3(0.15, 0.15, 0.15),
+  },
+  {
+    name: "enPassant",
+    diffuseColor: new Color3(1, 0, 1),
+    specularColor: new Color3(0.15, 0.15, 0.15),
+  },
+  {
+    name: "castling",
+    diffuseColor: new Color3(0, 0.2, 0.8),
+    specularColor: new Color3(0.15, 0.15, 0.15),
+  },
+];
+
 function createMovementMaterials(scene: Scene): void {
-  const greenMat = new StandardMaterial("greenMat", scene);
-  greenMat.diffuseColor = new Color3(0, 1, 0.2);
-  greenMat.specularColor = new Color3(0.15, 0.15, 0.15);
-
-  const orangeMat = new StandardMaterial("orangeMat", scene);
-  orangeMat.diffuseColor = new Color3(1, 0.64, 0);
-  orangeMat.specularColor = new Color3(0.15, 0.15, 0.15);
-
-  const redMat = new StandardMaterial("redMat", scene);
-  redMat.diffuseColor = new Color3(1, 0, 0);
-  redMat.specularColor = new Color3(0.15, 0.15, 0.15);
-
-  const purpleMat = new StandardMaterial("purpleMat", scene);
-  purpleMat.diffuseColor = new Color3(1, 0, 1);
-  purpleMat.specularColor = new Color3(0.15, 0.15, 0.15);
-
-  const blueMat = new StandardMaterial("blueMat", scene);
-  blueMat.diffuseColor = new Color3(0, 0.2, 0.8);
-  blueMat.specularColor = new Color3(0.15, 0.15, 0.15);
+  materials.forEach((material) => {
+    const { name, diffuseColor, specularColor } = material;
+    const mat = new StandardMaterial(name, scene);
+    mat.diffuseColor = diffuseColor;
+    mat.specularColor = specularColor;
+  });
 }
 
 type Materials = {
