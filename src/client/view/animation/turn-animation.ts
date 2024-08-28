@@ -2,8 +2,8 @@ import { AbstractMesh, AssetContainer } from "@babylonjs/core";
 import { Animation } from "@babylonjs/core/Animations/animation.js";
 import GamePiece from "../../components/game-logic/game-piece";
 import { GameScene } from "../../components/scene-manager";
-import { findIndex, findPosition } from "../../helper/canvas-helpers";
 import { doMovesMatch, TurnHistory } from "../../helper/game-helpers";
+import { findByPoint } from "../../helper/canvas-helpers";
 
 export default function calcTurnAnimation({
   gameScene,
@@ -57,8 +57,16 @@ export default function calcTurnAnimation({
         const direction = turnHistory.direction!;
         const newKingX = x + direction * 2;
         const newKingPoint: Point = [newKingX, y];
-        position = findPosition(origin, true);
-        targetPosition = findPosition(newKingPoint, true);
+        position = findByPoint({
+          get: "position",
+          point: origin,
+          externalMesh: true,
+        });
+        targetPosition = findByPoint({
+          get: "position",
+          point: newKingPoint,
+          externalMesh: true,
+        });
       } else if (turnHistory.type === "castling" && mesh.name === "Rook") {
         const {
           point: [x, y],
@@ -66,11 +74,27 @@ export default function calcTurnAnimation({
         const direction = turnHistory.direction!;
         const newRookX = x + direction;
         const newRookPoint: Point = [newRookX, y];
-        position = findPosition(target, true);
-        targetPosition = findPosition(newRookPoint, true);
+        position = findByPoint({
+          get: "position",
+          point: target,
+          externalMesh: true,
+        });
+        targetPosition = findByPoint({
+          get: "position",
+          point: newRookPoint,
+          externalMesh: true,
+        });
       } else {
-        position = findPosition(origin, true);
-        targetPosition = findPosition(target, true);
+        position = findByPoint({
+          get: "position",
+          point: origin,
+          externalMesh: true,
+        });
+        targetPosition = findByPoint({
+          get: "position",
+          point: target,
+          externalMesh: true,
+        });
       }
 
       const frameRate = 1;
@@ -166,7 +190,11 @@ export default function calcTurnAnimation({
     //Look up animation group based on piece breaking,
     const { name, color: team, point } = target;
     const targetMesh = gameScene.data.meshesToRender.find((mesh) => {
-      const meshPoint = findIndex([mesh.position.z, mesh.position.x], true);
+      const meshPoint = findByPoint({
+        get: "index",
+        point: [mesh.position.z, mesh.position.x],
+        externalMesh: true,
+      });
       return doMovesMatch(meshPoint, point);
     });
 
@@ -190,7 +218,11 @@ export default function calcTurnAnimation({
     point: Point;
     team: string;
   }) {
-    const [z, x] = findPosition(point, true);
+    const [z, x] = findByPoint({
+      get: "position",
+      point,
+      externalMesh: true,
+    });
     const material = gameScene.scene.getMaterialByName(
       team.toLocaleLowerCase()
     );

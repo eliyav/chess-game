@@ -1,9 +1,5 @@
 import { PickingInfo } from "@babylonjs/core/Collisions/pickingInfo";
-import {
-  displayPieceMoves,
-  findIndex,
-  findPosition,
-} from "../../helper/canvas-helpers";
+import { displayPieceMoves, findByPoint } from "../../helper/canvas-helpers";
 import { doMovesMatch, TurnHistory } from "../../helper/game-helpers";
 import calcTurnAnimation from "../../view/animation/turn-animation";
 import GamePiece from "../game-logic/game-piece";
@@ -87,7 +83,11 @@ export class Controller {
         //If there is already a mesh selected, and you select another of your own meshes
         const originalPiece = game.lookupPiece(currentMove[0])!;
         const newPiece = game.lookupPiece(
-          findIndex([mesh.position.z, mesh.position.x], true)
+          findByPoint({
+            get: "index",
+            point: [mesh.position.z, mesh.position.x],
+            externalMesh: true,
+          })
         )!;
         if (originalPiece === newPiece) {
           //If both selected pieces are the same, reset current move
@@ -117,7 +117,11 @@ export class Controller {
       } else if (mesh.metadata && mesh.metadata.color !== currentPlayer) {
         //If second selection is an enemy mesh, calculate move of original piece and push move if matches
         const opponentsPiece = game.lookupPiece(
-          findIndex([mesh.position.z, mesh.position.x], true)
+          findByPoint({
+            get: "index",
+            point: [mesh.position.z, mesh.position.x],
+            externalMesh: true,
+          })
         )!;
         const originalPiece = game.lookupPiece(currentMove[0])!;
         const isValidMove = game
@@ -126,7 +130,11 @@ export class Controller {
         isValidMove ? currentMove.push(opponentsPiece.point) : null;
       } else if (mesh.id === "plane") {
         //If the second mesh selected is one of the movement squares
-        const point = findIndex([mesh.position.z, mesh.position.x], false);
+        const point = findByPoint({
+          get: "index",
+          point: [mesh.position.z, mesh.position.x],
+          externalMesh: false,
+        });
         currentMove.push(point);
       }
       //If complete move return true
@@ -175,7 +183,11 @@ export class Controller {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
     return gameScene.data.meshesToRender.find((mesh) => {
-      const meshPoint = findIndex([mesh.position.z, mesh.position.x], true);
+      const meshPoint = findByPoint({
+        get: "index",
+        point: [mesh.position.z, mesh.position.x],
+        externalMesh: true,
+      });
       return doMovesMatch(meshPoint, point);
     });
   }
@@ -201,7 +213,11 @@ export class Controller {
       if (!foundMesh) return;
       const clone = foundMesh.clone(name, null);
       if (!clone) return;
-      [clone.position.z, clone.position.x] = findPosition(point, true);
+      [clone.position.z, clone.position.x] = findByPoint({
+        get: "position",
+        point,
+        externalMesh: true,
+      });
       clone.isVisible = true;
       gameScene.data.meshesToRender.push(clone);
     });
