@@ -101,7 +101,7 @@ export const findByPoint = ({
     const result: Point = [positionX.x, finalY];
     return result;
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     //# Refactor this error handling
     return point;
   }

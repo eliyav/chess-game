@@ -77,7 +77,6 @@ export const GameView: React.FC<{
         <PromotionModal
           submitSelection={(e) => {
             controller.setPromotionPiece(e.target.innerText);
-            controller.updateMeshesRender();
             setPromotion(false);
           }}
         />

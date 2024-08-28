@@ -1,5 +1,3 @@
-import { TurnHistory } from "../helper/game-helpers";
-import { Timer } from "./match-logic/timer";
 import Game from "./game-logic/game";
 
 export class Match {
@@ -8,7 +6,6 @@ export class Match {
     teams: string[];
     turn: number;
     player: { id: string };
-    moves: Point[];
     isActive: boolean;
   };
 
@@ -23,7 +20,6 @@ export class Match {
       teams: ["White", "Black"],
       turn: 1,
       player: { id: "White" },
-      moves: [],
       isActive: false,
     };
     return matchDefaults;
@@ -76,10 +72,6 @@ export class Match {
       return true;
     }
     return false;
-  }
-
-  resetMoves() {
-    this.current.moves = [];
   }
 
   getWinningTeam() {
