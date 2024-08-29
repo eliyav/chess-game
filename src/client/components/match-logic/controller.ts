@@ -65,13 +65,17 @@ export class Controller {
     };
   }
 
-  displayMoves(piece: GamePiece) {
+  displayMoves(piece: GamePiece | undefined) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
-    const moves = this.match.game.getValidMoves(piece);
-    this.selectedPiece = piece;
-    this.updateMeshesRender();
-    displayPieceMoves({ piece, moves, gameScene });
+    if (!piece) return;
+    const currentPlayersPiece = this.currentPlayerPiece(piece);
+    if (currentPlayersPiece) {
+      const moves = this.match.game.getValidMoves(piece);
+      this.selectedPiece = piece;
+      this.updateMeshesRender();
+      displayPieceMoves({ piece, moves, gameScene });
+    }
   }
 
   lookUpPiece(pickedMesh: AbstractMesh, externalMesh: boolean) {
@@ -84,25 +88,25 @@ export class Controller {
     );
   }
 
+  currentPlayerPiece(pickedPiece: GamePiece | undefined) {
+    if (!pickedPiece) return false;
+    const currentPlayer = this.match.current.player.id;
+    return pickedPiece.color === currentPlayer;
+  }
+
   gameInput(pickedMesh: AbstractMesh) {
     const {
       player: { id: currentPlayer },
     } = this.match.current;
     const { game } = this.match;
     //If no selection
-    const isGamePiece = pickedMesh.metadata;
+    const isGamePiece = pickedMesh.metadata && pickedMesh.metadata.color;
     const pickedPiece = this.lookUpPiece(pickedMesh, isGamePiece);
     if (!this.selectedPiece) {
-      //If no previous selected piece, check if picked mesh is a piece of the current player and display its moves, and set as selected piece
-      if (pickedMesh.metadata && pickedMesh.metadata.color === currentPlayer) {
-        if (!pickedPiece) return false;
-        this.displayMoves(pickedPiece);
-      }
+      this.displayMoves(pickedPiece);
     } else {
       //If there is a selected piece
-      const pickedCurrentPlayerPiece =
-        pickedMesh.metadata && pickedMesh.metadata.color === currentPlayer;
-      if (pickedCurrentPlayerPiece) {
+      if (this.currentPlayerPiece(pickedPiece)) {
         //If there is already a mesh selected, and you select another of your own meshes
         const originalPiece = this.selectedPiece;
         if (!pickedPiece) return false;
@@ -129,7 +133,7 @@ export class Controller {
           }
         }
         return false;
-      } else if (!pickedCurrentPlayerPiece && pickedMesh.metadata) {
+      } else if (!this.currentPlayerPiece(pickedPiece)) {
         //If second selection is an enemy mesh, calculate move of original piece and push move if matches
         if (!pickedPiece) return false;
         const validMove = game.isValidMove(
