@@ -104,6 +104,11 @@ export class Controller {
     return pickedPiece.color === currentPlayer;
   }
 
+  unselectCurrentPiece() {
+    this.selectedPiece = undefined;
+    this.updateMeshesRender();
+  }
+
   handlePieceInput(pickedPiece: GamePiece, resolve: (point: Point[]) => void) {
     const { game } = this.match;
     //If no selection
@@ -112,20 +117,21 @@ export class Controller {
     } else {
       if (this.currentPlayerPiece(pickedPiece)) {
         //If there is already a mesh selected, and you select another of your own meshes
-        const originalPiece = this.selectedPiece;
-        if (originalPiece === pickedPiece) {
-          this.selectedPiece = undefined;
-          return this.updateMeshesRender();
+        if (this.selectedPiece === pickedPiece) {
+          return this.unselectCurrentPiece();
         } else {
           // Check for castling
-          if (pickedPiece.name === "Rook" && originalPiece.name === "King") {
+          if (
+            pickedPiece.name === "Rook" &&
+            this.selectedPiece.name === "King"
+          ) {
             const castling = game.isValidMove(
-              originalPiece,
+              this.selectedPiece,
               pickedPiece.point,
               true
             );
             if (castling) {
-              return resolve([originalPiece.point, pickedPiece.point]);
+              return resolve([this.selectedPiece.point, pickedPiece.point]);
             } else {
               return this.displayMoves(pickedPiece);
             }
