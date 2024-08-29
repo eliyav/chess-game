@@ -54,6 +54,7 @@ export class CelestialSphere {
 
     // Add empty celestial sphere mesh.
     const starMesh = new Mesh("starMesh", scene);
+    starMesh.isPickable = false;
     starMesh.alphaIndex = 20;
 
     // Mesh vertex data arrays.
@@ -171,6 +172,7 @@ export class CelestialSphere {
       scene
     );
     tube.alphaIndex = 0;
+    tube.isPickable = false;
     const tubeTexture = new Texture(tubeUrl, scene, true, false);
     tubeTexture.vScale = -1;
     tube.parent = tubeChildXform;
