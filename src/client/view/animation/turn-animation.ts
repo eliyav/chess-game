@@ -5,14 +5,12 @@ import { GameScene } from "../../components/scene-manager";
 import { doMovesMatch, TurnHistory } from "../../helper/game-helpers";
 import { findByPoint } from "../scene-helpers";
 
-export default function calcTurnAnimation({
+export default async function calcTurnAnimation({
   gameScene,
-  onMoveSuccess,
   findMeshFromPoint,
   turnHistory,
 }: {
   gameScene: GameScene;
-  onMoveSuccess: () => void;
   findMeshFromPoint: (point: Point) => AbstractMesh | undefined;
   turnHistory: TurnHistory;
 }) {
@@ -21,16 +19,6 @@ export default function calcTurnAnimation({
 
   if (!movingMesh) return;
 
-  //Animate Piece Movement
-  const animateZ = movingMesh.name === "Knight" ? false : true;
-  if (turnHistory.type === "castling") {
-    const targetMesh = findMeshFromPoint(target);
-    if (!targetMesh) return;
-    animateMovements({ meshes: [movingMesh, targetMesh], animateZ });
-  } else {
-    animateMovements({ meshes: [movingMesh], animateZ });
-  }
-  //Animate Target Piece breaking animation
   if (
     turnHistory.targetPiece &&
     (turnHistory.type === "standard" || turnHistory.type === "enPassant")
@@ -40,6 +28,20 @@ export default function calcTurnAnimation({
     });
   }
 
+  //Animate Piece Movement
+  const animateZ = movingMesh.name === "Knight" ? false : true;
+  if (turnHistory.type === "castling") {
+    const targetMesh = findMeshFromPoint(target);
+    if (!targetMesh) return;
+    return await animateMovements({
+      meshes: [movingMesh, targetMesh],
+      animateZ,
+    });
+  } else {
+    return await animateMovements({ meshes: [movingMesh], animateZ });
+  }
+  //Animate Target Piece breaking animation
+
   function animateMovements({
     meshes,
     animateZ,
@@ -47,142 +49,144 @@ export default function calcTurnAnimation({
     meshes: AbstractMesh[];
     animateZ: boolean;
   }) {
-    meshes.forEach((mesh, i) => {
-      let position;
-      let targetPosition;
-      if (turnHistory.type === "castling" && mesh.name === "King") {
-        const {
-          point: [x, y],
-        } = turnHistory.originPiece!;
-        const direction = turnHistory.direction!;
-        const newKingX = x + direction * 2;
-        const newKingPoint: Point = [newKingX, y];
-        position = findByPoint({
-          get: "position",
-          point: origin,
-          externalMesh: true,
-        });
-        targetPosition = findByPoint({
-          get: "position",
-          point: newKingPoint,
-          externalMesh: true,
-        });
-      } else if (turnHistory.type === "castling" && mesh.name === "Rook") {
-        const {
-          point: [x, y],
-        } = turnHistory.originPiece!;
-        const direction = turnHistory.direction!;
-        const newRookX = x + direction;
-        const newRookPoint: Point = [newRookX, y];
-        position = findByPoint({
-          get: "position",
-          point: target,
-          externalMesh: true,
-        });
-        targetPosition = findByPoint({
-          get: "position",
-          point: newRookPoint,
-          externalMesh: true,
-        });
-      } else {
-        position = findByPoint({
-          get: "position",
-          point: origin,
-          externalMesh: true,
-        });
-        targetPosition = findByPoint({
-          get: "position",
-          point: target,
-          externalMesh: true,
-        });
-      }
-
-      const frameRate = 1;
-
-      const myAnimX = new Animation(
-        "moveSquaresX",
-        "position.x",
-        frameRate,
-        Animation.ANIMATIONTYPE_FLOAT,
-        Animation.ANIMATIONLOOPMODE_CONSTANT,
-        false
-      );
-
-      const myAnimY = new Animation(
-        "moveSquaresZ",
-        "position.z",
-        frameRate,
-        Animation.ANIMATIONTYPE_FLOAT,
-        Animation.ANIMATIONLOOPMODE_CONSTANT,
-        false
-      );
-
-      const myAnimZ = new Animation(
-        "moveSquaresY",
-        "position.y",
-        frameRate,
-        Animation.ANIMATIONTYPE_FLOAT,
-        Animation.ANIMATIONLOOPMODE_CONSTANT,
-        false
-      );
-
-      const keyFramesX = [
-        {
-          frame: 0,
-          value: position[1],
-        },
-        {
-          frame: frameRate,
-          value: targetPosition[1],
-        },
-      ];
-
-      const keyFramesY = [
-        {
-          frame: 0,
-          value: position[0],
-        },
-        {
-          frame: frameRate,
-          value: targetPosition[0],
-        },
-      ];
-
-      const keyFramesZ = [
-        {
-          frame: 0,
-          value: 0.5,
-        },
-        {
-          frame: frameRate / 2,
-          value: 5,
-        },
-        {
-          frame: frameRate,
-          value: 0.5,
-        },
-      ];
-
-      myAnimX.setKeys(keyFramesX);
-      myAnimY.setKeys(keyFramesY);
-      myAnimZ.setKeys(keyFramesZ);
-
-      const animations = animateZ
-        ? [myAnimX, myAnimY]
-        : [myAnimX, myAnimY, myAnimZ];
-
-      gameScene.scene.beginDirectAnimation(
-        mesh,
-        animations,
-        0,
-        frameRate,
-        false,
-        undefined,
-        () => {
-          const lastMesh = meshes.length - 1 === i;
-          if (lastMesh) onMoveSuccess();
+    return new Promise<void>((resolve) => {
+      meshes.forEach((mesh, i) => {
+        let position;
+        let targetPosition;
+        if (turnHistory.type === "castling" && mesh.name === "King") {
+          const {
+            point: [x, y],
+          } = turnHistory.originPiece!;
+          const direction = turnHistory.direction!;
+          const newKingX = x + direction * 2;
+          const newKingPoint: Point = [newKingX, y];
+          position = findByPoint({
+            get: "position",
+            point: origin,
+            externalMesh: true,
+          });
+          targetPosition = findByPoint({
+            get: "position",
+            point: newKingPoint,
+            externalMesh: true,
+          });
+        } else if (turnHistory.type === "castling" && mesh.name === "Rook") {
+          const {
+            point: [x, y],
+          } = turnHistory.originPiece!;
+          const direction = turnHistory.direction!;
+          const newRookX = x + direction;
+          const newRookPoint: Point = [newRookX, y];
+          position = findByPoint({
+            get: "position",
+            point: target,
+            externalMesh: true,
+          });
+          targetPosition = findByPoint({
+            get: "position",
+            point: newRookPoint,
+            externalMesh: true,
+          });
+        } else {
+          position = findByPoint({
+            get: "position",
+            point: origin,
+            externalMesh: true,
+          });
+          targetPosition = findByPoint({
+            get: "position",
+            point: target,
+            externalMesh: true,
+          });
         }
-      );
+
+        const frameRate = 1;
+
+        const myAnimX = new Animation(
+          "moveSquaresX",
+          "position.x",
+          frameRate,
+          Animation.ANIMATIONTYPE_FLOAT,
+          Animation.ANIMATIONLOOPMODE_CONSTANT,
+          false
+        );
+
+        const myAnimY = new Animation(
+          "moveSquaresZ",
+          "position.z",
+          frameRate,
+          Animation.ANIMATIONTYPE_FLOAT,
+          Animation.ANIMATIONLOOPMODE_CONSTANT,
+          false
+        );
+
+        const myAnimZ = new Animation(
+          "moveSquaresY",
+          "position.y",
+          frameRate,
+          Animation.ANIMATIONTYPE_FLOAT,
+          Animation.ANIMATIONLOOPMODE_CONSTANT,
+          false
+        );
+
+        const keyFramesX = [
+          {
+            frame: 0,
+            value: position[1],
+          },
+          {
+            frame: frameRate,
+            value: targetPosition[1],
+          },
+        ];
+
+        const keyFramesY = [
+          {
+            frame: 0,
+            value: position[0],
+          },
+          {
+            frame: frameRate,
+            value: targetPosition[0],
+          },
+        ];
+
+        const keyFramesZ = [
+          {
+            frame: 0,
+            value: 0.5,
+          },
+          {
+            frame: frameRate / 2,
+            value: 5,
+          },
+          {
+            frame: frameRate,
+            value: 0.5,
+          },
+        ];
+
+        myAnimX.setKeys(keyFramesX);
+        myAnimY.setKeys(keyFramesY);
+        myAnimZ.setKeys(keyFramesZ);
+
+        const animations = animateZ
+          ? [myAnimX, myAnimY]
+          : [myAnimX, myAnimY, myAnimZ];
+
+        gameScene.scene.beginDirectAnimation(
+          mesh,
+          animations,
+          0,
+          frameRate,
+          false,
+          undefined,
+          () => {
+            const lastMesh = meshes.length - 1 === i;
+            if (lastMesh) resolve();
+          }
+        );
+      });
     });
   }
 

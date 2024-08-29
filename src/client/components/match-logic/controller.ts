@@ -47,6 +47,7 @@ export class Controller {
     ) => {
       const pickedMesh = pickResult?.pickedMesh;
       if (!pickedMesh) return;
+      console.log(pickedMesh);
       const pickedPiece = this.lookUpPiece(
         pickedMesh,
         pickedMesh.metadata !== null
@@ -59,7 +60,7 @@ export class Controller {
     };
   }
 
-  resolveMove(move: Point[]) {
+  async resolveMove(move: Point[]) {
     if (move) {
       const [originPoint, targetPoint] = move;
       const validTurn = this.match.takeTurn(originPoint, targetPoint);
@@ -67,9 +68,10 @@ export class Controller {
         if (validTurn.promotion) {
           this.eventHandlers.promote();
         } else {
-          this.turnAnimation(validTurn);
-          const nextTurn = this.match.nextTurn();
-          if (!nextTurn) this.eventHandlers.endMatch();
+          const gameScene = this.sceneManager.getScene(Scenes.GAME);
+          if (!gameScene) return;
+          await this.turnAnimation(validTurn, gameScene);
+          this.onMoveSuccess();
         }
       }
     }
@@ -178,6 +180,8 @@ export class Controller {
   onMoveSuccess() {
     this.selectedPiece = undefined;
     this.updateMeshesRender();
+    const nextTurn = this.match.nextTurn();
+    if (!nextTurn) return this.eventHandlers.endMatch();
     this.rotateCamera();
   }
 
@@ -196,13 +200,9 @@ export class Controller {
     this.prepGameScreen();
   }
 
-  turnAnimation(turnHistory: TurnHistory) {
-    const gameScene = this.sceneManager.getScene(Scenes.GAME);
-    if (!gameScene) return;
-    //#return a promise here and await it instead of passing on move success into
+  turnAnimation(turnHistory: TurnHistory, gameScene: GameScene) {
     return calcTurnAnimation({
       gameScene,
-      onMoveSuccess: this.onMoveSuccess.bind(this),
       findMeshFromPoint: this.findMeshFromPoint.bind(this),
       turnHistory,
     });
