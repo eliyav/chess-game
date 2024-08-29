@@ -4,6 +4,7 @@ import {
   TurnHistory,
   LocationsInfo,
   undoUpdateLocation,
+  doMovesMatch,
 } from "../../helper/game-helpers";
 import Board, { Square } from "./board";
 import GamePiece, { Move } from "./game-piece";
@@ -200,6 +201,11 @@ class Game {
     return isKingChecked;
   }
 
+  isValidMove(movingPiece: GamePiece, point: Point, flag: boolean) {
+    return this.calculateAvailableMoves(movingPiece, flag).find((move) =>
+      doMovesMatch(move[0], point)
+    );
+  }
   getMoves(gamePieces: Square[]) {
     const availableMoves = gamePieces
       .map((square) => this.calculateAvailableMoves(square.on!))
