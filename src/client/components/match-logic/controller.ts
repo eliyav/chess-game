@@ -5,9 +5,9 @@ import type { Nullable } from "@babylonjs/core/types";
 import { doMovesMatch, TurnHistory } from "../../helper/game-helpers";
 import calcTurnAnimation from "../../view/animation/turn-animation";
 import { displayPieceMoves, findByPoint } from "../../view/scene-helpers";
-import GamePiece, { Move } from "../game-logic/game-piece";
+import GamePiece from "../game-logic/game-piece";
 import { Match } from "../match";
-import { SceneManager, Scenes } from "../scene-manager";
+import { GameScene, SceneManager, Scenes } from "../scene-manager";
 
 export class Controller {
   sceneManager: SceneManager;
@@ -33,36 +33,46 @@ export class Controller {
   }
 
   async prepareGame() {
-    this.sceneManager.switchScene(Scenes.GAME);
-    this.gameInputHandler();
-    this.prepGameScreen();
+    const gameScene = this.sceneManager.switchScene(Scenes.GAME);
+    if (gameScene) {
+      this.subscribeGameInput(gameScene);
+      this.prepGameScreen();
+    }
   }
 
-  gameInputHandler() {
-    const gameScene = this.sceneManager.getScene(Scenes.GAME);
-    if (!gameScene) return;
+  subscribeGameInput(gameScene: GameScene) {
     gameScene.scene.onPointerUp = async (
       e: IPointerEvent,
       pickResult: Nullable<PickingInfo>
     ) => {
       const pickedMesh = pickResult?.pickedMesh;
-      if (pickedMesh) {
-        const move = this.gameInput(pickedMesh);
-        if (move) {
-          const [originPoint, targetPoint] = move;
-          const validTurn = this.match.takeTurn(originPoint, targetPoint);
-          if (validTurn) {
-            if (validTurn.promotion) {
-              this.eventHandlers.promote();
-            } else {
-              this.turnAnimation(validTurn);
-              const nextTurn = this.match.nextTurn();
-              if (!nextTurn) this.eventHandlers.endMatch();
-            }
-          }
-        }
+      if (!pickedMesh) return;
+      const pickedPiece = this.lookUpPiece(
+        pickedMesh,
+        pickedMesh.metadata !== null
+      );
+      if (pickedPiece) {
+        this.handlePieceInput(pickedPiece, this.resolveMove.bind(this));
+      } else {
+        this.handleMovementSquareInput(pickedMesh, this.resolveMove.bind(this));
       }
     };
+  }
+
+  resolveMove(move: Point[]) {
+    if (move) {
+      const [originPoint, targetPoint] = move;
+      const validTurn = this.match.takeTurn(originPoint, targetPoint);
+      if (validTurn) {
+        if (validTurn.promotion) {
+          this.eventHandlers.promote();
+        } else {
+          this.turnAnimation(validTurn);
+          const nextTurn = this.match.nextTurn();
+          if (!nextTurn) this.eventHandlers.endMatch();
+        }
+      }
+    }
   }
 
   displayMoves(piece: GamePiece | undefined) {
@@ -94,67 +104,64 @@ export class Controller {
     return pickedPiece.color === currentPlayer;
   }
 
-  gameInput(pickedMesh: AbstractMesh) {
+  handlePieceInput(pickedPiece: GamePiece, resolve: (point: Point[]) => void) {
     const { game } = this.match;
     //If no selection
-    const isGamePiece = pickedMesh.metadata !== null;
-    const pickedPiece = this.lookUpPiece(pickedMesh, isGamePiece);
     if (!this.selectedPiece) {
-      this.displayMoves(pickedPiece);
+      return this.displayMoves(pickedPiece);
     } else {
-      if (pickedPiece) {
-        if (this.currentPlayerPiece(pickedPiece)) {
-          //If there is already a mesh selected, and you select another of your own meshes
-          const originalPiece = this.selectedPiece;
-          if (!pickedPiece) return false;
-          if (originalPiece === pickedPiece) {
-            this.selectedPiece = undefined;
-            this.updateMeshesRender();
-            return false;
-          } else {
-            // Check for castling
-            if (pickedPiece.name === "Rook" && originalPiece.name === "King") {
-              const castling = game.isValidMove(
-                originalPiece,
-                pickedPiece.point,
-                true
-              );
-              if (castling) {
-                return [originalPiece.point, pickedPiece.point];
-              } else {
-                this.displayMoves(pickedPiece);
-              }
-            } else {
-              //If not castling
-              this.displayMoves(pickedPiece);
-            }
-          }
-          return false;
+      if (this.currentPlayerPiece(pickedPiece)) {
+        //If there is already a mesh selected, and you select another of your own meshes
+        const originalPiece = this.selectedPiece;
+        if (originalPiece === pickedPiece) {
+          this.selectedPiece = undefined;
+          return this.updateMeshesRender();
         } else {
-          //If second selection is an enemy mesh, calculate move of original piece and push move if matches
-          if (!pickedPiece) return false;
-          const validMove = game.isValidMove(
-            this.selectedPiece,
-            pickedPiece.point,
-            false
-          );
-          if (validMove) {
-            return [this.selectedPiece.point, pickedPiece.point];
+          // Check for castling
+          if (pickedPiece.name === "Rook" && originalPiece.name === "King") {
+            const castling = game.isValidMove(
+              originalPiece,
+              pickedPiece.point,
+              true
+            );
+            if (castling) {
+              return resolve([originalPiece.point, pickedPiece.point]);
+            } else {
+              return this.displayMoves(pickedPiece);
+            }
+          } else {
+            //If not castling
+            return this.displayMoves(pickedPiece);
           }
         }
       } else {
-        if (pickedMesh.id === "plane") {
-          //If the second mesh selected is one of the movement squares
-          const point = findByPoint({
-            get: "index",
-            point: [pickedMesh.position.z, pickedMesh.position.x],
-            externalMesh: false,
-          });
-          return [this.selectedPiece.point, point];
+        //If second selection is an enemy mesh, calculate move of original piece and push move if matches
+        const validMove = game.isValidMove(
+          this.selectedPiece,
+          pickedPiece.point,
+          false
+        );
+        if (validMove) {
+          return resolve([this.selectedPiece.point, pickedPiece.point]);
         }
       }
     }
-    return false;
+  }
+
+  handleMovementSquareInput(
+    pickedMesh: AbstractMesh,
+    resolve: (point: Point[]) => void
+  ) {
+    if (!this.selectedPiece) return;
+    if (pickedMesh.id === "plane") {
+      //If the second mesh selected is one of the movement squares
+      const point = findByPoint({
+        get: "index",
+        point: [pickedMesh.position.z, pickedMesh.position.x],
+        externalMesh: false,
+      });
+      return resolve([this.selectedPiece.point, point]);
+    }
   }
 
   prepGameScreen(team?: string) {

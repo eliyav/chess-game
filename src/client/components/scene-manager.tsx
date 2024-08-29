@@ -47,16 +47,17 @@ export class SceneManager {
     this.initGameScene();
   }
 
-  public switchScene(scene: Scenes) {
+  public switchScene<T extends Scenes>(scene: T): ScenesDict[T] | undefined {
     this.detachScene(this.activeSceneId);
-    this.setScene(scene);
+    return this.setScene(scene);
   }
 
-  private setScene(scene: Scenes) {
+  private setScene<T extends Scenes>(scene: T): ScenesDict[T] | undefined {
     this.activeSceneId = scene;
     const currentScene = this.getScene(scene);
     if (currentScene) {
       currentScene.scene.attachControl();
+      return currentScene;
     }
   }
 
