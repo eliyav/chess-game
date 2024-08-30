@@ -119,52 +119,20 @@ export class Controller {
   handlePieceInput(pickedPiece: GamePiece) {
     const { game } = this.match;
     //If no selection
-    if (!this.selectedPiece) {
-      return this.displayMoves(pickedPiece);
-    } else {
-      if (this.currentPlayerPiece(pickedPiece)) {
-        //If there is already a mesh selected, and you select another of your own meshes
-        if (this.selectedPiece === pickedPiece) {
-          return this.unselectCurrentPiece();
-        } else {
-          // Check for castling
-          if (
-            pickedPiece.name === "Rook" &&
-            this.selectedPiece.name === "King"
-          ) {
-            const castling = game.isValidMove(
-              this.selectedPiece,
-              pickedPiece.point,
-              true
-            );
-            if (castling) {
-              return this.resolveMove([
-                this.selectedPiece.point,
-                pickedPiece.point,
-              ]);
-            } else {
-              return this.displayMoves(pickedPiece);
-            }
-          } else {
-            //If not castling
-            return this.displayMoves(pickedPiece);
-          }
-        }
-      } else {
-        //If second selection is an enemy mesh, calculate move of original piece and push move if matches
-        const validMove = game.isValidMove(
-          this.selectedPiece,
-          pickedPiece.point,
-          false
-        );
-        if (validMove) {
-          return this.resolveMove([
-            this.selectedPiece.point,
-            pickedPiece.point,
-          ]);
-        }
-      }
+    if (!this.selectedPiece) return this.displayMoves(pickedPiece);
+    //If you select the same piece as before deselect it
+    if (this.selectedPiece === pickedPiece) return this.unselectCurrentPiece();
+    //If you select a different piece check if its a valid move and resolve or display new moves
+    const isCurrentPlayersPiece = this.currentPlayerPiece(pickedPiece);
+    const validMove = game.isValidMove(
+      this.selectedPiece,
+      pickedPiece.point,
+      isCurrentPlayersPiece
+    );
+    if (validMove) {
+      return this.resolveMove([this.selectedPiece.point, pickedPiece.point]);
     }
+    return this.displayMoves(pickedPiece);
   }
 
   handleMovementSquareInput(pickedMesh: AbstractMesh) {
