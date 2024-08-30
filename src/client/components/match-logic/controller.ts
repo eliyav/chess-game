@@ -8,27 +8,32 @@ import { displayPieceMoves, findByPoint } from "../../view/scene-helpers";
 import GamePiece from "../game-logic/game-piece";
 import { Match } from "../match";
 import { GameScene, SceneManager, Scenes } from "../scene-manager";
+import { Message } from "../modals/message-modal";
 
 export class Controller {
   sceneManager: SceneManager;
   match: Match;
-  eventHandlers: {
-    endMatch: () => void;
+  events: {
+    setMessage: (message: Message | null) => void;
     promote: () => void;
   };
   selectedPiece?: GamePiece;
 
-  constructor(
-    sceneManager: SceneManager,
-    match: Match,
-    eventHandlers: {
-      endMatch: () => void;
+  constructor({
+    sceneManager,
+    match,
+    events,
+  }: {
+    sceneManager: SceneManager;
+    match: Match;
+    events: {
+      setMessage: (message: Message | null) => void;
       promote: () => void;
-    }
-  ) {
+    };
+  }) {
     this.sceneManager = sceneManager;
     this.match = match;
-    this.eventHandlers = eventHandlers;
+    this.events = events;
     this.init();
   }
 
@@ -67,7 +72,7 @@ export class Controller {
       const validTurn = this.match.takeTurn(originPoint, targetPoint);
       if (validTurn) {
         if (validTurn.promotion) {
-          this.eventHandlers.promote();
+          this.events.promote();
         } else {
           const gameScene = this.sceneManager.getScene(Scenes.GAME);
           if (!gameScene) return;
@@ -180,8 +185,22 @@ export class Controller {
     this.selectedPiece = undefined;
     this.updateMeshesRender();
     const nextTurn = this.match.nextTurn();
-    if (!nextTurn) return this.eventHandlers.endMatch();
+    if (!nextTurn) return this.events.setMessage(this.createMatchEndPrompt());
     this.rotateCamera();
+  }
+
+  createMatchEndPrompt() {
+    const winningTeam = this.match.getWinningTeam();
+    return {
+      question: `${winningTeam} team has won!, Would you like to play another game?`,
+      onConfirm: () => {
+        this.resetMatch();
+        this.events.setMessage(null);
+      },
+      onReject: () => {
+        this.events.setMessage(null);
+      },
+    };
   }
 
   undoMove() {
@@ -365,6 +384,6 @@ export class Controller {
     this.selectedPiece = undefined;
     this.updateMeshesRender();
     const nextTurn = this.match.nextTurn();
-    if (!nextTurn) this.eventHandlers.endMatch();
+    if (!nextTurn) return this.events.setMessage(this.createMatchEndPrompt());
   }
 }

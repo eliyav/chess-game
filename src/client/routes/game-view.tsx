@@ -16,24 +16,15 @@ export const GameView: React.FC<{
   const [promotion, setPromotion] = useState(false);
   const match = useRef(new Match()).current;
   const controller = useRef(
-    new Controller(sceneManager, match, {
-      promote: () => setPromotion(true),
-      endMatch: () => {
-        const winningTeam = match.getWinningTeam();
-        // sceneManager?.getScene()!.detachControl();
-        setMessage({
-          question: `${winningTeam} team has won!, Would you like to play another game?`,
-          onConfirm: () => {
-            controller.resetMatch();
-            setMessage(null);
-          },
-          onReject: () => {
-            setMessage(null);
-          },
-        });
+    new Controller({
+      sceneManager,
+      match,
+      events: {
+        setMessage: (message: Message | null) => setMessage(message),
+        promote: () => setPromotion(true),
       },
     })
-  ).current;
+  );
 
   //Game Overlay
   return (
@@ -49,15 +40,15 @@ export const GameView: React.FC<{
           },
           {
             text: "restart",
-            onClick: () => controller.resetMatch(),
+            onClick: () => controller.current.resetMatch(),
           },
           {
             text: "undo",
-            onClick: () => controller.undoMove(),
+            onClick: () => controller.current.undoMove(),
           },
           {
             text: "camera",
-            onClick: () => controller.resetCamera(),
+            onClick: () => controller.current.resetCamera(),
           },
           // {
           //   text: "pause",
@@ -76,7 +67,7 @@ export const GameView: React.FC<{
       {promotion && (
         <PromotionModal
           submitSelection={(e) => {
-            controller.setPromotionPiece(e.target.innerText);
+            controller.current.setPromotionPiece(e.target.innerText);
             setPromotion(false);
           }}
         />
