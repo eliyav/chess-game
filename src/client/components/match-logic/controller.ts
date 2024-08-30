@@ -29,14 +29,15 @@ export class Controller {
     this.sceneManager = sceneManager;
     this.match = match;
     this.eventHandlers = eventHandlers;
-    this.prepareGame();
+    this.init();
   }
 
-  async prepareGame() {
+  init(team?: string) {
     const gameScene = this.sceneManager.switchScene(Scenes.GAME);
     if (gameScene) {
       this.subscribeGameInput(gameScene);
-      this.prepGameScreen();
+      this.updateMeshesRender();
+      this.resetCamera(team);
     }
   }
 
@@ -53,9 +54,9 @@ export class Controller {
         pickedMesh.metadata !== null
       );
       if (pickedPiece) {
-        this.handlePieceInput(pickedPiece, this.resolveMove.bind(this));
+        this.handlePieceInput(pickedPiece);
       } else {
-        this.handleMovementSquareInput(pickedMesh, this.resolveMove.bind(this));
+        this.handleMovementSquareInput(pickedMesh);
       }
     };
   }
@@ -111,7 +112,7 @@ export class Controller {
     this.updateMeshesRender();
   }
 
-  handlePieceInput(pickedPiece: GamePiece, resolve: (point: Point[]) => void) {
+  handlePieceInput(pickedPiece: GamePiece) {
     const { game } = this.match;
     //If no selection
     if (!this.selectedPiece) {
@@ -133,7 +134,10 @@ export class Controller {
               true
             );
             if (castling) {
-              return resolve([this.selectedPiece.point, pickedPiece.point]);
+              return this.resolveMove([
+                this.selectedPiece.point,
+                pickedPiece.point,
+              ]);
             } else {
               return this.displayMoves(pickedPiece);
             }
@@ -150,16 +154,16 @@ export class Controller {
           false
         );
         if (validMove) {
-          return resolve([this.selectedPiece.point, pickedPiece.point]);
+          return this.resolveMove([
+            this.selectedPiece.point,
+            pickedPiece.point,
+          ]);
         }
       }
     }
   }
 
-  handleMovementSquareInput(
-    pickedMesh: AbstractMesh,
-    resolve: (point: Point[]) => void
-  ) {
+  handleMovementSquareInput(pickedMesh: AbstractMesh) {
     if (!this.selectedPiece) return;
     if (pickedMesh.id === "plane") {
       //If the second mesh selected is one of the movement squares
@@ -168,13 +172,8 @@ export class Controller {
         point: [pickedMesh.position.z, pickedMesh.position.x],
         externalMesh: false,
       });
-      return resolve([this.selectedPiece.point, point]);
+      return this.resolveMove([this.selectedPiece.point, point]);
     }
-  }
-
-  prepGameScreen(team?: string) {
-    this.updateMeshesRender();
-    this.resetCamera(team);
   }
 
   onMoveSuccess() {
@@ -197,7 +196,8 @@ export class Controller {
 
   resetMatch() {
     this.match.resetMatch();
-    this.prepGameScreen();
+    this.updateMeshesRender();
+    this.resetCamera();
   }
 
   turnAnimation(turnHistory: TurnHistory, gameScene: GameScene) {
