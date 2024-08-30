@@ -53,7 +53,6 @@ export class Controller {
     ) => {
       const pickedMesh = pickResult?.pickedMesh;
       if (!pickedMesh) return;
-      console.log(pickedMesh);
       const pickedPiece = this.lookUpPiece(
         pickedMesh,
         pickedMesh.metadata !== null
