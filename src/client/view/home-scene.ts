@@ -65,11 +65,7 @@ export const createHomeScene = async (
       materials: [materials.white, materials.black],
     });
   }
-
-  const [boardMesh, boardClone] = createDisplayBoard(
-    importedBoardMesh,
-    materials.board
-  );
+  const [boardMesh, boardClone] = createDisplayBoard(importedBoardMesh);
 
   function animateScene() {
     boardMesh.rotate(new Vector3(0, -1, 0), 0.004, Space.LOCAL);
@@ -127,14 +123,8 @@ function createDisplayPieces({
 }
 
 function createDisplayBoard(
-  board: ISceneLoaderAsyncResult,
-  material: Material
+  board: ISceneLoaderAsyncResult
 ): [AbstractMesh, Nullable<AbstractMesh>] {
-  board.meshes.forEach((mesh, idx) => {
-    if (idx !== 1) {
-      mesh.material = material;
-    }
-  });
   const boardMesh = board.meshes[0];
   const boardClone = boardMesh.clone("Board", null);
   boardMesh.position = new Vector3(30, -30, 30);

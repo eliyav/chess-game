@@ -30,10 +30,10 @@ export const loadGameAssets = async (scene: Scene) => {
   );
 
   loadedBoardMesh.meshes.forEach((mesh, idx) => {
-    mesh.isPickable = false;
-    if (idx !== 1) {
-      mesh.material = materials.board;
+    if (idx === 0) {
+      mesh.position = new Vector3(0.07, -0.4, 0);
     }
+    mesh.isPickable = false;
     if (idx === 2) {
       const material = new StandardMaterial("light", scene);
       material.diffuseColor = new Color3(0.01, 0.01, 0.01);

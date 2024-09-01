@@ -43,7 +43,6 @@ function createMovementMaterials(scene: Scene): void {
 type Materials = {
   white: StandardMaterial;
   black: StandardMaterial;
-  board: StandardMaterial;
 };
 
 function createMeshMaterials(scene: Scene): Materials {
@@ -61,11 +60,6 @@ function createMeshMaterials(scene: Scene): Materials {
   black.emissiveColor = new Color3(0.05, 0.05, 0.05);
   black.useEmissiveAsIllumination = true;
 
-  const board = new StandardMaterial("board", scene);
-  board.diffuseFresnelParameters = new FresnelParameters();
-  board.diffuseFresnelParameters.leftColor = Color3.Black();
-  board.diffuseFresnelParameters.rightColor = Color3.Black();
-
-  return { white, black, board };
+  return { white, black };
 }
 export { createMovementMaterials, createMeshMaterials };
