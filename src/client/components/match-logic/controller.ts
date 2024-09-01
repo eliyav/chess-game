@@ -10,6 +10,11 @@ import { Match } from "../match";
 import { GameScene, SceneManager, Scenes } from "../scene-manager";
 import { Message } from "../modals/message-modal";
 
+type ControllerOptions = {
+  playAnimations?: boolean;
+  rotateCamera?: boolean;
+};
+
 export class Controller {
   sceneManager: SceneManager;
   match: Match;
@@ -18,11 +23,13 @@ export class Controller {
     promote: () => void;
   };
   selectedPiece?: GamePiece;
+  options: Required<ControllerOptions>;
 
   constructor({
     sceneManager,
     match,
     events,
+    options = {},
   }: {
     sceneManager: SceneManager;
     match: Match;
@@ -30,10 +37,15 @@ export class Controller {
       setMessage: (message: Message | null) => void;
       promote: () => void;
     };
+    options?: Partial<ControllerOptions>;
   }) {
     this.sceneManager = sceneManager;
     this.match = match;
     this.events = events;
+    this.options = {
+      playAnimations: options.playAnimations ?? true,
+      rotateCamera: options.rotateCamera ?? true,
+    };
     this.init();
   }
 
@@ -75,7 +87,10 @@ export class Controller {
         } else {
           const gameScene = this.sceneManager.getScene(Scenes.GAME);
           if (!gameScene) return;
-          await this.turnAnimation(validTurn, gameScene);
+          await this.turnAnimation({
+            turnHistory: validTurn,
+            gameScene,
+          });
           this.onMoveSuccess();
         }
       }
@@ -186,7 +201,14 @@ export class Controller {
     this.resetCamera();
   }
 
-  turnAnimation(turnHistory: TurnHistory, gameScene: GameScene) {
+  turnAnimation({
+    turnHistory,
+    gameScene,
+  }: {
+    turnHistory: TurnHistory;
+    gameScene: GameScene;
+  }) {
+    if (!this.options.playAnimations) return;
     return calcTurnAnimation({
       gameScene,
       findMeshFromPoint: this.findMeshFromPoint.bind(this),
@@ -239,6 +261,7 @@ export class Controller {
   }
 
   rotateCamera() {
+    if (!this.options.rotateCamera) return;
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
     let currentPlayer = this.match.game.currentPlayer.id;
