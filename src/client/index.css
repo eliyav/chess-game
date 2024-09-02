@@ -119,30 +119,30 @@ canvas {
   }
 }
 
-.footer {
+footer {
   position: absolute;
   bottom: 0;
   width: 100%;
   text-align: center;
   user-select: none;
+}
 
-  .btn {
-    display: block;
-    width: 350px;
-    max-width: 85vw;
-    border-radius: 6px;
-    box-shadow: 0px 0px 5px 0.5px white;
-    color: black;
-    font-style: italic;
-    font-family: inherit;
-    font-weight: bold;
-    font-size: 40px;
-    padding: 0.25em 0em;
-    margin: 1em auto;
-    text-decoration: none;
-    &:hover {
-      box-shadow: 0px 0px 5px 0.5px lightblue;
-    }
+.btn {
+  display: block;
+  width: 350px;
+  max-width: 85vw;
+  border-radius: 6px;
+  box-shadow: 0px 0px 5px 0.5px white;
+  color: black;
+  font-style: italic;
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 40px;
+  padding: 0.25em 0em;
+  margin: 1em auto;
+  text-decoration: none;
+  &:hover {
+    box-shadow: 0px 0px 5px 0.5px lightblue;
   }
 }
 

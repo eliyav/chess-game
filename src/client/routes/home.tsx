@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { SvgGithub } from "../svg-components/svg-github";
+import { SelectionButton } from "../components/buttons/start-button";
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -14,16 +15,9 @@ export const Home: React.FC = () => {
           className="svg-icon bottom-right"
         />
       </div>
-      <div className="footer">
-        <button
-          className={"btn glass-light"}
-          onClick={() => {
-            navigate("/lobby");
-          }}
-        >
-          Play
-        </button>
-      </div>
+      <footer>
+        <SelectionButton text="Play" onClick={() => navigate("/lobby")} />
+      </footer>
     </div>
   );
 };

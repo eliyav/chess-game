@@ -8,7 +8,7 @@ export const BackButton: React.FC<{
 }> = ({ onClick, size, customClass }) => {
   return (
     <img
-      className={`return-btn ${customClass ?? ""}`}
+      className={`${customClass ?? ""}`}
       onClick={() => onClick()}
       src={backSvg}
       alt="Back Button"

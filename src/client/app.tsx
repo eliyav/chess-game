@@ -2,10 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { Route, Routes, BrowserRouter } from "react-router-dom";
 import LoadingScreen from "./components/loading-screen";
 import { Home } from "./routes/home";
-import { Lobby } from "./routes/lobby";
+import { LobbySelect } from "./routes/lobby";
 import { SceneManager } from "./components/scene-manager";
 import { GameView } from "./routes/game-view";
 import type { Socket } from "socket.io-client";
+import { OfflineLobby } from "./components/lobbys/offline-lobby";
+import { OnlineLobby } from "./components/lobbys/online-lobby";
 
 const App: React.FC<{
   websocket: Socket;
@@ -30,7 +32,12 @@ const App: React.FC<{
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/lobby" element={<Lobby socket={websocket} />} />
+          <Route path="/lobby" element={<LobbySelect />} />
+          <Route path="/lobby/offline" element={<OfflineLobby />} />
+          <Route
+            path="/lobby/online"
+            element={<OnlineLobby socket={websocket} />}
+          />
           <Route
             path="/game"
             element={

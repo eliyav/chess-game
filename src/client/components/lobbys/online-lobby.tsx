@@ -1,13 +1,20 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
-import { LobbySettings } from "../../routes/lobby";
-import { Clock } from "../buttons/clock";
+import { LOBBY, LobbySettings } from "../../routes/lobby";
 
 export const OnlineLobby: React.FC<{
   socket: Socket;
-  lobby: LobbySettings;
-  updateLobby: (key: keyof LobbySettings, value: any) => void;
-}> = ({ socket, lobby, updateLobby }) => {
+}> = ({ socket }) => {
+  //Get lobby settings from passed state
+  const [lobby, setLobby] = useState<LobbySettings>(createLobby(LOBBY.ONLINE));
+
+  const updateLobby = useCallback(
+    <KEY extends keyof LobbySettings>(key: KEY, value: LobbySettings[KEY]) => {
+      setLobby((prev) => ({ ...prev, [key]: value }));
+    },
+    [setLobby]
+  );
+
   useEffect(() => {
     socket.on("room-info", (settings: LobbySettings) => {
       Object.entries(settings).forEach(([key, value]) => {
@@ -27,22 +34,7 @@ export const OnlineLobby: React.FC<{
     <div>
       <div className="lobby-code">
         <h2 className="sub-title glass-dark">Join Lobby</h2>
-        <div id="join-lobby" className="mt-1">
-          <div className="selections">
-            <input id="join-lobby-input" type="text"></input>
-            <button
-              className="glass-light"
-              onClick={() => {
-                const lobbyKey = document.getElementById(
-                  "join-lobby-input"
-                ) as HTMLInputElement;
-                socket.emit("join-lobby", { lobbyKey: lobbyKey.value });
-              }}
-            >
-              Join
-            </button>
-          </div>
-        </div>
+        <div id="join-lobby" className="mt-1"></div>
         <h2 className="sub-title glass-dark">Invite Code</h2>
         <p>
           <span
@@ -65,7 +57,14 @@ export const OnlineLobby: React.FC<{
           <button>{player}</button>
         ))}
       </div>
-      <Clock time={lobby.time} setTime={(time) => updateLobby("time", time)} />
     </div>
   );
 };
+
+function createLobby(mode: string | LOBBY) {
+  return {
+    mode,
+    key: null,
+    players: [],
+  };
+}
