@@ -47,18 +47,16 @@ type Materials = {
 
 function createMeshMaterials(scene: Scene): Materials {
   const white = new StandardMaterial("white", scene);
-  white.specularPower = 1.1;
+  white.specularPower = 12;
   white.diffuseColor = new Color3(0.85, 0.63, 0.42);
-  white.specularColor = new Color3(0, 0, 0);
-  white.emissiveColor = new Color3(0, 0, 0);
-  white.useEmissiveAsIllumination = true;
+  white.specularColor = new Color3(0.4, 0.4, 0.4);
+  white.emissiveColor = new Color3(0.05, 0.05, 0.05);
 
   const black = new StandardMaterial("black", scene);
-  black.specularPower = 1;
+  black.specularPower = 12;
   black.diffuseColor = new Color3(0.04, 0.18, 0.21);
-  black.specularColor = new Color3(0.1, 0.1, 0.1);
+  black.specularColor = new Color3(0.8, 0.8, 0.8);
   black.emissiveColor = new Color3(0.05, 0.05, 0.05);
-  black.useEmissiveAsIllumination = true;
 
   return { white, black };
 }
