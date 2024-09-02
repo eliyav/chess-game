@@ -1,18 +1,19 @@
-import { AbstractMesh } from "@babylonjs/core";
 import { PickingInfo } from "@babylonjs/core/Collisions/pickingInfo";
 import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { Nullable } from "@babylonjs/core/types";
 import { doMovesMatch, TurnHistory } from "../../helper/game-helpers";
 import calcTurnAnimation from "../../view/animation/turn-animation";
 import { displayPieceMoves, findByPoint } from "../../view/scene-helpers";
 import GamePiece from "../game-logic/game-piece";
 import { Match } from "../match";
-import { GameScene, SceneManager, Scenes } from "../scene-manager";
 import { Message } from "../modals/message-modal";
+import { GameScene, SceneManager, Scenes } from "../scene-manager";
 
 type ControllerOptions = {
   playAnimations?: boolean;
   rotateCamera?: boolean;
+  renderShadows?: boolean;
 };
 
 export class Controller {
@@ -45,6 +46,7 @@ export class Controller {
     this.options = {
       playAnimations: options.playAnimations ?? true,
       rotateCamera: options.rotateCamera ?? true,
+      renderShadows: options.renderShadows ?? false,
     };
     this.init();
   }
@@ -236,11 +238,17 @@ export class Controller {
     if (gameScene.data.meshesToRender.length) {
       for (let i = 0; i < gameScene.data.meshesToRender.length; i++) {
         const mesh = gameScene.data.meshesToRender[i];
+        if (this.options.renderShadows) {
+          gameScene.data.shadowGenerator.forEach((gen) =>
+            gen.removeShadowCaster(mesh)
+          );
+        }
         gameScene.scene.removeMesh(mesh);
         mesh.dispose();
       }
       gameScene.data.meshesToRender = [];
     }
+
     //For each active piece, creates a mesh clone and places on board
     this.match.game.allPieces().forEach((square) => {
       const { name, color, point } = square.on!;
@@ -256,6 +264,11 @@ export class Controller {
         externalMesh: true,
       });
       clone.isVisible = true;
+      if (this.options.renderShadows) {
+        gameScene.data.shadowGenerator.forEach((gen) =>
+          gen.addShadowCaster(clone)
+        );
+      }
       gameScene.data.meshesToRender.push(clone);
     });
   }

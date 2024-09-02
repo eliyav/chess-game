@@ -1,4 +1,5 @@
 import { Engine } from "@babylonjs/core/Engines/engine";
+import type { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Scene } from "@babylonjs/core/scene";
 import { AnimationContainer } from "../view/animation/create-animations";
@@ -12,6 +13,7 @@ export type CustomScene<T> = {
 export type GameScene = CustomScene<{
   meshesToRender: AbstractMesh[];
   animationsContainer: AnimationContainer;
+  shadowGenerator: ShadowGenerator[];
 }>;
 
 export const enum Scenes {

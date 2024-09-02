@@ -2,8 +2,8 @@ import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera.js";
 import "@babylonjs/core/Culling/ray.js";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight.js";
-import { SpotLight } from "@babylonjs/core/Lights/spotLight.js";
-import { Color3 } from "@babylonjs/core/Maths/math.color.js";
+import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
 import { Scene } from "@babylonjs/core/scene.js";
 import { GameScene } from "../components/scene-manager";
@@ -30,29 +30,23 @@ export const gameScene = async (
   camera.attachControl(canvas, true);
 
   const light = new HemisphericLight("light", new Vector3(0, 100, 0), scene);
-  light.intensity = 0.8;
+  light.intensity = 0.2;
 
-  const light2 = new SpotLight(
-    "spotLight",
-    new Vector3(0, 20, 30),
-    new Vector3(0, 0, -30),
-    90,
-    1,
+  const pointLight = new PointLight(
+    "pointLight",
+    new Vector3(15, 20, 0),
     scene
   );
-  light2.intensity = 0.8;
-  light2.diffuse = new Color3(0, 0, 0);
-
-  const light3 = new SpotLight(
-    "spotLight2",
-    new Vector3(0, 20, -30),
-    new Vector3(0, 0, 30),
-    90,
-    1,
+  const pointLight2 = new PointLight(
+    "pointLight2",
+    new Vector3(-15, 20, 0),
     scene
   );
-  light3.intensity = 0.8;
-  light3.diffuse = new Color3(0, 0, 0);
+  pointLight.intensity = 0.5;
+  pointLight2.intensity = 0.5;
+
+  const shadowGenerator = new ShadowGenerator(2048, pointLight);
+  const shadowGenerator2 = new ShadowGenerator(2048, pointLight2);
 
   createCelestialSphere(scene);
   createMovementMaterials(scene);
@@ -65,6 +59,7 @@ export const gameScene = async (
     data: {
       meshesToRender: [],
       animationsContainer: await createAnimations(scene),
+      shadowGenerator: [shadowGenerator, shadowGenerator2],
     },
   };
 

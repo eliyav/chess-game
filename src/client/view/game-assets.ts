@@ -2,6 +2,7 @@ import {
   ISceneLoaderAsyncResult,
   SceneLoader,
 } from "@babylonjs/core/Loading/sceneLoader";
+import { Material } from "@babylonjs/core/Materials/material";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
@@ -16,7 +17,6 @@ import pawn from "../../../assets/pieces/pawnv3.gltf";
 import queen from "../../../assets/pieces/queenv3.gltf";
 import rook from "../../../assets/pieces/rookv3.gltf";
 import { createMeshMaterials } from "./materials";
-import { Material } from "@babylonjs/core";
 
 export const loadGameAssets = async (scene: Scene) => {
   const materials = createMeshMaterials(scene);
@@ -30,16 +30,22 @@ export const loadGameAssets = async (scene: Scene) => {
   );
 
   loadedBoardMesh.meshes.forEach((mesh, idx) => {
+    mesh.receiveShadows = true;
     if (idx === 0) {
       mesh.position = new Vector3(0.07, -0.4, 0);
     }
-    mesh.isPickable = false;
-    if (idx === 2) {
+    if (idx === 1) {
       const material = new StandardMaterial("light", scene);
-      material.diffuseColor = new Color3(0.01, 0.01, 0.01);
-      material.specularColor = new Color3(0.01, 0.01, 0.01);
+      material.diffuseColor = new Color3(1, 1, 1);
       mesh.material = material;
     }
+    if (idx === 3) {
+      const material = new StandardMaterial("light", scene);
+      material.emissiveColor = Color3.White().scale(0.2);
+      material.diffuseColor = Color3.Blue().scale(0.1);
+      mesh.material = material;
+    }
+    mesh.isPickable = false;
   });
 
   const piecesMeshes: ChessPieceMesh[] = [];
