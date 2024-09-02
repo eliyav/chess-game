@@ -1,4 +1,3 @@
-import { Color4, GlowLayer, Nullable } from "@babylonjs/core";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera.js";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight.js";
@@ -11,7 +10,7 @@ import { Space } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Scene } from "@babylonjs/core/scene.js";
-import "@babylonjs/loaders/glTF";
+import type { Nullable } from "@babylonjs/core/types";
 import board from "../../../assets/board.gltf";
 import bishop from "../../../assets/pieces/bishopv3.gltf";
 import king from "../../../assets/pieces/kingv3.gltf";

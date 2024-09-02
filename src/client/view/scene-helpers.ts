@@ -3,9 +3,9 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Move } from "../components/game-logic/game-piece";
 import { GameScene } from "../components/scene-manager";
-import { Scene } from "@babylonjs/core";
 import { pointIndexMap, pointPositionMap } from "./data/point-map-data";
 import GamePiece from "../components/game-logic/game-piece";
+import { Scene } from "@babylonjs/core/scene";
 
 const Y_ABOVE_FLOOR = 0.51;
 

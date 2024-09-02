@@ -8,6 +8,7 @@ import { GameView } from "./routes/game-view";
 import type { Socket } from "socket.io-client";
 import { OfflineLobby } from "./components/lobbys/offline-lobby";
 import { OnlineLobby } from "./components/lobbys/online-lobby";
+import "@babylonjs/loaders/glTF";
 
 const App: React.FC<{
   websocket: Socket;
@@ -33,9 +34,9 @@ const App: React.FC<{
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/lobby" element={<LobbySelect />} />
-          <Route path="/lobby/offline" element={<OfflineLobby />} />
+          <Route path="/lobby-offline" element={<OfflineLobby />} />
           <Route
-            path="/lobby/online"
+            path="/lobby-online"
             element={<OnlineLobby socket={websocket} />}
           />
           <Route

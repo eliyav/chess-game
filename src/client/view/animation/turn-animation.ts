@@ -1,9 +1,10 @@
-import { AbstractMesh, AssetContainer } from "@babylonjs/core";
 import { Animation } from "@babylonjs/core/Animations/animation.js";
 import GamePiece from "../../components/game-logic/game-piece";
 import { GameScene } from "../../components/scene-manager";
 import { doMovesMatch, TurnHistory } from "../../helper/game-helpers";
 import { findByPoint } from "../scene-helpers";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { AssetContainer } from "@babylonjs/core/assetContainer";
 
 export default async function calcTurnAnimation({
   gameScene,

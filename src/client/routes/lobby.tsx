@@ -30,7 +30,7 @@ export const LobbySelect: React.FC<{}> = () => {
           <SelectionButton
             text={LOBBY.OFFLINE}
             onClick={() => {
-              navigate("/lobby/offline");
+              navigate("/lobby-offline");
             }}
           />
         </div>
@@ -43,7 +43,7 @@ export const LobbySelect: React.FC<{}> = () => {
           <SelectionButton
             text={`Join ${LOBBY.ONLINE}`}
             onClick={() => {
-              navigate("/lobby/online");
+              navigate("/lobby-online");
             }}
           />
         </div>
@@ -51,7 +51,7 @@ export const LobbySelect: React.FC<{}> = () => {
           <SelectionButton
             text={`Create ${LOBBY.ONLINE}`}
             onClick={() => {
-              navigate("/lobby/online");
+              navigate("/lobby-online");
             }}
           />
         </div>

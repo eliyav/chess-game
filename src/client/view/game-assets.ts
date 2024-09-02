@@ -8,7 +8,6 @@ import { Color3 } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Scene } from "@babylonjs/core/scene";
-import "@babylonjs/loaders/glTF";
 import board from "../../../assets/board.gltf";
 import bishop from "../../../assets/pieces/bishopv3.gltf";
 import king from "../../../assets/pieces/kingv3.gltf";
