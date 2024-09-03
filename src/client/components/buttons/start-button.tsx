@@ -3,9 +3,10 @@ import React from "react";
 export const SelectionButton: React.FC<{
   text: string;
   onClick: () => void;
-}> = ({ text, onClick }) => {
+  disabled?: boolean;
+}> = ({ text, onClick, disabled }) => {
   return (
-    <button className={"btn glass-light"} onClick={onClick}>
+    <button className={"btn glass-light"} onClick={onClick} disabled={disabled}>
       {text}
     </button>
   );

@@ -1,14 +1,14 @@
+import "@babylonjs/loaders/glTF";
 import React, { useEffect, useRef, useState } from "react";
-import { Route, Routes, BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import type { Socket } from "socket.io-client";
 import LoadingScreen from "./components/loading-screen";
-import { Home } from "./routes/home";
-import { LobbySelect } from "./routes/lobby";
 import { SceneManager } from "./components/scene-manager";
 import { GameView } from "./routes/game-view";
-import type { Socket } from "socket.io-client";
-import { OfflineLobby } from "./components/lobbys/offline-lobby";
-import { OnlineLobby } from "./components/lobbys/online-lobby";
-import "@babylonjs/loaders/glTF";
+import { Home } from "./routes/home";
+import { LobbySelect } from "./routes/lobby";
+import { OfflineLobby } from "./routes/offline-lobby";
+import { OnlineLobby } from "./routes/online-lobby";
 
 const App: React.FC<{
   websocket: Socket;
