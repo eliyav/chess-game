@@ -13,13 +13,19 @@ class Game {
   board: Board;
   annotations: string[];
   turnHistory: TurnHistory[];
-  currentPlayer: { id: string };
+  teams: string[];
+  currentPlayer: string;
 
-  constructor(currentPlayer: { id: string }) {
+  constructor() {
     this.board = new Board();
     this.annotations = [];
     this.turnHistory = [];
-    this.currentPlayer = currentPlayer;
+    (this.teams = ["White", "Black"]), (this.currentPlayer = "White");
+  }
+
+  setCurrentTeam(turn: number) {
+    const currentTeam = turn % 2 ? this.teams[0] : this.teams[1];
+    this.currentPlayer = currentTeam;
   }
 
   resolveMove(originPoint: Point, targetPoint: Point): TurnHistory | false {
@@ -90,13 +96,11 @@ class Game {
     const { originPiece, targetPiece, originPoint, targetPoint } =
       locationsInfo;
     const castling =
-      originPiece!.name === "King" &&
-      originPiece!.color === this.currentPlayer.id;
+      originPiece!.name === "King" && originPiece!.color === this.currentPlayer;
     let castling2 = false;
     if (targetPiece !== undefined) {
       castling2 =
-        targetPiece.name === "Rook" &&
-        targetPiece.color === this.currentPlayer.id;
+        targetPiece.name === "Rook" && targetPiece.color === this.currentPlayer;
       if (castling && castling2) {
         const a = gameHelpers.getX(originPoint);
         const b = gameHelpers.getX(targetPoint);
@@ -237,12 +241,12 @@ class Game {
         if (currentPlayer) {
           return (
             square.on!.name === "King" &&
-            square.on!.color === this.currentPlayer.id
+            square.on!.color === this.currentPlayer
           );
         } else {
           return (
             square.on!.name === "King" &&
-            square.on!.color !== this.currentPlayer.id
+            square.on!.color !== this.currentPlayer
           );
         }
       });
@@ -256,9 +260,9 @@ class Game {
     const piecesArray = this.board.grid.flat().filter((square) => {
       if (square.on !== undefined) {
         if (currentPlayer) {
-          return square.on.color === this.currentPlayer.id;
+          return square.on.color === this.currentPlayer;
         } else {
-          return square.on.color !== this.currentPlayer.id;
+          return square.on.color !== this.currentPlayer;
         }
       }
     });
@@ -344,7 +348,7 @@ class Game {
         resolve[0] ? movesObj.push(resolve[1]) : null;
       }
     };
-    const playersRooks = this.findPieces("Rook", this.currentPlayer.id);
+    const playersRooks = this.findPieces("Rook", this.currentPlayer);
     if (playersRooks) {
       playersRooks.forEach((square) => {
         checkCastlingMove(piece!, square.on!);
@@ -414,9 +418,9 @@ class Game {
     return returnResult;
   }
 
-  resetGame(player: { id: string }) {
+  resetGame() {
     this.board.resetBoard();
-    this.currentPlayer = player;
+    this.setCurrentTeam(1);
     this.annotations = [];
     this.turnHistory = [];
   }

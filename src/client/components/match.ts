@@ -1,46 +1,61 @@
+import { LobbySettings } from "../../shared/lobby";
 import Game from "./game-logic/game";
 
 export class Match {
   game: Game;
   current: {
-    teams: string[];
+    key: string | null;
+    mode: string;
+    players: string[] | undefined;
     turn: number;
-    player: { id: string };
+    player: string;
     isActive: boolean;
   };
+  lobby: LobbySettings;
+  player: string;
 
-  constructor() {
-    this.current = this.setMatch();
-    this.game = new Game(this.current.player);
+  constructor({ lobby, player }: { lobby: LobbySettings; player: string }) {
+    this.lobby = lobby;
+    this.player = player;
+    this.current = this.setMatch({ lobby, player });
+    this.game = new Game();
     // this.timer = new Timer(time, this.matchDetails.player);
   }
 
-  setMatch() {
+  setMatch({ lobby, player }: { lobby: LobbySettings; player: string }) {
     const matchDefaults = {
-      teams: ["White", "Black"],
+      key: lobby.key,
+      mode: lobby.mode,
+      players: lobby.players,
       turn: 1,
-      player: { id: "White" },
+      player,
       isActive: false,
     };
     return matchDefaults;
   }
 
   nextTurn() {
-    this.current.turn++;
-    this.switchPlayer();
     if (this.game.isCheckmate()) return false;
+    this.current.turn++;
+    this.game.setCurrentTeam(this.current.turn);
     return true;
   }
 
-  switchPlayer() {
-    const player =
-      this.current.turn % 2 ? this.current.teams[0] : this.current.teams[1];
-    this.current.player.id = player;
+  isPlayersTurn() {
+    if (this.current.players) {
+      const currentPlayer =
+        this.current.turn % 2
+          ? this.current.players[0]
+          : this.current.players[1];
+      return currentPlayer === this.current.player;
+    } else {
+      return true;
+    }
   }
 
   resetMatch() {
-    this.current = this.setMatch();
-    this.game.resetGame(this.current.player);
+    this.current = this.setMatch({ lobby: this.lobby, player: this.player });
+    this.game.resetGame();
     // this.timer.resetTimers(this.data.player);
   }
 
@@ -67,7 +82,7 @@ export class Match {
         this.game.turnHistory.length = this.game.turnHistory.length - 1;
         this.game.annotations.length = this.game.annotations.length - 1;
         this.current.turn--;
-        this.switchPlayer();
+        this.game.setCurrentTeam(this.current.turn);
       }
       return true;
     }
@@ -75,10 +90,8 @@ export class Match {
   }
 
   getWinningTeam() {
-    const team =
-      this.current.player.id === this.current.teams[0]
-        ? this.current.teams[1]
-        : this.current.teams[0];
-    return team;
+    const currentPlayer =
+      this.current.turn % 2 ? this.current.player[0] : this.current.player[1];
+    return currentPlayer;
   }
 }

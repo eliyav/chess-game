@@ -43,7 +43,10 @@ const App: React.FC<{
             path="/game"
             element={
               sceneManager.current ? (
-                <GameView sceneManager={sceneManager.current} />
+                <GameView
+                  sceneManager={sceneManager.current}
+                  socket={websocket}
+                />
               ) : null
             }
           />

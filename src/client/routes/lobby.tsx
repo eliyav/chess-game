@@ -58,7 +58,9 @@ export const LobbySelect: React.FC<{}> = () => {
                 if (!joinRoomResponse.ok) {
                   throw new Error("Failed to join lobby");
                 }
-                navigate("/lobby-online", { state: { room: roomInput.value } });
+                navigate("/lobby-online", {
+                  state: { room: roomInput.value, player: "Guest" },
+                });
               } catch (e) {
                 if (e instanceof Error) {
                   alert(e.message);
@@ -77,11 +79,13 @@ export const LobbySelect: React.FC<{}> = () => {
                 const createRoomResponse = await fetch("./create-lobby", {
                   method: "POST",
                   body: JSON.stringify({
-                    name: "Eliya",
+                    name: "Host",
                   }),
                 });
                 const roomKey = await createRoomResponse.text();
-                navigate("/lobby-online", { state: { room: roomKey } });
+                navigate("/lobby-online", {
+                  state: { room: roomKey, player: "Host" },
+                });
               } catch (e) {
                 if (e instanceof Error) {
                   alert(e.message);

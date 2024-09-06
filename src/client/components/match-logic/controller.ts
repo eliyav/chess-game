@@ -22,6 +22,7 @@ export class Controller {
   events: {
     setMessage: (message: Message | null) => void;
     promote: () => void;
+    emitTurn: (originPoint: Point, targetPoint: Point) => void;
   };
   selectedPiece?: GamePiece;
   options: Required<ControllerOptions>;
@@ -37,6 +38,7 @@ export class Controller {
     events: {
       setMessage: (message: Message | null) => void;
       promote: () => void;
+      emitTurn: (originPoint: Point, targetPoint: Point) => void;
     };
     options?: Partial<ControllerOptions>;
   }) {
@@ -65,6 +67,7 @@ export class Controller {
       e: IPointerEvent,
       pickResult: Nullable<PickingInfo>
     ) => {
+      if (!this.match.isPlayersTurn()) return;
       const pickedMesh = pickResult?.pickedMesh;
       if (!pickedMesh) return;
       const pickedPiece = this.lookUpPiece(
@@ -79,7 +82,7 @@ export class Controller {
     };
   }
 
-  async resolveMove(move: Point[]) {
+  async resolveMove(move: Point[], toEmit?: boolean) {
     if (move) {
       const [originPoint, targetPoint] = move;
       const validTurn = this.match.takeTurn(originPoint, targetPoint);
@@ -93,7 +96,7 @@ export class Controller {
             turnHistory: validTurn,
             gameScene,
           });
-          this.onMoveSuccess();
+          this.onMoveSuccess(toEmit);
         }
       }
     }
@@ -103,6 +106,7 @@ export class Controller {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
     if (!piece) return;
+    if (this.match.current.player !== this.match.player) return;
     const currentPlayersPiece = this.currentPlayerPiece(piece);
     if (currentPlayersPiece) {
       const moves = this.match.game.getValidMoves(piece);
@@ -124,8 +128,7 @@ export class Controller {
 
   currentPlayerPiece(pickedPiece: GamePiece | undefined) {
     if (!pickedPiece) return false;
-    const currentPlayer = this.match.current.player.id;
-    return pickedPiece.color === currentPlayer;
+    return pickedPiece.color === this.match.game.currentPlayer;
   }
 
   unselectCurrentPiece() {
@@ -165,12 +168,19 @@ export class Controller {
     }
   }
 
-  onMoveSuccess() {
+  onMoveSuccess(toEmit = true) {
     this.selectedPiece = undefined;
     this.updateMeshesRender();
     const nextTurn = this.match.nextTurn();
     if (!nextTurn) return this.events.setMessage(this.createMatchEndPrompt());
     this.rotateCamera();
+    if (toEmit) {
+      const turnHistory = this.match.game.turnHistory.at(-1);
+      if (turnHistory) {
+        const { origin, target } = turnHistory;
+        this.events.emitTurn(origin, target);
+      }
+    }
   }
 
   createMatchEndPrompt() {
@@ -277,7 +287,7 @@ export class Controller {
     if (!this.options.rotateCamera) return;
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
-    let currentPlayer = this.match.game.currentPlayer.id;
+    let currentPlayer = this.match.game.currentPlayer;
     let camera: any = gameScene.scene.cameras[0];
     let alpha = camera.alpha;
     let ratio;
@@ -351,7 +361,7 @@ export class Controller {
     if (!gameScene) return;
     let camera: any = gameScene?.scene.cameras[0];
     if (!team) {
-      this.match.game.currentPlayer.id === "White"
+      this.match.game.currentPlayer === "White"
         ? setToWhitePlayer()
         : setToBlackPlayer();
     } else {

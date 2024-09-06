@@ -9,25 +9,33 @@ export const OnlineLobby: React.FC<{
   socket: Socket;
 }> = ({ socket }) => {
   const navigate = useNavigate();
-  const { room } = useLocation().state as { room: string };
+  const { room, player } = useLocation().state as {
+    room: string;
+    player: string;
+  };
 
   const [lobby, setLobby] = useState<LobbySettings>();
 
   useEffect(() => {
-    console.log("socket subscriptions");
-    socket.on("lobby-info", (settings: LobbySettings) => {
-      setLobby(settings);
+    socket.on("match-start", () => {
+      navigate("/game", { state: { lobby, player } });
     });
 
-    socket.on("match-start", () => {
-      navigate("/game", { state: { lobby } });
+    return () => {
+      socket.off("match-start");
+    };
+  }, [socket, navigate, lobby, player]);
+
+  useEffect(() => {
+    socket.on("lobby-info", (settings: LobbySettings) => {
+      setLobby(settings);
     });
 
     return () => {
       socket.off("lobby-info");
       socket.off("match-start");
     };
-  }, [socket, setLobby, navigate]);
+  }, [socket, setLobby]);
 
   useEffect(() => {
     if (room) {
