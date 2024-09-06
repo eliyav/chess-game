@@ -35,8 +35,8 @@ export class Match {
   }
 
   nextTurn() {
-    if (this.game.isCheckmate()) return false;
     this.current.turn++;
+    if (this.game.isCheckmate()) return false;
     this.game.setCurrentTeam(this.current.turn);
     return true;
   }
