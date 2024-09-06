@@ -198,12 +198,11 @@ export class Controller {
   }
 
   undoMove() {
-    if (this.match.current.isActive) {
-      const isValidUndo = this.match.undoTurn();
-      if (isValidUndo) {
-        this.updateMeshesRender();
-        this.rotateCamera();
-      }
+    if (this.match.game.turnHistory.length === 0) return;
+    const isValidUndo = this.match.undoTurn();
+    if (isValidUndo) {
+      this.updateMeshesRender();
+      this.rotateCamera();
     }
   }
 

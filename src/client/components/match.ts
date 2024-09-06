@@ -9,7 +9,6 @@ export class Match {
     players: string[] | undefined;
     turn: number;
     player: string;
-    isActive: boolean;
   };
   lobby: LobbySettings;
   player: string;
@@ -19,7 +18,6 @@ export class Match {
     this.player = player;
     this.current = this.setMatch({ lobby, player });
     this.game = new Game();
-    // this.timer = new Timer(time, this.matchDetails.player);
   }
 
   setMatch({ lobby, player }: { lobby: LobbySettings; player: string }) {
@@ -29,7 +27,6 @@ export class Match {
       players: lobby.players,
       turn: 1,
       player,
-      isActive: false,
     };
     return matchDefaults;
   }
@@ -56,12 +53,6 @@ export class Match {
   resetMatch() {
     this.current = this.setMatch({ lobby: this.lobby, player: this.player });
     this.game.resetGame();
-    // this.timer.resetTimers(this.data.player);
-  }
-
-  startMatch() {
-    this.current.isActive = true;
-    // this.timer.startTimer();
   }
 
   takeTurn(originPoint: Point, targetPoint: Point) {
