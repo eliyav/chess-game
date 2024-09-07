@@ -10,6 +10,7 @@ import { Match } from "../match";
 import { Message } from "../modals/message-modal";
 import { GameScene, SceneManager, Scenes } from "../scene-manager";
 import { ArcRotateCamera } from "@babylonjs/core";
+import { rotateCamera } from "../../view/animation/camera";
 
 type ControllerOptions = {
   playAnimations?: boolean;
@@ -296,67 +297,12 @@ export class Controller {
     if (!this.options.rotateCamera || this.match.isOnline()) return;
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
-    const currentPlayer = this.match.getPlayerTeam();
     const camera = gameScene.scene.cameras[0] as ArcRotateCamera;
-    const alpha = camera.alpha;
-    const isAlphaLessThanZero = alpha < 0;
-    const isWhiteTeam = currentPlayer === "White";
-    const ratio = isAlphaLessThanZero
-      ? Math.ceil(alpha / Math.PI)
-      : Math.floor(alpha / Math.PI);
-    const subtractedRatio = alpha - ratio * Math.PI;
-    const piDistance = isAlphaLessThanZero
-      ? Math.abs(Math.PI + subtractedRatio)
-      : Math.PI - subtractedRatio;
-    const isThereRemainingDistance = ratio % 2;
-
-    let remainingDistance: number;
-    if (isWhiteTeam) {
-      remainingDistance = isThereRemainingDistance
-        ? Math.PI - piDistance
-        : piDistance;
-    } else {
-      remainingDistance = isThereRemainingDistance
-        ? piDistance
-        : Math.PI - piDistance;
-    }
-
-    function animateCameraRotation(currentPlayer: string) {
-      requestAnimationFrame(() => {
-        const playerFlag = currentPlayer === "Black" ? true : false;
-        const rotateAmount = remainingDistance > 0.05 ? 0.05 : 0.01;
-        rotateCam(playerFlag, rotateAmount);
-      });
-
-      function rotateCam(playerFlag: boolean, rotateAmount: number) {
-        if (isThereRemainingDistance) {
-          if (isAlphaLessThanZero) {
-            playerFlag
-              ? (camera.alpha -= rotateAmount)
-              : (camera.alpha += rotateAmount);
-          } else {
-            playerFlag
-              ? (camera.alpha += rotateAmount)
-              : (camera.alpha -= rotateAmount);
-          }
-        } else {
-          if (!isAlphaLessThanZero) {
-            playerFlag
-              ? (camera.alpha -= rotateAmount)
-              : (camera.alpha += rotateAmount);
-          } else {
-            playerFlag
-              ? (camera.alpha += rotateAmount)
-              : (camera.alpha -= rotateAmount);
-          }
-        }
-        remainingDistance -= rotateAmount;
-        if (remainingDistance > 0.01) {
-          animateCameraRotation(currentPlayer);
-        }
-      }
-    }
-    animateCameraRotation(currentPlayer);
+    const currentPlayer = this.match.getPlayerTeam();
+    rotateCamera({
+      camera,
+      currentPlayer,
+    });
   }
 
   resetCamera() {
