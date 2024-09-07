@@ -296,35 +296,29 @@ export class Controller {
     if (!this.options.rotateCamera || this.match.isOnline()) return;
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
-    let currentPlayer = this.match.game.getCurrentPlayer();
-    let camera: any = gameScene.scene.cameras[0];
-    let alpha = camera.alpha;
-    let ratio;
-    let subtractedRatio;
-    let piDistance;
+    const currentPlayer = this.match.getPlayerTeam();
+    const camera = gameScene.scene.cameras[0] as ArcRotateCamera;
+    const alpha = camera.alpha;
+    const isAlphaLessThanZero = alpha < 0;
+    const isWhiteTeam = currentPlayer === "White";
+    const ratio = isAlphaLessThanZero
+      ? Math.ceil(alpha / Math.PI)
+      : Math.floor(alpha / Math.PI);
+    const subtractedRatio = alpha - ratio * Math.PI;
+    const piDistance = isAlphaLessThanZero
+      ? Math.abs(Math.PI + subtractedRatio)
+      : Math.PI - subtractedRatio;
+    const isThereRemainingDistance = ratio % 2;
+
     let remainingDistance: number;
-    let remainder: number;
-
-    if (alpha < 0) {
-      ratio = Math.ceil(alpha / Math.PI);
-      subtractedRatio = alpha - ratio * Math.PI;
-      piDistance = Math.abs(Math.PI + subtractedRatio);
+    if (isWhiteTeam) {
+      remainingDistance = isThereRemainingDistance
+        ? Math.PI - piDistance
+        : piDistance;
     } else {
-      ratio = Math.floor(alpha / Math.PI);
-      subtractedRatio = alpha - ratio * Math.PI;
-      piDistance = Math.PI - subtractedRatio;
-    }
-
-    remainder = ratio % 2;
-
-    if (currentPlayer === "Black") {
-      remainder
-        ? (remainingDistance = piDistance)
-        : (remainingDistance = Math.PI - piDistance);
-    } else {
-      remainder
-        ? (remainingDistance = Math.PI - piDistance)
-        : (remainingDistance = piDistance);
+      remainingDistance = isThereRemainingDistance
+        ? piDistance
+        : Math.PI - piDistance;
     }
 
     function animateCameraRotation(currentPlayer: string) {
@@ -335,8 +329,8 @@ export class Controller {
       });
 
       function rotateCam(playerFlag: boolean, rotateAmount: number) {
-        if (remainder) {
-          if (alpha < 0) {
+        if (isThereRemainingDistance) {
+          if (isAlphaLessThanZero) {
             playerFlag
               ? (camera.alpha -= rotateAmount)
               : (camera.alpha += rotateAmount);
@@ -346,7 +340,7 @@ export class Controller {
               : (camera.alpha -= rotateAmount);
           }
         } else {
-          if (alpha > 0) {
+          if (!isAlphaLessThanZero) {
             playerFlag
               ? (camera.alpha -= rotateAmount)
               : (camera.alpha += rotateAmount);
