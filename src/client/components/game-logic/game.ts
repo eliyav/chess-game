@@ -37,6 +37,11 @@ class Game {
     return this.teams[index];
   }
 
+  getLastPlayer() {
+    const index = this.current.turn % 2 ? 1 : 0;
+    return this.teams[index];
+  }
+
   nextTurn() {
     this.current.turn++;
     if (this.isCheckmate()) return false;
@@ -467,6 +472,24 @@ class Game {
     //If overlap, return false for possible castling move
     const returnResult: [boolean, Move] = [false, [targetPoint, "castling"]];
     return returnResult;
+  }
+
+  setPromotionPiece(selection: string) {
+    const turnHistory = this.current.turnHistory.at(-1);
+    if (turnHistory !== undefined) {
+      const square = turnHistory.targetSquare.square;
+      turnHistory.promotedPiece = selection;
+      const { color, point, movement } = turnHistory.originPiece!;
+      turnHistory.targetSquare.on = new GamePiece(
+        selection,
+        color,
+        point,
+        movement
+      );
+      const symbol = turnHistory.targetSquare.on.getSymbol();
+      const annotations = this.current.annotations;
+      annotations[annotations.length - 1] = `${square}${symbol}`;
+    }
   }
 
   resetGame() {

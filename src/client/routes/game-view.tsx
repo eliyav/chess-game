@@ -91,12 +91,11 @@ export const GameView: React.FC<{
       {promotion && (
         <PromotionModal
           submitSelection={(e) => {
-            controller.current.setPromotionPiece(e.target.innerText);
+            controller.current.handlePromotionEvent(e.target.innerText);
             setPromotion(false);
           }}
         />
       )}
-      {/* {matchReady && <TimerOverlay timer={match.timer} />} */}
     </>
   );
 };

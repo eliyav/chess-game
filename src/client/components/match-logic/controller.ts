@@ -67,7 +67,6 @@ export class Controller {
       e: IPointerEvent,
       pickResult: Nullable<PickingInfo>
     ) => {
-      console.log(this.match);
       if (!this.match.isPlayersTurn()) return;
       const pickedMesh = pickResult?.pickedMesh;
       if (!pickedMesh) return;
@@ -86,17 +85,17 @@ export class Controller {
   async resolveMove(move: Point[], toEmit?: boolean) {
     if (move) {
       const [originPoint, targetPoint] = move;
-      const validTurn = this.match.takeTurn(originPoint, targetPoint);
+      const validTurn = this.match.game.resolveMove(originPoint, targetPoint);
       if (validTurn) {
+        const gameScene = this.sceneManager.getScene(Scenes.GAME);
+        if (!gameScene) return;
+        await this.turnAnimation({
+          turnHistory: validTurn,
+          gameScene,
+        });
         if (validTurn.promotion) {
           this.events.promote();
         } else {
-          const gameScene = this.sceneManager.getScene(Scenes.GAME);
-          if (!gameScene) return;
-          await this.turnAnimation({
-            turnHistory: validTurn,
-            gameScene,
-          });
           this.onMoveSuccess(toEmit);
         }
       }
@@ -110,7 +109,7 @@ export class Controller {
     if (this.match.player !== this.match.player) return;
     const currentPlayersPiece = this.currentPlayerPiece(piece);
     if (currentPlayersPiece) {
-      const moves = this.match.current.game.getValidMoves(piece);
+      const moves = this.match.game.getValidMoves(piece);
       this.selectedPiece = piece;
       this.updateMeshesRender();
       displayPieceMoves({ piece, moves, gameScene });
@@ -118,7 +117,7 @@ export class Controller {
   }
 
   lookUpPiece(pickedMesh: AbstractMesh, externalMesh: boolean) {
-    return this.match.current.game.lookupPiece(
+    return this.match.game.lookupPiece(
       findByPoint({
         get: "index",
         point: [pickedMesh.position.z, pickedMesh.position.x],
@@ -129,7 +128,7 @@ export class Controller {
 
   currentPlayerPiece(pickedPiece: GamePiece | undefined) {
     if (!pickedPiece) return false;
-    return pickedPiece.color === this.match.current.game.getCurrentPlayer();
+    return pickedPiece.color === this.match.game.getCurrentPlayer();
   }
 
   unselectCurrentPiece() {
@@ -138,7 +137,7 @@ export class Controller {
   }
 
   handlePieceInput(pickedPiece: GamePiece) {
-    const { game } = this.match.current;
+    const { game } = this.match;
     //If no selection
     if (!this.selectedPiece) return this.displayMoves(pickedPiece);
     //If you select the same piece as before deselect it
@@ -170,13 +169,10 @@ export class Controller {
   }
 
   onMoveSuccess(toEmit = true) {
-    this.selectedPiece = undefined;
-    this.updateMeshesRender();
-    const nextTurn = this.match.nextTurn();
-    if (!nextTurn) return this.events.setMessage(this.createMatchEndPrompt());
+    this.handleNextTurn();
     this.rotateCamera();
     if (toEmit) {
-      const turnHistory = this.match.current.game.current.turnHistory.at(-1);
+      const turnHistory = this.match.game.current.turnHistory.at(-1);
       if (turnHistory) {
         const { origin, target } = turnHistory;
         this.events.emitTurn(origin, target);
@@ -184,8 +180,15 @@ export class Controller {
     }
   }
 
+  handleNextTurn() {
+    this.selectedPiece = undefined;
+    this.updateMeshesRender();
+    const nextTurn = this.match.game.nextTurn();
+    if (!nextTurn) return this.events.setMessage(this.createMatchEndPrompt());
+  }
+
   createMatchEndPrompt() {
-    const winningTeam = this.match.getWinningTeam();
+    const winningTeam = this.match.game.getLastPlayer();
     return {
       question: `${winningTeam} team has won!, Would you like to play another game?`,
       onConfirm: () => {
@@ -199,8 +202,8 @@ export class Controller {
   }
 
   undoMove() {
-    if (this.match.current.game.current.turnHistory.length === 0) return;
-    const isValidUndo = this.match.undoTurn();
+    if (this.match.game.current.turnHistory.length === 0) return;
+    const isValidUndo = this.match.game.undoTurn();
     if (isValidUndo) {
       this.updateMeshesRender();
       this.rotateCamera();
@@ -208,7 +211,7 @@ export class Controller {
   }
 
   resetMatch() {
-    this.match.resetMatch();
+    this.match.game.resetGame();
     this.updateMeshesRender();
     this.resetCamera();
   }
@@ -241,6 +244,11 @@ export class Controller {
     });
   }
 
+  handlePromotionEvent(selection: string) {
+    this.match.game.setPromotionPiece(selection);
+    this.handleNextTurn();
+  }
+
   updateMeshesRender() {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
@@ -260,7 +268,7 @@ export class Controller {
     }
 
     //For each active piece, creates a mesh clone and places on board
-    this.match.current.game.allPieces().forEach((square) => {
+    this.match.game.allPieces().forEach((square) => {
       const { name, color, point } = square.on!;
       const foundMesh = gameScene.scene.meshes.find(
         (mesh) => mesh.name === name && mesh.metadata.color === color
@@ -287,7 +295,7 @@ export class Controller {
     if (!this.options.rotateCamera) return;
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
-    let currentPlayer = this.match.current.game.getCurrentPlayer();
+    let currentPlayer = this.match.game.getCurrentPlayer();
     let camera: any = gameScene.scene.cameras[0];
     let alpha = camera.alpha;
     let ratio;
@@ -361,7 +369,7 @@ export class Controller {
     if (!gameScene) return;
     let camera: any = gameScene?.scene.cameras[0];
     if (!team) {
-      this.match.current.game.getCurrentPlayer() === "White"
+      this.match.game.getCurrentPlayer() === "White"
         ? setToWhitePlayer()
         : setToBlackPlayer();
     } else {
@@ -376,27 +384,5 @@ export class Controller {
       camera.alpha = 0;
       camera.beta = Math.PI / 4;
     }
-  }
-
-  setPromotionPiece(selection: string) {
-    const turnHistory = this.match.current.game.current.turnHistory.at(-1);
-    if (turnHistory !== undefined) {
-      const square = turnHistory.targetSquare.square;
-      turnHistory.promotedPiece = selection;
-      const { color, point, movement } = turnHistory.originPiece!;
-      turnHistory.targetSquare.on = new GamePiece(
-        selection,
-        color,
-        point,
-        movement
-      );
-      const symbol = turnHistory.targetSquare.on.getSymbol();
-      const annotations = this.match.current.game.current.annotations;
-      annotations[annotations.length - 1] = `${square}${symbol}`;
-    }
-    this.selectedPiece = undefined;
-    this.updateMeshesRender();
-    const nextTurn = this.match.nextTurn();
-    if (!nextTurn) return this.events.setMessage(this.createMatchEndPrompt());
   }
 }
