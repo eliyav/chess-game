@@ -10,22 +10,57 @@ import Board, { Square } from "./board";
 import GamePiece, { Move } from "./game-piece";
 
 class Game {
-  board: Board;
-  annotations: string[];
-  turnHistory: TurnHistory[];
   teams: string[];
-  currentPlayer: string;
+  current: {
+    board: Board;
+    annotations: string[];
+    turnHistory: TurnHistory[];
+    turn: number;
+  };
 
   constructor() {
-    this.board = new Board();
-    this.annotations = [];
-    this.turnHistory = [];
-    (this.teams = ["White", "Black"]), (this.currentPlayer = "White");
+    this.teams = ["White", "Black"];
+    this.current = this.createGame();
   }
 
-  setCurrentTeam(turn: number) {
-    const currentTeam = turn % 2 ? this.teams[0] : this.teams[1];
-    this.currentPlayer = currentTeam;
+  createGame() {
+    return {
+      board: new Board(),
+      annotations: [],
+      turnHistory: [],
+      turn: 1,
+    };
+  }
+
+  getCurrentPlayer() {
+    const index = this.current.turn % 2 ? 0 : 1;
+    return this.teams[index];
+  }
+
+  nextTurn() {
+    this.current.turn++;
+    if (this.isCheckmate()) return false;
+    return true;
+  }
+
+  undoTurn() {
+    const lastTurn = this.current.turnHistory.at(-1);
+    if (lastTurn !== undefined) {
+      if (lastTurn.originPiece) {
+        lastTurn.originPiece.resetPieceMovement();
+        if (lastTurn.castling) {
+          lastTurn.castling.forEach((square) => (square.on = undefined));
+        }
+        lastTurn.originSquare.on = lastTurn.originPiece;
+        lastTurn.originPiece.point = lastTurn.origin;
+        lastTurn.targetSquare.on = lastTurn.targetPiece;
+        this.current.turnHistory.length = this.current.turnHistory.length - 1;
+        this.current.annotations.length = this.current.annotations.length - 1;
+        this.current.turn--;
+      }
+      return true;
+    }
+    return false;
   }
 
   resolveMove(originPoint: Point, targetPoint: Point): TurnHistory | false {
@@ -34,24 +69,24 @@ class Game {
     const castlingResult = this.resolveCastling(locationsInfo);
     if (castlingResult) {
       const annotation = this.annotate(castlingResult);
-      this.annotations.push(annotation);
-      this.turnHistory.push(castlingResult);
+      this.current.annotations.push(annotation);
+      this.current.turnHistory.push(castlingResult);
       return castlingResult;
     }
     //Resolve a EnPassant Move
     const enPassantResult = this.resolveEnPassant(locationsInfo);
     if (enPassantResult) {
       const annotation = this.annotate(enPassantResult);
-      this.annotations.push(annotation);
-      this.turnHistory.push(enPassantResult);
+      this.current.annotations.push(annotation);
+      this.current.turnHistory.push(enPassantResult);
       return enPassantResult;
     }
     //Resolve a standard movement/capture move
     const standardResult = this.resolveStandard(locationsInfo);
     if (standardResult) {
       const annotation = this.annotate(standardResult);
-      this.annotations.push(annotation);
-      this.turnHistory.push(standardResult);
+      this.current.annotations.push(annotation);
+      this.current.turnHistory.push(standardResult);
       return standardResult;
     }
 
@@ -73,7 +108,8 @@ class Game {
 
   resolveEnPassant(locationsInfo: LocationsInfo) {
     const { originPiece, targetPoint } = locationsInfo;
-    const lastTurnHistory = this.turnHistory[this.turnHistory.length - 1];
+    const lastTurnHistory =
+      this.current.turnHistory[this.current.turnHistory.length - 1];
     const enPassant = gameHelpers.isEnPassantAvailable(lastTurnHistory);
     if (enPassant.result) {
       if (gameHelpers.doMovesMatch(enPassant.enPassantPoint, targetPoint)) {
@@ -96,17 +132,23 @@ class Game {
     const { originPiece, targetPiece, originPoint, targetPoint } =
       locationsInfo;
     const castling =
-      originPiece!.name === "King" && originPiece!.color === this.currentPlayer;
+      originPiece!.name === "King" &&
+      originPiece!.color === this.getCurrentPlayer();
     let castling2 = false;
     if (targetPiece !== undefined) {
       castling2 =
-        targetPiece.name === "Rook" && targetPiece.color === this.currentPlayer;
+        targetPiece.name === "Rook" &&
+        targetPiece.color === this.getCurrentPlayer();
       if (castling && castling2) {
         const a = gameHelpers.getX(originPoint);
         const b = gameHelpers.getX(targetPoint);
         let c = a - b;
         c < 0 ? (c = 1) : (c = -1);
-        const castlingResult = castlingMove(c, locationsInfo, this.board.grid);
+        const castlingResult = castlingMove(
+          c,
+          locationsInfo,
+          this.current.board.grid
+        );
         const promotion = originPiece!.checkPromotion();
         return gameHelpers.generateTurnHistory("castling", locationsInfo, {
           direction: c,
@@ -146,39 +188,46 @@ class Game {
 
   calculateAvailableMoves(piece: GamePiece, flag = false): Move[] {
     let availableMoves: Move[] = [];
-    let lastTurnHistory = this.turnHistory[this.turnHistory.length - 1];
+    let lastTurnHistory =
+      this.current.turnHistory[this.current.turnHistory.length - 1];
     switch (piece.name) {
       case "Pawn":
         availableMoves = movementHelpers.calcPawnMoves(
           piece,
           flag,
-          this.board.grid,
+          this.current.board.grid,
           lastTurnHistory
         );
         break;
       case "Rook":
-        availableMoves = movementHelpers.calcRookMoves(piece, this.board.grid);
+        availableMoves = movementHelpers.calcRookMoves(
+          piece,
+          this.current.board.grid
+        );
         break;
       case "Bishop":
         availableMoves = movementHelpers.calcBishopMoves(
           piece,
-          this.board.grid
+          this.current.board.grid
         );
         break;
       case "Knight":
         availableMoves = movementHelpers.calcKnightMoves(
           piece,
-          this.board.grid
+          this.current.board.grid
         );
         break;
       case "Queen":
-        availableMoves = movementHelpers.calcQueenMoves(piece, this.board.grid);
+        availableMoves = movementHelpers.calcQueenMoves(
+          piece,
+          this.current.board.grid
+        );
         break;
       case "King":
         availableMoves = movementHelpers.calcKingMoves(
           piece,
           flag,
-          this.board.grid,
+          this.current.board.grid,
           this.calcCastling.bind(this)
         );
         break;
@@ -234,19 +283,19 @@ class Game {
   }
 
   findKing(currentPlayer: boolean) {
-    const currentKing = this.board.grid
+    const currentKing = this.current.board.grid
       .flat()
       .filter((square) => (square.on !== undefined ? true : false))
       .find((square) => {
         if (currentPlayer) {
           return (
             square.on!.name === "King" &&
-            square.on!.color === this.currentPlayer
+            square.on!.color === this.getCurrentPlayer()
           );
         } else {
           return (
             square.on!.name === "King" &&
-            square.on!.color !== this.currentPlayer
+            square.on!.color !== this.getCurrentPlayer()
           );
         }
       });
@@ -257,12 +306,12 @@ class Game {
   }
 
   getPieces(currentPlayer: boolean) {
-    const piecesArray = this.board.grid.flat().filter((square) => {
+    const piecesArray = this.current.board.grid.flat().filter((square) => {
       if (square.on !== undefined) {
         if (currentPlayer) {
-          return square.on.color === this.currentPlayer;
+          return square.on.color === this.getCurrentPlayer();
         } else {
-          return square.on.color !== this.currentPlayer;
+          return square.on.color !== this.getCurrentPlayer();
         }
       }
     });
@@ -271,11 +320,11 @@ class Game {
 
   getLocationsInfo(originPoint: Point, targetPoint: Point): LocationsInfo {
     const originSquare =
-      this.board.grid[gameHelpers.getX(originPoint)][
+      this.current.board.grid[gameHelpers.getX(originPoint)][
         gameHelpers.getY(originPoint)
       ];
     const targetSquare =
-      this.board.grid[gameHelpers.getX(targetPoint)][
+      this.current.board.grid[gameHelpers.getX(targetPoint)][
         gameHelpers.getY(targetPoint)
       ];
     return {
@@ -289,7 +338,7 @@ class Game {
   }
 
   findPieces(name: string, color: string) {
-    const foundPieces = this.board.grid.flat().filter((square) => {
+    const foundPieces = this.current.board.grid.flat().filter((square) => {
       if (square.on !== undefined) {
         return square.on.name === name && square.on.color === color;
       }
@@ -299,7 +348,7 @@ class Game {
   }
 
   allPieces() {
-    const allPieces = this.board.grid
+    const allPieces = this.current.board.grid
       .flat()
       .filter((square) => square.on !== undefined);
 
@@ -308,7 +357,7 @@ class Game {
 
   lookupPiece(location: [x: number, y: number]) {
     const [x, y] = location;
-    const piece = this.board.grid[x][y].on;
+    const piece = this.current.board.grid[x][y].on;
     if (piece !== undefined) {
       return piece!;
     }
@@ -348,7 +397,7 @@ class Game {
         resolve[0] ? movesObj.push(resolve[1]) : null;
       }
     };
-    const playersRooks = this.findPieces("Rook", this.currentPlayer);
+    const playersRooks = this.findPieces("Rook", this.getCurrentPlayer());
     if (playersRooks) {
       playersRooks.forEach((square) => {
         checkCastlingMove(piece!, square.on!);
@@ -381,7 +430,9 @@ class Game {
       const squaresInUse = squaresInBetween
         .map((point) => {
           const square =
-            this.board.grid[gameHelpers.getX(point)][gameHelpers.getY(point)];
+            this.current.board.grid[gameHelpers.getX(point)][
+              gameHelpers.getY(point)
+            ];
           return square.on === undefined ? false : true;
         })
         .filter((result) => result === true);
@@ -419,10 +470,7 @@ class Game {
   }
 
   resetGame() {
-    this.board.resetBoard();
-    this.setCurrentTeam(1);
-    this.annotations = [];
-    this.turnHistory = [];
+    this.current = this.createGame();
   }
 
   annotate(result: TurnHistory) {

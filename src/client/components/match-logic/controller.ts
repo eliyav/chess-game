@@ -67,6 +67,7 @@ export class Controller {
       e: IPointerEvent,
       pickResult: Nullable<PickingInfo>
     ) => {
+      console.log(this.match);
       if (!this.match.isPlayersTurn()) return;
       const pickedMesh = pickResult?.pickedMesh;
       if (!pickedMesh) return;
@@ -106,10 +107,10 @@ export class Controller {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
     if (!piece) return;
-    if (this.match.current.player !== this.match.player) return;
+    if (this.match.player !== this.match.player) return;
     const currentPlayersPiece = this.currentPlayerPiece(piece);
     if (currentPlayersPiece) {
-      const moves = this.match.game.getValidMoves(piece);
+      const moves = this.match.current.game.getValidMoves(piece);
       this.selectedPiece = piece;
       this.updateMeshesRender();
       displayPieceMoves({ piece, moves, gameScene });
@@ -117,7 +118,7 @@ export class Controller {
   }
 
   lookUpPiece(pickedMesh: AbstractMesh, externalMesh: boolean) {
-    return this.match.game.lookupPiece(
+    return this.match.current.game.lookupPiece(
       findByPoint({
         get: "index",
         point: [pickedMesh.position.z, pickedMesh.position.x],
@@ -128,7 +129,7 @@ export class Controller {
 
   currentPlayerPiece(pickedPiece: GamePiece | undefined) {
     if (!pickedPiece) return false;
-    return pickedPiece.color === this.match.game.currentPlayer;
+    return pickedPiece.color === this.match.current.game.getCurrentPlayer();
   }
 
   unselectCurrentPiece() {
@@ -137,7 +138,7 @@ export class Controller {
   }
 
   handlePieceInput(pickedPiece: GamePiece) {
-    const { game } = this.match;
+    const { game } = this.match.current;
     //If no selection
     if (!this.selectedPiece) return this.displayMoves(pickedPiece);
     //If you select the same piece as before deselect it
@@ -175,7 +176,7 @@ export class Controller {
     if (!nextTurn) return this.events.setMessage(this.createMatchEndPrompt());
     this.rotateCamera();
     if (toEmit) {
-      const turnHistory = this.match.game.turnHistory.at(-1);
+      const turnHistory = this.match.current.game.current.turnHistory.at(-1);
       if (turnHistory) {
         const { origin, target } = turnHistory;
         this.events.emitTurn(origin, target);
@@ -198,7 +199,7 @@ export class Controller {
   }
 
   undoMove() {
-    if (this.match.game.turnHistory.length === 0) return;
+    if (this.match.current.game.current.turnHistory.length === 0) return;
     const isValidUndo = this.match.undoTurn();
     if (isValidUndo) {
       this.updateMeshesRender();
@@ -259,7 +260,7 @@ export class Controller {
     }
 
     //For each active piece, creates a mesh clone and places on board
-    this.match.game.allPieces().forEach((square) => {
+    this.match.current.game.allPieces().forEach((square) => {
       const { name, color, point } = square.on!;
       const foundMesh = gameScene.scene.meshes.find(
         (mesh) => mesh.name === name && mesh.metadata.color === color
@@ -286,7 +287,7 @@ export class Controller {
     if (!this.options.rotateCamera) return;
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
-    let currentPlayer = this.match.game.currentPlayer;
+    let currentPlayer = this.match.current.game.getCurrentPlayer();
     let camera: any = gameScene.scene.cameras[0];
     let alpha = camera.alpha;
     let ratio;
@@ -360,7 +361,7 @@ export class Controller {
     if (!gameScene) return;
     let camera: any = gameScene?.scene.cameras[0];
     if (!team) {
-      this.match.game.currentPlayer === "White"
+      this.match.current.game.getCurrentPlayer() === "White"
         ? setToWhitePlayer()
         : setToBlackPlayer();
     } else {
@@ -378,7 +379,7 @@ export class Controller {
   }
 
   setPromotionPiece(selection: string) {
-    const turnHistory = this.match.game.turnHistory.at(-1);
+    const turnHistory = this.match.current.game.current.turnHistory.at(-1);
     if (turnHistory !== undefined) {
       const square = turnHistory.targetSquare.square;
       turnHistory.promotedPiece = selection;
@@ -390,7 +391,7 @@ export class Controller {
         movement
       );
       const symbol = turnHistory.targetSquare.on.getSymbol();
-      const annotations = this.match.game.annotations;
+      const annotations = this.match.current.game.current.annotations;
       annotations[annotations.length - 1] = `${square}${symbol}`;
     }
     this.selectedPiece = undefined;

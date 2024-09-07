@@ -2,87 +2,58 @@ import { LobbySettings } from "../../shared/lobby";
 import Game from "./game-logic/game";
 
 export class Match {
-  game: Game;
+  lobby: LobbySettings;
+  player: string;
   current: {
     key: string | null;
     mode: string;
     players: string[] | undefined;
-    turn: number;
-    player: string;
+    game: Game;
   };
-  lobby: LobbySettings;
-  player: string;
 
   constructor({ lobby, player }: { lobby: LobbySettings; player: string }) {
     this.lobby = lobby;
     this.player = player;
-    this.current = this.setMatch({ lobby, player });
-    this.game = new Game();
+    this.current = this.setMatch({ lobby });
   }
 
-  setMatch({ lobby, player }: { lobby: LobbySettings; player: string }) {
+  setMatch({ lobby }: { lobby: LobbySettings }) {
     const matchDefaults = {
       key: lobby.key,
       mode: lobby.mode,
       players: lobby.players,
-      turn: 1,
-      player,
+      game: new Game(),
     };
     return matchDefaults;
   }
 
   nextTurn() {
-    this.current.turn++;
-    if (this.game.isCheckmate()) return false;
-    this.game.setCurrentTeam(this.current.turn);
-    return true;
+    return this.current.game.nextTurn();
   }
 
   isPlayersTurn() {
-    if (this.current.players) {
-      const currentPlayer =
-        this.current.turn % 2
-          ? this.current.players[0]
-          : this.current.players[1];
-      return currentPlayer === this.current.player;
+    if (this.current.players?.length) {
+      const currentPlayer = this.current.game.getCurrentPlayer();
+      return currentPlayer === this.player;
     } else {
       return true;
     }
   }
 
   resetMatch() {
-    this.current = this.setMatch({ lobby: this.lobby, player: this.player });
-    this.game.resetGame();
+    this.current = this.setMatch({ lobby: this.lobby });
   }
 
   takeTurn(originPoint: Point, targetPoint: Point) {
-    return this.game.resolveMove(originPoint, targetPoint);
+    return this.current.game.resolveMove(originPoint, targetPoint);
   }
 
   undoTurn() {
-    const lastTurn = this.game.turnHistory.at(-1);
-    if (lastTurn !== undefined) {
-      if (lastTurn.originPiece) {
-        lastTurn.originPiece.resetPieceMovement();
-        if (lastTurn.castling)
-          lastTurn.castling.forEach((square) => (square.on = undefined));
-
-        lastTurn.originSquare.on = lastTurn.originPiece;
-        lastTurn.originPiece.point = lastTurn.origin;
-        lastTurn.targetSquare.on = lastTurn.targetPiece;
-        this.game.turnHistory.length = this.game.turnHistory.length - 1;
-        this.game.annotations.length = this.game.annotations.length - 1;
-        this.current.turn--;
-        this.game.setCurrentTeam(this.current.turn);
-      }
-      return true;
-    }
-    return false;
+    return this.current.game.undoTurn();
   }
 
   getWinningTeam() {
-    const currentPlayer =
-      this.current.turn % 2 ? this.current.player[0] : this.current.player[1];
+    const currentPlayer = this.current.game.getCurrentPlayer();
     return currentPlayer;
   }
 }
