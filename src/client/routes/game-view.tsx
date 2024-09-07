@@ -17,7 +17,10 @@ export const GameView: React.FC<{
   const navigate = useNavigate();
   const { lobby, player } = useLocation().state as {
     lobby: LobbySettings;
-    player: string;
+    player: {
+      name: string;
+      team: "White" | "Black";
+    };
   };
   const [message, setMessage] = useState<Message | null>(null);
   const [promotion, setPromotion] = useState(false);

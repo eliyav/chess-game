@@ -59,7 +59,13 @@ export const LobbySelect: React.FC<{}> = () => {
                   throw new Error("Failed to join lobby");
                 }
                 navigate("/lobby-online", {
-                  state: { room: roomInput.value, player: "Guest" },
+                  state: {
+                    room: roomInput.value,
+                    player: {
+                      name: "Guest",
+                      team: "Black",
+                    },
+                  },
                 });
               } catch (e) {
                 if (e instanceof Error) {
@@ -84,7 +90,13 @@ export const LobbySelect: React.FC<{}> = () => {
                 });
                 const roomKey = await createRoomResponse.text();
                 navigate("/lobby-online", {
-                  state: { room: roomKey, player: "Host" },
+                  state: {
+                    room: roomKey,
+                    player: {
+                      name: "Host",
+                      team: "White",
+                    },
+                  },
                 });
               } catch (e) {
                 if (e instanceof Error) {

@@ -11,7 +11,10 @@ export const OnlineLobby: React.FC<{
   const navigate = useNavigate();
   const { room, player } = useLocation().state as {
     room: string;
-    player: string;
+    player: {
+      name: string;
+      team: "White" | "Black";
+    };
   };
 
   const [lobby, setLobby] = useState<LobbySettings>();

@@ -9,6 +9,7 @@ import GamePiece from "../game-logic/game-piece";
 import { Match } from "../match";
 import { Message } from "../modals/message-modal";
 import { GameScene, SceneManager, Scenes } from "../scene-manager";
+import { ArcRotateCamera } from "@babylonjs/core";
 
 type ControllerOptions = {
   playAnimations?: boolean;
@@ -53,12 +54,12 @@ export class Controller {
     this.init();
   }
 
-  init(team?: string) {
+  init() {
     const gameScene = this.sceneManager.switchScene(Scenes.GAME);
     if (gameScene) {
       this.subscribeGameInput(gameScene);
       this.updateMeshesRender();
-      this.resetCamera(team);
+      this.resetCamera();
     }
   }
 
@@ -364,25 +365,12 @@ export class Controller {
     animateCameraRotation(currentPlayer);
   }
 
-  resetCamera(team?: string) {
+  resetCamera() {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
-    let camera: any = gameScene?.scene.cameras[0];
-    if (!team) {
-      this.match.game.getCurrentPlayer() === "White"
-        ? setToWhitePlayer()
-        : setToBlackPlayer();
-    } else {
-      parseInt(team) === 1 ? setToWhitePlayer() : setToBlackPlayer();
-    }
-    function setToWhitePlayer() {
-      camera.alpha = Math.PI;
-      camera.beta = Math.PI / 4;
-    }
-
-    function setToBlackPlayer() {
-      camera.alpha = 0;
-      camera.beta = Math.PI / 4;
-    }
+    const camera = gameScene.scene.cameras[0] as ArcRotateCamera;
+    const isWhitePlayer = this.match.getPlayerTeam() === "White";
+    camera.alpha = isWhitePlayer ? Math.PI : 0;
+    camera.beta = Math.PI / 4;
   }
 }
