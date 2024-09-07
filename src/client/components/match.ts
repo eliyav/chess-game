@@ -24,8 +24,12 @@ export class Match {
     this.game = new Game();
   }
 
+  isOnline() {
+    return this.lobby.mode === LOBBY.ONLINE;
+  }
+
   isPlayersTurn() {
-    if (this.lobby.mode === LOBBY.ONLINE) {
+    if (this.isOnline()) {
       const currentPlayer = this.game.getCurrentPlayer();
       return currentPlayer === this.player.team;
     } else {
@@ -34,7 +38,7 @@ export class Match {
   }
 
   getPlayerTeam() {
-    if (this.lobby.mode === LOBBY.ONLINE) {
+    if (this.isOnline()) {
       return this.player.team;
     } else {
       return this.game.getCurrentPlayer();

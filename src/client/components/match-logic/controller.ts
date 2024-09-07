@@ -293,7 +293,7 @@ export class Controller {
   }
 
   rotateCamera() {
-    if (!this.options.rotateCamera) return;
+    if (!this.options.rotateCamera || this.match.isOnline()) return;
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
     let currentPlayer = this.match.game.getCurrentPlayer();
