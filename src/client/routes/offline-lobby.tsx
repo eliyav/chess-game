@@ -41,7 +41,7 @@ export const OfflineLobby: React.FC<{}> = ({}) => {
   );
 };
 
-function createLobby(mode: string | LOBBY) {
+function createLobby(mode: LOBBY) {
   return {
     mode,
     key: null,

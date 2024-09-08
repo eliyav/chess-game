@@ -1,16 +1,12 @@
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { Teams } from "../../../shared/match";
+import { LOBBY, LobbySettings, Player, Teams } from "../../../shared/match";
+import { TurnHistory } from "../../helper/game-helpers";
+import { Point } from "../../helper/movement-helpers";
 import { findByPoint } from "../../view/scene-helpers";
 import Game from "../game-logic/game";
-import GamePiece, { Move } from "../game-logic/game-piece";
-import { TurnHistory } from "../../helper/game-helpers";
-import { Square } from "../game-logic/board";
-import { Point } from "../../helper/movement-helpers";
+import GamePiece from "../game-logic/game-piece";
 
-interface MatchLogic {
-  isPlayersTurn(): boolean;
-  getPlayerTeam(): Teams;
-  shouldCameraRotate(): boolean;
+export interface MatchLogic {
   resolveMove({
     originPoint,
     targetPoint,
@@ -18,48 +14,22 @@ interface MatchLogic {
     originPoint: Point;
     targetPoint: Point;
   }): boolean | TurnHistory;
+  isPlayersTurn(): boolean;
+  getPlayerTeam(): Teams;
   nextTurn(): void;
   undoTurn(): void;
-  reset(): void;
-  saveGame(): void;
-  loadGame(): void;
-  getGame(): Game;
-  isGameOver(): boolean;
-  getWinner(): Teams;
-  getGameHistory(): TurnHistory[];
   isCurrentPlayersPiece(piece: GamePiece): boolean;
-  setPromotion(selection: string): void;
-  getAllGamePieces(): Square[];
-  getValidMoves(gamePiece: GamePiece): Move[];
-  lookupGamePiece(
-    pickedMesh: AbstractMesh,
-    externalMesh: boolean
-  ): GamePiece | undefined;
 }
 
-export class BaseMatch implements MatchLogic {
+export class BaseMatch {
   game: Game;
+  lobby: LobbySettings;
+  player: Player;
 
-  constructor() {
+  constructor({ lobby, player }: { lobby: LobbySettings; player: Player }) {
     this.game = new Game();
-  }
-
-  resolveMove({
-    originPoint,
-    targetPoint,
-  }: {
-    originPoint: Point;
-    targetPoint: Point;
-  }) {
-    return this.game.resolveMove(originPoint, targetPoint);
-  }
-
-  nextTurn() {
-    return this.game.nextTurn();
-  }
-
-  undoTurn() {
-    return this.game.undoTurn();
+    this.lobby = lobby;
+    this.player = player;
   }
 
   reset() {
@@ -86,28 +56,12 @@ export class BaseMatch implements MatchLogic {
     return this.game.getWinner();
   }
 
+  shouldCameraRotate() {
+    return this.lobby.mode === LOBBY.ONLINE ? false : true;
+  }
+
   getGameHistory() {
     return this.game.getHistory();
-  }
-
-  isPlayersTurn() {
-    return true;
-  }
-
-  getPlayerTeam() {
-    return this.game.getCurrentPlayer();
-  }
-
-  shouldCameraRotate() {
-    return true;
-  }
-
-  isCurrentPlayersPiece(piece: GamePiece) {
-    return piece.color === this.getPlayerTeam();
-  }
-
-  setPromotion(selection: string) {
-    this.game.setPromotionPiece(selection);
   }
 
   getAllGamePieces() {
@@ -126,5 +80,9 @@ export class BaseMatch implements MatchLogic {
         externalMesh,
       })
     );
+  }
+
+  setPromotion(selection: string) {
+    this.game.setPromotionPiece(selection);
   }
 }

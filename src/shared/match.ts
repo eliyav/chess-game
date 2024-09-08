@@ -4,7 +4,7 @@ export enum LOBBY {
 }
 
 export interface LobbySettings {
-  mode: string | LOBBY;
+  mode: LOBBY;
   key: string | null;
   players: string[];
 }

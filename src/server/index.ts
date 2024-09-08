@@ -3,7 +3,7 @@ import path from "path";
 import compression from "compression";
 import { Server } from "socket.io";
 import { fileURLToPath } from "node:url";
-import { LobbySettings } from "../shared/match";
+import { LOBBY, LobbySettings } from "../shared/match";
 
 const clientPath = fileURLToPath(new URL("../client", import.meta.url));
 
@@ -29,7 +29,7 @@ app.post("/create-lobby", (req, res) => {
   }
   const key = generateKey();
   const lobby = {
-    mode: "Online",
+    mode: LOBBY.ONLINE,
     key,
     players: [body.name],
   };

@@ -1,10 +1,12 @@
 import { Socket } from "socket.io-client";
-import { LobbySettings, Player } from "../../../shared/match";
-import { BaseMatch } from "./base-match";
+import { LOBBY, LobbySettings, Player } from "../../../shared/match";
+import { BaseMatch, MatchLogic } from "./base-match";
+import { Point } from "../../helper/movement-helpers";
+import GamePiece from "../game-logic/game-piece";
 
-export class OnlineMatch extends BaseMatch {
-  lobby: LobbySettings;
-  player: Player;
+export class OnlineMatch extends BaseMatch implements MatchLogic {
+  mode: LOBBY.ONLINE;
+  socket: Socket;
 
   constructor({
     lobby,
@@ -15,9 +17,19 @@ export class OnlineMatch extends BaseMatch {
     player: Player;
     socket: Socket;
   }) {
-    super();
-    this.lobby = lobby;
-    this.player = player;
+    super({ lobby, player });
+    this.mode = LOBBY.ONLINE;
+    this.socket = socket;
+  }
+
+  resolveMove({
+    originPoint,
+    targetPoint,
+  }: {
+    originPoint: Point;
+    targetPoint: Point;
+  }) {
+    return this.game.resolveMove(originPoint, targetPoint);
   }
 
   isPlayersTurn() {
@@ -29,7 +41,19 @@ export class OnlineMatch extends BaseMatch {
     return this.player.team;
   }
 
-  shouldCameraRotate() {
-    return false;
+  isCurrentPlayersPiece(piece: GamePiece) {
+    return piece.color === this.getPlayerTeam();
+  }
+
+  nextTurn() {
+    return this.game.nextTurn();
+  }
+
+  undoTurn() {
+    return this.game.undoTurn();
+  }
+
+  setPromotion(selection: string) {
+    this.game.setPromotionPiece(selection);
   }
 }
