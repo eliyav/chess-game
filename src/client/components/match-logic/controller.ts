@@ -127,18 +127,15 @@ export class Controller {
   }
 
   handlePieceInput(pickedPiece: GamePiece) {
-    const { game } = this.match;
     //If no selection
     if (!this.selectedPiece) return this.displayMoves(pickedPiece);
     //If you select the same piece as before deselect it
     if (this.selectedPiece === pickedPiece) return this.unselectCurrentPiece();
     //If you select a different piece check if its a valid move and resolve or display new moves
-    const isCurrentPlayersPiece = this.match.isCurrentPlayersPiece(pickedPiece);
-    const validMove = game.isValidMove(
-      this.selectedPiece,
-      pickedPiece.point,
-      isCurrentPlayersPiece
-    );
+    const validMove = this.match.isValidMove({
+      selectedPiece: this.selectedPiece,
+      pickedPiece,
+    });
     if (validMove) {
       return this.resolveMove([this.selectedPiece.point, pickedPiece.point]);
     }

@@ -22,7 +22,7 @@ export interface MatchLogic {
 }
 
 export class BaseMatch {
-  game: Game;
+  private game: Game;
   lobby: LobbySettings;
   player: Player;
 

@@ -18,7 +18,22 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
     originPoint: Point;
     targetPoint: Point;
   }) {
-    return this.game.resolveMove(originPoint, targetPoint);
+    return this.getGame().resolveMove(originPoint, targetPoint);
+  }
+
+  isValidMove({
+    pickedPiece,
+    selectedPiece,
+  }: {
+    pickedPiece: GamePiece;
+    selectedPiece: GamePiece;
+  }) {
+    const isCurrentPlayersPiece = this.isCurrentPlayersPiece(pickedPiece);
+    return this.getGame().isValidMove(
+      selectedPiece,
+      pickedPiece.point,
+      isCurrentPlayersPiece
+    );
   }
 
   isPlayersTurn() {
@@ -27,7 +42,7 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
   }
 
   getPlayerTeam() {
-    return this.game.getCurrentPlayer();
+    return this.getGame().getCurrentPlayer();
   }
 
   isCurrentPlayersPiece(piece: GamePiece) {
@@ -35,10 +50,10 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
   }
 
   nextTurn() {
-    return this.game.nextTurn();
+    return this.getGame().nextTurn();
   }
 
   undoTurn() {
-    return this.game.undoTurn();
+    return this.getGame().undoTurn();
   }
 }

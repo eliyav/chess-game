@@ -29,11 +29,26 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
     originPoint: Point;
     targetPoint: Point;
   }) {
-    return this.game.resolveMove(originPoint, targetPoint);
+    return this.getGame().resolveMove(originPoint, targetPoint);
+  }
+
+  isValidMove({
+    pickedPiece,
+    selectedPiece,
+  }: {
+    pickedPiece: GamePiece;
+    selectedPiece: GamePiece;
+  }) {
+    const isCurrentPlayersPiece = this.isCurrentPlayersPiece(pickedPiece);
+    return this.getGame().isValidMove(
+      selectedPiece,
+      pickedPiece.point,
+      isCurrentPlayersPiece
+    );
   }
 
   isPlayersTurn() {
-    const currentPlayer = this.game.getCurrentPlayer();
+    const currentPlayer = this.getGame().getCurrentPlayer();
     return currentPlayer === this.player.team;
   }
 
@@ -46,14 +61,14 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
   }
 
   nextTurn() {
-    return this.game.nextTurn();
+    return this.getGame().nextTurn();
   }
 
   undoTurn() {
-    return this.game.undoTurn();
+    return this.getGame().undoTurn();
   }
 
   setPromotion(selection: string) {
-    this.game.setPromotionPiece(selection);
+    this.getGame().setPromotionPiece(selection);
   }
 }
