@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MenuOverlay } from "../components/game-overlay/menu-overlay";
 import * as icons from "../components/game-overlay/overlay-icons";
@@ -6,9 +6,10 @@ import { Controller } from "../components/match-logic/controller";
 import { Message, MessageModal } from "../components/modals/message-modal";
 import PromotionModal from "../components/modals/promotion-modal";
 import { SceneManager, Scenes } from "../components/scene-manager";
-import { LobbySettings, Player } from "../../shared/match";
+import { LOBBY, LobbySettings, Player } from "../../shared/match";
 import { Socket } from "socket.io-client";
 import { LocalMatch } from "../components/match-logic/local-match";
+import { OnlineMatch } from "../components/match-logic/online-match";
 
 export const GameView: React.FC<{
   sceneManager: SceneManager;
@@ -21,7 +22,11 @@ export const GameView: React.FC<{
   };
   const [message, setMessage] = useState<Message | null>(null);
   const [promotion, setPromotion] = useState(false);
-  const match = useRef(new LocalMatch({ lobby, player }));
+  const match = useRef(
+    lobby.mode === LOBBY.OFFLINE
+      ? new LocalMatch({ lobby, player })
+      : new OnlineMatch({ lobby, player, socket })
+  );
   const controller = useRef(
     new Controller({
       sceneManager,
