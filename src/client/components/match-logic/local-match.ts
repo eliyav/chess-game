@@ -36,6 +36,10 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
     );
   }
 
+  resetRequest() {
+    return true;
+  }
+
   isPlayersTurn() {
     //Take into account AI opponent possibility
     return true;

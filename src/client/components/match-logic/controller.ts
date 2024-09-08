@@ -60,8 +60,7 @@ export class Controller {
     const gameScene = this.sceneManager.switchScene(Scenes.GAME);
     if (gameScene) {
       this.subscribeGameInput(gameScene);
-      this.updateMeshesRender();
-      this.resetCamera();
+      this.resetView();
     }
   }
 
@@ -172,7 +171,7 @@ export class Controller {
     return {
       question: `${winningTeam} team has won!, Would you like to play another game?`,
       onConfirm: () => {
-        this.resetMatch();
+        this.requestMatchReset();
         this.events.setMessage(null);
       },
       onReject: () => {
@@ -190,8 +189,18 @@ export class Controller {
     }
   }
 
-  resetMatch() {
+  requestMatchReset() {
+    if (this.match.resetRequest()) {
+      this.resetMatchAndView();
+    }
+  }
+
+  resetMatchAndView() {
     this.match.reset();
+    this.resetView();
+  }
+
+  resetView() {
     this.updateMeshesRender();
     this.resetCamera();
   }

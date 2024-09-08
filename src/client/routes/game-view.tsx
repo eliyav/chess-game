@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MenuOverlay } from "../components/game-overlay/menu-overlay";
 import * as icons from "../components/game-overlay/overlay-icons";
@@ -38,6 +38,22 @@ export const GameView: React.FC<{
     })
   );
 
+  useEffect(() => {
+    console.log("GameView mounted");
+    if (match.current.mode === LOBBY.ONLINE) {
+      console.log("GameView mounted2");
+      match.current.subscribeMatchEvents({
+        controller: controller.current,
+        setMessage,
+      });
+    }
+
+    return () => {
+      if (match.current.mode === LOBBY.ONLINE)
+        match.current.unsubscribeMatchEvents();
+    };
+  }, [match, controller]);
+
   //Game Overlay
   return (
     <>
@@ -52,7 +68,7 @@ export const GameView: React.FC<{
           },
           {
             text: "restart",
-            onClick: () => controller.current.resetMatch(),
+            onClick: () => controller.current.requestMatchReset(),
           },
           {
             text: "undo",

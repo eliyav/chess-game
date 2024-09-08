@@ -117,6 +117,15 @@ io.on("connection", (socket) => {
   socket.on("resolvedTurn", ({ originPoint, targetPoint, lobbyKey }) => {
     socket.to(lobbyKey).emit("resolvedMove", { originPoint, targetPoint });
   });
+
+  socket.on("reset-match-request", ({ key }) => {
+    socket.to(key).emit("reset-match-requested");
+  });
+
+  socket.on("reset-match-response", ({ answer, key }) => {
+    socket.to(key).emit("reset-match-resolve", { answer });
+    socket.emit("reset-match-resolve", { answer });
+  });
 });
 
 function generateKey() {

@@ -3,6 +3,9 @@ import { LOBBY, LobbySettings, Player } from "../../../shared/match";
 import { BaseMatch, MatchLogic } from "./base-match";
 import { Point } from "../../helper/movement-helpers";
 import GamePiece from "../game-logic/game-piece";
+import { Controller } from "./controller";
+import { SetStateAction } from "react";
+import { Message } from "../modals/message-modal";
 
 export class OnlineMatch extends BaseMatch implements MatchLogic {
   mode: LOBBY.ONLINE;
@@ -47,6 +50,11 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
     );
   }
 
+  resetRequest() {
+    this.socket.emit("reset-match-request", { key: this.lobby.key });
+    return false;
+  }
+
   isPlayersTurn() {
     const currentPlayer = this.getGame().getCurrentPlayer();
     return currentPlayer === this.player.team;
@@ -70,5 +78,50 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
 
   setPromotion(selection: string) {
     this.getGame().setPromotionPiece(selection);
+  }
+
+  subscribeMatchEvents({
+    controller,
+    setMessage,
+  }: {
+    controller: Controller;
+    setMessage: (value: React.SetStateAction<Message | null>) => void;
+  }) {
+    this.socket.on("reset-match-requested", () => {
+      setMessage({
+        question: "Opponent requested a match reset. Do you accept?",
+        onConfirm: () => {
+          this.socket.emit("reset-match-response", {
+            answer: true,
+            key: this.lobby.key,
+          });
+          setMessage(null);
+        },
+        onReject: () => {
+          this.socket.emit("reset-match-response", {
+            answer: false,
+            key: this.lobby.key,
+          });
+          setMessage(null);
+        },
+      });
+    });
+
+    this.socket.on("reset-match-resolve", ({ answer }) => {
+      if (answer) {
+        controller.match.reset();
+        controller.resetView();
+
+        setMessage({
+          question: "Match reset successfully!",
+          onConfirm: () => setMessage(null),
+        });
+      }
+    });
+  }
+
+  unsubscribeMatchEvents() {
+    this.socket.off("reset-match-requested");
+    this.socket.off("reset-match-resolve");
   }
 }

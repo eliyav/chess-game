@@ -4,7 +4,7 @@ import { TurnHistory } from "../../helper/game-helpers";
 import { Point } from "../../helper/movement-helpers";
 import { findByPoint } from "../../view/scene-helpers";
 import Game from "../game-logic/game";
-import GamePiece from "../game-logic/game-piece";
+import GamePiece, { Move } from "../game-logic/game-piece";
 
 export interface MatchLogic {
   resolveMove({
@@ -19,6 +19,14 @@ export interface MatchLogic {
   nextTurn(): void;
   undoTurn(): void;
   isCurrentPlayersPiece(piece: GamePiece): boolean;
+  isValidMove({
+    pickedPiece,
+    selectedPiece,
+  }: {
+    pickedPiece: GamePiece;
+    selectedPiece: GamePiece;
+  }): Move | undefined;
+  resetRequest(): boolean;
 }
 
 export class BaseMatch {

@@ -3,7 +3,7 @@ import React from "react";
 export type Message = {
   question: string;
   onConfirm: () => void;
-  onReject: () => void;
+  onReject?: () => void;
 };
 
 export const MessageModal: React.FC<Message> = ({
@@ -16,11 +16,13 @@ export const MessageModal: React.FC<Message> = ({
       <div className="message">
         <p className="text">{question}</p>
         <button className="confirm" onClick={onConfirm}>
-          Yes
+          Confirm
         </button>
-        <button className="reject" onClick={onReject}>
-          No
-        </button>
+        {onReject && (
+          <button className="reject" onClick={onReject}>
+            Reject
+          </button>
+        )}
       </div>
     </div>
   );
