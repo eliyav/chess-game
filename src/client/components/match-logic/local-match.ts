@@ -18,4 +18,8 @@ export class LocalMatch extends BaseMatch {
   getPlayerTeam() {
     return this.game.getCurrentPlayer();
   }
+
+  test() {
+    return "test";
+  }
 }

@@ -12,6 +12,7 @@ import { ArcRotateCamera } from "@babylonjs/core";
 import { rotateCamera } from "../../view/animation/camera";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
+import { Point } from "../../helper/movement-helpers";
 
 type ControllerOptions = {
   playAnimations?: boolean;
@@ -71,7 +72,7 @@ export class Controller {
       if (!this.match.isPlayersTurn()) return;
       const pickedMesh = pickResult?.pickedMesh;
       if (!pickedMesh) return;
-      const pickedPiece = this.lookUpPiece(
+      const pickedPiece = this.match.lookupGamePiece(
         pickedMesh,
         pickedMesh.metadata !== null
       );
@@ -83,10 +84,13 @@ export class Controller {
     };
   }
 
-  async resolveMove(move: Point[], toEmit?: boolean) {
+  async resolveMove(move: Point[]) {
     if (move) {
       const [originPoint, targetPoint] = move;
-      const validTurn = this.match.game.resolveMove(originPoint, targetPoint);
+      const validTurn = this.match.resolveMove({
+        originPoint,
+        targetPoint,
+      });
       if (validTurn) {
         const gameScene = this.sceneManager.getScene(Scenes.GAME);
         if (!gameScene) return;
@@ -107,28 +111,13 @@ export class Controller {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
     if (!piece) return;
-    const currentPlayersPiece = this.currentPlayerPiece(piece);
+    const currentPlayersPiece = this.match.isCurrentPlayersPiece(piece);
     if (currentPlayersPiece) {
-      const moves = this.match.game.getValidMoves(piece);
+      const moves = this.match.getValidMoves(piece);
       this.selectedPiece = piece;
       this.updateMeshesRender();
       displayPieceMoves({ piece, moves, gameScene });
     }
-  }
-
-  lookUpPiece(pickedMesh: AbstractMesh, externalMesh: boolean) {
-    return this.match.game.lookupPiece(
-      findByPoint({
-        get: "index",
-        point: [pickedMesh.position.z, pickedMesh.position.x],
-        externalMesh,
-      })
-    );
-  }
-
-  currentPlayerPiece(pickedPiece: GamePiece | undefined) {
-    if (!pickedPiece) return false;
-    return pickedPiece.color === this.match.game.getCurrentPlayer();
   }
 
   unselectCurrentPiece() {
@@ -143,7 +132,7 @@ export class Controller {
     //If you select the same piece as before deselect it
     if (this.selectedPiece === pickedPiece) return this.unselectCurrentPiece();
     //If you select a different piece check if its a valid move and resolve or display new moves
-    const isCurrentPlayersPiece = this.currentPlayerPiece(pickedPiece);
+    const isCurrentPlayersPiece = this.match.isCurrentPlayersPiece(pickedPiece);
     const validMove = game.isValidMove(
       this.selectedPiece,
       pickedPiece.point,
@@ -176,12 +165,12 @@ export class Controller {
   handleNextTurn() {
     this.selectedPiece = undefined;
     this.updateMeshesRender();
-    const nextTurn = this.match.game.nextTurn();
+    const nextTurn = this.match.nextTurn();
     if (!nextTurn) return this.events.setMessage(this.createMatchEndPrompt());
   }
 
   createMatchEndPrompt() {
-    const winningTeam = this.match.game.getLastPlayer();
+    const winningTeam = this.match.getWinner();
     return {
       question: `${winningTeam} team has won!, Would you like to play another game?`,
       onConfirm: () => {
@@ -195,8 +184,8 @@ export class Controller {
   }
 
   undoMove() {
-    if (this.match.game.current.turnHistory.length === 0) return;
-    const isValidUndo = this.match.game.undoTurn();
+    if (this.match.getGameHistory().length === 0) return;
+    const isValidUndo = this.match.undoTurn();
     if (isValidUndo) {
       this.updateMeshesRender();
       this.rotateCamera();
@@ -204,7 +193,7 @@ export class Controller {
   }
 
   resetMatch() {
-    this.match.game.resetGame();
+    this.match.reset();
     this.updateMeshesRender();
     this.resetCamera();
   }
@@ -238,7 +227,7 @@ export class Controller {
   }
 
   handlePromotionEvent(selection: string) {
-    this.match.game.setPromotionPiece(selection);
+    this.match.setPromotion(selection);
     this.handleNextTurn();
   }
 
@@ -261,7 +250,7 @@ export class Controller {
     }
 
     //For each active piece, creates a mesh clone and places on board
-    this.match.game.allPieces().forEach((square) => {
+    this.match.getAllGamePieces().forEach((square) => {
       const { name, color, point } = square.on!;
       const foundMesh = gameScene.scene.meshes.find(
         (mesh) => mesh.name === name && mesh.metadata.color === color

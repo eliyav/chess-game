@@ -1,3 +1,5 @@
+import { Point } from "../../helper/movement-helpers";
+
 interface Data {
   boardSize: number;
   columnNames: string[][];

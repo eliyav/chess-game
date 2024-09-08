@@ -9,6 +9,7 @@ import {
 import Board, { Square } from "./board";
 import GamePiece, { Move } from "./game-piece";
 import { Teams } from "../../../shared/match";
+import { Point } from "../../helper/movement-helpers";
 
 class Game {
   teams: Teams[];
@@ -38,7 +39,8 @@ class Game {
     return this.teams[index];
   }
 
-  getLastPlayer() {
+  getWinner() {
+    //Refactor this to not depend on looking at previous turn and emit a winner
     const index = this.current.turn % 2 ? 1 : 0;
     return this.teams[index];
   }
@@ -495,6 +497,10 @@ class Game {
 
   resetGame() {
     this.current = this.createGame();
+  }
+
+  getHistory() {
+    return this.current.turnHistory;
   }
 
   annotate(result: TurnHistory) {

@@ -6,6 +6,8 @@ import {
 import { Square } from "../components/game-logic/board";
 import GamePiece, { Move } from "../components/game-logic/game-piece";
 
+export type Point = [number, number];
+
 type MovesObj = {
   up?: Point[];
   down?: Point[];

@@ -1,3 +1,5 @@
+import { Point } from "../../helper/movement-helpers";
+
 class GamePiece {
   name: string;
   color: string;
