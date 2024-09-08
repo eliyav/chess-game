@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
-import { LOBBY } from "../../shared/lobby";
+import { LOBBY } from "../../shared/match";
 
 export const LobbySelect: React.FC<{}> = () => {
   const navigate = useNavigate();

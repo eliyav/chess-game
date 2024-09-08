@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
-import { LOBBY, LobbySettings } from "../../shared/lobby";
+import { LOBBY, LobbySettings } from "../../shared/match";
 
 export const OfflineLobby: React.FC<{}> = ({}) => {
   const navigate = useNavigate();

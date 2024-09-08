@@ -6,11 +6,12 @@ import { doMovesMatch, TurnHistory } from "../../helper/game-helpers";
 import calcTurnAnimation from "../../view/animation/turn-animation";
 import { displayPieceMoves, findByPoint } from "../../view/scene-helpers";
 import GamePiece from "../game-logic/game-piece";
-import { Match } from "../match";
 import { Message } from "../modals/message-modal";
 import { GameScene, SceneManager, Scenes } from "../scene-manager";
 import { ArcRotateCamera } from "@babylonjs/core";
 import { rotateCamera } from "../../view/animation/camera";
+import { LocalMatch } from "./local-match";
+import { OnlineMatch } from "./online-match";
 
 type ControllerOptions = {
   playAnimations?: boolean;
@@ -20,11 +21,10 @@ type ControllerOptions = {
 
 export class Controller {
   sceneManager: SceneManager;
-  match: Match;
+  match: LocalMatch | OnlineMatch;
   events: {
     setMessage: (message: Message | null) => void;
     promote: () => void;
-    emitTurn: (originPoint: Point, targetPoint: Point) => void;
   };
   selectedPiece?: GamePiece;
   options: Required<ControllerOptions>;
@@ -36,11 +36,10 @@ export class Controller {
     options = {},
   }: {
     sceneManager: SceneManager;
-    match: Match;
+    match: LocalMatch | OnlineMatch;
     events: {
       setMessage: (message: Message | null) => void;
       promote: () => void;
-      emitTurn: (originPoint: Point, targetPoint: Point) => void;
     };
     options?: Partial<ControllerOptions>;
   }) {
@@ -98,7 +97,7 @@ export class Controller {
         if (validTurn.promotion) {
           this.events.promote();
         } else {
-          this.onMoveSuccess(toEmit);
+          this.onMoveSuccess();
         }
       }
     }
@@ -108,7 +107,6 @@ export class Controller {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
     if (!piece) return;
-    if (this.match.player !== this.match.player) return;
     const currentPlayersPiece = this.currentPlayerPiece(piece);
     if (currentPlayersPiece) {
       const moves = this.match.game.getValidMoves(piece);
@@ -170,16 +168,9 @@ export class Controller {
     }
   }
 
-  onMoveSuccess(toEmit = true) {
+  onMoveSuccess() {
     this.handleNextTurn();
     this.rotateCamera();
-    if (toEmit) {
-      const turnHistory = this.match.game.current.turnHistory.at(-1);
-      if (turnHistory) {
-        const { origin, target } = turnHistory;
-        this.events.emitTurn(origin, target);
-      }
-    }
   }
 
   handleNextTurn() {
@@ -294,7 +285,7 @@ export class Controller {
   }
 
   rotateCamera() {
-    if (!this.options.rotateCamera || this.match.isOnline()) return;
+    if (!this.options.rotateCamera || !this.match.shouldCameraRotate()) return;
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
     const camera = gameScene.scene.cameras[0] as ArcRotateCamera;

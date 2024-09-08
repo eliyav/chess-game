@@ -3,7 +3,7 @@ import path from "path";
 import compression from "compression";
 import { Server } from "socket.io";
 import { fileURLToPath } from "node:url";
-import { LobbySettings } from "../shared/lobby";
+import { LobbySettings } from "../shared/match";
 
 const clientPath = fileURLToPath(new URL("../client", import.meta.url));
 

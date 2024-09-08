@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
-import { LobbySettings } from "../../shared/lobby";
+import { LobbySettings } from "../../shared/match";
 
 export const OnlineLobby: React.FC<{
   socket: Socket;

@@ -8,9 +8,10 @@ import {
 } from "../../helper/game-helpers";
 import Board, { Square } from "./board";
 import GamePiece, { Move } from "./game-piece";
+import { Teams } from "../../../shared/match";
 
 class Game {
-  teams: string[];
+  teams: Teams[];
   current: {
     board: Board;
     annotations: string[];

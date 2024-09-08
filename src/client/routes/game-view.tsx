@@ -2,13 +2,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MenuOverlay } from "../components/game-overlay/menu-overlay";
 import * as icons from "../components/game-overlay/overlay-icons";
-import { Match } from "../components/match";
 import { Controller } from "../components/match-logic/controller";
 import { Message, MessageModal } from "../components/modals/message-modal";
 import PromotionModal from "../components/modals/promotion-modal";
 import { SceneManager, Scenes } from "../components/scene-manager";
-import { LobbySettings } from "../../shared/lobby";
+import { LobbySettings, Player } from "../../shared/match";
 import { Socket } from "socket.io-client";
+import { LocalMatch } from "../components/match-logic/local-match";
 
 export const GameView: React.FC<{
   sceneManager: SceneManager;
@@ -17,14 +17,11 @@ export const GameView: React.FC<{
   const navigate = useNavigate();
   const { lobby, player } = useLocation().state as {
     lobby: LobbySettings;
-    player: {
-      name: string;
-      team: "White" | "Black";
-    };
+    player: Player;
   };
   const [message, setMessage] = useState<Message | null>(null);
   const [promotion, setPromotion] = useState(false);
-  const match = useRef(new Match({ lobby, player }));
+  const match = useRef(new LocalMatch({ lobby, player }));
   const controller = useRef(
     new Controller({
       sceneManager,
@@ -32,26 +29,9 @@ export const GameView: React.FC<{
       events: {
         setMessage: (message: Message | null) => setMessage(message),
         promote: () => setPromotion(true),
-        emitTurn: (originPoint, targetPoint) => {
-          socket.emit("resolvedTurn", {
-            originPoint,
-            targetPoint,
-            lobbyKey: lobby.key,
-          });
-        },
       },
     })
   );
-
-  useEffect(() => {
-    socket.on("resolvedMove", ({ originPoint, targetPoint }) => {
-      controller.current.resolveMove([originPoint, targetPoint], false);
-    });
-
-    return () => {
-      socket.off("resolvedMove");
-    };
-  }, [socket]);
 
   //Game Overlay
   return (
