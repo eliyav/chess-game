@@ -1,5 +1,25 @@
-declare module "*.gltf";
-declare module "*.png";
-declare module "*.jpg";
-declare module "*.webp";
-declare module "*.svg";
+//Meshes
+declare module "*.gltf" {
+  const src: string;
+  export default src;
+}
+
+//Images
+declare module "*.webp" {
+  const src: string;
+  export default src;
+}
+declare module "*.png" {
+  const src: string;
+  export default src;
+}
+declare module "*.jpg" {
+  const src: string;
+  export default src;
+}
+
+//Misc display
+declare module "*.svg" {
+  const src: string;
+  export default src;
+}
