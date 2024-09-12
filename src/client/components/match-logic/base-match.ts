@@ -7,17 +7,16 @@ import Game from "../game-logic/game";
 import GamePiece, { Move } from "../game-logic/game-piece";
 
 export interface MatchLogic {
-  resolveMove({
+  requestResolveMove({
     originPoint,
     targetPoint,
   }: {
     originPoint: Point;
     targetPoint: Point;
-  }): boolean | TurnHistory;
+  }): false | TurnHistory;
   isPlayersTurn(): boolean;
   getPlayerTeam(): Teams;
   nextTurn(): void;
-  undoTurn(): void;
   isCurrentPlayersPiece(piece: GamePiece): boolean;
   isValidMove({
     pickedPiece,
@@ -27,6 +26,7 @@ export interface MatchLogic {
     selectedPiece: GamePiece;
   }): Move | undefined;
   resetRequest(): boolean;
+  undoTurnRequest(): boolean;
 }
 
 export class BaseMatch {
@@ -38,6 +38,16 @@ export class BaseMatch {
     this.game = new Game();
     this.lobby = lobby;
     this.player = player;
+  }
+
+  resolveMove({
+    originPoint,
+    targetPoint,
+  }: {
+    originPoint: Point;
+    targetPoint: Point;
+  }) {
+    return this.getGame().resolveMove(originPoint, targetPoint);
   }
 
   reset() {
@@ -74,6 +84,10 @@ export class BaseMatch {
 
   getAllGamePieces() {
     return this.game.allPieces();
+  }
+
+  undoTurn() {
+    return this.game.undoTurn();
   }
 
   getValidMoves(gamePiece: GamePiece) {

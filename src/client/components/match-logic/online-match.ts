@@ -1,15 +1,18 @@
 import { Socket } from "socket.io-client";
 import { LOBBY, LobbySettings, Player } from "../../../shared/match";
-import { BaseMatch, MatchLogic } from "./base-match";
 import { Point } from "../../helper/movement-helpers";
 import GamePiece from "../game-logic/game-piece";
-import { Controller } from "./controller";
-import { SetStateAction } from "react";
 import { Message } from "../modals/message-modal";
+import { BaseMatch, MatchLogic } from "./base-match";
+import { Controller } from "./controller";
+import { requestMatchReset } from "./online-events/request-match-reset";
+import { requestUndoMove } from "./online-events/request-undo-move";
+import { requestResolveMove } from "./online-events/request-resolve-move";
 
 export class OnlineMatch extends BaseMatch implements MatchLogic {
   mode: LOBBY.ONLINE;
   socket: Socket;
+  listenerEvents: string[] = [];
 
   constructor({
     lobby,
@@ -25,14 +28,34 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
     this.socket = socket;
   }
 
-  resolveMove({
+  requestResolveMove({
     originPoint,
     targetPoint,
   }: {
     originPoint: Point;
     targetPoint: Point;
   }) {
-    return this.getGame().resolveMove(originPoint, targetPoint);
+    const isValidMove = this.resolveMove({ originPoint, targetPoint });
+    if (isValidMove) {
+      this.socket.emit("resolved-move", {
+        originPoint,
+        targetPoint,
+        key: this.lobby.key,
+      });
+      return isValidMove;
+    } else {
+      return false;
+    }
+  }
+
+  resetRequest() {
+    this.socket.emit("reset-match-request", { key: this.lobby.key });
+    return false;
+  }
+
+  undoTurnRequest() {
+    this.socket.emit("reset-match-request", { key: this.lobby.key });
+    return false;
   }
 
   isValidMove({
@@ -48,11 +71,6 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
       pickedPiece.point,
       isCurrentPlayersPiece
     );
-  }
-
-  resetRequest() {
-    this.socket.emit("reset-match-request", { key: this.lobby.key });
-    return false;
   }
 
   isPlayersTurn() {
@@ -72,10 +90,6 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
     return this.getGame().nextTurn();
   }
 
-  undoTurn() {
-    return this.getGame().undoTurn();
-  }
-
   setPromotion(selection: string) {
     this.getGame().setPromotionPiece(selection);
   }
@@ -87,41 +101,31 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
     controller: Controller;
     setMessage: (value: React.SetStateAction<Message | null>) => void;
   }) {
-    this.socket.on("reset-match-requested", () => {
-      setMessage({
-        question: "Opponent requested a match reset. Do you accept?",
-        onConfirm: () => {
-          this.socket.emit("reset-match-response", {
-            answer: true,
-            key: this.lobby.key,
-          });
-          setMessage(null);
-        },
-        onReject: () => {
-          this.socket.emit("reset-match-response", {
-            answer: false,
-            key: this.lobby.key,
-          });
-          setMessage(null);
-        },
-      });
+    const matchResetEvents = requestMatchReset({
+      socket: this.socket,
+      setMessage,
+      controller,
     });
-
-    this.socket.on("reset-match-resolve", ({ answer }) => {
-      if (answer) {
-        controller.match.reset();
-        controller.resetView();
-
-        setMessage({
-          question: "Match reset successfully!",
-          onConfirm: () => setMessage(null),
-        });
-      }
+    const matchUndoEvents = requestUndoMove({
+      socket: this.socket,
+      setMessage,
+      controller,
     });
+    const resolveMoveEvent = requestResolveMove({
+      socket: this.socket,
+      setMessage,
+      controller,
+    });
+    this.listenerEvents.push(
+      ...matchResetEvents,
+      ...matchUndoEvents,
+      ...resolveMoveEvent
+    );
   }
 
   unsubscribeMatchEvents() {
-    this.socket.off("reset-match-requested");
-    this.socket.off("reset-match-resolve");
+    this.listenerEvents.forEach((event) => {
+      this.socket.off(event);
+    });
   }
 }

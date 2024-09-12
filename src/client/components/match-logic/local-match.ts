@@ -11,14 +11,14 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
     this.mode = LOBBY.OFFLINE;
   }
 
-  resolveMove({
+  requestResolveMove({
     originPoint,
     targetPoint,
   }: {
     originPoint: Point;
     targetPoint: Point;
   }) {
-    return this.getGame().resolveMove(originPoint, targetPoint);
+    return this.resolveMove({ originPoint, targetPoint });
   }
 
   isValidMove({
@@ -40,6 +40,10 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
     return true;
   }
 
+  undoTurnRequest() {
+    return this.getGame().undoTurn();
+  }
+
   isPlayersTurn() {
     //Take into account AI opponent possibility
     return true;
@@ -55,9 +59,5 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
 
   nextTurn() {
     return this.getGame().nextTurn();
-  }
-
-  undoTurn() {
-    return this.getGame().undoTurn();
   }
 }

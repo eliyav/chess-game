@@ -87,6 +87,29 @@ export class Controller {
   async resolveMove(move: Point[]) {
     if (move) {
       const [originPoint, targetPoint] = move;
+      const validTurn = this.match.requestResolveMove({
+        originPoint,
+        targetPoint,
+      });
+      if (validTurn) {
+        const gameScene = this.sceneManager.getScene(Scenes.GAME);
+        if (!gameScene) return;
+        await this.turnAnimation({
+          turnHistory: validTurn,
+          gameScene,
+        });
+        if (validTurn.promotion) {
+          this.events.promote();
+        } else {
+          this.onMoveSuccess();
+        }
+      }
+    }
+  }
+
+  async handleResolvedMove(move: Point[]) {
+    if (move) {
+      const [originPoint, targetPoint] = move;
       const validTurn = this.match.resolveMove({
         originPoint,
         targetPoint,

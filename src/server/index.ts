@@ -114,10 +114,12 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("resolvedTurn", ({ originPoint, targetPoint, lobbyKey }) => {
-    socket.to(lobbyKey).emit("resolvedMove", { originPoint, targetPoint });
+  //Resolve Turn
+  socket.on("resolved-move", ({ originPoint, targetPoint, key }) => {
+    socket.to(key).emit("resolved-move", { originPoint, targetPoint });
   });
 
+  //Reset Match
   socket.on("reset-match-request", ({ key }) => {
     socket.to(key).emit("reset-match-requested");
   });
@@ -125,6 +127,16 @@ io.on("connection", (socket) => {
   socket.on("reset-match-response", ({ answer, key }) => {
     socket.to(key).emit("reset-match-resolve", { answer });
     socket.emit("reset-match-resolve", { answer });
+  });
+
+  //Undo Move
+  socket.on("undo-move-request", ({ key }) => {
+    socket.to(key).emit("undo-move-requested");
+  });
+
+  socket.on("undo-move-response", ({ answer, key }) => {
+    socket.to(key).emit("undo-move-resolve", { answer });
+    socket.emit("undo-move-resolve", { answer });
   });
 });
 

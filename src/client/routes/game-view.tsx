@@ -39,9 +39,7 @@ export const GameView: React.FC<{
   );
 
   useEffect(() => {
-    console.log("GameView mounted");
     if (match.current.mode === LOBBY.ONLINE) {
-      console.log("GameView mounted2");
       match.current.subscribeMatchEvents({
         controller: controller.current,
         setMessage,
