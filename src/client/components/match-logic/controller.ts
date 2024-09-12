@@ -92,17 +92,7 @@ export class Controller {
         targetPoint,
       });
       if (validTurn) {
-        const gameScene = this.sceneManager.getScene(Scenes.GAME);
-        if (!gameScene) return;
-        await this.turnAnimation({
-          turnHistory: validTurn,
-          gameScene,
-        });
-        if (validTurn.promotion) {
-          this.events.promote();
-        } else {
-          this.onMoveSuccess();
-        }
+        this.handleValidMove({ history: validTurn });
       }
     }
   }
@@ -115,18 +105,22 @@ export class Controller {
         targetPoint,
       });
       if (validTurn) {
-        const gameScene = this.sceneManager.getScene(Scenes.GAME);
-        if (!gameScene) return;
-        await this.turnAnimation({
-          turnHistory: validTurn,
-          gameScene,
-        });
-        if (validTurn.promotion) {
-          this.events.promote();
-        } else {
-          this.onMoveSuccess();
-        }
+        this.handleValidMove({ history: validTurn });
       }
+    }
+  }
+
+  async handleValidMove({ history }: { history: TurnHistory }) {
+    const gameScene = this.sceneManager.getScene(Scenes.GAME);
+    if (!gameScene) return;
+    await this.turnAnimation({
+      turnHistory: history,
+      gameScene,
+    });
+    if (history.promotion) {
+      this.events.promote();
+    } else {
+      this.onMoveSuccess();
     }
   }
 
