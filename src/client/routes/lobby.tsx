@@ -1,12 +1,16 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
 import { LOBBY } from "../../shared/match";
 import Divider from "../components/divider";
+import { Message } from "../components/modals/message-modal";
 
-export const LobbySelect: React.FC<{}> = () => {
+export const LobbySelect: React.FC<{
+  setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
+}> = ({ setMessage }) => {
   const navigate = useNavigate();
+  const [inviteCode, setInviteCode] = useState("");
 
   return (
     <div className="lobby screen">
@@ -30,20 +34,22 @@ export const LobbySelect: React.FC<{}> = () => {
           <input
             id="join-lobby-input"
             type="text"
-            placeholder="Enter Room Code"
+            placeholder="Enter Invite Code"
+            maxLength={5}
+            onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
           ></input>
           <SelectionButton
+            customClass={"no-top-br-radius"}
+            disabled={inviteCode.length !== 5}
             text={`Join ${LOBBY.ONLINE}`}
             onClick={async () => {
+              console.log("Joining lobby");
               try {
-                const roomInput = document.getElementById(
-                  "join-lobby-input"
-                ) as HTMLInputElement;
                 const joinRoomResponse = await fetch("./join-lobby", {
                   method: "POST",
                   body: JSON.stringify({
                     name: "Guest",
-                    room: roomInput.value,
+                    room: inviteCode,
                   }),
                 });
                 if (!joinRoomResponse.ok) {
@@ -51,8 +57,9 @@ export const LobbySelect: React.FC<{}> = () => {
                 }
                 navigate("/lobby-online", {
                   state: {
-                    room: roomInput.value,
+                    room: inviteCode,
                     player: {
+                      type: "Human",
                       name: "Guest",
                       team: "Black",
                     },
@@ -60,9 +67,15 @@ export const LobbySelect: React.FC<{}> = () => {
                 });
               } catch (e) {
                 if (e instanceof Error) {
-                  alert(e.message);
+                  setMessage({
+                    text: e.message,
+                    onConfirm: () => setMessage(null),
+                  });
                 } else {
-                  alert("Failed to create lobby");
+                  setMessage({
+                    text: "Failed to join lobby",
+                    onConfirm: () => setMessage(null),
+                  });
                 }
               }
             }}
@@ -84,6 +97,7 @@ export const LobbySelect: React.FC<{}> = () => {
                 state: {
                   room: roomKey,
                   player: {
+                    type: "Human",
                     name: "Host",
                     team: "White",
                   },
@@ -91,9 +105,15 @@ export const LobbySelect: React.FC<{}> = () => {
               });
             } catch (e) {
               if (e instanceof Error) {
-                alert(e.message);
+                setMessage({
+                  text: e.message,
+                  onConfirm: () => setMessage(null),
+                });
               } else {
-                alert("Failed to create lobby");
+                setMessage({
+                  text: "Failed to create lobby",
+                  onConfirm: () => setMessage(null),
+                });
               }
             }
           }}

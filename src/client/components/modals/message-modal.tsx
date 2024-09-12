@@ -1,7 +1,7 @@
 import React from "react";
 
 export type Message = {
-  question: string;
+  text: string;
   onConfirm: () => void;
   onReject?: () => void;
 };
@@ -9,12 +9,12 @@ export type Message = {
 export const MessageModal: React.FC<Message> = ({
   onConfirm,
   onReject,
-  question,
+  text,
 }) => {
   return (
     <div className="message-wrapper">
       <div className="message">
-        <p className="text">{question}</p>
+        <p className="text">{text}</p>
         <button className="confirm" onClick={onConfirm}>
           Confirm
         </button>

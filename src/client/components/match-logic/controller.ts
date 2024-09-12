@@ -186,7 +186,7 @@ export class Controller {
   createMatchEndPrompt() {
     const winningTeam = this.match.getWinner();
     return {
-      question: `${winningTeam} team has won!, Would you like to play another game?`,
+      text: `${winningTeam} team has won!, Would you like to play another game?`,
       onConfirm: () => {
         this.requestMatchReset();
         this.events.setMessage(null);

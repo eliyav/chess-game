@@ -44,11 +44,6 @@ canvas {
   width: 100%;
 }
 
-.match-btns {
-  position: absolute;
-  bottom: 0;
-}
-
 /* Loading */
 .loading {
   display: flex;
@@ -143,6 +138,10 @@ footer {
   &:hover {
     box-shadow: 0px 0px 5px 0.5px lightblue;
   }
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
 }
 
 .glass-light {
@@ -221,7 +220,6 @@ footer {
 }
 
 .menu-overlay > .item:hover {
-  transform: scale(0.95);
   background-color: gainsboro;
 }
 
@@ -322,7 +320,6 @@ footer {
 }
 
 .message button:hover {
-  transform: scale(0.9);
   background-color: rgb(238, 224, 153);
 }
 
@@ -382,34 +379,6 @@ footer {
 /* -------------------  */
 /* Lobby */
 
-.lobby-code p {
-  text-align: center;
-}
-
-.lobby-code span {
-  font-size: 1.2em;
-  padding: 0.5em;
-  background-color: #333333;
-  border-radius: 0.25em;
-}
-
-.lobby-code span:hover {
-  background-color: #444444;
-  cursor: pointer;
-}
-
-#join-lobby {
-  text-align: center;
-}
-
-#join-lobby input {
-  font-size: 1.25em;
-  padding: 0.5em;
-  border-radius: 0.25em;
-  border: 1.5px solid var(--primary-background);
-  width: 30%;
-}
-
 #join-lobby button {
   font-size: 1.25em;
   padding: 0.5em 1em;
@@ -419,7 +388,12 @@ footer {
 #join-lobby-input {
   width: 100%;
   font-size: 1.5em;
+  padding: 0.5em 0;
   text-align: center;
+  border: 1px solid black;
+  border-top-left-radius: 0.5em;
+  border-top-right-radius: 0.5em;
+  border: 1.5px solid var(--primary-background);
 }
 
 /* Margins */
@@ -429,6 +403,11 @@ footer {
 
 .mt-1 {
   margin-top: 1em;
+}
+
+.no-top-br-radius {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
 }
 
 .bottom-left {

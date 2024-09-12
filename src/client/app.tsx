@@ -9,6 +9,7 @@ import { Home } from "./routes/home";
 import { LobbySelect } from "./routes/lobby";
 import { OfflineLobby } from "./routes/offline-lobby";
 import { OnlineLobby } from "./routes/online-lobby";
+import { Message, MessageModal } from "./components/modals/message-modal";
 
 const App: React.FC<{
   websocket: Socket;
@@ -16,6 +17,7 @@ const App: React.FC<{
   const [isInitialized, setIsInitialized] = useState(false);
   const canvas = useRef<HTMLCanvasElement>(null);
   const sceneManager = useRef<SceneManager>();
+  const [message, setMessage] = useState<Message | null>(null);
 
   useEffect(() => {
     if (canvas.current && !sceneManager.current) {
@@ -29,11 +31,21 @@ const App: React.FC<{
   return (
     <div id="app">
       <canvas ref={canvas} style={{ backgroundColor: "black" }}></canvas>
+      {message && (
+        <MessageModal
+          text={message.text}
+          onConfirm={message.onConfirm}
+          onReject={message.onReject}
+        />
+      )}
       {!isInitialized && <LoadingScreen text="..." />}
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/lobby" element={<LobbySelect />} />
+          <Route
+            path="/lobby"
+            element={<LobbySelect setMessage={setMessage} />}
+          />
           <Route path="/lobby-offline" element={<OfflineLobby />} />
           <Route
             path="/lobby-online"
@@ -46,6 +58,7 @@ const App: React.FC<{
                 <GameView
                   sceneManager={sceneManager.current}
                   socket={websocket}
+                  setMessage={setMessage}
                 />
               ) : null
             }

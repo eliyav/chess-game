@@ -14,13 +14,13 @@ import { OnlineMatch } from "../components/match-logic/online-match";
 export const GameView: React.FC<{
   sceneManager: SceneManager;
   socket: Socket;
-}> = ({ sceneManager, socket }) => {
+  setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
+}> = ({ sceneManager, socket, setMessage }) => {
   const navigate = useNavigate();
   const { lobby, player } = useLocation().state as {
     lobby: LobbySettings;
     player: Player;
   };
-  const [message, setMessage] = useState<Message | null>(null);
   const [promotion, setPromotion] = useState(false);
   const match = useRef(
     lobby.mode === LOBBY.OFFLINE
@@ -83,13 +83,6 @@ export const GameView: React.FC<{
         ]}
         icons={icons}
       />
-      {message && (
-        <MessageModal
-          question={message.question}
-          onConfirm={message.onConfirm}
-          onReject={message.onReject}
-        />
-      )}
       {promotion && (
         <PromotionModal
           submitSelection={(e) => {

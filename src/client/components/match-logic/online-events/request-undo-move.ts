@@ -13,7 +13,7 @@ export function requestUndoMove({
 }): string[] {
   socket.on("undo-move-requested", () => {
     setMessage({
-      question: "Opponent requested to undo the last game move. Do you accept?",
+      text: "Opponent requested to undo the last game move. Do you accept?",
       onConfirm: () => {
         socket.emit("undo-move-response", {
           answer: true,
@@ -37,7 +37,7 @@ export function requestUndoMove({
       controller.resetView();
 
       setMessage({
-        question: "Last move has been undone successfully!",
+        text: "Last move has been undone successfully!",
         onConfirm: () => setMessage(null),
       });
     }

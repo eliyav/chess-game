@@ -13,7 +13,7 @@ export function requestMatchReset({
 }): string[] {
   socket.on("reset-match-requested", () => {
     setMessage({
-      question: "Opponent requested a match reset. Do you accept?",
+      text: "Opponent requested a match reset. Do you accept?",
       onConfirm: () => {
         socket.emit("reset-match-response", {
           answer: true,
@@ -37,7 +37,7 @@ export function requestMatchReset({
       controller.resetView();
 
       setMessage({
-        question: "Match reset successfully!",
+        text: "Match reset successfully!",
         onConfirm: () => setMessage(null),
       });
     }
