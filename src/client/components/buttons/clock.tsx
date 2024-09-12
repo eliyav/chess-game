@@ -9,11 +9,11 @@ export const Clock: React.FC<{
   return (
     <div className="clock">
       <h2 className="sub-title glass-dark">Game Time</h2>
-      <div className="selections">
+      <div className="flex">
         {clockTimes.map((clockTime) => (
           <button
             key={clockTime}
-            className={`glass-light ${time === clockTime ? "highlight" : ""}`}
+            className={`glass-light`}
             onClick={() => setTime(clockTime)}
           >
             {clockTime ? clockTime : "Unlimited"}

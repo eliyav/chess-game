@@ -4,9 +4,14 @@ export const SelectionButton: React.FC<{
   text: string;
   onClick: () => void;
   disabled?: boolean;
-}> = ({ text, onClick, disabled }) => {
+  customClass?: string;
+}> = ({ text, onClick, disabled, customClass }) => {
   return (
-    <button className={"btn glass-light"} onClick={onClick} disabled={disabled}>
+    <button
+      className={`btn glass-light ${customClass ? customClass : ""}`}
+      onClick={onClick}
+      disabled={disabled}
+    >
       {text}
     </button>
   );

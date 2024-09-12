@@ -16,7 +16,11 @@ export const Home: React.FC = () => {
         />
       </div>
       <footer>
-        <SelectionButton text="Play" onClick={() => navigate("/lobby")} />
+        <SelectionButton
+          customClass="mgn-1"
+          text="Play"
+          onClick={() => navigate("/lobby")}
+        />
       </footer>
     </div>
   );

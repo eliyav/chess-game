@@ -75,7 +75,7 @@ export const OnlineLobby: React.FC<{
           </p>
         </div>
         <h2 className="sub-title glass-dark">Players</h2>
-        <div className="selections">
+        <div className="flex">
           {lobby?.players.map((player, i) => (
             <button key={i}>{player}</button>
           ))}

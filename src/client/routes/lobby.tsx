@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
 import { LOBBY } from "../../shared/match";
+import Divider from "../components/divider";
 
 export const LobbySelect: React.FC<{}> = () => {
   const navigate = useNavigate();
@@ -17,24 +18,14 @@ export const LobbySelect: React.FC<{}> = () => {
         />
         <h1>Select Lobby</h1>
       </div>
-      <div
-        className="selections mt-1"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "1rem",
-        }}
-      >
-        <div>
-          <SelectionButton
-            text={LOBBY.OFFLINE}
-            onClick={() => {
-              navigate("/lobby-offline");
-            }}
-          />
-        </div>
+      <div className="flex column mt-1">
+        <SelectionButton
+          text={LOBBY.OFFLINE}
+          onClick={() => {
+            navigate("/lobby-offline");
+          }}
+        />
+        <Divider />
         <div>
           <input
             id="join-lobby-input"
@@ -77,37 +68,36 @@ export const LobbySelect: React.FC<{}> = () => {
             }}
           />
         </div>
-        <div>
-          <SelectionButton
-            text={`Create ${LOBBY.ONLINE}`}
-            onClick={async () => {
-              try {
-                const createRoomResponse = await fetch("./create-lobby", {
-                  method: "POST",
-                  body: JSON.stringify({
+        <Divider />
+        <SelectionButton
+          text={`Create ${LOBBY.ONLINE}`}
+          onClick={async () => {
+            try {
+              const createRoomResponse = await fetch("./create-lobby", {
+                method: "POST",
+                body: JSON.stringify({
+                  name: "Host",
+                }),
+              });
+              const roomKey = await createRoomResponse.text();
+              navigate("/lobby-online", {
+                state: {
+                  room: roomKey,
+                  player: {
                     name: "Host",
-                  }),
-                });
-                const roomKey = await createRoomResponse.text();
-                navigate("/lobby-online", {
-                  state: {
-                    room: roomKey,
-                    player: {
-                      name: "Host",
-                      team: "White",
-                    },
+                    team: "White",
                   },
-                });
-              } catch (e) {
-                if (e instanceof Error) {
-                  alert(e.message);
-                } else {
-                  alert("Failed to create lobby");
-                }
+                },
+              });
+            } catch (e) {
+              if (e instanceof Error) {
+                alert(e.message);
+              } else {
+                alert("Failed to create lobby");
               }
-            }}
-          />
-        </div>
+            }
+          }}
+        />
       </div>
     </div>
   );

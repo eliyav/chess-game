@@ -26,8 +26,8 @@ export const OfflineLobby: React.FC<{}> = ({}) => {
         <h1>Offline Lobby</h1>
       </div>
       <h2 className="sub-title glass-dark">Opponent</h2>
-      <div className="selections mt-1">
-        <button className="highlight">Human</button>
+      <div className="flex mt-1">
+        <button>Human</button>
       </div>
       <footer>
         <SelectionButton
