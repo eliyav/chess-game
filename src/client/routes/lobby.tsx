@@ -23,7 +23,7 @@ export const LobbySelect: React.FC<{
         />
         <h1>Select Lobby</h1>
       </div>
-      <div className="flex column mt-1">
+      <div className="flex column mt-3">
         <SelectionButton
           text={LOBBY.OFFLINE}
           onClick={() => {
@@ -38,6 +38,7 @@ export const LobbySelect: React.FC<{
             placeholder="Enter Invite Code"
             maxLength={5}
             onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+            autoComplete="off"
           ></input>
           <SelectionButton
             customClass={"no-top-br-radius"}
