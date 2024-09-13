@@ -2,13 +2,14 @@ import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
-import { LOBBY } from "../../shared/match";
+import { LOBBY, PlayerLobby } from "../../shared/match";
 import Divider from "../components/divider";
 import { Message } from "../components/modals/message-modal";
 
 export const LobbySelect: React.FC<{
   setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
-}> = ({ setMessage }) => {
+  setOnlineLobby: React.Dispatch<React.SetStateAction<PlayerLobby | null>>;
+}> = ({ setMessage, setOnlineLobby }) => {
   const navigate = useNavigate();
   const [inviteCode, setInviteCode] = useState("");
 
@@ -55,14 +56,12 @@ export const LobbySelect: React.FC<{
                 if (!joinRoomResponse.ok) {
                   throw new Error("Failed to join lobby");
                 }
-                navigate("/lobby-online", {
-                  state: {
-                    room: inviteCode,
-                    player: {
-                      type: "Human",
-                      name: "Guest",
-                      team: "Black",
-                    },
+                setOnlineLobby({
+                  room: inviteCode,
+                  player: {
+                    type: "Human",
+                    name: "Guest",
+                    team: "Black",
                   },
                 });
               } catch (e) {
@@ -93,14 +92,12 @@ export const LobbySelect: React.FC<{
                 }),
               });
               const roomKey = await createRoomResponse.text();
-              navigate("/lobby-online", {
-                state: {
-                  room: roomKey,
-                  player: {
-                    type: "Human",
-                    name: "Host",
-                    team: "White",
-                  },
+              setOnlineLobby({
+                room: roomKey,
+                player: {
+                  type: "Human",
+                  name: "Host",
+                  team: "White",
                 },
               });
             } catch (e) {

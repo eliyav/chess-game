@@ -9,6 +9,11 @@ export interface LobbySettings {
   players: string[];
 }
 
+export interface PlayerLobby {
+  room: string;
+  player: Player;
+}
+
 export type Teams = "White" | "Black";
 
 export type PlayerType = "Human" | "AI";

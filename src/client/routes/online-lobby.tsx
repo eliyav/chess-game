@@ -1,19 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
+import { LobbySettings, PlayerLobby } from "../../shared/match";
 import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
-import { LobbySettings, Player } from "../../shared/match";
 
 export const OnlineLobby: React.FC<{
   socket: Socket;
-}> = ({ socket }) => {
+  playerLobby: PlayerLobby;
+}> = ({ socket, playerLobby }) => {
   const navigate = useNavigate();
-  const { room, player } = useLocation().state as {
-    room: string;
-    player: Player;
-  };
-
+  const { room, player } = playerLobby;
   const [lobby, setLobby] = useState<LobbySettings>();
 
   useEffect(() => {
@@ -79,6 +76,7 @@ export const OnlineLobby: React.FC<{
         </div>
         <footer>
           <SelectionButton
+            customClass="mgn-1"
             text={"Start Game"}
             onClick={() => {
               socket.emit("request-match-start", { room });

@@ -1,8 +1,9 @@
 import React from "react";
 import * as ReactDOMClient from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import { io } from "socket.io-client";
 import App from "./app";
 import "./index.css";
-import { io } from "socket.io-client";
 
 const websocket = io(`ws://${window.location.host}`, {
   transports: ["websocket"],
@@ -13,6 +14,8 @@ const root = ReactDOMClient.createRoot(container);
 
 root.render(
   <React.StrictMode>
-    <App websocket={websocket} />
+    <BrowserRouter>
+      <App websocket={websocket} />
+    </BrowserRouter>
   </React.StrictMode>
 );

@@ -31,6 +31,7 @@ export const OfflineLobby: React.FC<{}> = ({}) => {
       </div>
       <footer>
         <SelectionButton
+          customClass="mgn-1"
           text={"Start Game"}
           onClick={() => {
             navigate("/game", { state: { lobby } });
