@@ -415,7 +415,7 @@ footer {
   border: 1px solid black;
   border-top-left-radius: 0.5em;
   border-top-right-radius: 0.5em;
-  border: 1.5px solid var(--primary-background);
+  border: 3px solid var(--primary-alt-color);
 }
 
 #join-lobby-input::placeholder {
