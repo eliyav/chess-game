@@ -12,7 +12,6 @@ export const OnlineLobby: React.FC<{
   const navigate = useNavigate();
   const location = useLocation();
   const room = location.search.split("=")[1];
-  const playerUUID = useRef(RandomGUID());
   const [lobby, setLobby] = useState<Lobby>();
 
   // useEffect(() => {
@@ -38,9 +37,15 @@ export const OnlineLobby: React.FC<{
 
   useEffect(() => {
     if (room) {
-      socket.emit("join-room", { room, id: playerUUID.current });
+      socket.emit("join-room", { room });
     }
-  }, [room, playerUUID, socket]);
+
+    return () => {
+      if (room) {
+        socket.emit("leave-room", { room });
+      }
+    };
+  }, [room, socket]);
 
   return (
     <div className="lobby screen">
@@ -48,7 +53,7 @@ export const OnlineLobby: React.FC<{
         <BackButton
           customClass={"bottom-left"}
           size={30}
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/lobby")}
         />
         <h1>Online Lobby</h1>
       </div>

@@ -18,7 +18,7 @@ export const LobbySelect: React.FC<{
         <BackButton
           customClass={"bottom-left"}
           size={30}
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/")}
         />
         <h1>Select Lobby</h1>
       </div>

@@ -85,24 +85,46 @@ setInterval(() => {
 }, 10000);
 
 io.on("connection", (socket) => {
-  socket.on("join-room", ({ room, id }) => {
+  socket.on("disconnect", () => {
+    const lobbies = lobbyLog.entries();
+    for (const [key, lobby] of lobbies) {
+      const player = lobby.players.find((player) => player.id !== socket.id);
+      if (player) {
+        lobby.players = lobby.players.filter(
+          (player) => player.id !== socket.id
+        );
+        io.to(key).emit("lobby-info", lobby);
+      }
+    }
+  });
+
+  socket.on("join-room", ({ room }) => {
     if (lobbyLog.has(room)) {
       const lobby = lobbyLog.get(room);
       if (!lobby) return;
-      if (lobby.players.find((player) => player.id === id)) return;
+      if (lobby.players.find((player) => player.id === socket.id)) return;
       if (lobby.players.length === 2) {
         socket.emit("redirect", { message: "Room is full" });
         return;
       }
       socket.join(room);
       lobby.players.push({
-        id,
+        id: socket.id,
         type: "Human",
         name: `Player ${lobby.players.length + 1}`,
       });
       io.to(room).emit("lobby-info", lobby);
     } else {
       socket.emit("message", "Room does not exist");
+    }
+  });
+
+  socket.on("leave-room", ({ room }) => {
+    if (lobbyLog.has(room)) {
+      const lobby = lobbyLog.get(room);
+      if (!lobby) return;
+      lobby.players = lobby.players.filter((player) => player.id !== socket.id);
+      socket.to(room).emit("lobby-info", lobby);
     }
   });
 

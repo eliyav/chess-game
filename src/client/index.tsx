@@ -9,6 +9,10 @@ const websocket = io(`ws://${window.location.host}`, {
   transports: ["websocket"],
 });
 
+window.addEventListener("beforeunload", () => {
+  websocket.disconnect();
+});
+
 const container = document.getElementById("root") as HTMLDivElement;
 const root = ReactDOMClient.createRoot(container);
 
