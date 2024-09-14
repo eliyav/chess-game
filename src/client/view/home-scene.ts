@@ -57,7 +57,7 @@ export const createHomeScene = async (
 
   const displayedMeshes: DisplayMesh[] = [];
 
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 4; i++) {
     createDisplayPieces({
       finalArray: displayedMeshes,
       meshes: importedPiecesMeshes,

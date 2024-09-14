@@ -23,7 +23,7 @@ export class DisplayMesh {
     if (!meshOptions.mesh) {
       throw new Error("Mesh is required");
     }
-    this.speed = Math.random() * 0.1;
+    this.speed = Math.max(0.2, Math.random());
     this.rotationIndex = [
       calcRandomNumber(),
       calcRandomNumber(),
@@ -40,8 +40,8 @@ export class DisplayMesh {
 
   public animate() {
     this.moveMesh();
-    this.resetMesh();
     this.rotate();
+    this.resetMesh();
   }
 
   private moveMesh() {
@@ -64,7 +64,7 @@ export class DisplayMesh {
     if (this.mesh.position.y < this.endingPosition) {
       this.mesh.position.z = calcRandomZ();
       this.mesh.position.y = STARTING_Y_POSITION;
-      this.speed = Math.random();
+      this.speed = Math.max(0.2, Math.random());
       this.rotationIndex = [
         calcRandomNumber(),
         calcRandomNumber(),
