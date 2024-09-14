@@ -39,6 +39,10 @@ const App: React.FC<{
         },
       });
     });
+
+    return () => {
+      websocket.off("redirect");
+    };
   }, [websocket, navigate, setMessage]);
 
   return (

@@ -1,11 +1,10 @@
+import { RandomGUID } from "@babylonjs/core";
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import { Lobby } from "../../shared/match";
 import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
-import { randomUUID } from "crypto";
-import { RandomGUID } from "@babylonjs/core";
 
 export const OnlineLobby: React.FC<{
   socket: Socket;
