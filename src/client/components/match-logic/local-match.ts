@@ -1,14 +1,14 @@
-import { LOBBY, LobbySettings, Player } from "../../../shared/match";
+import { LOBBY_TYPE, Lobby, Player } from "../../../shared/match";
 import { Point } from "../../helper/movement-helpers";
 import GamePiece from "../game-logic/game-piece";
 import { BaseMatch, MatchLogic } from "./base-match";
 
 export class LocalMatch extends BaseMatch implements MatchLogic {
-  mode: LOBBY.OFFLINE;
+  mode: LOBBY_TYPE.LOCAL;
 
-  constructor({ lobby, player }: { lobby: LobbySettings; player: Player }) {
+  constructor({ lobby, player }: { lobby: Lobby; player: Player }) {
     super({ lobby, player });
-    this.mode = LOBBY.OFFLINE;
+    this.mode = LOBBY_TYPE.LOCAL;
   }
 
   requestResolveMove({

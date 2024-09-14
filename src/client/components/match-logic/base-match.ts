@@ -1,5 +1,5 @@
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { LOBBY, LobbySettings, Player, Teams } from "../../../shared/match";
+import { LOBBY_TYPE, Lobby, Player, Teams } from "../../../shared/match";
 import { TurnHistory } from "../../helper/game-helpers";
 import { Point } from "../../helper/movement-helpers";
 import { findByPoint } from "../../view/scene-helpers";
@@ -31,10 +31,10 @@ export interface MatchLogic {
 
 export class BaseMatch {
   private game: Game;
-  lobby: LobbySettings;
+  lobby: Lobby;
   player: Player;
 
-  constructor({ lobby, player }: { lobby: LobbySettings; player: Player }) {
+  constructor({ lobby, player }: { lobby: Lobby; player: Player }) {
     this.game = new Game();
     this.lobby = lobby;
     this.player = player;
@@ -75,7 +75,7 @@ export class BaseMatch {
   }
 
   shouldCameraRotate() {
-    return this.lobby.mode === LOBBY.ONLINE ? false : true;
+    return this.lobby.mode === LOBBY_TYPE.ONLINE ? false : true;
   }
 
   getGameHistory() {

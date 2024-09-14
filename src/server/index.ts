@@ -3,7 +3,7 @@ import path from "path";
 import compression from "compression";
 import { Server } from "socket.io";
 import { fileURLToPath } from "node:url";
-import { LOBBY, LobbySettings } from "../shared/match";
+import { LOBBY_TYPE, Lobby } from "../shared/match";
 
 const clientPath = fileURLToPath(new URL("../client", import.meta.url));
 
@@ -14,24 +14,16 @@ const port = process.env.PORT || 3000;
 app.use(compression());
 
 app.use(express.static(clientPath));
-app.get("*", function (req, res) {
-  res.sendFile(path.join(clientPath, "index.html"));
-});
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.text());
 
-app.post("/create-lobby", (req, res) => {
-  const body = JSON.parse(req.body) as { name: string };
-  if (!body.name) {
-    res.status(400).send("Name is required");
-    return;
-  }
+app.get("/create-lobby", (req, res) => {
   const key = generateKey();
   const lobby = {
-    mode: LOBBY.ONLINE,
+    mode: LOBBY_TYPE.ONLINE,
     key,
-    players: [body.name],
+    players: [],
   };
   lobbyLog.set(key, lobby);
   res.send(key);
@@ -40,7 +32,7 @@ app.post("/create-lobby", (req, res) => {
 app.post("/update-lobby", (req, res) => {
   const { room, lobby } = JSON.parse(req.body) as {
     room: string;
-    lobby: LobbySettings;
+    lobby: Lobby;
   };
   if (!room) {
     res.status(400).send("Lobby key is required");
@@ -56,11 +48,7 @@ app.post("/update-lobby", (req, res) => {
 });
 
 app.post("/join-lobby", (req, res) => {
-  const { name, room } = JSON.parse(req.body) as { name: string; room: string };
-  if (!name) {
-    res.status(400).send("Name is required");
-    return;
-  }
+  const { room } = JSON.parse(req.body) as { room: string };
   if (!room) {
     res.status(400).send("Lobby key is required");
     return;
@@ -74,17 +62,18 @@ app.post("/join-lobby", (req, res) => {
     res.status(400).send("Room is full");
     return;
   }
-  lobby.players.push(name);
-  io.to(room).emit("lobby-info", lobby);
+  res.send(room);
+});
 
-  res.send("Joined lobby successfully!");
+app.get("*", function (req, res) {
+  res.sendFile(path.join(clientPath, "index.html"));
 });
 
 const server = app.listen(port, function () {
   console.log(`Example app listening on port ${port}!\n`);
 });
 
-const lobbyLog = new Map<string, LobbySettings>();
+const lobbyLog = new Map<string, Lobby>();
 
 const io = new Server(server);
 
@@ -96,10 +85,22 @@ setInterval(() => {
 }, 10000);
 
 io.on("connection", (socket) => {
-  socket.on("join-room", ({ room }) => {
+  socket.on("join-room", ({ room, id }) => {
     if (lobbyLog.has(room)) {
+      const lobby = lobbyLog.get(room);
+      if (!lobby) return;
+      if (lobby.players.find((player) => player.id === id)) return;
+      if (lobby.players.length === 2) {
+        socket.emit("redirect", { message: "Room is full" });
+        return;
+      }
       socket.join(room);
-      io.to(room).emit("lobby-info", lobbyLog.get(room));
+      lobby.players.push({
+        id,
+        type: "Human",
+        name: `Player ${lobby.players.length + 1}`,
+      });
+      io.to(room).emit("lobby-info", lobby);
     } else {
       socket.emit("message", "Room does not exist");
     }
@@ -141,11 +142,15 @@ io.on("connection", (socket) => {
 });
 
 function generateKey() {
-  let chars = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
-  let key = [];
+  const chars = [
+    ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
+    ["K", "L", "M", "N", "O", "P", "Q", "R", "S", "T"],
+  ];
+  const key = [];
   for (let i = 0; i < 5; i++) {
-    let num = Math.floor(Math.random() * 10);
-    let char = chars[num];
+    const num = Math.floor(Math.random() * 10);
+    const charsIndex = Math.random() > 0.5 ? 0 : 1;
+    const char = chars[charsIndex][num];
     key[i] = char;
   }
   return key.join("");

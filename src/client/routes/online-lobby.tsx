@@ -1,31 +1,34 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
-import { LobbySettings, PlayerLobby } from "../../shared/match";
+import { Lobby } from "../../shared/match";
 import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
+import { randomUUID } from "crypto";
+import { RandomGUID } from "@babylonjs/core";
 
 export const OnlineLobby: React.FC<{
   socket: Socket;
-  playerLobby: PlayerLobby;
-}> = ({ socket, playerLobby }) => {
+}> = ({ socket }) => {
   const navigate = useNavigate();
-  const { room, player } = playerLobby;
-  const [lobby, setLobby] = useState<LobbySettings>();
+  const location = useLocation();
+  const room = location.search.split("=")[1];
+  const playerUUID = useRef(RandomGUID());
+  const [lobby, setLobby] = useState<Lobby>();
+
+  // useEffect(() => {
+  //   socket.on("match-start", () => {
+  //     navigate("/game", { state: { lobby, player } });
+  //   });
+
+  //   return () => {
+  //     socket.off("match-start");
+  //   };
+  // }, [socket, navigate, lobby, player]);
 
   useEffect(() => {
-    socket.on("match-start", () => {
-      navigate("/game", { state: { lobby, player } });
-    });
-
-    return () => {
-      socket.off("match-start");
-    };
-  }, [socket, navigate, lobby, player]);
-
-  useEffect(() => {
-    socket.on("lobby-info", (settings: LobbySettings) => {
-      setLobby(settings);
+    socket.on("lobby-info", (lobby: Lobby) => {
+      setLobby(lobby);
     });
 
     return () => {
@@ -36,9 +39,9 @@ export const OnlineLobby: React.FC<{
 
   useEffect(() => {
     if (room) {
-      socket.emit("join-room", { room });
+      socket.emit("join-room", { room, id: playerUUID.current });
     }
-  }, [room]);
+  }, [room, playerUUID, socket]);
 
   return (
     <div className="lobby screen">
@@ -71,7 +74,7 @@ export const OnlineLobby: React.FC<{
         <h2 className="sub-title glass-dark">Players</h2>
         <div className="flex">
           {lobby?.players.map((player, i) => (
-            <button key={i}>{player}</button>
+            <button key={i}>{player.name}</button>
           ))}
         </div>
         <footer>

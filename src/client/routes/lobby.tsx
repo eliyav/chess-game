@@ -1,15 +1,14 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { LOBBY_TYPE } from "../../shared/match";
 import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
-import { LOBBY, PlayerLobby } from "../../shared/match";
 import Divider from "../components/divider";
 import { Message } from "../components/modals/message-modal";
 
 export const LobbySelect: React.FC<{
   setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
-  setOnlineLobby: React.Dispatch<React.SetStateAction<PlayerLobby | null>>;
-}> = ({ setMessage, setOnlineLobby }) => {
+}> = ({ setMessage }) => {
   const navigate = useNavigate();
   const [inviteCode, setInviteCode] = useState("");
 
@@ -25,7 +24,7 @@ export const LobbySelect: React.FC<{
       </div>
       <div className="flex column mt-3">
         <SelectionButton
-          text={LOBBY.OFFLINE}
+          text={LOBBY_TYPE.LOCAL}
           onClick={() => {
             navigate("/lobby-offline");
           }}
@@ -39,32 +38,24 @@ export const LobbySelect: React.FC<{
             maxLength={5}
             onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
             autoComplete="off"
+            value={inviteCode}
           ></input>
           <SelectionButton
             customClass={"no-top-br-radius"}
             disabled={inviteCode.length !== 5}
-            text={`Join ${LOBBY.ONLINE}`}
+            text={`Join ${LOBBY_TYPE.ONLINE}`}
             onClick={async () => {
-              console.log("Joining lobby");
               try {
-                const joinRoomResponse = await fetch("./join-lobby", {
+                const response = await fetch("./join-lobby", {
                   method: "POST",
                   body: JSON.stringify({
-                    name: "Guest",
                     room: inviteCode,
                   }),
                 });
-                if (!joinRoomResponse.ok) {
+                if (!response.ok) {
                   throw new Error("Failed to join lobby");
                 }
-                setOnlineLobby({
-                  room: inviteCode,
-                  player: {
-                    type: "Human",
-                    name: "Guest",
-                    team: "Black",
-                  },
-                });
+                navigate(`/lobby-online?room=${inviteCode}`);
               } catch (e) {
                 if (e instanceof Error) {
                   setMessage({
@@ -83,24 +74,12 @@ export const LobbySelect: React.FC<{
         </div>
         <Divider />
         <SelectionButton
-          text={`Create ${LOBBY.ONLINE}`}
+          text={`Create ${LOBBY_TYPE.ONLINE}`}
           onClick={async () => {
             try {
-              const createRoomResponse = await fetch("./create-lobby", {
-                method: "POST",
-                body: JSON.stringify({
-                  name: "Host",
-                }),
-              });
-              const roomKey = await createRoomResponse.text();
-              setOnlineLobby({
-                room: roomKey,
-                player: {
-                  type: "Human",
-                  name: "Host",
-                  team: "White",
-                },
-              });
+              const response = await fetch("./create-lobby");
+              const roomKey = await response.text();
+              navigate(`/lobby-online?room=${roomKey}`);
             } catch (e) {
               if (e instanceof Error) {
                 setMessage({

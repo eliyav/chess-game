@@ -2,14 +2,14 @@ import React, { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
-import { LOBBY, LobbySettings } from "../../shared/match";
+import { LOBBY_TYPE, Lobby } from "../../shared/match";
 
 export const OfflineLobby: React.FC<{}> = ({}) => {
   const navigate = useNavigate();
-  const [lobby, setLobby] = useState<LobbySettings>(createLobby(LOBBY.OFFLINE));
+  const [lobby, setLobby] = useState<Lobby>(createLobby(LOBBY_TYPE.LOCAL));
 
   const updateLobby = useCallback(
-    <KEY extends keyof LobbySettings>(key: KEY, value: LobbySettings[KEY]) => {
+    <KEY extends keyof Lobby>(key: KEY, value: Lobby[KEY]) => {
       setLobby((prev) => ({ ...prev, [key]: value }));
     },
     [setLobby]
@@ -42,7 +42,7 @@ export const OfflineLobby: React.FC<{}> = ({}) => {
   );
 };
 
-function createLobby(mode: LOBBY) {
+function createLobby(mode: LOBBY_TYPE) {
   return {
     mode,
     key: null,

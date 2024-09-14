@@ -1,5 +1,5 @@
 import { Socket } from "socket.io-client";
-import { LOBBY, LobbySettings, Player } from "../../../shared/match";
+import { LOBBY_TYPE, Lobby, Player } from "../../../shared/match";
 import { Point } from "../../helper/movement-helpers";
 import GamePiece from "../game-logic/game-piece";
 import { Message } from "../modals/message-modal";
@@ -10,7 +10,7 @@ import { requestUndoMove } from "./online-events/request-undo-move";
 import { requestResolveMove } from "./online-events/request-resolve-move";
 
 export class OnlineMatch extends BaseMatch implements MatchLogic {
-  mode: LOBBY.ONLINE;
+  mode: LOBBY_TYPE.ONLINE;
   socket: Socket;
   listenerEvents: string[] = [];
 
@@ -19,12 +19,12 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
     player,
     socket,
   }: {
-    lobby: LobbySettings;
+    lobby: Lobby;
     player: Player;
     socket: Socket;
   }) {
     super({ lobby, player });
-    this.mode = LOBBY.ONLINE;
+    this.mode = LOBBY_TYPE.ONLINE;
     this.socket = socket;
   }
 

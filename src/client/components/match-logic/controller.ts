@@ -13,7 +13,7 @@ import { rotateCamera } from "../../view/animation/camera";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
 import { Point } from "../../helper/movement-helpers";
-import { LOBBY } from "../../../shared/match";
+import { LOBBY_TYPE } from "../../../shared/match";
 
 type ControllerOptions = {
   playAnimations?: boolean;

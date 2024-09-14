@@ -2,7 +2,6 @@ import "@babylonjs/loaders/glTF";
 import React, { useEffect, useRef, useState } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import type { Socket } from "socket.io-client";
-import { PlayerLobby } from "../shared/match";
 import LoadingScreen from "./components/loading-screen";
 import { Message, MessageModal } from "./components/modals/message-modal";
 import { SceneManager } from "./components/scene-manager";
@@ -18,7 +17,6 @@ const App: React.FC<{
   const navigate = useNavigate();
   const [isInitialized, setIsInitialized] = useState(false);
   const [message, setMessage] = useState<Message | null>(null);
-  const [onlineLobby, setOnlineLobby] = useState<PlayerLobby | null>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const sceneManager = useRef<SceneManager>();
 
@@ -32,16 +30,16 @@ const App: React.FC<{
   }, [canvas.current, setIsInitialized]);
 
   useEffect(() => {
-    if (onlineLobby) {
-      const { room, player } = onlineLobby;
-      navigate("/lobby-online", {
-        state: {
-          room,
-          player,
+    websocket.on("redirect", ({ message }) => {
+      navigate("/");
+      setMessage({
+        text: message,
+        onConfirm: () => {
+          setMessage(null);
         },
       });
-    }
-  }, [onlineLobby]);
+    });
+  }, [websocket, navigate, setMessage]);
 
   return (
     <div id="app">
@@ -58,21 +56,12 @@ const App: React.FC<{
         <Route path="/" element={<Home />} />
         <Route
           path="/lobby"
-          element={
-            <LobbySelect
-              setMessage={setMessage}
-              setOnlineLobby={setOnlineLobby}
-            />
-          }
+          element={<LobbySelect setMessage={setMessage} />}
         />
         <Route path="/lobby-offline" element={<OfflineLobby />} />
         <Route
           path="/lobby-online"
-          element={
-            onlineLobby && (
-              <OnlineLobby socket={websocket} playerLobby={onlineLobby} />
-            )
-          }
+          element={<OnlineLobby socket={websocket} />}
         />
         <Route
           path="/game"

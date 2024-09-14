@@ -6,7 +6,7 @@ import { Controller } from "../components/match-logic/controller";
 import { Message, MessageModal } from "../components/modals/message-modal";
 import PromotionModal from "../components/modals/promotion-modal";
 import { SceneManager, Scenes } from "../components/scene-manager";
-import { LOBBY, LobbySettings, Player } from "../../shared/match";
+import { LOBBY_TYPE, Lobby, Player } from "../../shared/match";
 import { Socket } from "socket.io-client";
 import { LocalMatch } from "../components/match-logic/local-match";
 import { OnlineMatch } from "../components/match-logic/online-match";
@@ -18,12 +18,12 @@ export const GameView: React.FC<{
 }> = ({ sceneManager, socket, setMessage }) => {
   const navigate = useNavigate();
   const { lobby, player } = useLocation().state as {
-    lobby: LobbySettings;
+    lobby: Lobby;
     player: Player;
   };
   const [promotion, setPromotion] = useState(false);
   const match = useRef(
-    lobby.mode === LOBBY.OFFLINE
+    lobby.mode === LOBBY_TYPE.LOCAL
       ? new LocalMatch({ lobby, player })
       : new OnlineMatch({ lobby, player, socket })
   );
@@ -39,7 +39,7 @@ export const GameView: React.FC<{
   );
 
   useEffect(() => {
-    if (match.current.mode === LOBBY.ONLINE) {
+    if (match.current.mode === LOBBY_TYPE.ONLINE) {
       match.current.subscribeMatchEvents({
         controller: controller.current,
         setMessage,
@@ -47,7 +47,7 @@ export const GameView: React.FC<{
     }
 
     return () => {
-      if (match.current.mode === LOBBY.ONLINE)
+      if (match.current.mode === LOBBY_TYPE.ONLINE)
         match.current.unsubscribeMatchEvents();
     };
   }, [match, controller]);
