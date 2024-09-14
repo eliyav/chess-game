@@ -30,8 +30,8 @@ const App: React.FC<{
   }, [canvas.current, setIsInitialized]);
 
   useEffect(() => {
-    websocket.on("redirect", ({ message }) => {
-      navigate("/");
+    websocket.on("redirect", ({ path, message }) => {
+      navigate(path || "/");
       if (message) {
         setMessage({
           text: message,
