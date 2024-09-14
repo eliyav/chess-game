@@ -32,12 +32,14 @@ const App: React.FC<{
   useEffect(() => {
     websocket.on("redirect", ({ message }) => {
       navigate("/");
-      setMessage({
-        text: message,
-        onConfirm: () => {
-          setMessage(null);
-        },
-      });
+      if (message) {
+        setMessage({
+          text: message,
+          onConfirm: () => {
+            setMessage(null);
+          },
+        });
+      }
     });
 
     return () => {
