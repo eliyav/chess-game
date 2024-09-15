@@ -10,15 +10,19 @@ import { Home } from "./routes/home";
 import { LobbySelect } from "./routes/lobby";
 import { OfflineLobby } from "./routes/offline-lobby";
 import { OnlineLobby } from "./routes/online-lobby";
+import { Lobby } from "../shared/match";
 
 const App: React.FC<{
   websocket: Socket;
 }> = ({ websocket }) => {
   const navigate = useNavigate();
   const [isInitialized, setIsInitialized] = useState(false);
+  const [lobby, setLobby] = useState<Lobby>();
   const [message, setMessage] = useState<Message | null>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const sceneManager = useRef<SceneManager>();
+  const canGameViewRender =
+    sceneManager.current !== undefined && lobby !== undefined;
 
   useEffect(() => {
     if (canvas.current && !sceneManager.current) {
@@ -28,6 +32,17 @@ const App: React.FC<{
       });
     }
   }, [canvas.current, setIsInitialized]);
+
+  useEffect(() => {
+    websocket.on("lobby-info", (lobby: Lobby) => {
+      setLobby(lobby);
+    });
+
+    return () => {
+      websocket.off("lobby-info");
+      websocket.off("match-start");
+    };
+  }, [websocket, setLobby]);
 
   useEffect(() => {
     websocket.on("redirect", ({ path, message }) => {
@@ -67,15 +82,16 @@ const App: React.FC<{
         <Route path="/lobby-offline" element={<OfflineLobby />} />
         <Route
           path="/lobby-online"
-          element={<OnlineLobby socket={websocket} />}
+          element={<OnlineLobby socket={websocket} lobby={lobby} />}
         />
         <Route
           path="/game"
           element={
-            sceneManager.current ? (
+            canGameViewRender ? (
               <GameView
-                sceneManager={sceneManager.current}
+                sceneManager={sceneManager.current!}
                 socket={websocket}
+                lobby={lobby}
                 setMessage={setMessage}
               />
             ) : null

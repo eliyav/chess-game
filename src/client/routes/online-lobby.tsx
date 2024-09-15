@@ -1,5 +1,4 @@
-import { RandomGUID } from "@babylonjs/core";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import { Lobby } from "../../shared/match";
@@ -8,35 +7,19 @@ import { SelectionButton } from "../components/buttons/start-button";
 
 export const OnlineLobby: React.FC<{
   socket: Socket;
-}> = ({ socket }) => {
+  lobby: Lobby | undefined;
+}> = ({ socket, lobby }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const room = location.search.split("=")[1];
-  const [lobby, setLobby] = useState<Lobby>();
   const playersReady = lobby?.players.every((player) => player.ready);
+  const disableReadyButton =
+    lobby?.teams.White === "" ||
+    lobby?.teams.Black === "" ||
+    lobby?.players.length !== 2;
   const disableMatchStart = lobby
     ? lobby.players.length < 2 || !playersReady
     : true;
-  // useEffect(() => {
-  //   socket.on("match-start", () => {
-  //     navigate("/game", { state: { lobby, player } });
-  //   });
-
-  //   return () => {
-  //     socket.off("match-start");
-  //   };
-  // }, [socket, navigate, lobby, player]);
-
-  useEffect(() => {
-    socket.on("lobby-info", (lobby: Lobby) => {
-      setLobby(lobby);
-    });
-
-    return () => {
-      socket.off("lobby-info");
-      socket.off("match-start");
-    };
-  }, [socket, setLobby]);
 
   useEffect(() => {
     if (room) {
@@ -45,10 +28,14 @@ export const OnlineLobby: React.FC<{
 
     return () => {
       if (room) {
-        socket.emit("leave-room", { room });
+        if (lobby?.matchStarted === false) {
+          socket.emit("leave-room", { room });
+        }
       }
     };
   }, [room, socket]);
+
+  if (!lobby) return null;
 
   return (
     <div className="lobby screen">
@@ -80,8 +67,8 @@ export const OnlineLobby: React.FC<{
         </div>
         <h2 className="sub-title glass-dark">Players</h2>
         <div className="flex">
-          {lobby?.players.map((player) => (
-            <div className="player-card">
+          {lobby?.players.map((player, i) => (
+            <div className="player-card" key={i}>
               <p style={{ fontWeight: "bold" }} key={player.id}>
                 {player.name}
               </p>
@@ -96,21 +83,43 @@ export const OnlineLobby: React.FC<{
             </div>
           ))}
         </div>
-        <h2 className="sub-title glass-dark">Teams</h2>
+        <h2 className="sub-title glass-dark">First Move (White Team)</h2>
         <div className="flex">
-          <button>White</button>
-          <button>Black</button>
-        </div>
-        <div className="flex">
-          <label>Ready</label>
-          <input
-            type="checkbox"
-            onClick={() => {
-              socket.emit("readyPlayer", { room });
-            }}
-          ></input>
+          {lobby?.players.map((player, i) => (
+            <div className="player-card" key={i}>
+              <input
+                type="radio"
+                id={`first-move-${player.id}`}
+                name="first-move"
+                value={player.id}
+                checked={lobby.teams.White === player.id}
+                disabled={lobby?.players.length !== 2}
+                onChange={(e) => {
+                  socket.emit("set-teams", {
+                    room,
+                    first: e.target.value,
+                  });
+                }}
+                style={{ display: "none" }}
+              />
+              <label htmlFor={`first-move-${player.id}`}>{player.name}</label>
+            </div>
+          ))}
         </div>
         <footer>
+          <div className="flex ready">
+            <input
+              type="checkbox"
+              id="ready-checkbox"
+              disabled={disableReadyButton}
+              onClick={() => {
+                socket.emit("readyPlayer", { room });
+              }}
+              style={{ display: "none" }}
+            />
+            <label htmlFor="ready-checkbox">Ready</label>
+          </div>
+
           <SelectionButton
             customClass="mgn-1"
             text={"Start Game"}

@@ -95,6 +95,7 @@ io.on("connection", (socket) => {
         lobby.players = lobby.players.filter(
           (player) => player.id !== socket.id
         );
+        lobby.teams = { White: "", Black: "" };
         io.to(key).emit("lobby-info", lobby);
       }
     }
@@ -118,6 +119,10 @@ io.on("connection", (socket) => {
       name: `Player ${lobby.players.length + 1}`,
       ready: false,
     });
+    if (lobby.players.length === 2) {
+      lobby.teams.White = lobby.players[0].id;
+      lobby.teams.Black = lobby.players[1].id;
+    }
     io.to(room).emit("lobby-info", lobby);
   });
 
@@ -125,6 +130,7 @@ io.on("connection", (socket) => {
     const lobby = lobbyLog.get(room);
     if (!lobby) return;
     lobby.players = lobby.players.filter((player) => player.id !== socket.id);
+    lobby.teams = { White: "", Black: "" };
     io.to(room).emit("lobby-info", lobby);
   });
 
@@ -136,8 +142,11 @@ io.on("connection", (socket) => {
       lobby.players.every((player) => player.ready)
     ) {
       lobby.matchStarted = true;
-      io.to(room).emit("match-start");
-      io.to(room).emit("message", "Match started!");
+      io.to(room).emit("lobby-info", lobby);
+      io.to(room).emit("redirect", {
+        path: "/game",
+        message: "Match started!",
+      });
     }
   });
 
@@ -147,6 +156,15 @@ io.on("connection", (socket) => {
     const player = lobby.players.find((player) => player.id === socket.id);
     if (!player) return;
     player.ready = !player.ready;
+    io.to(room).emit("lobby-info", lobby);
+  });
+
+  socket.on("set-teams", ({ room, first }) => {
+    const lobby = lobbyLog.get(room);
+    if (!lobby) return;
+    if (lobby.players.length !== 2) return;
+    lobby.teams.White = first;
+    lobby.teams.Black = lobby.players.find((player) => player.id !== first)!.id;
     io.to(room).emit("lobby-info", lobby);
   });
 

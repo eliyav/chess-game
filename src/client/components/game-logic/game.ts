@@ -8,11 +8,11 @@ import {
 } from "../../helper/game-helpers";
 import Board, { Square } from "./board";
 import GamePiece, { Move } from "./game-piece";
-import { Teams } from "../../../shared/match";
+import { TEAM } from "../../../shared/match";
 import { Point } from "../../helper/movement-helpers";
 
 class Game {
-  teams: Teams[];
+  teams: TEAM[];
   current: {
     board: Board;
     annotations: string[];
@@ -21,7 +21,7 @@ class Game {
   };
 
   constructor() {
-    this.teams = ["White", "Black"];
+    this.teams = [TEAM.WHITE, TEAM.BLACK];
     this.current = this.createGame();
   }
 

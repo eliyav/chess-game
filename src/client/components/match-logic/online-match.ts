@@ -1,5 +1,5 @@
 import { Socket } from "socket.io-client";
-import { LOBBY_TYPE, Lobby, Player } from "../../../shared/match";
+import { LOBBY_TYPE, Lobby, Player, TEAM } from "../../../shared/match";
 import { Point } from "../../helper/movement-helpers";
 import GamePiece from "../game-logic/game-piece";
 import { Message } from "../modals/message-modal";
@@ -75,11 +75,18 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
 
   isPlayersTurn() {
     const currentPlayer = this.getGame().getCurrentPlayer();
-    return currentPlayer === this.player.team;
+    const teamsPlayer = this.lobby.teams[currentPlayer];
+    console.log(teamsPlayer, this.player.id);
+    return teamsPlayer === this.player.id;
   }
 
   getPlayerTeam() {
-    return this.player.team;
+    const teams = Object.entries(this.lobby.teams);
+    const team = teams.find(([, player]) => player === this.player.id);
+    if (team) {
+      return team[0];
+    }
+    return;
   }
 
   isCurrentPlayersPiece(piece: GamePiece) {

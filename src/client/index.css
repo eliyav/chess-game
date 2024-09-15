@@ -16,6 +16,8 @@ body {
   --primary-alt-color: #8b8b8b;
   --primary-dark-opaque: rgba(0, 0, 0, 0.6);
   --primary-light-opaque: rgba(255, 255, 255, 0.6);
+  --green-highlight: rgba(0, 255, 0, 0.5);
+  --red-highlight: rgba(255, 0, 0, 0.5);
 }
 
 #root {
@@ -78,7 +80,7 @@ canvas {
 .header {
   user-select: none;
   text-align: center;
-  margin-top: 1em;
+  margin: 1em 0.2em 0 0.2em;
   padding: 0.5em;
   font-size: 1.5em;
 }
@@ -436,13 +438,44 @@ footer {
   background-color: var(--primary-background);
 }
 
-/* Highlights */
-.green-highlight {
+input[type="radio"]:checked + label {
   color: rgba(0, 255, 0, 0.5);
 }
 
+.ready {
+  display: inline-block;
+  font-weight: bold;
+  padding: 0.5em;
+  font-size: 1.5em;
+  margin: auto;
+  border: 1px solid whitesmoke;
+  border-radius: 0.5em;
+  background-color: var(--primary-background);
+}
+
+.ready > * {
+  margin: 0 0.25em;
+}
+
+.ready:has(input[type="checkbox"]:checked) {
+  background-color: var(--green-highlight);
+}
+
+.ready:has(input[type="checkbox"]:not(:checked)) {
+  background-color: var(--red-highlight);
+}
+
+.ready:has(input[type="checkbox"]:disabled) {
+  opacity: 0.5;
+}
+
+/* Highlights */
+.green-highlight {
+  color: var(--green-highlight);
+}
+
 .red-highlight {
-  color: rgba(255, 0, 0, 0.5);
+  color: var(--red-highlight);
 }
 
 /* Margins */
