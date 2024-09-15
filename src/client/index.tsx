@@ -5,9 +5,12 @@ import { io } from "socket.io-client";
 import App from "./app";
 import "./index.css";
 
-const websocket = io(`ws://${window.location.host}`, {
-  transports: ["websocket"],
-});
+const websocket = io(
+  `${process.env.NODE_ENV === "dev" ? "ws" : "wss"}://${window.location.host}`,
+  {
+    transports: ["websocket"],
+  }
+);
 
 window.addEventListener("beforeunload", () => {
   websocket.disconnect();
