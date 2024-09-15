@@ -13,7 +13,10 @@ export const OnlineLobby: React.FC<{
   const location = useLocation();
   const room = location.search.split("=")[1];
   const [lobby, setLobby] = useState<Lobby>();
-
+  const playersReady = lobby?.players.every((player) => player.ready);
+  const disableMatchStart = lobby
+    ? lobby.players.length < 2 || !playersReady
+    : true;
   // useEffect(() => {
   //   socket.on("match-start", () => {
   //     navigate("/game", { state: { lobby, player } });
@@ -59,7 +62,7 @@ export const OnlineLobby: React.FC<{
       </div>
       <div>
         <div className="lobby-code">
-          <h2 className="sub-title glass-dark">Room</h2>
+          <h2 className="sub-title glass-dark">Invite Code</h2>
           <p>
             <span
               onClick={() => {
@@ -77,9 +80,35 @@ export const OnlineLobby: React.FC<{
         </div>
         <h2 className="sub-title glass-dark">Players</h2>
         <div className="flex">
-          {lobby?.players.map((player, i) => (
-            <button key={i}>{player.name}</button>
+          {lobby?.players.map((player) => (
+            <div className="player-card">
+              <p style={{ fontWeight: "bold" }} key={player.id}>
+                {player.name}
+              </p>
+              <p>
+                Ready:{" "}
+                {player.ready ? (
+                  <span className={"green-highlight"}>✔</span>
+                ) : (
+                  <span className={"red-highlight"}>✖</span>
+                )}
+              </p>
+            </div>
           ))}
+        </div>
+        <h2 className="sub-title glass-dark">Teams</h2>
+        <div className="flex">
+          <button>White</button>
+          <button>Black</button>
+        </div>
+        <div className="flex">
+          <label>Ready</label>
+          <input
+            type="checkbox"
+            onClick={() => {
+              socket.emit("readyPlayer", { room });
+            }}
+          ></input>
         </div>
         <footer>
           <SelectionButton
@@ -88,7 +117,7 @@ export const OnlineLobby: React.FC<{
             onClick={() => {
               socket.emit("request-match-start", { room });
             }}
-            disabled={lobby ? lobby.players.length < 2 : true}
+            disabled={disableMatchStart}
           />
         </footer>
       </div>

@@ -24,6 +24,8 @@ app.get("/create-lobby", (req, res) => {
     mode: LOBBY_TYPE.ONLINE,
     key,
     players: [],
+    teams: { White: "", Black: "" },
+    matchStarted: false,
   };
   lobbyLog.set(key, lobby);
   res.send(key);
@@ -99,42 +101,53 @@ io.on("connection", (socket) => {
   });
 
   socket.on("join-room", ({ room }) => {
-    if (lobbyLog.has(room)) {
-      const lobby = lobbyLog.get(room);
-      if (!lobby) return;
-      if (lobby.players.find((player) => player.id === socket.id)) return;
-      if (lobby.players.length === 2) {
-        socket.emit("redirect", { message: "Room is full" });
-        return;
-      }
-      socket.join(room);
-      lobby.players.push({
-        id: socket.id,
-        type: "Human",
-        name: `Player ${lobby.players.length + 1}`,
-      });
-      io.to(room).emit("lobby-info", lobby);
-    } else {
+    const lobby = lobbyLog.get(room);
+    if (!lobby) {
       socket.emit("message", "Room does not exist");
+      return;
     }
+    if (lobby.players.find((player) => player.id === socket.id)) return;
+    if (lobby.players.length === 2) {
+      socket.emit("redirect", { message: "Room is full" });
+      return;
+    }
+    socket.join(room);
+    lobby.players.push({
+      id: socket.id,
+      type: "Human",
+      name: `Player ${lobby.players.length + 1}`,
+      ready: false,
+    });
+    io.to(room).emit("lobby-info", lobby);
   });
 
   socket.on("leave-room", ({ room }) => {
-    if (lobbyLog.has(room)) {
-      const lobby = lobbyLog.get(room);
-      if (!lobby) return;
-      lobby.players = lobby.players.filter((player) => player.id !== socket.id);
-      io.to(room).emit("lobby-info", lobby);
-    }
+    const lobby = lobbyLog.get(room);
+    if (!lobby) return;
+    lobby.players = lobby.players.filter((player) => player.id !== socket.id);
+    io.to(room).emit("lobby-info", lobby);
   });
 
   socket.on("request-match-start", ({ room }) => {
-    const clients = io.sockets.adapter.rooms.get(room);
-    const serializedSet = clients ? [...clients.keys()] : [];
-    if (serializedSet.length === 2) {
+    const lobby = lobbyLog.get(room);
+    if (!lobby) return;
+    if (
+      lobby.players.length === 2 &&
+      lobby.players.every((player) => player.ready)
+    ) {
+      lobby.matchStarted = true;
       io.to(room).emit("match-start");
-      socket.emit("message", "Match started!");
+      io.to(room).emit("message", "Match started!");
     }
+  });
+
+  socket.on("readyPlayer", ({ room }) => {
+    const lobby = lobbyLog.get(room);
+    if (!lobby) return;
+    const player = lobby.players.find((player) => player.id === socket.id);
+    if (!player) return;
+    player.ready = !player.ready;
+    io.to(room).emit("lobby-info", lobby);
   });
 
   //Resolve Turn

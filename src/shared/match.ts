@@ -5,8 +5,10 @@ export enum LOBBY_TYPE {
 
 export interface Lobby {
   mode: LOBBY_TYPE;
-  key: string | null;
+  key: string;
   players: Player[];
+  teams: { [key in TEAM]: Player["id"] };
+  matchStarted: boolean;
 }
 
 export interface RoomDetails {
@@ -14,7 +16,10 @@ export interface RoomDetails {
   playerId: Player["id"];
 }
 
-export type Teams = "White" | "Black";
+export enum TEAM {
+  WHITE = "White",
+  BLACK = "Black",
+}
 
 export type PlayerType = "Human" | "AI";
 
@@ -22,4 +27,5 @@ export type Player = {
   id: string;
   type: PlayerType;
   name: string;
+  ready: boolean;
 };
