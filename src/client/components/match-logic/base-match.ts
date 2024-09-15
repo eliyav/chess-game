@@ -1,5 +1,5 @@
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { LOBBY_TYPE, Lobby, Player, Teams } from "../../../shared/match";
+import { LOBBY_TYPE, Lobby, Player, TEAM } from "../../../shared/match";
 import { TurnHistory } from "../../helper/game-helpers";
 import { Point } from "../../helper/movement-helpers";
 import { findByPoint } from "../../view/scene-helpers";
@@ -15,7 +15,7 @@ export interface MatchLogic {
     targetPoint: Point;
   }): false | TurnHistory;
   isPlayersTurn(): boolean;
-  getPlayerTeam(): Teams;
+  getPlayerTeam(): TEAM | undefined;
   nextTurn(): void;
   isCurrentPlayersPiece(piece: GamePiece): boolean;
   isValidMove({

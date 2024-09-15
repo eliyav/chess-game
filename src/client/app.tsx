@@ -79,7 +79,10 @@ const App: React.FC<{
           path="/lobby"
           element={<LobbySelect setMessage={setMessage} />}
         />
-        <Route path="/lobby-offline" element={<OfflineLobby />} />
+        <Route
+          path="/lobby-offline"
+          element={<OfflineLobby setLobby={setLobby} />}
+        />
         <Route
           path="/lobby-online"
           element={<OnlineLobby socket={websocket} lobby={lobby} />}

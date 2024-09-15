@@ -1,19 +1,40 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { LOBBY_TYPE, Lobby } from "../../shared/match";
 import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
-import { LOBBY_TYPE, Lobby } from "../../shared/match";
 
-export const OfflineLobby: React.FC<{}> = ({}) => {
+export const OfflineLobby: React.FC<{
+  setLobby: React.Dispatch<React.SetStateAction<Lobby | undefined>>;
+}> = ({ setLobby }) => {
   const navigate = useNavigate();
-  const [lobby, setLobby] = useState<Lobby>(createLobby(LOBBY_TYPE.LOCAL));
 
   const updateLobby = useCallback(
     <KEY extends keyof Lobby>(key: KEY, value: Lobby[KEY]) => {
-      setLobby((prev) => ({ ...prev, [key]: value }));
+      setLobby((prev) => ({
+        mode: prev?.mode ?? LOBBY_TYPE.LOCAL,
+        key: prev?.key ?? "",
+        players: prev?.players ?? [],
+        teams: prev?.teams ?? { White: "", Black: "" },
+        matchStarted: prev?.matchStarted ?? false,
+        [key]: value,
+      }));
     },
     [setLobby]
   );
+
+  useEffect(() => {
+    setLobby({
+      mode: LOBBY_TYPE.LOCAL,
+      key: "",
+      players: [],
+      teams: {
+        White: "",
+        Black: "",
+      },
+      matchStarted: false,
+    });
+  }, [setLobby]);
 
   return (
     <div className="lobby screen">
@@ -21,7 +42,7 @@ export const OfflineLobby: React.FC<{}> = ({}) => {
         <BackButton
           customClass={"bottom-left"}
           size={30}
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/lobby")}
         />
         <h1>Offline Lobby</h1>
       </div>
@@ -34,18 +55,10 @@ export const OfflineLobby: React.FC<{}> = ({}) => {
           customClass="mgn-1"
           text={"Start Game"}
           onClick={() => {
-            navigate("/game", { state: { lobby } });
+            navigate("/game");
           }}
         />
       </footer>
     </div>
   );
 };
-
-function createLobby(mode: LOBBY_TYPE) {
-  return {
-    mode,
-    key: null,
-    players: [],
-  };
-}

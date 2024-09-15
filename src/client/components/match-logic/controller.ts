@@ -303,6 +303,7 @@ export class Controller {
     if (!gameScene) return;
     const camera = gameScene.scene.cameras[0] as ArcRotateCamera;
     const currentPlayer = this.match.getPlayerTeam();
+    if (!currentPlayer) return;
     rotateCamera({
       camera,
       currentPlayer,

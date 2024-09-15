@@ -34,7 +34,7 @@ class Game {
     };
   }
 
-  getCurrentPlayer() {
+  getCurrentTeam() {
     const index = this.current.turn % 2 ? 0 : 1;
     return this.teams[index];
   }
@@ -141,12 +141,12 @@ class Game {
       locationsInfo;
     const castling =
       originPiece!.name === "King" &&
-      originPiece!.color === this.getCurrentPlayer();
+      originPiece!.color === this.getCurrentTeam();
     let castling2 = false;
     if (targetPiece !== undefined) {
       castling2 =
         targetPiece.name === "Rook" &&
-        targetPiece.color === this.getCurrentPlayer();
+        targetPiece.color === this.getCurrentTeam();
       if (castling && castling2) {
         const a = gameHelpers.getX(originPoint);
         const b = gameHelpers.getX(targetPoint);
@@ -298,12 +298,12 @@ class Game {
         if (currentPlayer) {
           return (
             square.on!.name === "King" &&
-            square.on!.color === this.getCurrentPlayer()
+            square.on!.color === this.getCurrentTeam()
           );
         } else {
           return (
             square.on!.name === "King" &&
-            square.on!.color !== this.getCurrentPlayer()
+            square.on!.color !== this.getCurrentTeam()
           );
         }
       });
@@ -317,9 +317,9 @@ class Game {
     const piecesArray = this.current.board.grid.flat().filter((square) => {
       if (square.on !== undefined) {
         if (currentPlayer) {
-          return square.on.color === this.getCurrentPlayer();
+          return square.on.color === this.getCurrentTeam();
         } else {
-          return square.on.color !== this.getCurrentPlayer();
+          return square.on.color !== this.getCurrentTeam();
         }
       }
     });
@@ -405,7 +405,7 @@ class Game {
         resolve[0] ? movesObj.push(resolve[1]) : null;
       }
     };
-    const playersRooks = this.findPieces("Rook", this.getCurrentPlayer());
+    const playersRooks = this.findPieces("Rook", this.getCurrentTeam());
     if (playersRooks) {
       playersRooks.forEach((square) => {
         checkCastlingMove(piece!, square.on!);

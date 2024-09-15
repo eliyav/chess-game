@@ -50,7 +50,7 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
   }
 
   getPlayerTeam() {
-    return this.getGame().getCurrentPlayer();
+    return this.getGame().getCurrentTeam();
   }
 
   isCurrentPlayersPiece(piece: GamePiece) {

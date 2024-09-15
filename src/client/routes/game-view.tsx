@@ -19,7 +19,6 @@ export const GameView: React.FC<{
 }> = ({ sceneManager, socket, setMessage, lobby }) => {
   const navigate = useNavigate();
   const [promotion, setPromotion] = useState(false);
-  console.log(lobby);
   const match = useRef(
     lobby.mode === LOBBY_TYPE.LOCAL
       ? new LocalMatch({ lobby, player: lobby.players[0] })
