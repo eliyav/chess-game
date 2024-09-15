@@ -124,7 +124,7 @@ io.on("connection", (socket) => {
       const lobby = lobbyLog.get(room);
       if (!lobby) return;
       lobby.players = lobby.players.filter((player) => player.id !== socket.id);
-      socket.to(room).emit("lobby-info", lobby);
+      io.to(room).emit("lobby-info", lobby);
     }
   });
 
