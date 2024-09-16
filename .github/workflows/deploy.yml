@@ -11,4 +11,4 @@ jobs:
       - name: Setup SSH
         run: echo "${{ secrets.SSH_PRIVATE_KEY  }}" > digitalOcean.pem && chmod 400 digitalOcean.pem
       - name: Deploy prod
-        run: ssh -i "digitalOcean.pem" -o StrictHostKeyChecking=no "${{ secrets.SERVER_USER  }}"@"${{ secrets.SERVER_IP }}" "cd /www && git pull && npm install && npm run clean && npm run build:prod && npx pm2 restart 0 && exit"
+        run: ssh -i "digitalOcean.pem" -o StrictHostKeyChecking=no "${{ secrets.SERVER_USER  }}"@"${{ secrets.SERVER_IP }}" "cd www && git pull && npm install && npm run clean && npm run build:prod && npx pm2 restart 0 && exit"
