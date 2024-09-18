@@ -39,12 +39,12 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
   }
 
   resetRequest() {
-    websocket.emit("resetMatchRequest", { key: this.lobby.key });
+    websocket.emit("resetMatchRequest", { lobbyKey: this.lobby.key });
     return false;
   }
 
   undoTurnRequest() {
-    websocket.emit("resetMatchRequest", { key: this.lobby.key });
+    websocket.emit("resetMatchRequest", { lobbyKey: this.lobby.key });
     return false;
   }
 

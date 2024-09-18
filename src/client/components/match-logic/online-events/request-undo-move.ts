@@ -15,14 +15,14 @@ export function requestUndoMove({
       onConfirm: () => {
         websocket.emit("undoMoveResponse", {
           answer: true,
-          key: controller.match.lobby.key,
+          lobbyKey: controller.match.lobby.key,
         });
         setMessage(null);
       },
       onReject: () => {
         websocket.emit("undoMoveResponse", {
           answer: false,
-          key: controller.match.lobby.key,
+          lobbyKey: controller.match.lobby.key,
         });
         setMessage(null);
       },

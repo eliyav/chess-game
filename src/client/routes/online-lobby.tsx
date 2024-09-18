@@ -10,7 +10,7 @@ export const OnlineLobby: React.FC<{
 }> = ({ lobby }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const room = location.search.split("=")[1];
+  const lobbyKey = location.search.split("=")[1];
   const playersReady = lobby?.players.every((player) => player.ready);
   const disableReadyButton =
     lobby?.teams.White === "" ||
@@ -21,18 +21,18 @@ export const OnlineLobby: React.FC<{
     : true;
 
   useEffect(() => {
-    if (room) {
-      websocket.emit("joinRoom", { room });
+    if (lobbyKey) {
+      websocket.emit("joinLobby", { lobbyKey });
     }
 
     return () => {
-      if (room) {
+      if (lobbyKey) {
         if (lobby?.matchStarted === false) {
-          websocket.emit("leaveRoom", { room });
+          websocket.emit("leaveLobby", { lobbyKey });
         }
       }
     };
-  }, [room, websocket]);
+  }, [lobbyKey, websocket]);
 
   if (!lobby) return null;
 
@@ -53,14 +53,14 @@ export const OnlineLobby: React.FC<{
             <span
               onClick={() => {
                 try {
-                  const text = room ?? "";
+                  const text = lobbyKey ?? "";
                   navigator.clipboard.writeText(text);
                 } catch (e) {
                   console.error(e);
                 }
               }}
             >
-              {room ?? "..."}
+              {lobbyKey ?? "..."}
             </span>
           </p>
         </div>
@@ -95,7 +95,7 @@ export const OnlineLobby: React.FC<{
                 disabled={lobby?.players.length !== 2}
                 onChange={(e) => {
                   websocket.emit("setTeams", {
-                    room,
+                    lobbyKey,
                     first: e.target.value,
                   });
                 }}
@@ -112,7 +112,7 @@ export const OnlineLobby: React.FC<{
               id="ready-checkbox"
               disabled={disableReadyButton}
               onClick={() => {
-                websocket.emit("readyPlayer", { room });
+                websocket.emit("readyPlayer", { lobbyKey });
               }}
               style={{ display: "none" }}
             />
@@ -123,7 +123,7 @@ export const OnlineLobby: React.FC<{
             customClass="mgn-1"
             text={"Start Game"}
             onClick={() => {
-              websocket.emit("requestMatchStart", { room });
+              websocket.emit("requestMatchStart", { lobbyKey });
             }}
             disabled={disableMatchStart}
           />

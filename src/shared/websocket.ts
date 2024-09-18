@@ -4,7 +4,7 @@ import { Lobby } from "./match";
 export interface ServerToClientEvents {
   lobbyInfo: (lobby: Lobby) => void;
   message: (message: string) => void;
-  redirect: (data: { path?: string; message: string }) => void;
+  redirect: (data: { path: string; message: string | undefined }) => void;
   resolvedMove: (data: { originPoint: Point; targetPoint: Point }) => void;
   resetMatchRequested: () => void;
   resetMatchResolve: (data: { answer: boolean }) => void;
@@ -14,20 +14,20 @@ export interface ServerToClientEvents {
 
 export interface ClientToServerEvents {
   disconnect: () => void;
-  joinRoom: (data: { room: string }) => void;
-  leaveRoom: (data: { room: string }) => void;
-  requestMatchStart: (data: { room: string }) => void;
-  readyPlayer: (data: { room: string }) => void;
-  setTeams: (data: { room: string; first: string }) => void;
+  joinLobby: (data: { lobbyKey: string }) => void;
+  leaveLobby: (data: { lobbyKey: string }) => void;
+  requestMatchStart: (data: { lobbyKey: string }) => void;
+  readyPlayer: (data: { lobbyKey: string }) => void;
+  setTeams: (data: { lobbyKey: string; first: string }) => void;
   resolvedMove: (data: {
     originPoint: Point;
     targetPoint: Point;
     key: string;
   }) => void;
-  resetMatchRequest: (data: { key: string }) => void;
-  resetMatchResponse: (data: { answer: boolean; key: string }) => void;
-  undoMoveRequest: (data: { key: string }) => void;
-  undoMoveResponse: (data: { answer: boolean; key: string }) => void;
+  resetMatchRequest: (data: { lobbyKey: string }) => void;
+  resetMatchResponse: (data: { answer: boolean; lobbyKey: string }) => void;
+  undoMoveRequest: (data: { lobbyKey: string }) => void;
+  undoMoveResponse: (data: { answer: boolean; lobbyKey: string }) => void;
 }
 
 export interface InterServerEvents {

@@ -36,40 +36,22 @@ app.get("/create-lobby", (req, res) => {
   res.send(key);
 });
 
-app.post("/update-lobby", (req, res) => {
-  const { room, lobby } = JSON.parse(req.body) as {
-    room: string;
-    lobby: Lobby;
-  };
-  if (!room) {
+app.get("/join-lobby", (req, res) => {
+  const lobbyKey = req.query.key as string;
+  if (!lobbyKey) {
     res.status(400).send("Lobby key is required");
     return;
   }
-  if (!lobby) {
-    res.status(400).send("Lobby is required");
-    return;
-  }
-  if (!lobbyLog.has(room)) res.status(400).send("Lobby does not exist");
-  io.to(room).emit("lobbyInfo", lobby);
-  res.send("Lobby updated successfully!");
-});
-
-app.post("/join-lobby", (req, res) => {
-  const { room } = JSON.parse(req.body) as { room: string };
-  if (!room) {
-    res.status(400).send("Lobby key is required");
-    return;
-  }
-  const lobby = lobbyLog.get(room);
+  const lobby = lobbyLog.get(lobbyKey);
   if (!lobby) {
     res.status(400).send("Lobby does not exist");
     return;
   }
   if (lobby.players.length === 2) {
-    res.status(400).send("Room is full");
+    res.status(400).send("Lobby is full");
     return;
   }
-  res.send(room);
+  res.send(lobbyKey);
 });
 
 app.get("*", function (req, res) {
@@ -110,18 +92,16 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("joinRoom", ({ room }) => {
-    const lobby = lobbyLog.get(room);
+  socket.on("joinLobby", ({ lobbyKey }) => {
+    const lobby = lobbyLog.get(lobbyKey);
     if (!lobby) {
-      socket.emit("message", "Room does not exist");
-      return;
+      return socket.emit("message", "Lobby does not exist");
     }
     if (lobby.players.find((player) => player.id === socket.id)) return;
     if (lobby.players.length === 2) {
-      socket.emit("redirect", { message: "Room is full" });
-      return;
+      return socket.emit("message", "Lobby is full");
     }
-    socket.join(room);
+    socket.join(lobbyKey);
     lobby.players.push({
       id: socket.id,
       type: "Human",
@@ -132,49 +112,49 @@ io.on("connection", (socket) => {
       lobby.teams.White = lobby.players[0].id;
       lobby.teams.Black = lobby.players[1].id;
     }
-    io.to(room).emit("lobbyInfo", lobby);
+    io.to(lobbyKey).emit("lobbyInfo", lobby);
   });
 
-  socket.on("leaveRoom", ({ room }) => {
-    const lobby = lobbyLog.get(room);
+  socket.on("leaveLobby", ({ lobbyKey }) => {
+    const lobby = lobbyLog.get(lobbyKey);
     if (!lobby) return;
     lobby.players = lobby.players.filter((player) => player.id !== socket.id);
     lobby.teams = { White: "", Black: "" };
-    io.to(room).emit("lobbyInfo", lobby);
+    io.to(lobbyKey).emit("lobbyInfo", lobby);
   });
 
-  socket.on("requestMatchStart", ({ room }) => {
-    const lobby = lobbyLog.get(room);
+  socket.on("requestMatchStart", ({ lobbyKey }) => {
+    const lobby = lobbyLog.get(lobbyKey);
     if (!lobby) return;
     if (
       lobby.players.length === 2 &&
       lobby.players.every((player) => player.ready)
     ) {
       lobby.matchStarted = true;
-      io.to(room).emit("lobbyInfo", lobby);
-      io.to(room).emit("redirect", {
+      io.to(lobbyKey).emit("lobbyInfo", lobby);
+      io.to(lobbyKey).emit("redirect", {
         path: "/game",
         message: "Match started!",
       });
     }
   });
 
-  socket.on("readyPlayer", ({ room }) => {
-    const lobby = lobbyLog.get(room);
+  socket.on("readyPlayer", ({ lobbyKey }) => {
+    const lobby = lobbyLog.get(lobbyKey);
     if (!lobby) return;
     const player = lobby.players.find((player) => player.id === socket.id);
     if (!player) return;
     player.ready = !player.ready;
-    io.to(room).emit("lobbyInfo", lobby);
+    io.to(lobbyKey).emit("lobbyInfo", lobby);
   });
 
-  socket.on("setTeams", ({ room, first }) => {
-    const lobby = lobbyLog.get(room);
+  socket.on("setTeams", ({ lobbyKey, first }) => {
+    const lobby = lobbyLog.get(lobbyKey);
     if (!lobby) return;
     if (lobby.players.length !== 2) return;
     lobby.teams.White = first;
     lobby.teams.Black = lobby.players.find((player) => player.id !== first)!.id;
-    io.to(room).emit("lobbyInfo", lobby);
+    io.to(lobbyKey).emit("lobbyInfo", lobby);
   });
 
   //Resolve Turn
@@ -183,22 +163,22 @@ io.on("connection", (socket) => {
   });
 
   //Reset Match
-  socket.on("resetMatchRequest", ({ key }) => {
-    socket.to(key).emit("resetMatchRequested");
+  socket.on("resetMatchRequest", ({ lobbyKey }) => {
+    socket.to(lobbyKey).emit("resetMatchRequested");
   });
 
-  socket.on("resetMatchResponse", ({ answer, key }) => {
-    socket.to(key).emit("resetMatchResolve", { answer });
+  socket.on("resetMatchResponse", ({ answer, lobbyKey }) => {
+    socket.to(lobbyKey).emit("resetMatchResolve", { answer });
     socket.emit("resetMatchResolve", { answer });
   });
 
   //Undo Move
-  socket.on("undoMoveRequest", ({ key }) => {
-    socket.to(key).emit("undoMoveRequested");
+  socket.on("undoMoveRequest", ({ lobbyKey }) => {
+    socket.to(lobbyKey).emit("undoMoveRequested");
   });
 
-  socket.on("undoMoveResponse", ({ answer, key }) => {
-    socket.to(key).emit("undoMoveResolve", { answer });
+  socket.on("undoMoveResponse", ({ answer, lobbyKey }) => {
+    socket.to(lobbyKey).emit("undoMoveResolve", { answer });
     socket.emit("undoMoveResolve", { answer });
   });
 });

@@ -8,10 +8,10 @@ import { LocalMatch } from "../components/match-logic/local-match";
 import { OnlineMatch } from "../components/match-logic/online-match";
 import { Message } from "../components/modals/message-modal";
 import PromotionModal from "../components/modals/promotion-modal";
-import { SceneManager, Scenes } from "../components/scene-manager";
+import { SceneManager } from "../components/scene-manager";
 import { websocket } from "../websocket-client";
 
-export const GameView: React.FC<{
+export const Game: React.FC<{
   sceneManager: SceneManager;
   lobby: Lobby;
   setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
@@ -59,7 +59,6 @@ export const GameView: React.FC<{
           {
             text: "home",
             onClick: () => {
-              sceneManager.switchScene(Scenes.HOME);
               navigate("/");
             },
           },

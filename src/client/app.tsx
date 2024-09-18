@@ -5,7 +5,7 @@ import { Lobby } from "../shared/match";
 import LoadingScreen from "./components/loading-screen";
 import { Message, MessageModal } from "./components/modals/message-modal";
 import { SceneManager } from "./components/scene-manager";
-import { GameView } from "./routes/game-view";
+import { Game } from "./routes/game";
 import { Home } from "./routes/home";
 import { LobbySelect } from "./routes/lobby";
 import { OfflineLobby } from "./routes/offline-lobby";
@@ -85,7 +85,7 @@ const App: React.FC<{}> = () => {
           path="/game"
           element={
             canGameViewRender ? (
-              <GameView
+              <Game
                 sceneManager={sceneManager.current!}
                 lobby={lobby}
                 setMessage={setMessage}

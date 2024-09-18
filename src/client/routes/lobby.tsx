@@ -10,7 +10,7 @@ export const LobbySelect: React.FC<{
   setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
 }> = ({ setMessage }) => {
   const navigate = useNavigate();
-  const [inviteCode, setInviteCode] = useState("");
+  const [lobbyKey, setLobbyKey] = useState("");
 
   return (
     <div className="lobby screen">
@@ -36,26 +36,24 @@ export const LobbySelect: React.FC<{
             type="text"
             placeholder="Enter Invite Code"
             maxLength={5}
-            onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+            onChange={(e) => setLobbyKey(e.target.value.toUpperCase())}
             autoComplete="off"
-            value={inviteCode}
+            value={lobbyKey}
           ></input>
           <SelectionButton
             customClass={"no-top-br-radius"}
-            disabled={inviteCode.length !== 5}
+            disabled={lobbyKey.length !== 5}
             text={`Join ${LOBBY_TYPE.ONLINE}`}
             onClick={async () => {
               try {
-                const response = await fetch("./join-lobby", {
-                  method: "POST",
-                  body: JSON.stringify({
-                    room: inviteCode,
-                  }),
-                });
+                const response = await fetch(
+                  `./join-lobby?key=${lobbyKey}`,
+                  {}
+                );
                 if (!response.ok) {
                   throw new Error("Failed to join lobby");
                 }
-                navigate(`/lobby-online?room=${inviteCode}`);
+                navigate(`/lobby-online?key=${lobbyKey}`);
               } catch (e) {
                 if (e instanceof Error) {
                   setMessage({
@@ -78,8 +76,8 @@ export const LobbySelect: React.FC<{
           onClick={async () => {
             try {
               const response = await fetch("./create-lobby");
-              const roomKey = await response.text();
-              navigate(`/lobby-online?room=${roomKey}`);
+              const lobbyKey = await response.text();
+              navigate(`/lobby-online?key=${lobbyKey}`);
             } catch (e) {
               if (e instanceof Error) {
                 setMessage({
