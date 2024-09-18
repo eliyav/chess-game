@@ -12,5 +12,5 @@ jobs:
         run: echo "${{ secrets.SSH_PRIVATE_KEY  }}" > digitalOcean.pem && chmod 400 digitalOcean.pem
       - name: Deploy prod
         run: |
-          rsync --rsync-path "rsync" --exclude ".git" --exclude ".env" --exclude "node_modules" --exclude "digitalOcean.pem" --delete --checksum -azvv -e "ssh -i "digitalOcean.pem" -o StrictHostKeyChecking=no" "${{ secrets.SERVER_USER  }}"@"${{ secrets.SERVER_IP }}":~/www
+          rsync --rsync-path "rsync" --exclude ".git" --exclude ".env" --exclude "node_modules" --exclude "digitalOcean.pem" --delete -azvv -e "ssh -i "digitalOcean.pem" -o StrictHostKeyChecking=no" "${{ secrets.SERVER_USER  }}"@"${{ secrets.SERVER_IP }}":~/www/
           ssh -i "digitalOcean.pem" -o StrictHostKeyChecking=no "${{ secrets.SERVER_USER  }}"@"${{ secrets.SERVER_IP }}" "source ~/.nvm/nvm.sh && cd www && npm install && npm run clean && npm run build:prod && npx pm2 restart all && exit"
