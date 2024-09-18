@@ -9,18 +9,18 @@ export function requestMatchReset({
   setMessage: (value: React.SetStateAction<Message | null>) => void;
   controller: Controller;
 }): string[] {
-  websocket.on("reset-match-requested", () => {
+  websocket.on("resetMatchRequested", () => {
     setMessage({
       text: "Opponent requested a match reset. Do you accept?",
       onConfirm: () => {
-        websocket.emit("reset-match-response", {
+        websocket.emit("resetMatchResponse", {
           answer: true,
           key: controller.match.lobby.key,
         });
         setMessage(null);
       },
       onReject: () => {
-        websocket.emit("reset-match-response", {
+        websocket.emit("resetMatchResponse", {
           answer: false,
           key: controller.match.lobby.key,
         });
@@ -29,7 +29,7 @@ export function requestMatchReset({
     });
   });
 
-  websocket.on("reset-match-resolve", ({ answer }) => {
+  websocket.on("resetMatchResolve", ({ answer }) => {
     if (answer) {
       controller.match.reset();
       controller.resetView();

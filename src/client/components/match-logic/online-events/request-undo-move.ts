@@ -9,18 +9,18 @@ export function requestUndoMove({
   setMessage: (value: React.SetStateAction<Message | null>) => void;
   controller: Controller;
 }): string[] {
-  websocket.on("undo-move-requested", () => {
+  websocket.on("undoMoveRequested", () => {
     setMessage({
       text: "Opponent requested to undo the last game move. Do you accept?",
       onConfirm: () => {
-        websocket.emit("undo-move-response", {
+        websocket.emit("undoMoveResponse", {
           answer: true,
           key: controller.match.lobby.key,
         });
         setMessage(null);
       },
       onReject: () => {
-        websocket.emit("undo-move-response", {
+        websocket.emit("undoMoveResponse", {
           answer: false,
           key: controller.match.lobby.key,
         });
@@ -29,7 +29,7 @@ export function requestUndoMove({
     });
   });
 
-  websocket.on("undo-move-resolve", ({ answer }) => {
+  websocket.on("undoMoveResolve", ({ answer }) => {
     if (answer) {
       controller.match.undoTurn();
       controller.resetView();

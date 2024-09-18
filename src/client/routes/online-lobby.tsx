@@ -22,13 +22,13 @@ export const OnlineLobby: React.FC<{
 
   useEffect(() => {
     if (room) {
-      websocket.emit("join-room", { room });
+      websocket.emit("joinRoom", { room });
     }
 
     return () => {
       if (room) {
         if (lobby?.matchStarted === false) {
-          websocket.emit("leave-room", { room });
+          websocket.emit("leaveRoom", { room });
         }
       }
     };
@@ -94,7 +94,7 @@ export const OnlineLobby: React.FC<{
                 checked={lobby.teams.White === player.id}
                 disabled={lobby?.players.length !== 2}
                 onChange={(e) => {
-                  websocket.emit("set-teams", {
+                  websocket.emit("setTeams", {
                     room,
                     first: e.target.value,
                   });
@@ -123,7 +123,7 @@ export const OnlineLobby: React.FC<{
             customClass="mgn-1"
             text={"Start Game"}
             onClick={() => {
-              websocket.emit("request-match-start", { room });
+              websocket.emit("requestMatchStart", { room });
             }}
             disabled={disableMatchStart}
           />

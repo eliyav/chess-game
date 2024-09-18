@@ -32,12 +32,12 @@ const App: React.FC<{}> = () => {
   }, [canvas.current, setIsInitialized]);
 
   useEffect(() => {
-    websocket.on("lobby-info", (lobby: Lobby) => {
+    websocket.on("lobbyInfo", (lobby: Lobby) => {
       setLobby(lobby);
     });
 
     return () => {
-      websocket.off("lobby-info");
+      websocket.off("lobbyInfo");
     };
   }, [websocket, setLobby]);
 

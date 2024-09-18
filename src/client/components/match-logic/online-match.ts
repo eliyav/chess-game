@@ -1,14 +1,13 @@
-import { Socket } from "socket.io-client";
-import { LOBBY_TYPE, Lobby, Player, TEAM } from "../../../shared/match";
+import { Lobby, LOBBY_TYPE, Player, TEAM } from "../../../shared/match";
 import { Point } from "../../helper/movement-helpers";
+import { websocket } from "../../websocket-client";
 import GamePiece from "../game-logic/game-piece";
 import { Message } from "../modals/message-modal";
 import { BaseMatch, MatchLogic } from "./base-match";
 import { Controller } from "./controller";
 import { requestMatchReset } from "./online-events/request-match-reset";
-import { requestUndoMove } from "./online-events/request-undo-move";
 import { requestResolveMove } from "./online-events/request-resolve-move";
-import { websocket } from "../../websocket-client";
+import { requestUndoMove } from "./online-events/request-undo-move";
 
 export class OnlineMatch extends BaseMatch implements MatchLogic {
   mode: LOBBY_TYPE.ONLINE;
@@ -28,7 +27,7 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
   }) {
     const isValidMove = this.resolveMove({ originPoint, targetPoint });
     if (isValidMove) {
-      websocket.emit("resolved-move", {
+      websocket.emit("resolvedMove", {
         originPoint,
         targetPoint,
         key: this.lobby.key,
@@ -40,12 +39,12 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
   }
 
   resetRequest() {
-    websocket.emit("reset-match-request", { key: this.lobby.key });
+    websocket.emit("resetMatchRequest", { key: this.lobby.key });
     return false;
   }
 
   undoTurnRequest() {
-    websocket.emit("reset-match-request", { key: this.lobby.key });
+    websocket.emit("resetMatchRequest", { key: this.lobby.key });
     return false;
   }
 
@@ -116,7 +115,7 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
 
   unsubscribeMatchEvents() {
     this.listenerEvents.forEach((event) => {
-      websocket.off(event);
+      websocket.off(event as any);
     });
   }
 }

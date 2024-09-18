@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Socket } from "socket.io-client";
 import { LOBBY_TYPE, Lobby } from "../../shared/match";
 import { MenuOverlay } from "../components/game-overlay/menu-overlay";
 import * as icons from "../components/game-overlay/overlay-icons";

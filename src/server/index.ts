@@ -45,7 +45,7 @@ app.post("/update-lobby", (req, res) => {
     return;
   }
   if (!lobbyLog.has(room)) res.status(400).send("Lobby does not exist");
-  io.to(room).emit("lobby-info", lobby);
+  io.to(room).emit("lobbyInfo", lobby);
   res.send("Lobby updated successfully!");
 });
 
@@ -77,7 +77,11 @@ const server = app.listen(port, function () {
 
 const lobbyLog = new Map<string, Lobby>();
 
-const io = new Server(server);
+const io = new Server<
+  ClientToServerEvents,
+  ServerToClientEvents,
+  InterServerEvents
+>(server);
 
 setInterval(() => {
   const socketedRooms = io.sockets.adapter.rooms;
@@ -96,12 +100,12 @@ io.on("connection", (socket) => {
           (player) => player.id !== socket.id
         );
         lobby.teams = { White: "", Black: "" };
-        io.to(key).emit("lobby-info", lobby);
+        io.to(key).emit("lobbyInfo", lobby);
       }
     }
   });
 
-  socket.on("join-room", ({ room }) => {
+  socket.on("joinRoom", ({ room }) => {
     const lobby = lobbyLog.get(room);
     if (!lobby) {
       socket.emit("message", "Room does not exist");
@@ -123,18 +127,18 @@ io.on("connection", (socket) => {
       lobby.teams.White = lobby.players[0].id;
       lobby.teams.Black = lobby.players[1].id;
     }
-    io.to(room).emit("lobby-info", lobby);
+    io.to(room).emit("lobbyInfo", lobby);
   });
 
-  socket.on("leave-room", ({ room }) => {
+  socket.on("leaveRoom", ({ room }) => {
     const lobby = lobbyLog.get(room);
     if (!lobby) return;
     lobby.players = lobby.players.filter((player) => player.id !== socket.id);
     lobby.teams = { White: "", Black: "" };
-    io.to(room).emit("lobby-info", lobby);
+    io.to(room).emit("lobbyInfo", lobby);
   });
 
-  socket.on("request-match-start", ({ room }) => {
+  socket.on("requestMatchStart", ({ room }) => {
     const lobby = lobbyLog.get(room);
     if (!lobby) return;
     if (
@@ -142,7 +146,7 @@ io.on("connection", (socket) => {
       lobby.players.every((player) => player.ready)
     ) {
       lobby.matchStarted = true;
-      io.to(room).emit("lobby-info", lobby);
+      io.to(room).emit("lobbyInfo", lobby);
       io.to(room).emit("redirect", {
         path: "/game",
         message: "Match started!",
@@ -156,41 +160,41 @@ io.on("connection", (socket) => {
     const player = lobby.players.find((player) => player.id === socket.id);
     if (!player) return;
     player.ready = !player.ready;
-    io.to(room).emit("lobby-info", lobby);
+    io.to(room).emit("lobbyInfo", lobby);
   });
 
-  socket.on("set-teams", ({ room, first }) => {
+  socket.on("setTeams", ({ room, first }) => {
     const lobby = lobbyLog.get(room);
     if (!lobby) return;
     if (lobby.players.length !== 2) return;
     lobby.teams.White = first;
     lobby.teams.Black = lobby.players.find((player) => player.id !== first)!.id;
-    io.to(room).emit("lobby-info", lobby);
+    io.to(room).emit("lobbyInfo", lobby);
   });
 
   //Resolve Turn
-  socket.on("resolved-move", ({ originPoint, targetPoint, key }) => {
-    socket.to(key).emit("resolved-move", { originPoint, targetPoint });
+  socket.on("resolvedMove", ({ originPoint, targetPoint, key }) => {
+    socket.to(key).emit("resolvedMove", { originPoint, targetPoint });
   });
 
   //Reset Match
-  socket.on("reset-match-request", ({ key }) => {
-    socket.to(key).emit("reset-match-requested");
+  socket.on("resetMatchRequest", ({ key }) => {
+    socket.to(key).emit("resetMatchRequested");
   });
 
-  socket.on("reset-match-response", ({ answer, key }) => {
-    socket.to(key).emit("reset-match-resolve", { answer });
-    socket.emit("reset-match-resolve", { answer });
+  socket.on("resetMatchResponse", ({ answer, key }) => {
+    socket.to(key).emit("resetMatchResolve", { answer });
+    socket.emit("resetMatchResolve", { answer });
   });
 
   //Undo Move
-  socket.on("undo-move-request", ({ key }) => {
-    socket.to(key).emit("undo-move-requested");
+  socket.on("undoMoveRequest", ({ key }) => {
+    socket.to(key).emit("undoMoveRequested");
   });
 
-  socket.on("undo-move-response", ({ answer, key }) => {
-    socket.to(key).emit("undo-move-resolve", { answer });
-    socket.emit("undo-move-resolve", { answer });
+  socket.on("undoMoveResponse", ({ answer, key }) => {
+    socket.to(key).emit("undoMoveResolve", { answer });
+    socket.emit("undoMoveResolve", { answer });
   });
 });
 
