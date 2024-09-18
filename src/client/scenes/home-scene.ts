@@ -11,7 +11,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Scene } from "@babylonjs/core/scene.js";
 import type { Nullable } from "@babylonjs/core/types";
-import board from "../../../assets/board.gltf";
+import board from "../../../assets/pieces/board.gltf";
 import bishop from "../../../assets/pieces/bishopv3.gltf";
 import king from "../../../assets/pieces/kingv3.gltf";
 import knight from "../../../assets/pieces/knightv3.gltf";
@@ -124,6 +124,7 @@ function createDisplayPieces({
 function createDisplayBoard(
   board: ISceneLoaderAsyncResult
 ): [AbstractMesh, Nullable<AbstractMesh>] {
+  console.log(board);
   const boardMesh = board.meshes[0];
   const boardClone = boardMesh.clone("Board", null);
   boardMesh.position = new Vector3(30, -30, 30);

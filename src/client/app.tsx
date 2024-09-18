@@ -7,7 +7,7 @@ import { Message, MessageModal } from "./components/modals/message-modal";
 import { SceneManager } from "./scenes/scene-manager";
 import { Game } from "./routes/game";
 import { Home } from "./routes/home";
-import { LobbySelect } from "./routes/lobby";
+import { LobbySelect } from "./routes/lobby-select";
 import { OfflineLobby } from "./routes/offline-lobby";
 import { OnlineLobby } from "./routes/online-lobby";
 import { websocket } from "./websocket-client";

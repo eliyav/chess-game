@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { LOBBY_TYPE } from "../../shared/match";
 import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
-import Divider from "../components/divider";
 import { Message } from "../components/modals/message-modal";
+import { Divider } from "../components/svg/divider";
 
 export const LobbySelect: React.FC<{
   setMessage: React.Dispatch<React.SetStateAction<Message | null>>;

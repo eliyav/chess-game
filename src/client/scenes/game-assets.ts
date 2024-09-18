@@ -3,12 +3,13 @@ import {
   SceneLoader,
 } from "@babylonjs/core/Loading/sceneLoader";
 import { Material } from "@babylonjs/core/Materials/material";
+
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Scene } from "@babylonjs/core/scene";
-import board from "../../../assets/board.gltf";
+import board from "../../../assets/pieces/board.gltf";
 import bishop from "../../../assets/pieces/bishopv3.gltf";
 import king from "../../../assets/pieces/kingv3.gltf";
 import knight from "../../../assets/pieces/knightv3.gltf";

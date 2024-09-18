@@ -1,4 +1,3 @@
-import { on } from "events";
 import React from "react";
 
 export const SvgGithub: React.FC<{

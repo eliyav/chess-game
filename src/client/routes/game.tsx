@@ -8,7 +8,7 @@ import { LocalMatch } from "../match-logic/local-match";
 import { OnlineMatch } from "../match-logic/online-match";
 import { Message } from "../components/modals/message-modal";
 import PromotionModal from "../components/modals/promotion-modal";
-import { SceneManager } from "../scenes/scene-manager";
+import { SceneManager, Scenes } from "../scenes/scene-manager";
 import { websocket } from "../websocket-client";
 
 export const Game: React.FC<{
@@ -60,6 +60,7 @@ export const Game: React.FC<{
             text: "home",
             onClick: () => {
               navigate("/");
+              sceneManager.switchScene(Scenes.HOME);
             },
           },
           {
