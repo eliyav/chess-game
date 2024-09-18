@@ -1,8 +1,8 @@
-import { Point } from "../../../shared/game";
-import { Lobby, LOBBY_TYPE, Player, TEAM } from "../../../shared/match";
-import { websocket } from "../../websocket-client";
+import { Point } from "../../shared/game";
+import { Lobby, LOBBY_TYPE, Player, TEAM } from "../../shared/match";
+import { websocket } from "../websocket-client";
 import GamePiece from "../game-logic/game-piece";
-import { Message } from "../modals/message-modal";
+import { Message } from "../components/modals/message-modal";
 import { BaseMatch, MatchLogic } from "./base-match";
 import { Controller } from "./controller";
 import { requestMatchReset } from "./online-events/request-match-reset";

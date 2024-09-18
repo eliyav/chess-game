@@ -3,8 +3,8 @@ import {
   isEnPassantAvailable,
   doMovesMatch,
 } from "./game-helpers";
-import { Square } from "../components/game-logic/board";
-import GamePiece, { Move } from "../components/game-logic/game-piece";
+import { Square } from "./board";
+import GamePiece, { Move } from "./game-piece";
 import { Point } from "../../shared/game";
 
 type MovesObj = {
@@ -464,5 +464,6 @@ export {
   calcKnightMoves,
   calcPawnMoves,
   calcQueenMoves,
-  calcRookMoves, Point,
+  calcRookMoves,
+  Point,
 };

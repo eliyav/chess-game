@@ -2,8 +2,8 @@ import { Engine } from "@babylonjs/core/Engines/engine";
 import type { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Scene } from "@babylonjs/core/scene";
-import { AnimationContainer } from "../view/animation/create-animations";
-import { createHomeScene } from "../view/home-scene";
+import { AnimationContainer } from "./animation/create-animations";
+import { createHomeScene } from "./home-scene";
 
 export type CustomScene<T> = {
   scene: Scene;
@@ -85,7 +85,7 @@ export class SceneManager {
   }
 
   private async initGameScene() {
-    const { gameScene } = await import("../view/game-scene");
+    const { gameScene } = await import("./game-scene");
     this.scenes[Scenes.GAME] = await gameScene(this.canvas, this.engine);
   }
 

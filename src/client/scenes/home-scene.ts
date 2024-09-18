@@ -18,8 +18,8 @@ import knight from "../../../assets/pieces/knightv3.gltf";
 import pawn from "../../../assets/pieces/pawnv3.gltf";
 import queen from "../../../assets/pieces/queenv3.gltf";
 import rook from "../../../assets/pieces/rookv3.gltf";
-import { DisplayMesh } from "../components/scene-entities/display-mesh";
-import { CustomScene } from "../components/scene-manager";
+import { DisplayMesh } from "./display-mesh";
+import { CustomScene } from "./scene-manager";
 import { createCelestialSphere } from "./celestial-shere/celestial-sphere";
 import { createMeshMaterials } from "./materials";
 

@@ -1,4 +1,4 @@
-import { Point } from "../../../shared/game";
+import { Point } from "../../shared/game";
 
 class GamePiece {
   name: string;

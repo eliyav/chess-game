@@ -1,15 +1,15 @@
-import * as gameHelpers from "../../helper/game-helpers";
-import * as movementHelpers from "../../helper/movement-helpers";
+import * as gameHelpers from "./game-helpers";
+import * as movementHelpers from "./movement-helpers";
 import {
   TurnHistory,
   LocationsInfo,
   undoUpdateLocation,
   doMovesMatch,
-} from "../../helper/game-helpers";
+} from "./game-helpers";
 import Board, { Square } from "./board";
 import GamePiece, { Move } from "./game-piece";
-import { TEAM } from "../../../shared/match";
-import { Point } from "../../../shared/game";
+import { TEAM } from "../../shared/match";
+import { Point } from "../../shared/game";
 
 class Game {
   teams: TEAM[];

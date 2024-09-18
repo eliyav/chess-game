@@ -4,7 +4,7 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import { Lobby } from "../shared/match";
 import LoadingScreen from "./components/loading-screen";
 import { Message, MessageModal } from "./components/modals/message-modal";
-import { SceneManager } from "./components/scene-manager";
+import { SceneManager } from "./scenes/scene-manager";
 import { Game } from "./routes/game";
 import { Home } from "./routes/home";
 import { LobbySelect } from "./routes/lobby";

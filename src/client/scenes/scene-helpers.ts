@@ -1,10 +1,10 @@
 import { Material } from "@babylonjs/core/Materials/material";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import type { Move } from "../components/game-logic/game-piece";
-import { GameScene } from "../components/scene-manager";
-import { pointIndexMap, pointPositionMap } from "./data/point-map-data";
-import GamePiece from "../components/game-logic/game-piece";
+import type { Move } from "../game-logic/game-piece";
+import { GameScene } from "./scene-manager";
+import { pointIndexMap, pointPositionMap } from "../data/point-map-data";
+import GamePiece from "../game-logic/game-piece";
 import { Scene } from "@babylonjs/core/scene";
 import { Point } from "../../shared/game";
 

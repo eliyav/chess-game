@@ -3,12 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { LOBBY_TYPE, Lobby } from "../../shared/match";
 import { MenuOverlay } from "../components/game-overlay/menu-overlay";
 import * as icons from "../components/game-overlay/overlay-icons";
-import { Controller } from "../components/match-logic/controller";
-import { LocalMatch } from "../components/match-logic/local-match";
-import { OnlineMatch } from "../components/match-logic/online-match";
+import { Controller } from "../match-logic/controller";
+import { LocalMatch } from "../match-logic/local-match";
+import { OnlineMatch } from "../match-logic/online-match";
 import { Message } from "../components/modals/message-modal";
 import PromotionModal from "../components/modals/promotion-modal";
-import { SceneManager } from "../components/scene-manager";
+import { SceneManager } from "../scenes/scene-manager";
 import { websocket } from "../websocket-client";
 
 export const Game: React.FC<{

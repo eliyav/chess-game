@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { SvgGithub } from "../svg-components/svg-github";
+import { SvgGithub } from "../components/svg/svg-github";
 import { SelectionButton } from "../components/buttons/start-button";
 
 export const Home: React.FC = () => {

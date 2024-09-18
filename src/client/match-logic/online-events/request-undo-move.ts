@@ -1,6 +1,6 @@
-import { Message } from "../../modals/message-modal";
+import { Message } from "../../components/modals/message-modal";
 import { Controller } from "../controller";
-import { websocket } from "../../../websocket-client";
+import { websocket } from "../../websocket-client";
 
 export function requestUndoMove({
   setMessage,

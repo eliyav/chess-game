@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import whitePlayer from "../../../assets/white-player.png";
 import blackPlayer from "../../../assets/black-player.png";
-import { Timer } from "./timer";
+import { Timer } from "../../match-logic/timer";
 
 export const TimerOverlay: React.FC<{
   timer: Timer;

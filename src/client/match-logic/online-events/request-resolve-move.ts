@@ -1,5 +1,5 @@
 import { Controller } from "../controller";
-import { websocket } from "../../../websocket-client";
+import { websocket } from "../../websocket-client";
 
 export function requestResolveMove({
   controller,
