@@ -3,16 +3,16 @@ import { PickingInfo } from "@babylonjs/core/Collisions/pickingInfo";
 import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { Nullable } from "@babylonjs/core/types";
+import { Point } from "../../shared/game";
+import { Message } from "../components/modals/message-modal";
 import { doMovesMatch, TurnHistory } from "../game-logic/game-helpers";
+import GamePiece from "../game-logic/game-piece";
 import { rotateCamera } from "../scenes/animation/camera";
 import calcTurnAnimation from "../scenes/animation/turn-animation";
 import { displayPieceMoves, findByPoint } from "../scenes/scene-helpers";
-import GamePiece from "../game-logic/game-piece";
-import { Message } from "../components/modals/message-modal";
 import { GameScene, SceneManager, Scenes } from "../scenes/scene-manager";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
-import { Point } from "../../shared/game";
 
 type ControllerOptions = {
   playAnimations?: boolean;
@@ -71,6 +71,7 @@ export class Controller {
       if (!this.match.isPlayersTurn()) return;
       const pickedMesh = pickResult?.pickedMesh;
       if (!pickedMesh) return;
+      gameScene.data.audio.select?.play();
       const pickedPiece = this.match.lookupGamePiece(
         pickedMesh,
         pickedMesh.metadata !== null

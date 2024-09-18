@@ -1,3 +1,5 @@
+import { AudioEngine } from "@babylonjs/core/Audio/audioEngine";
+import type { Sound } from "@babylonjs/core/Audio/sound";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import type { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
@@ -14,6 +16,9 @@ export type GameScene = CustomScene<{
   meshesToRender: AbstractMesh[];
   animationsContainer: AnimationContainer;
   shadowGenerator: ShadowGenerator[];
+  audio: {
+    select?: Sound;
+  };
 }>;
 
 export const enum Scenes {
@@ -31,6 +36,7 @@ export class SceneManager {
   private engine: Engine;
   private scenes: ScenesDict;
   private activeSceneId: Scenes;
+  private audioEngine: AudioEngine;
 
   constructor({
     canvas,
@@ -46,6 +52,7 @@ export class SceneManager {
     this.initHomeScene({ setInitialized });
     this.render();
     window.addEventListener("resize", () => this.engine?.resize());
+    this.audioEngine = new AudioEngine(null, window.AudioContext);
     this.initGameScene();
   }
 
@@ -86,7 +93,11 @@ export class SceneManager {
 
   private async initGameScene() {
     const { gameScene } = await import("./game-scene");
-    this.scenes[Scenes.GAME] = await gameScene(this.canvas, this.engine);
+    this.scenes[Scenes.GAME] = await gameScene(
+      this.canvas,
+      this.engine,
+      this.audioEngine
+    );
   }
 
   private render() {

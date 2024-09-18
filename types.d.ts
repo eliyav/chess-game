@@ -18,6 +18,12 @@ declare module "*.jpg" {
   export default src;
 }
 
+//Audio
+declare module "*.mp3" {
+  const src: string;
+  export default src;
+}
+
 //Misc display
 declare module "*.svg" {
   const src: string;

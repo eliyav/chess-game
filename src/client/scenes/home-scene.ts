@@ -124,7 +124,6 @@ function createDisplayPieces({
 function createDisplayBoard(
   board: ISceneLoaderAsyncResult
 ): [AbstractMesh, Nullable<AbstractMesh>] {
-  console.log(board);
   const boardMesh = board.meshes[0];
   const boardClone = boardMesh.clone("Board", null);
   boardMesh.position = new Vector3(30, -30, 30);
