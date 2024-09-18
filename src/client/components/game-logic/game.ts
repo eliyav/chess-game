@@ -9,7 +9,7 @@ import {
 import Board, { Square } from "./board";
 import GamePiece, { Move } from "./game-piece";
 import { TEAM } from "../../../shared/match";
-import { Point } from "../../helper/movement-helpers";
+import { Point } from "../../../shared/game";
 
 class Game {
   teams: TEAM[];

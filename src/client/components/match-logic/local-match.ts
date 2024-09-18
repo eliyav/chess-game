@@ -1,5 +1,5 @@
+import { Point } from "../../../shared/game";
 import { LOBBY_TYPE, Lobby, Player } from "../../../shared/match";
-import { Point } from "../../helper/movement-helpers";
 import GamePiece from "../game-logic/game-piece";
 import { BaseMatch, MatchLogic } from "./base-match";
 

@@ -5,7 +5,7 @@ import { doMovesMatch, TurnHistory } from "../../helper/game-helpers";
 import { findByPoint } from "../scene-helpers";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { AssetContainer } from "@babylonjs/core/assetContainer";
-import { Point } from "../../helper/movement-helpers";
+import { Point } from "../../../shared/game";
 
 export default async function calcTurnAnimation({
   gameScene,

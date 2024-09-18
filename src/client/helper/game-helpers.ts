@@ -1,6 +1,6 @@
+import { Point } from "../../shared/game";
 import { Square } from "../components/game-logic/board";
 import GamePiece from "../components/game-logic/game-piece";
-import { Point } from "./movement-helpers";
 
 export interface TurnHistory {
   result: boolean;

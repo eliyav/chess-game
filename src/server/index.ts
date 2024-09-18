@@ -4,6 +4,11 @@ import compression from "compression";
 import { Server } from "socket.io";
 import { fileURLToPath } from "node:url";
 import { LOBBY_TYPE, Lobby } from "../shared/match";
+import {
+  ClientToServerEvents,
+  InterServerEvents,
+  ServerToClientEvents,
+} from "../shared/websocket";
 
 const clientPath = fileURLToPath(new URL("../client", import.meta.url));
 

@@ -1,19 +1,18 @@
+import { ArcRotateCamera } from "@babylonjs/core";
 import { PickingInfo } from "@babylonjs/core/Collisions/pickingInfo";
 import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { Nullable } from "@babylonjs/core/types";
 import { doMovesMatch, TurnHistory } from "../../helper/game-helpers";
+import { rotateCamera } from "../../view/animation/camera";
 import calcTurnAnimation from "../../view/animation/turn-animation";
 import { displayPieceMoves, findByPoint } from "../../view/scene-helpers";
 import GamePiece from "../game-logic/game-piece";
 import { Message } from "../modals/message-modal";
 import { GameScene, SceneManager, Scenes } from "../scene-manager";
-import { ArcRotateCamera } from "@babylonjs/core";
-import { rotateCamera } from "../../view/animation/camera";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
-import { Point } from "../../helper/movement-helpers";
-import { LOBBY_TYPE } from "../../../shared/match";
+import { Point } from "../../../shared/game";
 
 type ControllerOptions = {
   playAnimations?: boolean;

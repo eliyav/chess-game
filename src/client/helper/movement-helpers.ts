@@ -5,8 +5,7 @@ import {
 } from "./game-helpers";
 import { Square } from "../components/game-logic/board";
 import GamePiece, { Move } from "../components/game-logic/game-piece";
-
-export type Point = [number, number];
+import { Point } from "../../shared/game";
 
 type MovesObj = {
   up?: Point[];
@@ -465,5 +464,5 @@ export {
   calcKnightMoves,
   calcPawnMoves,
   calcQueenMoves,
-  calcRookMoves,
+  calcRookMoves, Point,
 };

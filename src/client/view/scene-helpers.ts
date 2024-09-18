@@ -6,7 +6,7 @@ import { GameScene } from "../components/scene-manager";
 import { pointIndexMap, pointPositionMap } from "./data/point-map-data";
 import GamePiece from "../components/game-logic/game-piece";
 import { Scene } from "@babylonjs/core/scene";
-import { Point } from "../helper/movement-helpers";
+import { Point } from "../../shared/game";
 
 const Y_ABOVE_FLOOR = 0.51;
 

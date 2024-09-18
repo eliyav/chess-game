@@ -1,5 +1,5 @@
+import { Point } from "../../../shared/game";
 import { Lobby, LOBBY_TYPE, Player, TEAM } from "../../../shared/match";
-import { Point } from "../../helper/movement-helpers";
 import { websocket } from "../../websocket-client";
 import GamePiece from "../game-logic/game-piece";
 import { Message } from "../modals/message-modal";

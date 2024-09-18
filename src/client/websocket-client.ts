@@ -1,4 +1,8 @@
 import { io, Socket } from "socket.io-client";
+import {
+  ClientToServerEvents,
+  ServerToClientEvents,
+} from "../shared/websocket";
 
 const protocol = window.location.protocol === "https:" ? "wss" : "ws";
 

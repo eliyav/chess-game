@@ -1,4 +1,4 @@
-import { Point } from "../../helper/movement-helpers";
+import { Point } from "../../../shared/game";
 
 interface Data {
   boardSize: number;

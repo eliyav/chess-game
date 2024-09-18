@@ -1,10 +1,10 @@
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { LOBBY_TYPE, Lobby, Player, TEAM } from "../../../shared/match";
 import { TurnHistory } from "../../helper/game-helpers";
-import { Point } from "../../helper/movement-helpers";
 import { findByPoint } from "../../view/scene-helpers";
 import Game from "../game-logic/game";
 import GamePiece, { Move } from "../game-logic/game-piece";
+import { Point } from "../../../shared/game";
 
 export interface MatchLogic {
   requestResolveMove({
