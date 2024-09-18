@@ -10,13 +10,13 @@ import { OnlineMatch } from "../components/match-logic/online-match";
 import { Message } from "../components/modals/message-modal";
 import PromotionModal from "../components/modals/promotion-modal";
 import { SceneManager, Scenes } from "../components/scene-manager";
+import { websocket } from "../websocket-client";
 
 export const GameView: React.FC<{
   sceneManager: SceneManager;
-  socket: Socket;
   lobby: Lobby;
   setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
-}> = ({ sceneManager, socket, setMessage, lobby }) => {
+}> = ({ sceneManager, setMessage, lobby }) => {
   const navigate = useNavigate();
   const [promotion, setPromotion] = useState(false);
   const match = useRef(
@@ -24,8 +24,7 @@ export const GameView: React.FC<{
       ? new LocalMatch({ lobby, player: lobby.players[0] })
       : new OnlineMatch({
           lobby,
-          player: lobby.players.find((player) => player.id === socket.id)!,
-          socket,
+          player: lobby.players.find((player) => player.id === websocket.id)!,
         })
   );
   const controller = useRef(

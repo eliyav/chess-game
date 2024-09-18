@@ -8,24 +8,15 @@ import { Controller } from "./controller";
 import { requestMatchReset } from "./online-events/request-match-reset";
 import { requestUndoMove } from "./online-events/request-undo-move";
 import { requestResolveMove } from "./online-events/request-resolve-move";
+import { websocket } from "../../websocket-client";
 
 export class OnlineMatch extends BaseMatch implements MatchLogic {
   mode: LOBBY_TYPE.ONLINE;
-  socket: Socket;
   listenerEvents: string[] = [];
 
-  constructor({
-    lobby,
-    player,
-    socket,
-  }: {
-    lobby: Lobby;
-    player: Player;
-    socket: Socket;
-  }) {
+  constructor({ lobby, player }: { lobby: Lobby; player: Player }) {
     super({ lobby, player });
     this.mode = LOBBY_TYPE.ONLINE;
-    this.socket = socket;
   }
 
   requestResolveMove({
@@ -37,7 +28,7 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
   }) {
     const isValidMove = this.resolveMove({ originPoint, targetPoint });
     if (isValidMove) {
-      this.socket.emit("resolved-move", {
+      websocket.emit("resolved-move", {
         originPoint,
         targetPoint,
         key: this.lobby.key,
@@ -49,12 +40,12 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
   }
 
   resetRequest() {
-    this.socket.emit("reset-match-request", { key: this.lobby.key });
+    websocket.emit("reset-match-request", { key: this.lobby.key });
     return false;
   }
 
   undoTurnRequest() {
-    this.socket.emit("reset-match-request", { key: this.lobby.key });
+    websocket.emit("reset-match-request", { key: this.lobby.key });
     return false;
   }
 
@@ -106,18 +97,14 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
     setMessage: (value: React.SetStateAction<Message | null>) => void;
   }) {
     const matchResetEvents = requestMatchReset({
-      socket: this.socket,
       setMessage,
       controller,
     });
     const matchUndoEvents = requestUndoMove({
-      socket: this.socket,
       setMessage,
       controller,
     });
     const resolveMoveEvent = requestResolveMove({
-      socket: this.socket,
-      setMessage,
       controller,
     });
     this.listenerEvents.push(
@@ -129,7 +116,7 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
 
   unsubscribeMatchEvents() {
     this.listenerEvents.forEach((event) => {
-      this.socket.off(event);
+      websocket.off(event);
     });
   }
 }

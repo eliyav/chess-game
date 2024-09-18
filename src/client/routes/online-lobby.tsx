@@ -1,14 +1,13 @@
 import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Socket } from "socket.io-client";
 import { Lobby } from "../../shared/match";
 import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
+import { websocket } from "../websocket-client";
 
 export const OnlineLobby: React.FC<{
-  socket: Socket;
   lobby: Lobby | undefined;
-}> = ({ socket, lobby }) => {
+}> = ({ lobby }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const room = location.search.split("=")[1];
@@ -23,17 +22,17 @@ export const OnlineLobby: React.FC<{
 
   useEffect(() => {
     if (room) {
-      socket.emit("join-room", { room });
+      websocket.emit("join-room", { room });
     }
 
     return () => {
       if (room) {
         if (lobby?.matchStarted === false) {
-          socket.emit("leave-room", { room });
+          websocket.emit("leave-room", { room });
         }
       }
     };
-  }, [room, socket]);
+  }, [room, websocket]);
 
   if (!lobby) return null;
 
@@ -95,7 +94,7 @@ export const OnlineLobby: React.FC<{
                 checked={lobby.teams.White === player.id}
                 disabled={lobby?.players.length !== 2}
                 onChange={(e) => {
-                  socket.emit("set-teams", {
+                  websocket.emit("set-teams", {
                     room,
                     first: e.target.value,
                   });
@@ -113,7 +112,7 @@ export const OnlineLobby: React.FC<{
               id="ready-checkbox"
               disabled={disableReadyButton}
               onClick={() => {
-                socket.emit("readyPlayer", { room });
+                websocket.emit("readyPlayer", { room });
               }}
               style={{ display: "none" }}
             />
@@ -124,7 +123,7 @@ export const OnlineLobby: React.FC<{
             customClass="mgn-1"
             text={"Start Game"}
             onClick={() => {
-              socket.emit("request-match-start", { room });
+              websocket.emit("request-match-start", { room });
             }}
             disabled={disableMatchStart}
           />

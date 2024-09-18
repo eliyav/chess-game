@@ -1,7 +1,7 @@
 import "@babylonjs/loaders/glTF";
 import React, { useEffect, useRef, useState } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
-import type { Socket } from "socket.io-client";
+import { Lobby } from "../shared/match";
 import LoadingScreen from "./components/loading-screen";
 import { Message, MessageModal } from "./components/modals/message-modal";
 import { SceneManager } from "./components/scene-manager";
@@ -10,11 +10,9 @@ import { Home } from "./routes/home";
 import { LobbySelect } from "./routes/lobby";
 import { OfflineLobby } from "./routes/offline-lobby";
 import { OnlineLobby } from "./routes/online-lobby";
-import { Lobby } from "../shared/match";
+import { websocket } from "./websocket-client";
 
-const App: React.FC<{
-  websocket: Socket;
-}> = ({ websocket }) => {
+const App: React.FC<{}> = () => {
   const navigate = useNavigate();
   const [isInitialized, setIsInitialized] = useState(false);
   const [lobby, setLobby] = useState<Lobby>();
@@ -25,9 +23,9 @@ const App: React.FC<{
     sceneManager.current !== undefined && lobby !== undefined;
 
   useEffect(() => {
-    if (canvas.current && !sceneManager.current) {
+    if (!sceneManager.current) {
       sceneManager.current = new SceneManager({
-        canvas: canvas.current,
+        canvas: canvas.current!,
         setInitialized: () => setIsInitialized(true),
       });
     }
@@ -40,7 +38,6 @@ const App: React.FC<{
 
     return () => {
       websocket.off("lobby-info");
-      websocket.off("match-start");
     };
   }, [websocket, setLobby]);
 
@@ -83,17 +80,13 @@ const App: React.FC<{
           path="/lobby-offline"
           element={<OfflineLobby setLobby={setLobby} />}
         />
-        <Route
-          path="/lobby-online"
-          element={<OnlineLobby socket={websocket} lobby={lobby} />}
-        />
+        <Route path="/lobby-online" element={<OnlineLobby lobby={lobby} />} />
         <Route
           path="/game"
           element={
             canGameViewRender ? (
               <GameView
                 sceneManager={sceneManager.current!}
-                socket={websocket}
                 lobby={lobby}
                 setMessage={setMessage}
               />

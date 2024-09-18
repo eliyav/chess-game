@@ -1,28 +1,26 @@
-import { Socket } from "socket.io-client";
 import { Message } from "../../modals/message-modal";
 import { Controller } from "../controller";
+import { websocket } from "../../../websocket-client";
 
 export function requestMatchReset({
-  socket,
   setMessage,
   controller,
 }: {
-  socket: Socket;
   setMessage: (value: React.SetStateAction<Message | null>) => void;
   controller: Controller;
 }): string[] {
-  socket.on("reset-match-requested", () => {
+  websocket.on("reset-match-requested", () => {
     setMessage({
       text: "Opponent requested a match reset. Do you accept?",
       onConfirm: () => {
-        socket.emit("reset-match-response", {
+        websocket.emit("reset-match-response", {
           answer: true,
           key: controller.match.lobby.key,
         });
         setMessage(null);
       },
       onReject: () => {
-        socket.emit("reset-match-response", {
+        websocket.emit("reset-match-response", {
           answer: false,
           key: controller.match.lobby.key,
         });
@@ -31,7 +29,7 @@ export function requestMatchReset({
     });
   });
 
-  socket.on("reset-match-resolve", ({ answer }) => {
+  websocket.on("reset-match-resolve", ({ answer }) => {
     if (answer) {
       controller.match.reset();
       controller.resetView();
