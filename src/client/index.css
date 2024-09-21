@@ -94,6 +94,8 @@ canvas {
   margin: 1em auto;
   padding: 0.25em;
   max-width: clamp(250px, 80vw, 500px);
+  pointer-events: none;
+  user-select: none;
 }
 
 .home {
@@ -172,7 +174,7 @@ footer {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1em;
+  gap: 0.25em;
   flex-wrap: wrap;
 }
 
@@ -389,6 +391,12 @@ footer {
 /* -------------------  */
 /* Lobby */
 
+.lobby-contents {
+  overflow-y: scroll;
+  max-height: clamp(250px, 65vh, 600px);
+  scrollbar-color: var(--primary-color) var(--primary-background);
+}
+
 .lobby-code p {
   text-align: center;
 }
@@ -437,6 +445,8 @@ footer {
   border: 1px solid whitesmoke;
   border-radius: 0.5em;
   background-color: var(--primary-background);
+  pointer-events: none;
+  user-select: none;
 }
 
 input[type="radio"]:checked + label {
@@ -507,6 +517,11 @@ input[type="radio"]:checked + label {
   background-color: var(--red-highlight);
 }
 
+.options-wrapper div label {
+  pointer-events: none;
+  user-select: none;
+}
+
 .options-wrapper div label span {
   display: inline-block;
   width: 25px;
@@ -519,6 +534,16 @@ input[type="radio"]:checked + label {
 
 .red-highlight {
   color: var(--red-highlight);
+}
+
+.team-symbol-background {
+  border-radius: 50%;
+  background-color: var(--primary-background);
+  border: 2px solid #ffd700;
+}
+
+.gold path {
+  stroke: #ffd700;
 }
 
 /* Margins */

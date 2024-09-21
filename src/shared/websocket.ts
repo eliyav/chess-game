@@ -18,7 +18,7 @@ export interface ClientToServerEvents {
   leaveLobby: (data: { lobbyKey: string }) => void;
   requestMatchStart: (data: { lobbyKey: string }) => void;
   readyPlayer: (data: { lobbyKey: string }) => void;
-  setTeams: (data: { lobbyKey: string; first: string }) => void;
+  switchTeams: (data: { lobbyKey: string }) => void;
   resolvedMove: (data: {
     originPoint: Point;
     targetPoint: Point;

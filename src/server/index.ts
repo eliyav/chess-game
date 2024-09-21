@@ -156,12 +156,13 @@ io.on("connection", (socket) => {
     io.to(lobbyKey).emit("lobbyInfo", lobby);
   });
 
-  socket.on("setTeams", ({ lobbyKey, first }) => {
+  socket.on("switchTeams", ({ lobbyKey }) => {
     const lobby = lobbyLog.get(lobbyKey);
     if (!lobby) return;
     if (lobby.players.length !== 2) return;
-    lobby.teams.White = first;
-    lobby.teams.Black = lobby.players.find((player) => player.id !== first)!.id;
+    const temp = lobby.teams.White;
+    lobby.teams.White = lobby.teams.Black;
+    lobby.teams.Black = temp;
     io.to(lobbyKey).emit("lobbyInfo", lobby);
   });
 

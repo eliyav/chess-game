@@ -6,6 +6,8 @@ import { SelectionButton } from "../components/buttons/start-button";
 import { websocket } from "../websocket-client";
 import PlayerCard from "../components/lobby/player-card";
 import { ControllerOptionsList } from "../components/lobby/controller-options-list";
+import { Pawn } from "../components/svg/pawn";
+import { Switch } from "../components/svg/switch";
 
 export const OnlineLobby: React.FC<{
   lobby: Lobby | undefined;
@@ -48,7 +50,7 @@ export const OnlineLobby: React.FC<{
         />
         <h1>Online Lobby</h1>
       </div>
-      <div>
+      <div className="lobby-contents">
         <div className="lobby-code">
           <h2 className="sub-title glass-dark">Invite Code</h2>
           <p>
@@ -68,32 +70,38 @@ export const OnlineLobby: React.FC<{
         </div>
         <h2 className="sub-title glass-dark">Players</h2>
         <div className="flex">
-          {lobby?.players.map((player, i) => (
-            <PlayerCard key={i} player={player} showReady={true} />
-          ))}
-        </div>
-        <h2 className="sub-title glass-dark">First Move (White Team)</h2>
-        <div className="flex">
-          {lobby?.players.map((player, i) => (
-            <div className="player-card" key={i}>
-              <input
-                type="radio"
-                id={`first-move-${player.id}`}
-                name="first-move"
-                value={player.id}
-                checked={lobby.teams.White === player.id}
-                disabled={lobby?.players.length !== 2}
-                onChange={(e) => {
-                  websocket.emit("setTeams", {
-                    lobbyKey,
-                    first: e.target.value,
-                  });
-                }}
-                style={{ display: "none" }}
+          {lobby.players[0] ? (
+            <div className="flex">
+              <Pawn
+                className="team-symbol-background"
+                color={
+                  lobby.teams.White === lobby.players[0].id
+                    ? "#ffffff"
+                    : "#000000"
+                }
               />
-              <label htmlFor={`first-move-${player.id}`}>{player.name}</label>
+              <PlayerCard player={lobby.players[0]} showReady={true} />
             </div>
-          ))}
+          ) : null}
+          <Switch
+            className="gold"
+            onClick={() => {
+              websocket.emit("switchTeams", { lobbyKey });
+            }}
+          />
+          {lobby.players[1] ? (
+            <div className="flex">
+              <PlayerCard player={lobby.players[1]} showReady={true} />
+              <Pawn
+                className="team-symbol-background"
+                color={
+                  lobby.teams.White === lobby.players[1].id
+                    ? "#ffffff"
+                    : "#000000"
+                }
+              />
+            </div>
+          ) : null}
         </div>
         <h2 className="sub-title glass-dark">Settings</h2>
         <ControllerOptionsList
@@ -104,30 +112,30 @@ export const OnlineLobby: React.FC<{
               options: { [key]: e.target.checked },
             })}
         />
-        <footer>
-          <div className="flex ready">
-            <input
-              type="checkbox"
-              id="ready-checkbox"
-              disabled={disableReadyButton}
-              onClick={() => {
-                websocket.emit("readyPlayer", { lobbyKey });
-              }}
-              style={{ display: "none" }}
-            />
-            <label htmlFor="ready-checkbox">Ready</label>
-          </div>
-
-          <SelectionButton
-            customClass="mgn-1"
-            text={"Start Game"}
-            onClick={() => {
-              websocket.emit("requestMatchStart", { lobbyKey });
-            }}
-            disabled={disableMatchStart}
-          />
-        </footer>
       </div>
+      <footer>
+        <div className="flex ready">
+          <input
+            type="checkbox"
+            id="ready-checkbox"
+            disabled={disableReadyButton}
+            onClick={() => {
+              websocket.emit("readyPlayer", { lobbyKey });
+            }}
+            style={{ display: "none" }}
+          />
+          <label htmlFor="ready-checkbox">Ready</label>
+        </div>
+
+        <SelectionButton
+          customClass="mgn-1"
+          text={"Start Game"}
+          onClick={() => {
+            websocket.emit("requestMatchStart", { lobbyKey });
+          }}
+          disabled={disableMatchStart}
+        />
+      </footer>
     </div>
   );
 };
