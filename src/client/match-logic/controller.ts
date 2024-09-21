@@ -62,7 +62,9 @@ export class Controller {
       if (!this.match.isPlayersTurn()) return;
       const pickedMesh = pickResult?.pickedMesh;
       if (!pickedMesh) return;
-      gameScene.data.audio.select?.play();
+      if (this.options.playGameSounds) {
+        gameScene.data.audio.select?.play();
+      }
       const pickedPiece = this.match.lookupGamePiece(
         pickedMesh,
         pickedMesh.metadata !== null
@@ -124,7 +126,8 @@ export class Controller {
       const moves = this.match.getValidMoves(piece);
       this.selectedPiece = piece;
       this.updateMeshesRender();
-      displayPieceMoves({ piece, moves, gameScene });
+      const visibleMoves = this.options.displayAvailableMoves;
+      displayPieceMoves({ piece, moves, gameScene, visibleMoves });
     }
   }
 

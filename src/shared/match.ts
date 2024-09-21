@@ -34,12 +34,16 @@ export type Player = {
 export type ControllerOptions = {
   playAnimations: boolean;
   renderShadows: boolean;
+  playGameSounds: boolean;
+  displayAvailableMoves: boolean;
 };
 
 export function buildDefaultOptions(): ControllerOptions {
   return {
+    displayAvailableMoves: true,
     playAnimations: true,
     renderShadows: false,
+    playGameSounds: true,
   };
 }
 
@@ -49,5 +53,9 @@ export function getOptionText(option: keyof ControllerOptions) {
       return "Animations";
     case "renderShadows":
       return "Shadows";
+    case "playGameSounds":
+      return "Game Sounds";
+    case "displayAvailableMoves":
+      return "Display Available Moves";
   }
 }

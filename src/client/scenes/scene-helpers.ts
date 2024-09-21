@@ -14,23 +14,27 @@ export const displayPieceMoves = ({
   piece,
   moves,
   gameScene,
+  visibleMoves,
 }: {
   piece: GamePiece;
   moves: Move[];
   gameScene: GameScene;
+  visibleMoves: boolean;
 }) => {
   highlightPiece({ move: piece.point, gameScene });
   moves.forEach((move) => {
-    highlightValidMoves({ move, gameScene });
+    highlightValidMoves({ move, gameScene, visibleMoves });
   });
 };
 
 const highlightValidMoves = ({
   move,
   gameScene,
+  visibleMoves,
 }: {
   move: Move;
   gameScene: GameScene;
+  visibleMoves: boolean;
 }) => {
   const [point, type] = move;
   const plane = MeshBuilder.CreatePlane(`plane`, {
@@ -46,8 +50,12 @@ const highlightValidMoves = ({
   plane.rotation = new Vector3(Math.PI / 2, 0, 0);
   const material = findMaterial(type, gameScene.scene);
   if (material) {
+    if (!visibleMoves) {
+      material.alpha = 0;
+    }
     plane.material = material;
   }
+
   gameScene.data.meshesToRender.push(plane);
 };
 
