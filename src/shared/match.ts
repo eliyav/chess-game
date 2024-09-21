@@ -9,6 +9,7 @@ export interface Lobby {
   players: Player[];
   teams: { [key in TEAM]: Player["id"] };
   matchStarted: boolean;
+  controllerOptions: ControllerOptions;
 }
 
 export interface RoomDetails {
@@ -28,4 +29,9 @@ export type Player = {
   type: PlayerType;
   name: string;
   ready: boolean;
+};
+
+export type ControllerOptions = {
+  playAnimations: boolean;
+  renderShadows: boolean;
 };

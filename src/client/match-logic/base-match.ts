@@ -1,10 +1,10 @@
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { LOBBY_TYPE, Lobby, Player, TEAM } from "../../shared/match";
-import { TurnHistory } from "../game-logic/game-helpers";
-import { findByPoint } from "../scenes/scene-helpers";
-import Game from "../game-logic/game";
-import GamePiece, { Move } from "../game-logic/game-piece";
 import { Point } from "../../shared/game";
+import { Lobby, Player, TEAM } from "../../shared/match";
+import Game from "../game-logic/game";
+import { TurnHistory } from "../game-logic/game-helpers";
+import GamePiece, { Move } from "../game-logic/game-piece";
+import { findByPoint } from "../scenes/scene-helpers";
 
 export interface MatchLogic {
   requestResolveMove({
@@ -72,10 +72,6 @@ export class BaseMatch {
 
   getWinner() {
     return this.game.getWinner();
-  }
-
-  shouldCameraRotate() {
-    return this.lobby.mode === LOBBY_TYPE.ONLINE ? false : true;
   }
 
   getGameHistory() {

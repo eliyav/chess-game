@@ -34,6 +34,7 @@ export const Game: React.FC<{
         setMessage: (message: Message | null) => setMessage(message),
         promote: () => setPromotion(true),
       },
+      options: lobby.controllerOptions,
     })
   );
 

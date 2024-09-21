@@ -13,12 +13,7 @@ import { displayPieceMoves, findByPoint } from "../scenes/scene-helpers";
 import { GameScene, SceneManager, Scenes } from "../scenes/scene-manager";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
-
-type ControllerOptions = {
-  playAnimations?: boolean;
-  rotateCamera?: boolean;
-  renderShadows?: boolean;
-};
+import { ControllerOptions, LOBBY_TYPE } from "../../shared/match";
 
 export class Controller {
   sceneManager: SceneManager;
@@ -28,13 +23,13 @@ export class Controller {
     promote: () => void;
   };
   selectedPiece?: GamePiece;
-  options: Required<ControllerOptions>;
+  options: ControllerOptions;
 
   constructor({
     sceneManager,
     match,
     events,
-    options = {},
+    options,
   }: {
     sceneManager: SceneManager;
     match: LocalMatch | OnlineMatch;
@@ -42,16 +37,12 @@ export class Controller {
       setMessage: (message: Message | null) => void;
       promote: () => void;
     };
-    options?: Partial<ControllerOptions>;
+    options: ControllerOptions;
   }) {
     this.sceneManager = sceneManager;
     this.match = match;
     this.events = events;
-    this.options = {
-      playAnimations: options.playAnimations ?? true,
-      rotateCamera: options.rotateCamera ?? true,
-      renderShadows: options.renderShadows ?? false,
-    };
+    this.options = options;
     this.init();
   }
 
@@ -297,8 +288,17 @@ export class Controller {
     });
   }
 
+  shouldCameraRotate() {
+    if (this.match.lobby.mode === LOBBY_TYPE.LOCAL) {
+      //Check for AI opponent here
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   rotateCamera() {
-    if (!this.options.rotateCamera || !this.match.shouldCameraRotate()) return;
+    if (!this.shouldCameraRotate()) return;
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
     const camera = gameScene.scene.cameras[0] as ArcRotateCamera;

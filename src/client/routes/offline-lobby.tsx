@@ -4,6 +4,9 @@ import { LOBBY_TYPE, Lobby } from "../../shared/match";
 import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
 import PlayerCard from "../components/lobby/player-card";
+import { buildDefaultOptions, getOptionText } from "../match-logic/options";
+import { Controller } from "../match-logic/controller";
+import { ControllerOptionsList } from "../components/lobby/controller-options-list";
 
 export const OfflineLobby: React.FC<{
   lobby: Lobby | undefined;
@@ -19,6 +22,7 @@ export const OfflineLobby: React.FC<{
         players: prev?.players ?? [],
         teams: prev?.teams ?? { White: "", Black: "" },
         matchStarted: prev?.matchStarted ?? false,
+        controllerOptions: prev?.controllerOptions ?? buildDefaultOptions(),
         [key]: value,
       }));
     },
@@ -38,8 +42,11 @@ export const OfflineLobby: React.FC<{
         Black: "",
       },
       matchStarted: false,
+      controllerOptions: buildDefaultOptions(),
     });
   }, [setLobby]);
+
+  if (!lobby) return null;
 
   return (
     <div className="lobby screen">
@@ -57,9 +64,18 @@ export const OfflineLobby: React.FC<{
           <PlayerCard key={i} player={player} showReady={false} />
         ))}
       </div>
+      <h2 className="sub-title glass-dark">Settings</h2>
+      <ControllerOptionsList
+        options={lobby.controllerOptions}
+        onChange={(key: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
+          updateLobby("controllerOptions", {
+            ...lobby.controllerOptions,
+            [key]: e.target.checked,
+          })}
+      />
       <footer>
         <SelectionButton
-          disabled={!lobby || lobby.mode !== LOBBY_TYPE.LOCAL}
+          disabled={lobby.mode !== LOBBY_TYPE.LOCAL}
           customClass="mgn-1"
           text={"Start Game"}
           onClick={() => {
