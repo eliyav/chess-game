@@ -1,12 +1,10 @@
 import React, { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { LOBBY_TYPE, Lobby } from "../../shared/match";
+import { LOBBY_TYPE, Lobby, buildDefaultOptions } from "../../shared/match";
 import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
-import PlayerCard from "../components/lobby/player-card";
-import { buildDefaultOptions, getOptionText } from "../match-logic/options";
-import { Controller } from "../match-logic/controller";
 import { ControllerOptionsList } from "../components/lobby/controller-options-list";
+import PlayerCard from "../components/lobby/player-card";
 
 export const OfflineLobby: React.FC<{
   lobby: Lobby | undefined;

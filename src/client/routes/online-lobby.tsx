@@ -5,6 +5,7 @@ import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
 import { websocket } from "../websocket-client";
 import PlayerCard from "../components/lobby/player-card";
+import { ControllerOptionsList } from "../components/lobby/controller-options-list";
 
 export const OnlineLobby: React.FC<{
   lobby: Lobby | undefined;
@@ -94,6 +95,15 @@ export const OnlineLobby: React.FC<{
             </div>
           ))}
         </div>
+        <h2 className="sub-title glass-dark">Settings</h2>
+        <ControllerOptionsList
+          options={lobby.controllerOptions}
+          onChange={(key: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
+            websocket.emit("updateControllerOptions", {
+              lobbyKey,
+              options: { [key]: e.target.checked },
+            })}
+        />
         <footer>
           <div className="flex ready">
             <input

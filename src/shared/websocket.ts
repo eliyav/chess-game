@@ -28,6 +28,10 @@ export interface ClientToServerEvents {
   resetMatchResponse: (data: { answer: boolean; lobbyKey: string }) => void;
   undoMoveRequest: (data: { lobbyKey: string }) => void;
   undoMoveResponse: (data: { answer: boolean; lobbyKey: string }) => void;
+  updateControllerOptions: (data: {
+    lobbyKey: string;
+    options: { [key: string]: boolean };
+  }) => void;
 }
 
 export interface InterServerEvents {

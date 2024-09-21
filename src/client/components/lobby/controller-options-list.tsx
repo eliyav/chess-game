@@ -1,6 +1,5 @@
 import React from "react";
-import { getOptionText } from "../../match-logic/options";
-import { ControllerOptions } from "../../../shared/match";
+import { ControllerOptions, getOptionText } from "../../../shared/match";
 
 interface ControllerOptionsProps {
   options: ControllerOptions;

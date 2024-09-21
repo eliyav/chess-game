@@ -3,7 +3,7 @@ import path from "path";
 import compression from "compression";
 import { Server } from "socket.io";
 import { fileURLToPath } from "node:url";
-import { LOBBY_TYPE, Lobby } from "../shared/match";
+import { LOBBY_TYPE, Lobby, buildDefaultOptions } from "../shared/match";
 import {
   ClientToServerEvents,
   InterServerEvents,
@@ -31,6 +31,7 @@ app.get("/create-lobby", (req, res) => {
     players: [],
     teams: { White: "", Black: "" },
     matchStarted: false,
+    controllerOptions: buildDefaultOptions(),
   };
   lobbyLog.set(key, lobby);
   res.send(key);
@@ -145,6 +146,13 @@ io.on("connection", (socket) => {
     const player = lobby.players.find((player) => player.id === socket.id);
     if (!player) return;
     player.ready = !player.ready;
+    io.to(lobbyKey).emit("lobbyInfo", lobby);
+  });
+
+  socket.on("updateControllerOptions", ({ lobbyKey, options }) => {
+    const lobby = lobbyLog.get(lobbyKey);
+    if (!lobby) return;
+    lobby.controllerOptions = { ...lobby.controllerOptions, ...options };
     io.to(lobbyKey).emit("lobbyInfo", lobby);
   });
 

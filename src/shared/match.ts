@@ -35,3 +35,19 @@ export type ControllerOptions = {
   playAnimations: boolean;
   renderShadows: boolean;
 };
+
+export function buildDefaultOptions(): ControllerOptions {
+  return {
+    playAnimations: true,
+    renderShadows: false,
+  };
+}
+
+export function getOptionText(option: keyof ControllerOptions) {
+  switch (option) {
+    case "playAnimations":
+      return "Animations";
+    case "renderShadows":
+      return "Shadows";
+  }
+}
