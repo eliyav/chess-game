@@ -18,6 +18,7 @@ body {
   --primary-light-opaque: rgba(255, 255, 255, 0.6);
   --green-highlight: rgba(0, 255, 0, 0.5);
   --red-highlight: rgba(255, 0, 0, 0.5);
+  --gold: #ffd700;
 }
 
 #root {
@@ -539,11 +540,18 @@ input[type="radio"]:checked + label {
 .team-symbol-background {
   border-radius: 50%;
   background-color: var(--primary-background);
-  border: 2px solid #ffd700;
+  border: 2px solid var(--gold);
 }
 
-.gold path {
-  stroke: #ffd700;
+.gold-switch {
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  background-color: var(--primary-background);
+  padding-right: 0.2em;
+}
+
+.gold-switch path {
+  stroke: var(--gold);
 }
 
 /* Margins */

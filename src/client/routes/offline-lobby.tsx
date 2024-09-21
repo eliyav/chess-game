@@ -59,7 +59,7 @@ export const OfflineLobby: React.FC<{
       <h2 className="sub-title glass-dark">Players</h2>
       <div className="flex">
         {lobby?.players.map((player, i) => (
-          <PlayerCard key={i} player={player} showReady={false} />
+          <PlayerCard key={i} name={player.name} type={player.type} />
         ))}
       </div>
       <h2 className="sub-title glass-dark">Settings</h2>

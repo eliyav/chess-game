@@ -1,16 +1,17 @@
 import React from "react";
-import type { Player } from "../../../shared/match";
 
-const PlayerCard: React.FC<{ player: Player; showReady: boolean }> = ({
-  player,
-  showReady,
-}) => {
-  const { name, ready, type } = player;
+const PlayerCard: React.FC<{
+  name: string;
+  ready?: boolean;
+  type?: string;
+  team?: string;
+}> = ({ name, ready, type, team }) => {
   return (
     <div className="player-card">
       <p style={{ fontWeight: "bold" }}>{name}</p>
-      <p>{type}</p>
-      {showReady && (
+      {team !== undefined && <p>{team}</p>}
+      {type !== undefined && <p>{type}</p>}
+      {ready !== undefined && (
         <p>
           Ready:{" "}
           {ready ? (

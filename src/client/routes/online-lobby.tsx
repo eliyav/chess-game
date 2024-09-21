@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Lobby } from "../../shared/match";
+import { Lobby, TEAM } from "../../shared/match";
 import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
 import { websocket } from "../websocket-client";
@@ -15,14 +15,6 @@ export const OnlineLobby: React.FC<{
   const navigate = useNavigate();
   const location = useLocation();
   const lobbyKey = location.search.split("=")[1];
-  const playersReady = lobby?.players.every((player) => player.ready);
-  const disableReadyButton =
-    lobby?.teams.White === "" ||
-    lobby?.teams.Black === "" ||
-    lobby?.players.length !== 2;
-  const disableMatchStart = lobby
-    ? lobby.players.length < 2 || !playersReady
-    : true;
 
   useEffect(() => {
     if (lobbyKey) {
@@ -39,6 +31,15 @@ export const OnlineLobby: React.FC<{
   }, [lobbyKey, websocket]);
 
   if (!lobby) return null;
+
+  const [player1, player2] = lobby.players;
+  const lessThanTwoPlayers = lobby.players.length < 2;
+  const playersReady = lobby.players.every((player) => player.ready);
+  const disableReadyButton =
+    lobby.teams.White === "" ||
+    lobby.teams.Black === "" ||
+    lobby.players.length !== 2;
+  const disableMatchStart = lobby.players.length < 2 || !playersReady;
 
   return (
     <div className="lobby screen">
@@ -70,36 +71,60 @@ export const OnlineLobby: React.FC<{
         </div>
         <h2 className="sub-title glass-dark">Players</h2>
         <div className="flex">
-          {lobby.players[0] ? (
+          {player1 ? (
             <div className="flex">
-              <Pawn
-                className="team-symbol-background"
-                color={
-                  lobby.teams.White === lobby.players[0].id
-                    ? "#ffffff"
-                    : "#000000"
+              {!lessThanTwoPlayers && (
+                <Pawn
+                  className="team-symbol-background"
+                  color={
+                    lobby.teams.White === player1.id ? "#ffffff" : "#000000"
+                  }
+                />
+              )}
+              <PlayerCard
+                name={player1.name}
+                ready={player1.ready}
+                type={player1.type}
+                team={
+                  lessThanTwoPlayers
+                    ? undefined
+                    : lobby.teams.White === player1.id
+                    ? TEAM.WHITE
+                    : TEAM.BLACK
                 }
               />
-              <PlayerCard player={lobby.players[0]} showReady={true} />
             </div>
           ) : null}
-          <Switch
-            className="gold"
-            onClick={() => {
-              websocket.emit("switchTeams", { lobbyKey });
-            }}
-          />
-          {lobby.players[1] ? (
+          {!lessThanTwoPlayers && (
+            <Switch
+              className="gold-switch"
+              onClick={() => {
+                websocket.emit("switchTeams", { lobbyKey });
+              }}
+            />
+          )}
+          {player2 ? (
             <div className="flex">
-              <PlayerCard player={lobby.players[1]} showReady={true} />
-              <Pawn
-                className="team-symbol-background"
-                color={
-                  lobby.teams.White === lobby.players[1].id
-                    ? "#ffffff"
-                    : "#000000"
+              <PlayerCard
+                name={player2.name}
+                ready={player2.ready}
+                type={player2.type}
+                team={
+                  lessThanTwoPlayers
+                    ? undefined
+                    : lobby.teams.White === player2.id
+                    ? TEAM.WHITE
+                    : TEAM.BLACK
                 }
               />
+              {!lessThanTwoPlayers && (
+                <Pawn
+                  className="team-symbol-background"
+                  color={
+                    lobby.teams.White === player2.id ? "#ffffff" : "#000000"
+                  }
+                />
+              )}
             </div>
           ) : null}
         </div>
