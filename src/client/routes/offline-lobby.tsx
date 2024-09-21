@@ -59,6 +59,7 @@ export const OfflineLobby: React.FC<{
       </div>
       <footer>
         <SelectionButton
+          disabled={!lobby || lobby.mode !== LOBBY_TYPE.LOCAL}
           customClass="mgn-1"
           text={"Start Game"}
           onClick={() => {
