@@ -78,7 +78,7 @@ const App: React.FC<{}> = () => {
         />
         <Route
           path="/lobby-offline"
-          element={<OfflineLobby setLobby={setLobby} />}
+          element={<OfflineLobby setLobby={setLobby} lobby={lobby} />}
         />
         <Route path="/lobby-online" element={<OnlineLobby lobby={lobby} />} />
         <Route

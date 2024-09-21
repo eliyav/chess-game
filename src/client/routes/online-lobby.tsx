@@ -4,6 +4,7 @@ import { Lobby } from "../../shared/match";
 import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
 import { websocket } from "../websocket-client";
+import PlayerCard from "../components/lobby/player-card";
 
 export const OnlineLobby: React.FC<{
   lobby: Lobby | undefined;
@@ -67,19 +68,7 @@ export const OnlineLobby: React.FC<{
         <h2 className="sub-title glass-dark">Players</h2>
         <div className="flex">
           {lobby?.players.map((player, i) => (
-            <div className="player-card" key={i}>
-              <p style={{ fontWeight: "bold" }} key={player.id}>
-                {player.name}
-              </p>
-              <p>
-                Ready:{" "}
-                {player.ready ? (
-                  <span className={"green-highlight"}>✔</span>
-                ) : (
-                  <span className={"red-highlight"}>✖</span>
-                )}
-              </p>
-            </div>
+            <PlayerCard key={i} player={player} showReady={true} />
           ))}
         </div>
         <h2 className="sub-title glass-dark">First Move (White Team)</h2>

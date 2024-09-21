@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { LOBBY_TYPE, Lobby } from "../../shared/match";
 import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
+import PlayerCard from "../components/lobby/player-card";
 
 export const OfflineLobby: React.FC<{
+  lobby: Lobby | undefined;
   setLobby: React.Dispatch<React.SetStateAction<Lobby | undefined>>;
-}> = ({ setLobby }) => {
+}> = ({ setLobby, lobby }) => {
   const navigate = useNavigate();
 
   const updateLobby = useCallback(
@@ -27,7 +29,10 @@ export const OfflineLobby: React.FC<{
     setLobby({
       mode: LOBBY_TYPE.LOCAL,
       key: "",
-      players: [],
+      players: [
+        { name: "Player 1", ready: false, id: "1", type: "Human" },
+        { name: "Player 2", ready: false, id: "2", type: "Human" },
+      ],
       teams: {
         White: "",
         Black: "",
@@ -46,9 +51,11 @@ export const OfflineLobby: React.FC<{
         />
         <h1>Offline Lobby</h1>
       </div>
-      <h2 className="sub-title glass-dark">Opponent</h2>
-      <div className="flex mt-1">
-        <button>Human</button>
+      <h2 className="sub-title glass-dark">Players</h2>
+      <div className="flex">
+        {lobby?.players.map((player, i) => (
+          <PlayerCard key={i} player={player} showReady={false} />
+        ))}
       </div>
       <footer>
         <SelectionButton
