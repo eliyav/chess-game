@@ -71,7 +71,7 @@ export const OfflineLobby: React.FC<{
             [key]: e.target.checked,
           })}
       />
-      <footer>
+      <div style={{ padding: "1em" }}>
         <SelectionButton
           disabled={lobby.mode !== LOBBY_TYPE.LOCAL}
           customClass="mgn-1"
@@ -80,7 +80,7 @@ export const OfflineLobby: React.FC<{
             navigate("/game");
           }}
         />
-      </footer>
+      </div>
     </div>
   );
 };

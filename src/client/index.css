@@ -36,6 +36,7 @@ body {
   z-index: 1;
   background: transparent;
   position: absolute;
+  scrollbar-color: var(--primary-color) var(--primary-background);
 }
 
 canvas {
@@ -392,12 +393,6 @@ footer {
 /* -------------------  */
 /* Lobby */
 
-.lobby-contents {
-  overflow-y: scroll;
-  max-height: clamp(250px, 65vh, 600px);
-  scrollbar-color: var(--primary-color) var(--primary-background);
-}
-
 .lobby-code p {
   text-align: center;
 }
@@ -455,14 +450,15 @@ input[type="radio"]:checked + label {
 }
 
 .ready {
-  display: inline-block;
   font-weight: bold;
   padding: 0.5em;
   font-size: 1.5em;
-  margin: auto;
+  margin: 1em auto 0 auto;
   border: 1px solid whitesmoke;
   border-radius: 0.5em;
   background-color: var(--primary-background);
+  width: 200px;
+  text-align: center;
 }
 
 .ready > * {
@@ -483,7 +479,7 @@ input[type="radio"]:checked + label {
 
 .options-wrapper {
   margin: auto;
-  max-width: clamp(250px, 65vw, 400px);
+  max-width: clamp(250px, 75vw, 400px);
 }
 
 .options-wrapper div {
@@ -574,8 +570,8 @@ input[type="radio"]:checked + label {
 
 .bottom-left {
   position: absolute;
-  bottom: 0.5em;
-  left: 0.5em;
+  bottom: 0.25em;
+  left: 0.25em;
 }
 
 .bottom-right {

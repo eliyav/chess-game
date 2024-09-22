@@ -138,8 +138,8 @@ export const OnlineLobby: React.FC<{
             })}
         />
       </div>
-      <footer>
-        <div className="flex ready">
+      <div style={{ width: "100%" }}>
+        <div className="ready">
           <input
             type="checkbox"
             id="ready-checkbox"
@@ -151,7 +151,8 @@ export const OnlineLobby: React.FC<{
           />
           <label htmlFor="ready-checkbox">Ready</label>
         </div>
-
+      </div>
+      <div style={{ padding: "1em" }}>
         <SelectionButton
           customClass="mgn-1"
           text={"Start Game"}
@@ -160,7 +161,7 @@ export const OnlineLobby: React.FC<{
           }}
           disabled={disableMatchStart}
         />
-      </footer>
+      </div>
     </div>
   );
 };
