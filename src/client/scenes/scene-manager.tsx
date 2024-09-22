@@ -18,6 +18,7 @@ export type GameScene = CustomScene<{
   shadowGenerator: ShadowGenerator[];
   audio: {
     select?: Sound;
+    crumble?: Sound;
   };
 }>;
 

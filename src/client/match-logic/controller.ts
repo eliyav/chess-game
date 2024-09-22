@@ -147,6 +147,11 @@ export class Controller {
       pickedPiece,
     });
     if (validMove) {
+      if (this.options.playGameSounds) {
+        const gameScene = this.sceneManager.getScene(Scenes.GAME);
+        if (!gameScene) return;
+        gameScene.data.audio.crumble?.play();
+      }
       return this.resolveMove([this.selectedPiece.point, pickedPiece.point]);
     }
     return this.displayMoves(pickedPiece);
