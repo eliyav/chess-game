@@ -106,6 +106,13 @@ export class Controller {
   async handleValidMove({ history }: { history: TurnHistory }) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
+    if (this.options.playGameSounds) {
+      const moveType = history.type;
+      const captured = moveType === "standard" && history.targetPiece;
+      if (captured || moveType === "enPassant") {
+        gameScene.data.audio.crumble?.play();
+      }
+    }
     await this.turnAnimation({
       turnHistory: history,
       gameScene,
@@ -147,11 +154,6 @@ export class Controller {
       pickedPiece,
     });
     if (validMove) {
-      if (this.options.playGameSounds) {
-        const gameScene = this.sceneManager.getScene(Scenes.GAME);
-        if (!gameScene) return;
-        gameScene.data.audio.crumble?.play();
-      }
       return this.resolveMove([this.selectedPiece.point, pickedPiece.point]);
     }
     return this.displayMoves(pickedPiece);
