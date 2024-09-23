@@ -6,7 +6,7 @@ import { SelectionButton } from "../components/buttons/start-button";
 export const Home: React.FC = () => {
   const navigate = useNavigate();
   return (
-    <div className="home screen">
+    <div className="flex-column space-between h-100">
       <div className="header glass-dark">
         <h1 className="title">3D CHESS</h1>
         <p className="description">Play for free!</p>
@@ -15,13 +15,11 @@ export const Home: React.FC = () => {
           className="svg-icon bottom-right"
         />
       </div>
-      <footer>
-        <SelectionButton
-          customClass="mgn-1"
-          text="Play"
-          onClick={() => navigate("/lobby")}
-        />
-      </footer>
+      <SelectionButton
+        customClass="mgn-1"
+        text="Play"
+        onClick={() => navigate("/lobby")}
+      />
     </div>
   );
 };

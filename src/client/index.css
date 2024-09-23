@@ -6,7 +6,6 @@
 
 html,
 body {
-  height: 100%;
   font-family: "Times New Roman", Times, serif;
 }
 
@@ -22,27 +21,20 @@ body {
 }
 
 #root {
-  height: 100%;
   color: var(--primary-color);
+  height: 100dvh;
+  width: 100dvw;
 }
 
 #app {
   height: 100%;
-}
-
-.screen {
   width: 100%;
-  height: 100%;
-  z-index: 1;
-  background: transparent;
   position: absolute;
-  scrollbar-color: var(--primary-color) var(--primary-background);
 }
 
 canvas {
   position: fixed;
   z-index: 0;
-  display: block;
   outline: none;
   height: 100%;
   width: 100%;
@@ -50,10 +42,12 @@ canvas {
 
 /* Loading */
 .loading {
-  display: flex;
   background-color: rgb(0, 0, 0);
   z-index: 2;
-  position: relative;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  display: flex;
   justify-content: center;
   align-items: center;
 }
@@ -78,29 +72,17 @@ canvas {
   }
 }
 /* Home Screen-------------------  */
-
 .header {
   user-select: none;
   text-align: center;
-  margin: 1em 0.2em 0 0.2em;
   padding: 0.5em;
   font-size: 1.5em;
-}
+  width: 100%;
 
-.header > h1 {
-  display: inline-block;
-}
+  > h1 {
+    display: inline-block;
+  }
 
-.sub-title {
-  text-align: center;
-  margin: 1em auto;
-  padding: 0.25em;
-  max-width: clamp(250px, 80vw, 500px);
-  pointer-events: none;
-  user-select: none;
-}
-
-.home {
   .title {
     font-size: 3em;
     font-weight: bold;
@@ -120,12 +102,14 @@ canvas {
   }
 }
 
-footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
+.sub-title {
   text-align: center;
+  margin: 1em auto;
+  padding: 0.25em;
+  max-width: clamp(250px, 80vw, 500px);
+  pointer-events: none;
   user-select: none;
+  width: 100%;
 }
 
 .btn {
@@ -180,10 +164,24 @@ footer {
   flex-wrap: wrap;
 }
 
-.flex.column {
-  flex-direction: column;
-  flex-wrap: nowrap;
-  gap: 3em;
+.flex-column {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.space-between {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.gap-1 {
+  gap: 1em;
+}
+
+.gap-2 {
+  gap: 2em;
 }
 
 #divider {
@@ -392,6 +390,14 @@ footer {
 
 /* -------------------  */
 /* Lobby */
+.lobby-content {
+  overflow-y: scroll;
+  width: 100%;
+}
+
+.lobby-content .options-wrapper {
+  margin: auto;
+}
 
 .lobby-code p {
   text-align: center;
@@ -478,7 +484,6 @@ input[type="radio"]:checked + label {
 }
 
 .options-wrapper {
-  margin: auto;
   max-width: clamp(250px, 75vw, 400px);
 }
 
@@ -578,4 +583,8 @@ input[type="radio"]:checked + label {
   position: absolute;
   bottom: 0.5em;
   right: 0.5em;
+}
+
+.h-100 {
+  height: 100%;
 }

@@ -47,7 +47,7 @@ export const OfflineLobby: React.FC<{
   if (!lobby) return null;
 
   return (
-    <div className="lobby screen">
+    <div className="flex-column h-100">
       <div className="header glass-dark">
         <BackButton
           customClass={"bottom-left"}
@@ -71,7 +71,7 @@ export const OfflineLobby: React.FC<{
             [key]: e.target.checked,
           })}
       />
-      <div style={{ padding: "1em" }}>
+      <div>
         <SelectionButton
           disabled={lobby.mode !== LOBBY_TYPE.LOCAL}
           customClass="mgn-1"

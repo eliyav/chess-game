@@ -42,7 +42,7 @@ export const OnlineLobby: React.FC<{
   const disableMatchStart = lobby.players.length < 2 || !playersReady;
 
   return (
-    <div className="lobby screen">
+    <div className="flex-column h-100">
       <div className="header glass-dark">
         <BackButton
           customClass={"bottom-left"}
@@ -51,7 +51,7 @@ export const OnlineLobby: React.FC<{
         />
         <h1>Online Lobby</h1>
       </div>
-      <div className="lobby-contents">
+      <div className="lobby-content">
         <div className="lobby-code">
           <h2 className="sub-title glass-dark">Invite Code</h2>
           <p>
@@ -138,7 +138,7 @@ export const OnlineLobby: React.FC<{
             })}
         />
       </div>
-      <div style={{ width: "100%" }}>
+      <div>
         <div className="ready">
           <input
             type="checkbox"
@@ -152,7 +152,7 @@ export const OnlineLobby: React.FC<{
           <label htmlFor="ready-checkbox">Ready</label>
         </div>
       </div>
-      <div style={{ padding: "1em" }}>
+      <div>
         <SelectionButton
           customClass="mgn-1"
           text={"Start Game"}
