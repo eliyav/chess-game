@@ -10,6 +10,7 @@ import {
   ServerToClientEvents,
 } from "../shared/websocket";
 import { AppRoutes } from "../shared/routes";
+import { Resources } from "../shared/resources";
 
 const clientPath = fileURLToPath(new URL("../client", import.meta.url));
 
@@ -24,7 +25,7 @@ app.use(express.static(clientPath));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.text());
 
-app.get("/create-lobby", (req, res) => {
+app.get(Resources.CREATE_LOBBY, (req, res) => {
   const key = generateKey();
   const lobby = {
     mode: LOBBY_TYPE.ONLINE,
@@ -38,7 +39,7 @@ app.get("/create-lobby", (req, res) => {
   res.send(key);
 });
 
-app.get("/join-lobby", (req, res) => {
+app.get(Resources.JOIN_LOBBY, (req, res) => {
   const lobbyKey = req.query.key as string;
   if (!lobbyKey) {
     res.status(400).send("Lobby key is required");

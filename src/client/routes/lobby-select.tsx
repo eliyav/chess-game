@@ -6,6 +6,7 @@ import { SelectionButton } from "../components/buttons/start-button";
 import { Message } from "../components/modals/message-modal";
 import { Divider } from "../components/svg/divider";
 import { AppRoutes } from "../../shared/routes";
+import { Resources } from "../../shared/resources";
 
 export const LobbySelect: React.FC<{
   setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
@@ -48,7 +49,7 @@ export const LobbySelect: React.FC<{
             onClick={async () => {
               try {
                 const response = await fetch(
-                  `./join-lobby?key=${lobbyKey}`,
+                  `${Resources.JOIN_LOBBY}?key=${lobbyKey}`,
                   {}
                 );
                 if (!response.ok) {
@@ -76,7 +77,7 @@ export const LobbySelect: React.FC<{
           text={`Create ${LOBBY_TYPE.ONLINE}`}
           onClick={async () => {
             try {
-              const response = await fetch("./create-lobby");
+              const response = await fetch(Resources.CREATE_LOBBY);
               const lobbyKey = await response.text();
               navigate(`${AppRoutes.OnlineLobby}?key=${lobbyKey}`);
             } catch (e) {
