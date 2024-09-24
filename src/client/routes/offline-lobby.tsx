@@ -47,7 +47,7 @@ export const OfflineLobby: React.FC<{
   if (!lobby) return null;
 
   return (
-    <div className="flex-column h-100">
+    <div className="content flex-column space-between h-100">
       <div className="header glass-dark">
         <BackButton
           customClass={"bottom-left"}
@@ -56,25 +56,31 @@ export const OfflineLobby: React.FC<{
         />
         <h1>Offline Lobby</h1>
       </div>
-      <h2 className="sub-title glass-dark">Players</h2>
-      <div className="flex">
-        {lobby?.players.map((player, i) => (
-          <PlayerCard key={i} name={player.name} type={player.type} />
-        ))}
+      <div className="lobby-content">
+        <div>
+          <h2 className="sub-title glass-dark">Players</h2>
+          <div className="flex">
+            {lobby?.players.map((player, i) => (
+              <PlayerCard key={i} name={player.name} type={player.type} />
+            ))}
+          </div>
+        </div>
+        <div>
+          <h2 className="sub-title glass-dark">Settings</h2>
+          <ControllerOptionsList
+            options={lobby.controllerOptions}
+            onChange={(key: string) =>
+              (e: React.ChangeEvent<HTMLInputElement>) =>
+                updateLobby("controllerOptions", {
+                  ...lobby.controllerOptions,
+                  [key]: e.target.checked,
+                })}
+          />
+        </div>
       </div>
-      <h2 className="sub-title glass-dark">Settings</h2>
-      <ControllerOptionsList
-        options={lobby.controllerOptions}
-        onChange={(key: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
-          updateLobby("controllerOptions", {
-            ...lobby.controllerOptions,
-            [key]: e.target.checked,
-          })}
-      />
-      <div>
+      <div className={"flex-align-end pb-1"}>
         <SelectionButton
           disabled={lobby.mode !== LOBBY_TYPE.LOCAL}
-          customClass="mgn-1"
           text={"Start Game"}
           onClick={() => {
             navigate("/game");

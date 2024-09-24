@@ -42,7 +42,7 @@ export const OnlineLobby: React.FC<{
   const disableMatchStart = lobby.players.length < 2 || !playersReady;
 
   return (
-    <div className="flex-column h-100">
+    <div className="content flex-column h-100">
       <div className="header glass-dark">
         <BackButton
           customClass={"bottom-left"}
@@ -138,7 +138,7 @@ export const OnlineLobby: React.FC<{
             })}
         />
       </div>
-      <div>
+      <div className="flex-align-end pb-1">
         <div className="ready">
           <input
             type="checkbox"
@@ -151,10 +151,7 @@ export const OnlineLobby: React.FC<{
           />
           <label htmlFor="ready-checkbox">Ready</label>
         </div>
-      </div>
-      <div>
         <SelectionButton
-          customClass="mgn-1"
           text={"Start Game"}
           onClick={() => {
             websocket.emit("requestMatchStart", { lobbyKey });

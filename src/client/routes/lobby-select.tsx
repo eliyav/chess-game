@@ -13,7 +13,7 @@ export const LobbySelect: React.FC<{
   const [lobbyKey, setLobbyKey] = useState("");
 
   return (
-    <div>
+    <div className="content">
       <div className="header glass-dark">
         <BackButton
           customClass={"bottom-left"}
