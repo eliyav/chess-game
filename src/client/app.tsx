@@ -11,6 +11,7 @@ import { LobbySelect } from "./routes/lobby-select";
 import { OfflineLobby } from "./routes/offline-lobby";
 import { OnlineLobby } from "./routes/online-lobby";
 import { websocket } from "./websocket-client";
+import { AppRoutes } from "../shared/routes";
 
 const App: React.FC<{}> = () => {
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ const App: React.FC<{}> = () => {
 
   useEffect(() => {
     websocket.on("redirect", ({ path, message }) => {
-      navigate(path || "/");
+      navigate(path);
       if (message) {
         setMessage({
           text: message,
@@ -71,18 +72,21 @@ const App: React.FC<{}> = () => {
       )}
       {!isInitialized && <LoadingScreen text="..." />}
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path={AppRoutes.Home} element={<Home />} />
         <Route
-          path="/lobby"
+          path={AppRoutes.Lobby}
           element={<LobbySelect setMessage={setMessage} />}
         />
         <Route
-          path="/lobby-offline"
+          path={AppRoutes.OfflineLobby}
           element={<OfflineLobby setLobby={setLobby} lobby={lobby} />}
         />
-        <Route path="/lobby-online" element={<OnlineLobby lobby={lobby} />} />
         <Route
-          path="/game"
+          path={AppRoutes.OnlineLobby}
+          element={<OnlineLobby lobby={lobby} />}
+        />
+        <Route
+          path={AppRoutes.Game}
           element={
             canGameViewRender ? (
               <Game

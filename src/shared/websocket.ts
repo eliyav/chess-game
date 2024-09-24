@@ -1,10 +1,11 @@
 import { Point } from "./game";
 import { Lobby } from "./match";
+import { AppRoutes } from "./routes";
 
 export interface ServerToClientEvents {
   lobbyInfo: (lobby: Lobby) => void;
   message: (message: string) => void;
-  redirect: (data: { path: string; message: string | undefined }) => void;
+  redirect: (data: { path: AppRoutes; message: string | undefined }) => void;
   resolvedMove: (data: { originPoint: Point; targetPoint: Point }) => void;
   resetMatchRequested: () => void;
   resetMatchResolve: (data: { answer: boolean }) => void;

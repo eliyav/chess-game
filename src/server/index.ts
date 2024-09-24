@@ -9,6 +9,7 @@ import {
   InterServerEvents,
   ServerToClientEvents,
 } from "../shared/websocket";
+import { AppRoutes } from "../shared/routes";
 
 const clientPath = fileURLToPath(new URL("../client", import.meta.url));
 
@@ -134,7 +135,7 @@ io.on("connection", (socket) => {
       lobby.matchStarted = true;
       io.to(lobbyKey).emit("lobbyInfo", lobby);
       io.to(lobbyKey).emit("redirect", {
-        path: "/game",
+        path: AppRoutes.Game,
         message: "Match started!",
       });
     }

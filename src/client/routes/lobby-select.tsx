@@ -5,6 +5,7 @@ import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
 import { Message } from "../components/modals/message-modal";
 import { Divider } from "../components/svg/divider";
+import { AppRoutes } from "../../shared/routes";
 
 export const LobbySelect: React.FC<{
   setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
@@ -18,7 +19,7 @@ export const LobbySelect: React.FC<{
         <BackButton
           customClass={"bottom-left"}
           size={30}
-          onClick={() => navigate("/")}
+          onClick={() => navigate(AppRoutes.Home)}
         />
         <h1>Select Lobby</h1>
       </div>
@@ -26,7 +27,7 @@ export const LobbySelect: React.FC<{
         <SelectionButton
           text={LOBBY_TYPE.LOCAL}
           onClick={() => {
-            navigate("/lobby-offline");
+            navigate(AppRoutes.OfflineLobby);
           }}
         />
         <Divider />
@@ -53,7 +54,7 @@ export const LobbySelect: React.FC<{
                 if (!response.ok) {
                   throw new Error("Failed to join lobby");
                 }
-                navigate(`/lobby-online?key=${lobbyKey}`);
+                navigate(`${AppRoutes.OnlineLobby}?key=${lobbyKey}`);
               } catch (e) {
                 if (e instanceof Error) {
                   setMessage({
@@ -77,7 +78,7 @@ export const LobbySelect: React.FC<{
             try {
               const response = await fetch("./create-lobby");
               const lobbyKey = await response.text();
-              navigate(`/lobby-online?key=${lobbyKey}`);
+              navigate(`${AppRoutes.OnlineLobby}?key=${lobbyKey}`);
             } catch (e) {
               if (e instanceof Error) {
                 setMessage({

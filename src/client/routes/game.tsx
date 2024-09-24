@@ -10,6 +10,8 @@ import { Message } from "../components/modals/message-modal";
 import PromotionModal from "../components/modals/promotion-modal";
 import { SceneManager, Scenes } from "../scenes/scene-manager";
 import { websocket } from "../websocket-client";
+import App from "../app";
+import { AppRoutes } from "../../shared/routes";
 
 export const Game: React.FC<{
   sceneManager: SceneManager;
@@ -60,7 +62,7 @@ export const Game: React.FC<{
           {
             text: "home",
             onClick: () => {
-              navigate("/");
+              navigate(AppRoutes.Home);
               sceneManager.switchScene(Scenes.HOME);
             },
           },
