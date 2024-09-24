@@ -62,13 +62,12 @@ export class Controller {
       if (!this.match.isPlayersTurn()) return;
       const pickedMesh = pickResult?.pickedMesh;
       if (!pickedMesh) return;
-      if (this.options.playGameSounds) {
-        gameScene.data.audio.select?.play();
-      }
+
       const pickedPiece = this.match.lookupGamePiece(
         pickedMesh,
         pickedMesh.metadata !== null
       );
+
       if (pickedPiece) {
         this.handlePieceInput(pickedPiece);
       } else {
@@ -130,6 +129,9 @@ export class Controller {
     if (!piece) return;
     const currentPlayersPiece = this.match.isCurrentPlayersPiece(piece);
     if (currentPlayersPiece) {
+      if (this.options.playGameSounds) {
+        gameScene.data.audio.select?.play();
+      }
       const moves = this.match.getValidMoves(piece);
       this.selectedPiece = piece;
       this.updateMeshesRender();
