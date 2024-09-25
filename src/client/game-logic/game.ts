@@ -34,8 +34,9 @@ class Game {
     };
   }
 
-  getCurrentTeam() {
-    const index = this.current.turn % 2 ? 0 : 1;
+  getTeam(currentPlayer = true) {
+    const remainder = this.current.turn % 2;
+    const index = currentPlayer ? (remainder ? 0 : 1) : remainder ? 1 : 0;
     return this.teams[index];
   }
 
@@ -137,13 +138,11 @@ class Game {
     const { originPiece, targetPiece, originPoint, targetPoint } =
       locationsInfo;
     const castling =
-      originPiece!.type === Piece.K &&
-      originPiece!.team === this.getCurrentTeam();
+      originPiece!.type === Piece.K && originPiece!.team === this.getTeam();
     let castling2 = false;
     if (targetPiece !== undefined) {
       castling2 =
-        targetPiece.type === Piece.R &&
-        targetPiece.team === this.getCurrentTeam();
+        targetPiece.type === Piece.R && targetPiece.team === this.getTeam();
       if (castling && castling2) {
         const a = gameHelpers.getX(originPoint);
         const b = gameHelpers.getX(targetPoint);
@@ -304,11 +303,9 @@ class Game {
   findKing(currentPlayer: boolean) {
     const pieces = this.getAllPieces();
     const king = pieces.find((piece) => {
-      if (currentPlayer) {
-        return piece.type === "King" && piece.team === this.getCurrentTeam();
-      } else {
-        return piece.type === "King" && piece.team !== this.getCurrentTeam();
-      }
+      return (
+        piece.type === "King" && piece.team === this.getTeam(currentPlayer)
+      );
     })!;
     return king;
   }
@@ -316,11 +313,7 @@ class Game {
   getPieces(currentPlayer: boolean) {
     const pieces = this.getAllPieces();
     return pieces.filter((piece) => {
-      if (currentPlayer) {
-        return piece.team === this.getCurrentTeam();
-      } else {
-        return piece.team !== this.getCurrentTeam();
-      }
+      return piece.team === this.getTeam(currentPlayer);
     });
   }
 
@@ -393,7 +386,7 @@ class Game {
         resolve[0] ? movesObj.push(resolve[1]) : null;
       }
     };
-    const playersRooks = this.findPieces("Rook", this.getCurrentTeam());
+    const playersRooks = this.findPieces("Rook", this.getTeam());
     if (playersRooks.length) {
       playersRooks.forEach((rook) => {
         checkCastlingMove(piece!, rook);
