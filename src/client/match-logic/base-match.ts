@@ -79,7 +79,7 @@ export class BaseMatch {
   }
 
   getAllGamePieces() {
-    return this.game.allPieces();
+    return this.game.getAllPieces();
   }
 
   undoTurn() {

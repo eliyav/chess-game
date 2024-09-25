@@ -14,10 +14,12 @@ class GamePiece {
     type,
     team,
     point,
+    update,
   }: {
     type: Piece;
     team: TEAM;
     point: Point;
+    update?: boolean;
   }) {
     this.type = type;
     this.team = team;
@@ -26,6 +28,7 @@ class GamePiece {
     this.moved = false;
     this.moveCounter = 0;
     this.direction = this.team === TEAM.WHITE ? 1 : -1;
+    if (update) this.update();
   }
 
   resetPieceMovement() {
@@ -34,7 +37,7 @@ class GamePiece {
   }
 
   update() {
-    this.moved ? null : (this.moved = true);
+    this.moved = true;
     this.moveCounter++;
   }
 

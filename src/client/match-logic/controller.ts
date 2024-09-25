@@ -277,8 +277,8 @@ export class Controller {
     }
 
     //For each active piece, creates a mesh clone and places on board
-    this.match.getAllGamePieces().forEach((square) => {
-      const { type, team, point } = square.on!;
+    this.match.getAllGamePieces().forEach((piece) => {
+      const { type, team, point } = piece;
       const foundMesh = gameScene.scene.meshes.find(
         (mesh) => mesh.name === type && mesh.metadata.color === team
       );

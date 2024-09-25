@@ -1,6 +1,6 @@
 import { Point } from "../../shared/game";
 import { TEAM } from "../../shared/match";
-import { Square } from "./board";
+import { Grid } from "./board";
 import GamePiece from "./game-piece";
 
 export interface TurnHistory {
@@ -8,13 +8,13 @@ export interface TurnHistory {
   type: string;
   direction?: number;
   enPassant?: EnPassantResult;
-  castling?: Square[];
+  castling?: { square: string }[];
   origin: Point;
   target: Point;
   originPiece: GamePiece | undefined;
   targetPiece: GamePiece | undefined;
-  originSquare: Square;
-  targetSquare: Square;
+  originSquare: Grid[0][0];
+  targetSquare: Grid[0][0];
   promotion: boolean;
   promotedPiece?: string;
   turn?: number;
@@ -26,8 +26,8 @@ type EnPassantResult = {
 };
 
 export interface LocationsInfo {
-  originSquare: Square;
-  targetSquare: Square;
+  originSquare: Grid[0][0];
+  targetSquare: Grid[0][0];
   originPiece: GamePiece | undefined;
   targetPiece: GamePiece | undefined;
   originPoint: Point;
@@ -41,9 +41,9 @@ const generateTurnHistory = (
     promotion: boolean;
     enPassant?: EnPassantResult;
     enPassantPiece?: GamePiece | undefined;
-    lastTurnHistorySquare?: Square;
+    lastTurnHistorySquare?: Grid[0][0];
     direction?: number;
-    castlingResult?: Square[];
+    castlingResult?: { square: string }[];
   }
 ): TurnHistory | undefined => {
   if (type === "standard") {
@@ -114,20 +114,20 @@ const isEnPassantAvailable = (turnHistory: TurnHistory): EnPassantResult => {
 
 //Functions to switch game pieces back and forth between squares once move is entered
 const updateLocation = (LocationsInfo: LocationsInfo) => {
-  const { originSquare, targetSquare, originPiece, targetPoint } =
-    LocationsInfo;
-  targetSquare.on = originPiece;
-  targetSquare.on!.point = [getX(targetPoint), getY(targetPoint)];
-  originSquare.on = undefined;
+  const { originPiece, targetPoint } = LocationsInfo;
+  if (originPiece) {
+    originPiece.point = [getX(targetPoint), getY(targetPoint)];
+  }
   return true;
 };
 
 const undoUpdateLocation = (LocationsInfo: LocationsInfo) => {
   const { originSquare, targetSquare, originPiece, targetPiece, originPoint } =
     LocationsInfo;
-  originSquare.on = originPiece;
-  originSquare.on!.point = [getX(originPoint), getY(originPoint)];
-  targetSquare.on = targetPiece;
+  if (originPiece) {
+    originPiece.point = [getX(originPoint), getY(originPoint)];
+  }
+  // targetPiece.addPiece(targetPiece);
   return true;
 };
 

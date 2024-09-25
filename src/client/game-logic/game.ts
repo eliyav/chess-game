@@ -1,15 +1,15 @@
-import * as gameHelpers from "./game-helpers";
-import * as movementHelpers from "./movement-helpers";
-import {
-  TurnHistory,
-  LocationsInfo,
-  undoUpdateLocation,
-  doMovesMatch,
-} from "./game-helpers";
-import Board, { Square } from "./board";
-import GamePiece from "./game-piece";
-import { TEAM } from "../../shared/match";
 import { Move, Piece, Point } from "../../shared/game";
+import { TEAM } from "../../shared/match";
+import Board from "./board";
+import * as gameHelpers from "./game-helpers";
+import {
+  doMovesMatch,
+  LocationsInfo,
+  TurnHistory,
+  undoUpdateLocation,
+} from "./game-helpers";
+import GamePiece from "./game-piece";
+import * as movementHelpers from "./movement-helpers";
 
 class Game {
   teams: TEAM[];
@@ -56,12 +56,10 @@ class Game {
     if (lastTurn !== undefined) {
       if (lastTurn.originPiece) {
         lastTurn.originPiece.resetPieceMovement();
-        if (lastTurn.castling) {
-          lastTurn.castling.forEach((square) => (square.on = undefined));
-        }
-        lastTurn.originSquare.on = lastTurn.originPiece;
+        this.current.board.addPiece(lastTurn.originPiece);
+        if (lastTurn.targetPiece)
+          this.current.board.addPiece(lastTurn.targetPiece);
         lastTurn.originPiece.point = lastTurn.origin;
-        lastTurn.targetSquare.on = lastTurn.targetPiece;
         this.current.turnHistory.length = this.current.turnHistory.length - 1;
         this.current.annotations.length = this.current.annotations.length - 1;
         this.current.turn--;
@@ -122,8 +120,7 @@ class Game {
     if (enPassant.result) {
       if (gameHelpers.doMovesMatch(enPassant.enPassantPoint, targetPoint)) {
         if (this.canValidMoveResolve(locationsInfo)) {
-          const enPassantPiece = lastTurnHistory.targetSquare.on;
-          lastTurnHistory.targetSquare.on = undefined;
+          const enPassantPiece = lastTurnHistory.targetPiece;
           const promotion = originPiece!.checkPromotion();
           return gameHelpers.generateTurnHistory("enPassant", locationsInfo, {
             enPassant,
@@ -140,12 +137,12 @@ class Game {
     const { originPiece, targetPiece, originPoint, targetPoint } =
       locationsInfo;
     const castling =
-      originPiece!.type === "King" &&
+      originPiece!.type === Piece.K &&
       originPiece!.team === this.getCurrentTeam();
     let castling2 = false;
     if (targetPiece !== undefined) {
       castling2 =
-        targetPiece.type === "Rook" &&
+        targetPiece.type === Piece.R &&
         targetPiece.team === this.getCurrentTeam();
       if (castling && castling2) {
         const a = gameHelpers.getX(originPoint);
@@ -155,7 +152,7 @@ class Game {
         const castlingResult = castlingMove(
           c,
           locationsInfo,
-          this.current.board.grid
+          this.current.board
         );
         const promotion = originPiece!.checkPromotion();
         return gameHelpers.generateTurnHistory("castling", locationsInfo, {
@@ -169,18 +166,15 @@ class Game {
     function castlingMove(
       direction: number,
       locationsInfo: LocationsInfo,
-      grid: Square[][]
+      board: Board
     ) {
-      const { originSquare, originPiece, targetSquare, targetPiece } =
-        locationsInfo;
+      const { originPiece, targetPiece } = locationsInfo;
       const {
         type: originType,
         team: originTeam,
         point: originPoint,
       } = originPiece!;
       const { type: targetType, team: targetTeam } = targetPiece!;
-      originSquare.on = undefined;
-      targetSquare.on = undefined;
       //Move King 2 Spaces from current location in the direction of rook
       //Move the Rook 1 space in that same direction from the kings original location
       const [x, y] = originPoint;
@@ -188,21 +182,27 @@ class Game {
       const newRookX = x + direction;
       const newKingPoint: Point = [newKingX, y];
       const newRookPoint: Point = [newRookX, y];
-      const newKingSquare = grid[newKingX][y];
-      const newRookSquare = grid[newRookX][y];
-      newKingSquare.on = new GamePiece({
-        type: originType,
-        team: originTeam,
-        point: newKingPoint,
-      });
-      newRookSquare.on = new GamePiece({
-        type: targetType,
-        team: targetTeam,
-        point: newRookPoint,
-      });
-      newKingSquare.on.update();
-      newRookSquare.on.update();
-      return [newKingSquare, newRookSquare];
+
+      //Remove origin piece and target piece
+      board.removePieceByPoint(originPoint);
+      board.removePieceByPoint(targetPoint);
+      board.addPiece(
+        new GamePiece({
+          type: originType,
+          team: originTeam,
+          point: newKingPoint,
+          update: true,
+        })
+      );
+      board.addPiece(
+        new GamePiece({
+          type: targetType,
+          team: targetTeam,
+          point: newRookPoint,
+          update: true,
+        })
+      );
+      return [board.getSquare(newKingPoint), board.getSquare(newRookPoint)];
     }
   }
 
@@ -215,39 +215,39 @@ class Game {
         availableMoves = movementHelpers.calcPawnMoves(
           piece,
           flag,
-          this.current.board.grid,
+          this.current.board,
           lastTurnHistory
         );
         break;
       case "Rook":
         availableMoves = movementHelpers.calcRookMoves(
           piece,
-          this.current.board.grid
+          this.current.board
         );
         break;
       case "Bishop":
         availableMoves = movementHelpers.calcBishopMoves(
           piece,
-          this.current.board.grid
+          this.current.board
         );
         break;
       case "Knight":
         availableMoves = movementHelpers.calcKnightMoves(
           piece,
-          this.current.board.grid
+          this.current.board
         );
         break;
       case "Queen":
         availableMoves = movementHelpers.calcQueenMoves(
           piece,
-          this.current.board.grid
+          this.current.board
         );
         break;
       case "King":
         availableMoves = movementHelpers.calcKingMoves(
           piece,
           flag,
-          this.current.board.grid,
+          this.current.board,
           this.calcCastling.bind(this)
         );
         break;
@@ -263,12 +263,11 @@ class Game {
   }
 
   isChecked(currentPlayer: boolean) {
-    const piecesBoolean = currentPlayer === true ? false : true;
-    const kingSquare = this.findKing(currentPlayer);
-    const opponentsPieces = this.getPieces(piecesBoolean);
+    const king = this.findKing(currentPlayer);
+    const opponentsPieces = this.getPieces(!currentPlayer);
     const opponentsAvailableMoves = this.getMoves(opponentsPieces);
     const isKingChecked = opponentsAvailableMoves.find((move) =>
-      gameHelpers.doMovesMatch(move[0], kingSquare!.on!.point)
+      gameHelpers.doMovesMatch(move[0], king.point)
     );
     //Returns an array with the kings location if checked
     return isKingChecked;
@@ -279,9 +278,9 @@ class Game {
       doMovesMatch(move[0], point)
     );
   }
-  getMoves(gamePieces: Square[]) {
+  getMoves(gamePieces: GamePiece[]) {
     const availableMoves = gamePieces
-      .map((square) => this.calculateAvailableMoves(square.on!))
+      .map((piece) => this.calculateAvailableMoves(piece))
       .flat()
       .filter((move) => (move[0] !== undefined ? true : false));
     return availableMoves;
@@ -303,39 +302,26 @@ class Game {
   }
 
   findKing(currentPlayer: boolean) {
-    const currentKing = this.current.board.grid
-      .flat()
-      .filter((square) => (square.on !== undefined ? true : false))
-      .find((square) => {
-        if (currentPlayer) {
-          return (
-            square.on!.type === "King" &&
-            square.on!.team === this.getCurrentTeam()
-          );
-        } else {
-          return (
-            square.on!.type === "King" &&
-            square.on!.team !== this.getCurrentTeam()
-          );
-        }
-      });
-
-    if (typeof currentKing !== "undefined") {
-      return currentKing;
-    }
+    const pieces = this.getAllPieces();
+    const king = pieces.find((piece) => {
+      if (currentPlayer) {
+        return piece.type === "King" && piece.team === this.getCurrentTeam();
+      } else {
+        return piece.type === "King" && piece.team !== this.getCurrentTeam();
+      }
+    })!;
+    return king;
   }
 
   getPieces(currentPlayer: boolean) {
-    const piecesArray = this.current.board.grid.flat().filter((square) => {
-      if (square.on !== undefined) {
-        if (currentPlayer) {
-          return square.on.team === this.getCurrentTeam();
-        } else {
-          return square.on.team !== this.getCurrentTeam();
-        }
+    const pieces = this.getAllPieces();
+    return pieces.filter((piece) => {
+      if (currentPlayer) {
+        return piece.team === this.getCurrentTeam();
+      } else {
+        return piece.team !== this.getCurrentTeam();
       }
     });
-    return piecesArray;
   }
 
   getLocationsInfo(originPoint: Point, targetPoint: Point): LocationsInfo {
@@ -350,37 +336,27 @@ class Game {
     return {
       originSquare,
       targetSquare,
-      originPiece: originSquare.on,
-      targetPiece: targetSquare.on,
+      originPiece: this.current.board.getPieceByPoint(originPoint),
+      targetPiece: this.current.board.getPieceByPoint(targetPoint),
       originPoint,
       targetPoint,
     };
   }
 
   findPieces(name: string, color: string) {
-    const foundPieces = this.current.board.grid.flat().filter((square) => {
-      if (square.on !== undefined) {
-        return square.on.type === name && square.on.team === color;
-      }
-      return false;
+    const pieces = this.getAllPieces();
+    const foundPieces = pieces.filter((piece) => {
+      return piece.type === name && piece.team === color;
     });
     return foundPieces;
   }
 
-  allPieces() {
-    const allPieces = this.current.board.grid
-      .flat()
-      .filter((square) => square.on !== undefined);
-
-    return allPieces;
+  getAllPieces() {
+    return this.current.board.getPieces();
   }
 
-  lookupPiece(location: [x: number, y: number]) {
-    const [x, y] = location;
-    const piece = this.current.board.grid[x][y].on;
-    if (piece !== undefined) {
-      return piece!;
-    }
+  lookupPiece(location: Point) {
+    return this.current.board.getPieceByPoint(location);
   }
 
   isCheckmate() {
@@ -393,10 +369,10 @@ class Game {
     const currentPlayerPieces = this.getPieces(true);
     //For each piece, iterate on its available moves
     currentPlayerPieces.forEach((piece) => {
-      const availableMoves = this.calculateAvailableMoves(piece.on!);
+      const availableMoves = this.calculateAvailableMoves(piece);
       //For each available move, check if resolving it results in player still being in check
       const isItCheckmate = availableMoves.map((move) => {
-        const locationsInfo = this.getLocationsInfo(piece.on!.point, move[0]);
+        const locationsInfo = this.getLocationsInfo(piece.point, move[0]);
         const result = this.canValidMoveResolve(locationsInfo);
         gameHelpers.undoUpdateLocation(locationsInfo);
         return result ? false : true;
@@ -418,9 +394,9 @@ class Game {
       }
     };
     const playersRooks = this.findPieces("Rook", this.getCurrentTeam());
-    if (playersRooks) {
-      playersRooks.forEach((square) => {
-        checkCastlingMove(piece!, square.on!);
+    if (playersRooks.length) {
+      playersRooks.forEach((rook) => {
+        checkCastlingMove(piece!, rook);
       });
     }
   }
@@ -447,15 +423,9 @@ class Game {
         squaresInBetween.push(point);
       }
       //Check if squares in between are used by any pieces
-      const squaresInUse = squaresInBetween
-        .map((point) => {
-          const square =
-            this.current.board.grid[gameHelpers.getX(point)][
-              gameHelpers.getY(point)
-            ];
-          return square.on === undefined ? false : true;
-        })
-        .filter((result) => result === true);
+      const squaresInUse = squaresInBetween.filter((point) => {
+        return this.current.board.getPieceByPoint(point) ? true : false;
+      });
       if (!squaresInUse.length) {
         //Check if opponents pieces, threathen any of the spaces in between
         const opponentsPieces = this.getPieces(false);
@@ -495,14 +465,14 @@ class Game {
       const square = turnHistory.targetSquare.square;
       turnHistory.promotedPiece = selection;
       const { team, point } = turnHistory.originPiece!;
-      turnHistory.targetSquare.on = new GamePiece({
-        type: selection,
-        team,
-        point,
-      });
-      const symbol = turnHistory.targetSquare.on.getSymbol();
+      // turnHistory.targetSquare.on = new GamePiece({
+      //   type: selection,
+      //   team,
+      //   point,
+      // });
+      // const symbol = turnHistory.targetSquare.on.getSymbol();
       const annotations = this.current.annotations;
-      annotations[annotations.length - 1] = `${square}${symbol}`;
+      annotations[annotations.length - 1] = `${square}${"placeholder"}`;
     }
   }
 
