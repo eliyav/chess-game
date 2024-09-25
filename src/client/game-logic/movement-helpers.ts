@@ -454,7 +454,6 @@ const calcLeft = (
 };
 
 export {
-  Point,
   calcBishopMoves,
   calcKingMoves,
   calcKnightMoves,
