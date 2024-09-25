@@ -1,5 +1,5 @@
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { Move, Point } from "../../shared/game";
+import { Move, Piece, Point } from "../../shared/game";
 import { Lobby, Player, TEAM } from "../../shared/match";
 import Game from "../game-logic/game";
 import { TurnHistory } from "../game-logic/game-helpers";
@@ -100,7 +100,7 @@ export class BaseMatch {
     );
   }
 
-  setPromotion(selection: string) {
+  setPromotion(selection: Piece) {
     this.game.setPromotionPiece(selection);
   }
 }

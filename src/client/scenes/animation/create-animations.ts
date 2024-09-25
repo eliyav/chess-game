@@ -7,13 +7,14 @@ import knightAnimation from "../../../../assets/piece-animations/knight-animatio
 import pawnAnimation from "../../../../assets/piece-animations/pawn-animation.gltf";
 import queenAnimation from "../../../../assets/piece-animations/queen-animation.gltf";
 import rookAnimation from "../../../../assets/piece-animations/rook-animation.gltf";
+import { Piece } from "../../../shared/game";
 
 const animationsGltf = [
-  { id: "Pawn", animation: pawnAnimation },
-  { id: "Rook", animation: rookAnimation },
-  { id: "Bishop", animation: bishopAnimation },
-  { id: "Knight", animation: knightAnimation },
-  { id: "Queen", animation: queenAnimation },
+  { id: Piece.P, animation: pawnAnimation },
+  { id: Piece.R, animation: rookAnimation },
+  { id: Piece.B, animation: bishopAnimation },
+  { id: Piece.K, animation: knightAnimation },
+  { id: Piece.Q, animation: queenAnimation },
 ];
 
 export async function createAnimations(scene: Scene) {

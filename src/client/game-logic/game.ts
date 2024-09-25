@@ -9,7 +9,7 @@ import {
 import Board, { Square } from "./board";
 import GamePiece from "./game-piece";
 import { TEAM } from "../../shared/match";
-import { Move, Point } from "../../shared/game";
+import { Move, Piece, Point } from "../../shared/game";
 
 class Game {
   teams: TEAM[];
@@ -489,7 +489,7 @@ class Game {
     return returnResult;
   }
 
-  setPromotionPiece(selection: string) {
+  setPromotionPiece(selection: Piece) {
     const turnHistory = this.current.turnHistory.at(-1);
     if (turnHistory !== undefined) {
       const square = turnHistory.targetSquare.square;

@@ -2,10 +2,11 @@ export type Point = [number, number];
 
 export type Move = [Point, string];
 
-export type GamePieceType =
-  | "Pawn"
-  | "Rook"
-  | "Bishop"
-  | "Knight"
-  | "King"
-  | "Queen";
+export enum Piece {
+  P = "Pawn",
+  R = "Rook",
+  B = "Bishop",
+  N = "Knight",
+  K = "King",
+  Q = "Queen",
+}

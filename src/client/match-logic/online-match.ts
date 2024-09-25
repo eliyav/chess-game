@@ -1,4 +1,4 @@
-import { Point } from "../../shared/game";
+import { Piece, Point } from "../../shared/game";
 import { Lobby, LOBBY_TYPE, Player, TEAM } from "../../shared/match";
 import { websocket } from "../websocket-client";
 import GamePiece from "../game-logic/game-piece";
@@ -84,7 +84,7 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
     return this.getGame().nextTurn();
   }
 
-  setPromotion(selection: string) {
+  setPromotion(selection: Piece) {
     this.getGame().setPromotionPiece(selection);
   }
 

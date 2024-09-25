@@ -1,8 +1,8 @@
-import { Point } from "../../shared/game";
+import { Piece, Point } from "../../shared/game";
 import { TEAM } from "../../shared/match";
 
 class GamePiece {
-  type: string;
+  type: Piece;
   team: TEAM;
   point: Point;
   movement: number[];
@@ -15,7 +15,7 @@ class GamePiece {
     team,
     point,
   }: {
-    type: string;
+    type: Piece;
     team: TEAM;
     point: Point;
   }) {
@@ -39,27 +39,14 @@ class GamePiece {
   }
 
   checkPromotion() {
-    if (this.type === "Pawn" && (this.point[1] === 0 || this.point[1] === 7)) {
+    if (this.type === Piece.P && (this.point[1] === 0 || this.point[1] === 7)) {
       return true;
     }
     return false;
   }
 
   getSymbol() {
-    switch (this.type) {
-      case "King":
-        return "K";
-      case "Queen":
-        return "Q";
-      case "Knight":
-        return "N";
-      case "Bishop":
-        return "B";
-      case "Rook":
-        return "R";
-      default:
-        return "";
-    }
+    return Object.entries(Piece).find(([_, value]) => value === this.type)?.[0];
   }
 }
 

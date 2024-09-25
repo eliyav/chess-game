@@ -1,4 +1,4 @@
-import { GamePieceType, Point } from "../../shared/game";
+import { Piece, Point } from "../../shared/game";
 import { TEAM } from "../../shared/match";
 
 type Data = {
@@ -8,7 +8,7 @@ type Data = {
 };
 
 type InitialPositions = {
-  type: GamePieceType;
+  type: Piece;
   teams: [
     {
       name: TEAM.WHITE;
@@ -26,7 +26,7 @@ export const chessData: Data = {
   columnNames: ["a", "b", "c", "d", "e", "f", "g", "h"],
   initialPositions: [
     {
-      type: "Pawn",
+      type: Piece.P,
       teams: [
         {
           name: TEAM.WHITE,
@@ -57,7 +57,7 @@ export const chessData: Data = {
       ],
     },
     {
-      type: "Rook",
+      type: Piece.R,
       teams: [
         {
           name: TEAM.WHITE,
@@ -76,7 +76,7 @@ export const chessData: Data = {
       ],
     },
     {
-      type: "Bishop",
+      type: Piece.B,
       teams: [
         {
           name: TEAM.WHITE,
@@ -95,7 +95,7 @@ export const chessData: Data = {
       ],
     },
     {
-      type: "Knight",
+      type: Piece.N,
       teams: [
         {
           name: TEAM.WHITE,
@@ -114,7 +114,7 @@ export const chessData: Data = {
       ],
     },
     {
-      type: "King",
+      type: Piece.K,
       teams: [
         {
           name: TEAM.WHITE,
@@ -127,7 +127,7 @@ export const chessData: Data = {
       ],
     },
     {
-      type: "Queen",
+      type: Piece.Q,
       teams: [
         {
           name: TEAM.WHITE,

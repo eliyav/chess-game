@@ -3,7 +3,7 @@ import { PickingInfo } from "@babylonjs/core/Collisions/pickingInfo";
 import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { Nullable } from "@babylonjs/core/types";
-import { Point } from "../../shared/game";
+import { Piece, Point } from "../../shared/game";
 import { Message } from "../components/modals/message-modal";
 import { doMovesMatch, TurnHistory } from "../game-logic/game-helpers";
 import GamePiece from "../game-logic/game-piece";
@@ -253,7 +253,7 @@ export class Controller {
     });
   }
 
-  handlePromotionEvent(selection: string) {
+  handlePromotionEvent(selection: Piece) {
     this.match.setPromotion(selection);
     this.handleNextTurn();
   }
