@@ -1,22 +1,31 @@
 import { Point } from "../../shared/game";
+import { TEAM } from "../../shared/match";
 
 class GamePiece {
-  name: string;
-  color: string;
+  type: string;
+  team: TEAM;
   point: Point;
   movement: number[];
   moved: boolean;
   moveCounter: number;
   direction: number;
 
-  constructor(name: string, color: string, point: Point, movement: number[]) {
-    this.name = name;
-    this.color = color;
+  constructor({
+    type,
+    team,
+    point,
+  }: {
+    type: string;
+    team: TEAM;
+    point: Point;
+  }) {
+    this.type = type;
+    this.team = team;
     this.point = point;
-    this.movement = movement;
+    this.movement = [1, 2, 3, 4, 5, 6, 7];
     this.moved = false;
     this.moveCounter = 0;
-    this.direction = this.color === "White" ? 1 : -1;
+    this.direction = this.team === TEAM.WHITE ? 1 : -1;
   }
 
   resetPieceMovement() {
@@ -30,14 +39,14 @@ class GamePiece {
   }
 
   checkPromotion() {
-    if (this.name === "Pawn" && (this.point[1] === 0 || this.point[1] === 7)) {
+    if (this.type === "Pawn" && (this.point[1] === 0 || this.point[1] === 7)) {
       return true;
     }
     return false;
   }
 
   getSymbol() {
-    switch (this.name) {
+    switch (this.type) {
       case "King":
         return "K";
       case "Queen":
@@ -53,7 +62,5 @@ class GamePiece {
     }
   }
 }
-
-export type Move = [Point, string];
 
 export default GamePiece;

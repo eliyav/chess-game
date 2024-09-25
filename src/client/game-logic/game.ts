@@ -7,9 +7,9 @@ import {
   doMovesMatch,
 } from "./game-helpers";
 import Board, { Square } from "./board";
-import GamePiece, { Move } from "./game-piece";
+import GamePiece from "./game-piece";
 import { TEAM } from "../../shared/match";
-import { Point } from "../../shared/game";
+import { Move, Point } from "../../shared/game";
 
 class Game {
   teams: TEAM[];
@@ -140,13 +140,13 @@ class Game {
     const { originPiece, targetPiece, originPoint, targetPoint } =
       locationsInfo;
     const castling =
-      originPiece!.name === "King" &&
-      originPiece!.color === this.getCurrentTeam();
+      originPiece!.type === "King" &&
+      originPiece!.team === this.getCurrentTeam();
     let castling2 = false;
     if (targetPiece !== undefined) {
       castling2 =
-        targetPiece.name === "Rook" &&
-        targetPiece.color === this.getCurrentTeam();
+        targetPiece.type === "Rook" &&
+        targetPiece.team === this.getCurrentTeam();
       if (castling && castling2) {
         const a = gameHelpers.getX(originPoint);
         const b = gameHelpers.getX(targetPoint);
@@ -173,21 +173,33 @@ class Game {
     ) {
       const { originSquare, originPiece, targetSquare, targetPiece } =
         locationsInfo;
-      const { name, color, point, movement } = originPiece!;
-      const { name: name2, color: color2, movement: movement2 } = targetPiece!;
+      const {
+        type: originType,
+        team: originTeam,
+        point: originPoint,
+      } = originPiece!;
+      const { type: targetType, team: targetTeam } = targetPiece!;
       originSquare.on = undefined;
       targetSquare.on = undefined;
       //Move King 2 Spaces from current location in the direction of rook
       //Move the Rook 1 space in that same direction from the kings original location
-      const [x, y] = point;
+      const [x, y] = originPoint;
       const newKingX = x + direction * 2;
       const newRookX = x + direction;
       const newKingPoint: Point = [newKingX, y];
       const newRookPoint: Point = [newRookX, y];
       const newKingSquare = grid[newKingX][y];
       const newRookSquare = grid[newRookX][y];
-      newKingSquare.on = new GamePiece(name, color, newKingPoint, movement);
-      newRookSquare.on = new GamePiece(name2, color2, newRookPoint, movement2);
+      newKingSquare.on = new GamePiece({
+        type: originType,
+        team: originTeam,
+        point: newKingPoint,
+      });
+      newRookSquare.on = new GamePiece({
+        type: targetType,
+        team: targetTeam,
+        point: newRookPoint,
+      });
       newKingSquare.on.update();
       newRookSquare.on.update();
       return [newKingSquare, newRookSquare];
@@ -198,7 +210,7 @@ class Game {
     let availableMoves: Move[] = [];
     let lastTurnHistory =
       this.current.turnHistory[this.current.turnHistory.length - 1];
-    switch (piece.name) {
+    switch (piece.type) {
       case "Pawn":
         availableMoves = movementHelpers.calcPawnMoves(
           piece,
@@ -297,13 +309,13 @@ class Game {
       .find((square) => {
         if (currentPlayer) {
           return (
-            square.on!.name === "King" &&
-            square.on!.color === this.getCurrentTeam()
+            square.on!.type === "King" &&
+            square.on!.team === this.getCurrentTeam()
           );
         } else {
           return (
-            square.on!.name === "King" &&
-            square.on!.color !== this.getCurrentTeam()
+            square.on!.type === "King" &&
+            square.on!.team !== this.getCurrentTeam()
           );
         }
       });
@@ -317,9 +329,9 @@ class Game {
     const piecesArray = this.current.board.grid.flat().filter((square) => {
       if (square.on !== undefined) {
         if (currentPlayer) {
-          return square.on.color === this.getCurrentTeam();
+          return square.on.team === this.getCurrentTeam();
         } else {
-          return square.on.color !== this.getCurrentTeam();
+          return square.on.team !== this.getCurrentTeam();
         }
       }
     });
@@ -348,7 +360,7 @@ class Game {
   findPieces(name: string, color: string) {
     const foundPieces = this.current.board.grid.flat().filter((square) => {
       if (square.on !== undefined) {
-        return square.on.name === name && square.on.color === color;
+        return square.on.type === name && square.on.team === color;
       }
       return false;
     });
@@ -482,13 +494,12 @@ class Game {
     if (turnHistory !== undefined) {
       const square = turnHistory.targetSquare.square;
       turnHistory.promotedPiece = selection;
-      const { color, point, movement } = turnHistory.originPiece!;
-      turnHistory.targetSquare.on = new GamePiece(
-        selection,
-        color,
+      const { team, point } = turnHistory.originPiece!;
+      turnHistory.targetSquare.on = new GamePiece({
+        type: selection,
+        team,
         point,
-        movement
-      );
+      });
       const symbol = turnHistory.targetSquare.on.getSymbol();
       const annotations = this.current.annotations;
       annotations[annotations.length - 1] = `${square}${symbol}`;
@@ -507,7 +518,7 @@ class Game {
     let annotation;
     const type = result.type;
     const promotion = result.promotion;
-    const pieceName = result.originPiece!.name;
+    const pieceName = result.originPiece!.type;
     const square = result.targetSquare.square;
     const isCapturing = result.targetPiece !== undefined ? true : false;
     const symbol = result.originPiece?.getSymbol();

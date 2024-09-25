@@ -278,12 +278,12 @@ export class Controller {
 
     //For each active piece, creates a mesh clone and places on board
     this.match.getAllGamePieces().forEach((square) => {
-      const { name, color, point } = square.on!;
+      const { type, team, point } = square.on!;
       const foundMesh = gameScene.scene.meshes.find(
-        (mesh) => mesh.name === name && mesh.metadata.color === color
+        (mesh) => mesh.name === type && mesh.metadata.color === team
       );
       if (!foundMesh) return;
-      const clone = foundMesh.clone(name, null);
+      const clone = foundMesh.clone(type, null);
       if (!clone) return;
       [clone.position.z, clone.position.x] = findByPoint({
         get: "position",

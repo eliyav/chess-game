@@ -194,7 +194,7 @@ export default async function calcTurnAnimation({
 
   function pieceBreakAnimation({ target }: { target: GamePiece }) {
     //Look up animation group based on piece breaking,
-    const { name, color: team, point } = target;
+    const { type, team, point } = target;
     const targetMesh = gameScene.data.meshesToRender.find((mesh) => {
       const meshPoint = findByPoint({
         get: "index",
@@ -207,7 +207,7 @@ export default async function calcTurnAnimation({
     if (targetMesh) {
       gameScene.scene.removeMesh(targetMesh);
     }
-    const animationContainer = gameScene.data.animationsContainer[name];
+    const animationContainer = gameScene.data.animationsContainer[type];
     animatePieceBreak({
       container: animationContainer,
       point,

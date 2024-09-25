@@ -1,4 +1,5 @@
 import { Point } from "../../shared/game";
+import { TEAM } from "../../shared/match";
 import { Square } from "./board";
 import GamePiece from "./game-piece";
 
@@ -96,11 +97,11 @@ const isEnPassantAvailable = (turnHistory: TurnHistory): EnPassantResult => {
   turnHistory === undefined
     ? null
     : (() => {
-        if (turnHistory.originPiece!.name === "Pawn") {
+        if (turnHistory.originPiece!.type === "Pawn") {
           const targetY = turnHistory.target[1];
           const originY = turnHistory.origin[1];
           moved = Math.abs(targetY - originY);
-          direction = turnHistory.originPiece!.color === "White" ? 1 : -1;
+          direction = turnHistory.originPiece!.team === TEAM.WHITE ? 1 : -1;
           x = turnHistory.target[0];
           y = turnHistory.origin[1] + direction;
         }
