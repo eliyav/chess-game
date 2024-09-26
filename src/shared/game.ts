@@ -1,3 +1,5 @@
+import GamePiece from "./game-piece";
+
 export type Point = [number, number];
 
 export type MoveType =
@@ -17,3 +19,42 @@ export enum Piece {
   K = "King",
   Q = "Queen",
 }
+
+export type TurnHistory =
+  | {
+      type: "movement";
+      origin: Point;
+      target: Point;
+      originPiece: GamePiece;
+      promote?: boolean;
+    }
+  | {
+      type: "capture";
+      origin: Point;
+      target: Point;
+      originPiece: GamePiece;
+      targetPiece: GamePiece;
+      promote?: boolean;
+    }
+  | {
+      type: "castle";
+      origin: Point;
+      target: Point;
+      originPiece: GamePiece;
+      targetPiece: GamePiece;
+      direction: number;
+      castling: { name: string }[];
+    }
+  | {
+      type: "enPassant";
+      origin: Point;
+      target: Point;
+      originPiece: GamePiece;
+      targetPiece: GamePiece;
+      enPassant: EnPassantResult;
+    };
+
+export type EnPassantResult = {
+  result: boolean;
+  enPassantPoint: Point;
+};

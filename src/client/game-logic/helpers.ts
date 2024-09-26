@@ -1,14 +1,15 @@
-import { Move, Point } from "../../shared/game";
+import {
+  EnPassantResult,
+  Move,
+  Piece,
+  Point,
+  TurnHistory,
+} from "../../shared/game";
+import GamePiece from "../../shared/game-piece";
 import { TEAM } from "../../shared/match";
 import Board, { type Grid } from "./board";
-import {
-  TurnHistory,
-  doMovesMatch,
-  isEnPassantAvailable,
-} from "./game-helpers";
-import GamePiece from "./game-piece";
 
-type MovementsDirection =
+export type Direction =
   | "up"
   | "down"
   | "right"
@@ -19,88 +20,112 @@ type MovementsDirection =
   | "downLeft";
 
 type Movements = {
-  [direction in MovementsDirection]?: Point[];
+  [dir in Direction]?: Point[];
 };
 
-const calcRookMoves = (piece: GamePiece, board: Board) => {
-  const availableMoves: Move[] = [];
-  const verticalMovements = {
-    up: [],
-    down: [],
-    right: [],
-    left: [],
-  };
+type LateralMovements = {
+  up: Point[];
+  down: Point[];
+  right: Point[];
+  left: Point[];
+};
 
-  piece.movement.forEach((move) => {
-    calcVerticalMovements(board.grid, piece.point, move, verticalMovements);
+type DiagonalMovements = {
+  upRight: Point[];
+  upLeft: Point[];
+  downRight: Point[];
+  downLeft: Point[];
+};
+
+export function getPieceMoves({
+  board,
+  piece,
+  lastTurnHistory,
+  calcCastling,
+  flag,
+}: {
+  board: Board;
+  flag: boolean;
+  piece: GamePiece;
+  lastTurnHistory: TurnHistory | undefined;
+  calcCastling: (piece: GamePiece, movesObj: Move[]) => void;
+}) {
+  switch (piece.type) {
+    case Piece.P:
+      return calcPawnMoves(piece, flag, board, lastTurnHistory);
+    case Piece.R:
+      return calcRookMoves(piece, board);
+    case Piece.B:
+      return calcBishopMoves(piece, board);
+    case Piece.N:
+      return calcKnightMoves(piece, board);
+    case Piece.Q:
+      return calcQueenMoves(piece, board);
+    case Piece.K:
+      return calcKingMoves(piece, flag, board, calcCastling);
+  }
+}
+
+function calcRookMoves(piece: GamePiece, board: Board) {
+  const lateralMovements = calcLateralMovements({
+    grid: board.grid,
+    currentPoint: piece.point,
+    movement: piece.movement,
   });
+  const finalMoves: Move[] = [];
+  getMoves(board, piece.team, lateralMovements, finalMoves);
+  return finalMoves;
+}
 
-  filterToFinalMoves(board, piece.team, verticalMovements, availableMoves);
-
-  return availableMoves;
-};
-
-const calcQueenMoves = (piece: GamePiece, board: Board) => {
-  const availableMoves: Move[] = [];
-  const verticalMovements = {
-    up: [],
-    down: [],
-    right: [],
-    left: [],
-  };
-  const horizantalMovements = {
-    upRight: [],
-    upLeft: [],
-    downRight: [],
-    downLeft: [],
-  };
-
-  piece.movement.forEach((move) => {
-    calcVerticalMovements(board.grid, piece.point, move, verticalMovements);
-    calcHorizontalMovements(board.grid, piece.point, move, horizantalMovements);
+function calcQueenMoves(piece: GamePiece, board: Board) {
+  const lateralMovements = calcLateralMovements({
+    grid: board.grid,
+    currentPoint: piece.point,
+    movement: piece.movement,
   });
-
-  filterToFinalMoves(board, piece.team, verticalMovements, availableMoves);
-  filterToFinalMoves(board, piece.team, horizantalMovements, availableMoves);
-
+  const diagonalMovements = calcDiagonalMovements(
+    board.grid,
+    piece.point,
+    piece.movement
+  );
+  const availableMoves: Move[] = [];
+  getMoves(board, piece.team, lateralMovements, availableMoves);
+  getMoves(board, piece.team, diagonalMovements, availableMoves);
   return availableMoves;
-};
+}
 
-const calcPawnMoves = (
+function calcPawnMoves(
   piece: GamePiece,
   boolean: boolean,
   board: Board,
-  turnHistory: TurnHistory
-) => {
+  turnHistory: TurnHistory | undefined
+) {
   const availableMoves: Move[] = [];
-
   calcPawnMovement(board, piece, availableMoves);
-  if (boolean) {
-    let result;
-    if (turnHistory !== undefined) {
-      result = isEnPassantAvailable(turnHistory);
-      if (result.result) {
-        const targetSquare = result.enPassantPoint;
-        const [x, y] = piece.point;
-        const direction = piece.team === "White" ? 1 : -1;
-        const x1 = x - 1;
-        const x2 = x + 1;
-        const newY = y + direction;
-        const potential1: Point = [x1, newY];
-        const potential2: Point = [x2, newY];
-        if (
-          doMovesMatch(potential1, targetSquare) ||
-          doMovesMatch(potential2, targetSquare)
-        ) {
-          availableMoves.push([targetSquare, "enPassant"]);
-        }
+  let result;
+  if (turnHistory) {
+    result = isEnPassantAvailable(turnHistory);
+    if (result.result) {
+      const targetSquare = result.enPassantPoint;
+      const [x, y] = piece.point;
+      const direction = piece.team === "White" ? 1 : -1;
+      const x1 = x - 1;
+      const x2 = x + 1;
+      const newY = y + direction;
+      const potential1: Point = [x1, newY];
+      const potential2: Point = [x2, newY];
+      if (
+        doMovesMatch(potential1, targetSquare) ||
+        doMovesMatch(potential2, targetSquare)
+      ) {
+        availableMoves.push([targetSquare, "enPassant"]);
       }
     }
   }
   return availableMoves;
-};
+}
 
-const calcKnightMoves = (piece: GamePiece, board: Board) => {
+function calcKnightMoves(piece: GamePiece, board: Board) {
   const knightMoves: Point[] = [
     [1, 2],
     [2, 1],
@@ -113,7 +138,6 @@ const calcKnightMoves = (piece: GamePiece, board: Board) => {
   ];
 
   const availableMoves: Move[] = [];
-
   calcKnightMovement(
     board,
     piece.point,
@@ -123,14 +147,14 @@ const calcKnightMoves = (piece: GamePiece, board: Board) => {
   );
 
   return availableMoves;
-};
+}
 
-const calcKingMoves = (
+function calcKingMoves(
   piece: GamePiece,
   castling: boolean,
   board: Board,
   calcCastling: (piece: GamePiece, movesObj: Move[]) => void
-) => {
+) {
   const kingMoves: Point[] = [
     [0, 1],
     [1, 0],
@@ -151,28 +175,21 @@ const calcKingMoves = (
   }
 
   return availableMoves;
-};
+}
 
-const calcBishopMoves = (piece: GamePiece, board: Board) => {
+function calcBishopMoves(piece: GamePiece, board: Board) {
   const availableMoves: Move[] = [];
-  const horizantalMovements = {
-    upRight: [],
-    upLeft: [],
-    downRight: [],
-    downLeft: [],
-  };
-
-  piece.movement.forEach((move) => {
-    calcHorizontalMovements(board.grid, piece.point, move, horizantalMovements);
-  });
-
-  filterToFinalMoves(board, piece.team, horizantalMovements, availableMoves);
-
+  const diagonalMovements = calcDiagonalMovements(
+    board.grid,
+    piece.point,
+    piece.movement
+  );
+  getMoves(board, piece.team, diagonalMovements, availableMoves);
   return availableMoves;
-};
+}
 
 //Filters the moves from the final movements object and enters them in the available moves array
-const filterToFinalMoves = (
+const getMoves = (
   board: Board,
   team: TEAM,
   movesObj: Movements,
@@ -198,12 +215,17 @@ const filterToFinalMoves = (
 };
 
 //Calculates Horizontal Movements by calculating each direction from the current point and adds them to the final movements object
-const calcHorizontalMovements = (
+const calcDiagonalMovements = (
   grid: Grid,
   currentPoint: Point,
-  movement: number,
-  finalObj: Movements
+  movement: number[]
 ) => {
+  const finalObj: DiagonalMovements = {
+    upRight: [],
+    upLeft: [],
+    downRight: [],
+    downLeft: [],
+  };
   for (const [key, value] of Object.entries(finalObj)) {
     const moves: Point[] = value;
     switch (key) {
@@ -225,29 +247,38 @@ const calcHorizontalMovements = (
         );
     }
   }
+  return finalObj;
 };
 
 //Calculates Vertical Movements by calculating each direction from the current point and adds them to the final movements object
-const calcVerticalMovements = (
-  grid: Grid,
-  currentPoint: Point,
-  movement: number,
-  finalObj: Movements
-) => {
-  for (const [key, value] of Object.entries(finalObj)) {
-    const moves: Point[] = value;
+const calcLateralMovements = ({
+  grid,
+  currentPoint,
+  movement,
+}: {
+  grid: Grid;
+  currentPoint: Point;
+  movement: number[];
+}) => {
+  const finalObj: LateralMovements = {
+    up: [],
+    down: [],
+    right: [],
+    left: [],
+  };
+  for (const key of Object.keys(finalObj)) {
     switch (key) {
       case "up":
-        calcUp(grid, currentPoint, movement, moves);
+        calcUp(grid, currentPoint, movement, finalObj[key]);
         break;
       case "down":
-        calcDown(grid, currentPoint, movement, moves);
+        calcDown(grid, currentPoint, movement, finalObj[key]);
         break;
       case "right":
-        calcRight(grid, currentPoint, movement, moves);
+        calcRight(grid, currentPoint, movement, finalObj[key]);
         break;
       case "left":
-        calcLeft(grid, currentPoint, movement, moves);
+        calcLeft(grid, currentPoint, movement, finalObj[key]);
         break;
       default:
         throw new Error(
@@ -255,6 +286,7 @@ const calcVerticalMovements = (
         );
     }
   }
+  return finalObj;
 };
 
 const calcPawnMovement = (board: Board, piece: GamePiece, finalObj: Move[]) => {
@@ -358,108 +390,140 @@ const bounds = (num: number, grid: Grid) => num >= 0 && num <= grid.length - 1;
 const calcUpRight = (
   grid: Grid,
   currentPoint: Point,
-  movement: number,
+  movement: number[],
   finalObj: Point[]
 ) => {
   let [x, y] = currentPoint;
-  let upRightX = x + movement;
-  let upRightY = y + movement;
-  bounds(upRightX, grid) && bounds(upRightY, grid)
-    ? finalObj.push([upRightX, upRightY])
-    : null;
+  movement.forEach((move) => {
+    let upRightX = x + move;
+    let upRightY = y + move;
+    bounds(upRightX, grid) && bounds(upRightY, grid)
+      ? finalObj.push([upRightX, upRightY])
+      : null;
+  });
 };
 
 const calcUpLeft = (
   grid: Grid,
   currentPoint: Point,
-  movement: number,
+  movement: number[],
   finalObj: Point[]
 ) => {
   let [x, y] = currentPoint;
-  let upLeftX = x - movement;
-  let upLeftY = y + movement;
-  bounds(upLeftX, grid) && bounds(upLeftY, grid)
-    ? finalObj.push([upLeftX, upLeftY])
-    : null;
+  movement.forEach((move) => {
+    let upLeftX = x - move;
+    let upLeftY = y + move;
+    bounds(upLeftX, grid) && bounds(upLeftY, grid)
+      ? finalObj.push([upLeftX, upLeftY])
+      : null;
+  });
 };
 
 const calcDownRight = (
   grid: Grid,
   currentPoint: Point,
-  movement: number,
+  movement: number[],
   finalObj: Point[]
 ) => {
   let [x, y] = currentPoint;
-  let downRightX = x + movement;
-  let downRightY = y - movement;
-  bounds(downRightX, grid) && bounds(downRightY, grid)
-    ? finalObj.push([downRightX, downRightY])
-    : null;
+  movement.forEach((move) => {
+    let downRightX = x + move;
+    let downRightY = y - move;
+    bounds(downRightX, grid) && bounds(downRightY, grid)
+      ? finalObj.push([downRightX, downRightY])
+      : null;
+  });
 };
 
 const calcDownLeft = (
   grid: Grid,
   currentPoint: Point,
-  movement: number,
+  movement: number[],
   finalObj: Point[]
 ) => {
   let [x, y] = currentPoint;
-  let downLeftX = x - movement;
-  let downLeftY = y - movement;
-  bounds(downLeftX, grid) && bounds(downLeftY, grid)
-    ? finalObj.push([downLeftX, downLeftY])
-    : null;
+  movement.forEach((move) => {
+    let downLeftX = x - move;
+    let downLeftY = y - move;
+    bounds(downLeftX, grid) && bounds(downLeftY, grid)
+      ? finalObj.push([downLeftX, downLeftY])
+      : null;
+  });
 };
 
 const calcUp = (
   grid: Grid,
   currentPoint: Point,
-  movement: number,
+  movement: number[],
   finalObj: Point[]
 ) => {
   let [x, y] = currentPoint;
-  let upY = y + movement;
-  bounds(upY, grid) ? finalObj.push([x, upY]) : null;
+  movement.forEach((move) => {
+    let upY = y + move;
+    bounds(upY, grid) ? finalObj.push([x, upY]) : null;
+  });
 };
 
 const calcDown = (
   grid: Grid,
   currentPoint: Point,
-  movement: number,
+  movement: number[],
   finalObj: Point[]
 ) => {
   let [x, y] = currentPoint;
-  let downY = y - movement;
-  bounds(downY, grid) ? finalObj.push([x, downY]) : null;
+  movement.forEach((move) => {
+    let downY = y - move;
+    bounds(downY, grid) ? finalObj.push([x, downY]) : null;
+  });
 };
 
 const calcRight = (
   grid: Grid,
   currentPoint: Point,
-  movement: number,
+  movement: number[],
   finalObj: Point[]
 ) => {
   let [x, y] = currentPoint;
-  let rightX = x + movement;
-  bounds(rightX, grid) ? finalObj.push([rightX, y]) : null;
+  movement.forEach((move) => {
+    let rightX = x + move;
+    bounds(rightX, grid) ? finalObj.push([rightX, y]) : null;
+  });
 };
 
 const calcLeft = (
   grid: Grid,
   currentPoint: Point,
-  movement: number,
+  movement: number[],
   finalObj: Point[]
 ) => {
   let [x, y] = currentPoint;
-  let leftX = x - movement;
-  bounds(leftX, grid) ? finalObj.push([leftX, y]) : null;
+  movement.forEach((move) => {
+    let leftX = x - move;
+    bounds(leftX, grid) ? finalObj.push([leftX, y]) : null;
+  });
 };
 
-export {
-  calcBishopMoves,
-  calcKingMoves,
-  calcKnightMoves,
-  calcPawnMoves,
-  calcQueenMoves,
-  calcRookMoves,
+export const isEnPassantAvailable = (
+  turnHistory: TurnHistory
+): EnPassantResult => {
+  let moved;
+  let direction;
+  let noMove = -1;
+  let x = noMove;
+  let y = noMove;
+  if (turnHistory.originPiece.type === "Pawn") {
+    const targetY = turnHistory.target[1];
+    const originY = turnHistory.origin[1];
+    moved = Math.abs(targetY - originY);
+    direction = turnHistory.originPiece.team === TEAM.WHITE ? 1 : -1;
+    x = turnHistory.target[0];
+    y = turnHistory.origin[1] + direction;
+  }
+  return {
+    result: moved === 2 ? true : false,
+    enPassantPoint: [x, y],
+  };
 };
+
+export const doMovesMatch = (move: Point, move2: Point) =>
+  move[0] == move2[0] && move[1] == move2[1];

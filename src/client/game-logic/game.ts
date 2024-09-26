@@ -1,14 +1,8 @@
-import { Move, Piece, Point } from "../../shared/game";
+import { Move, Piece, Point, TurnHistory } from "../../shared/game";
+import GamePiece from "../../shared/game-piece";
 import { TEAM } from "../../shared/match";
 import Board from "./board";
-import {
-  doMovesMatch,
-  getX,
-  isEnPassantAvailable,
-  TurnHistory,
-} from "./game-helpers";
-import GamePiece from "./game-piece";
-import * as movementHelpers from "./movement-helpers";
+import { doMovesMatch, getPieceMoves, isEnPassantAvailable } from "./helpers";
 
 class Game {
   teams: TEAM[];
@@ -81,15 +75,12 @@ class Game {
     const originPiece = this.lookupPiece(origin);
     if (!originPiece) return;
     const availableMoves = this.calculateAvailableMoves(originPiece, true);
-    console.log(availableMoves);
     const move = availableMoves.find((move) => doMovesMatch(move[0], target));
     return move?.[1];
   }
 
   resolveMove(origin: Point, target: Point): TurnHistory | undefined {
-    //Get move type from origin and target points
     const moveType = this.getMoveType(origin, target);
-    console.log(moveType);
     let result: TurnHistory | undefined;
     switch (moveType) {
       case "movement":
@@ -217,9 +208,9 @@ class Game {
       castling2 =
         targetPiece.type === Piece.R && targetPiece.team === this.getTeam();
       if (castling && castling2) {
-        const a = getX(origin);
-        const b = getX(target);
-        let c = a - b;
+        const [originX] = origin;
+        const [targetX] = target;
+        let c = originX - targetX;
         c < 0 ? (c = 1) : (c = -1);
         const castlingResult = castlingMove(
           c,
@@ -262,51 +253,14 @@ class Game {
   }
 
   calculateAvailableMoves(piece: GamePiece, flag = false): Move[] {
-    let availableMoves: Move[] = [];
-    let lastTurnHistory =
-      this.current.turnHistory[this.current.turnHistory.length - 1];
-    switch (piece.type) {
-      case "Pawn":
-        availableMoves = movementHelpers.calcPawnMoves(
-          piece,
-          flag,
-          this.current.board,
-          lastTurnHistory
-        );
-        break;
-      case "Rook":
-        availableMoves = movementHelpers.calcRookMoves(
-          piece,
-          this.current.board
-        );
-        break;
-      case "Bishop":
-        availableMoves = movementHelpers.calcBishopMoves(
-          piece,
-          this.current.board
-        );
-        break;
-      case "Knight":
-        availableMoves = movementHelpers.calcKnightMoves(
-          piece,
-          this.current.board
-        );
-        break;
-      case "Queen":
-        availableMoves = movementHelpers.calcQueenMoves(
-          piece,
-          this.current.board
-        );
-        break;
-      case "King":
-        availableMoves = movementHelpers.calcKingMoves(
-          piece,
-          flag,
-          this.current.board,
-          this.calcCastling.bind(this)
-        );
-        break;
-    }
+    const lastTurnHistory = this.current.turnHistory.at(-1);
+    const availableMoves = getPieceMoves({
+      piece,
+      board: this.current.board,
+      lastTurnHistory,
+      calcCastling: this.calcCastling.bind(this),
+      flag,
+    });
     return availableMoves;
   }
 
@@ -461,7 +415,7 @@ class Game {
     const isKingChecked = this.isChecked(true);
     if (!isKingChecked) {
       const [kingX, kingY] = originPoint;
-      const rookX = getX(targetPoint);
+      const [rookX] = targetPoint;
       const spaceBetween = kingX - rookX;
       let distance;
       spaceBetween < 0
