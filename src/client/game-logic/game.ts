@@ -1,23 +1,8 @@
-import {
-  EnPassantResult,
-  Move,
-  Piece,
-  Point,
-  TurnHistory,
-} from "../../shared/game";
+import { Move, Piece, Point, TurnHistory } from "../../shared/game";
+import GamePiece from "../../shared/game-piece";
 import { TEAM } from "../../shared/match";
 import Board from "./board";
-import GamePiece from "../../shared/game-piece";
-import {
-  calcBishopMoves,
-  calcKingMoves,
-  calcKnightMoves,
-  calcPawnMoves,
-  calcQueenMoves,
-  calcRookMoves,
-  doMovesMatch,
-  isEnPassantAvailable,
-} from "./helpers";
+import { doMovesMatch, getPieceMoves, isEnPassantAvailable } from "./helpers";
 
 class Game {
   teams: TEAM[];
@@ -271,39 +256,14 @@ class Game {
   }
 
   calculateAvailableMoves(piece: GamePiece, flag = false): Move[] {
-    let availableMoves: Move[] = [];
-    let lastTurnHistory =
-      this.current.turnHistory[this.current.turnHistory.length - 1];
-    switch (piece.type) {
-      case "Pawn":
-        availableMoves = calcPawnMoves(
-          piece,
-          flag,
-          this.current.board,
-          lastTurnHistory
-        );
-        break;
-      case "Rook":
-        availableMoves = calcRookMoves(piece, this.current.board);
-        break;
-      case "Bishop":
-        availableMoves = calcBishopMoves(piece, this.current.board);
-        break;
-      case "Knight":
-        availableMoves = calcKnightMoves(piece, this.current.board);
-        break;
-      case "Queen":
-        availableMoves = calcQueenMoves(piece, this.current.board);
-        break;
-      case "King":
-        availableMoves = calcKingMoves(
-          piece,
-          flag,
-          this.current.board,
-          this.calcCastling.bind(this)
-        );
-        break;
-    }
+    const lastTurnHistory = this.current.turnHistory.at(-1);
+    const availableMoves = getPieceMoves({
+      piece,
+      board: this.current.board,
+      lastTurnHistory,
+      calcCastling: this.calcCastling.bind(this),
+      flag,
+    });
     return availableMoves;
   }
 
@@ -343,8 +303,8 @@ class Game {
     return isKingChecked;
   }
 
-  isValidMove(movingPiece: GamePiece, point: Point, flag: boolean) {
-    return this.calculateAvailableMoves(movingPiece, flag).find((move) =>
+  isValidMove(movingPiece: GamePiece, point: Point) {
+    return this.calculateAvailableMoves(movingPiece).find((move) =>
       doMovesMatch(move[0], point)
     );
   }

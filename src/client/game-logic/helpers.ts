@@ -1,4 +1,10 @@
-import { EnPassantResult, Move, Point, TurnHistory } from "../../shared/game";
+import {
+  EnPassantResult,
+  Move,
+  Piece,
+  Point,
+  TurnHistory,
+} from "../../shared/game";
 import GamePiece from "../../shared/game-piece";
 import { TEAM } from "../../shared/match";
 import Board, { type Grid } from "./board";
@@ -31,7 +37,36 @@ type DiagonalMovements = {
   downLeft: Point[];
 };
 
-export const calcRookMoves = (piece: GamePiece, board: Board) => {
+export function getPieceMoves({
+  board,
+  piece,
+  lastTurnHistory,
+  calcCastling,
+  flag,
+}: {
+  board: Board;
+  flag: boolean;
+  piece: GamePiece;
+  lastTurnHistory: TurnHistory | undefined;
+  calcCastling: (piece: GamePiece, movesObj: Move[]) => void;
+}) {
+  switch (piece.type) {
+    case Piece.P:
+      return calcPawnMoves(piece, flag, board, lastTurnHistory);
+    case Piece.R:
+      return calcRookMoves(piece, board);
+    case Piece.B:
+      return calcBishopMoves(piece, board);
+    case Piece.N:
+      return calcKnightMoves(piece, board);
+    case Piece.Q:
+      return calcQueenMoves(piece, board);
+    case Piece.K:
+      return calcKingMoves(piece, flag, board, calcCastling);
+  }
+}
+
+function calcRookMoves(piece: GamePiece, board: Board) {
   const lateralMovements = calcLateralMovements({
     grid: board.grid,
     currentPoint: piece.point,
@@ -40,9 +75,9 @@ export const calcRookMoves = (piece: GamePiece, board: Board) => {
   const finalMoves: Move[] = [];
   getMoves(board, piece.team, lateralMovements, finalMoves);
   return finalMoves;
-};
+}
 
-export const calcQueenMoves = (piece: GamePiece, board: Board) => {
+function calcQueenMoves(piece: GamePiece, board: Board) {
   const lateralMovements = calcLateralMovements({
     grid: board.grid,
     currentPoint: piece.point,
@@ -57,42 +92,40 @@ export const calcQueenMoves = (piece: GamePiece, board: Board) => {
   getMoves(board, piece.team, lateralMovements, availableMoves);
   getMoves(board, piece.team, diagonalMovements, availableMoves);
   return availableMoves;
-};
+}
 
-export const calcPawnMoves = (
+function calcPawnMoves(
   piece: GamePiece,
   boolean: boolean,
   board: Board,
-  turnHistory: TurnHistory
-) => {
+  turnHistory: TurnHistory | undefined
+) {
   const availableMoves: Move[] = [];
   calcPawnMovement(board, piece, availableMoves);
-  if (boolean) {
-    let result;
-    if (turnHistory !== undefined) {
-      result = isEnPassantAvailable(turnHistory);
-      if (result.result) {
-        const targetSquare = result.enPassantPoint;
-        const [x, y] = piece.point;
-        const direction = piece.team === "White" ? 1 : -1;
-        const x1 = x - 1;
-        const x2 = x + 1;
-        const newY = y + direction;
-        const potential1: Point = [x1, newY];
-        const potential2: Point = [x2, newY];
-        if (
-          doMovesMatch(potential1, targetSquare) ||
-          doMovesMatch(potential2, targetSquare)
-        ) {
-          availableMoves.push([targetSquare, "enPassant"]);
-        }
+  let result;
+  if (turnHistory) {
+    result = isEnPassantAvailable(turnHistory);
+    if (result.result) {
+      const targetSquare = result.enPassantPoint;
+      const [x, y] = piece.point;
+      const direction = piece.team === "White" ? 1 : -1;
+      const x1 = x - 1;
+      const x2 = x + 1;
+      const newY = y + direction;
+      const potential1: Point = [x1, newY];
+      const potential2: Point = [x2, newY];
+      if (
+        doMovesMatch(potential1, targetSquare) ||
+        doMovesMatch(potential2, targetSquare)
+      ) {
+        availableMoves.push([targetSquare, "enPassant"]);
       }
     }
   }
   return availableMoves;
-};
+}
 
-export const calcKnightMoves = (piece: GamePiece, board: Board) => {
+function calcKnightMoves(piece: GamePiece, board: Board) {
   const knightMoves: Point[] = [
     [1, 2],
     [2, 1],
@@ -114,14 +147,14 @@ export const calcKnightMoves = (piece: GamePiece, board: Board) => {
   );
 
   return availableMoves;
-};
+}
 
-export const calcKingMoves = (
+function calcKingMoves(
   piece: GamePiece,
   castling: boolean,
   board: Board,
   calcCastling: (piece: GamePiece, movesObj: Move[]) => void
-) => {
+) {
   const kingMoves: Point[] = [
     [0, 1],
     [1, 0],
@@ -142,9 +175,9 @@ export const calcKingMoves = (
   }
 
   return availableMoves;
-};
+}
 
-export const calcBishopMoves = (piece: GamePiece, board: Board) => {
+function calcBishopMoves(piece: GamePiece, board: Board) {
   const availableMoves: Move[] = [];
   const diagonalMovements = calcDiagonalMovements(
     board.grid,
@@ -153,7 +186,7 @@ export const calcBishopMoves = (piece: GamePiece, board: Board) => {
   );
   getMoves(board, piece.team, diagonalMovements, availableMoves);
   return availableMoves;
-};
+}
 
 //Filters the moves from the final movements object and enters them in the available moves array
 const getMoves = (
