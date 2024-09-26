@@ -115,8 +115,7 @@ class Game {
           this.setPromotionPiece(result, Piece.Q);
         }
       }
-      // const annotation = this.annotate(result);
-      // this.current.annotations.push(result);
+      this.annotate(result);
       this.current.turnHistory.push(result);
       return result;
     }
@@ -524,40 +523,38 @@ class Game {
   getHistory() {
     return this.current.turnHistory;
   }
+
+  annotate(result: TurnHistory) {
+    let annotation;
+    const type = result.type;
+    const promotion =
+      (result.type === "movement" || result.type === "capture") &&
+      result.promote;
+    const pieceName = result.originPiece.type;
+    const originSquare = this.current.board.getSquare(result.origin);
+    const targetSquare = this.current.board.getSquare(result.target);
+    const isCapturing = result.type === "capture";
+    const symbol = result.originPiece?.getSymbol();
+    if (type === "castle") {
+      annotation = result.direction === 1 ? "O-O" : "O-O-O";
+    } else if (promotion) {
+      //Add promoted piece so can get symbol
+      // const symbol = promotedPiece.getSymbol();
+      annotation = `${targetSquare}${symbol}`;
+    } else if (isCapturing) {
+      if (pieceName === "Pawn") {
+        annotation = `${originSquare.name.charAt(0)}x${targetSquare}`;
+      } else {
+        annotation = `${symbol}x${targetSquare}`;
+      }
+    } else {
+      annotation = `${symbol}${targetSquare}`;
+    }
+    const isCheck = this.isChecked(false);
+    if (isCheck) annotation = `${annotation}+`;
+
+    this.current.annotations.push(annotation);
+  }
 }
-//   annotate(result: TurnHistory) {
-//     let annotation;
-//     const type = result.type;
-//     const promotion = result.promotion;
-//     const pieceName = result.originPiece!.type;
-//     const square = result.targetSquare.square;
-//     const isCapturing = result.targetPiece !== undefined ? true : false;
-//     const symbol = result.originPiece?.getSymbol();
-//     if (type === "castling") {
-//       annotation = result.direction === 1 ? "O-O" : "O-O-O";
-//     } else if (promotion) {
-//       annotation = `${square}=${symbol}`;
-//     } else if (isCapturing) {
-//       if (pieceName === "Pawn") {
-//         annotation = `${result.originSquare.square.charAt(0)}x${square}`;
-//       } else {
-//         annotation = `${symbol}x${square}`;
-//       }
-//     } else {
-//       annotation = `${symbol}${square}`;
-//     }
-//     const isCheck = this.isChecked(false);
-//     if (isCheck) annotation = `${annotation}+`;
-
-//     return annotation;
-//   }
-
-//Additional promotion possible annotations
-// const square = this.current.board.getSquare(history.target);
-
-// const symbol = promotedPiece.getSymbol();
-// const annotations = this.current.annotations;
-// annotations[annotations.length - 1] = `${square.name}${symbol}`;
-// }
 
 export default Game;
