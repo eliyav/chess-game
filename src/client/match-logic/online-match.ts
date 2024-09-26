@@ -1,8 +1,8 @@
-import { Piece, Point } from "../../shared/game";
+import { Point } from "../../shared/game";
 import { Lobby, LOBBY_TYPE, Player, TEAM } from "../../shared/match";
-import { websocket } from "../websocket-client";
-import GamePiece from "../game-logic/game-piece";
 import { Message } from "../components/modals/message-modal";
+import GamePiece from "../game-logic/game-piece";
+import { websocket } from "../websocket-client";
 import { BaseMatch, MatchLogic } from "./base-match";
 import { Controller } from "./controller";
 import { requestMatchReset } from "./online-events/request-match-reset";

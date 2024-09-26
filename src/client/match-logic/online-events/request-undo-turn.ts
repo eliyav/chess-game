@@ -1,6 +1,6 @@
 import { Message } from "../../components/modals/message-modal";
-import { Controller } from "../controller";
 import { websocket } from "../../websocket-client";
+import { Controller } from "../controller";
 
 export function requestUndoTurn({
   setMessage,
