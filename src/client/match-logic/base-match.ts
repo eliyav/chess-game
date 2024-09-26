@@ -13,7 +13,7 @@ export interface MatchLogic {
   }: {
     originPoint: Point;
     targetPoint: Point;
-  }): false | TurnHistory;
+  }): TurnHistory | undefined;
   isPlayersTurn(): boolean;
   getPlayerTeam(): TEAM | undefined;
   nextTurn(): void;

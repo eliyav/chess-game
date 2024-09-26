@@ -32,9 +32,8 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
         targetPoint,
         key: this.lobby.key,
       });
-      return isValidMove;
     } else {
-      return false;
+      return isValidMove;
     }
   }
 
