@@ -20,7 +20,6 @@ export class Controller {
   match: LocalMatch | OnlineMatch;
   events: {
     setMessage: (message: Message | null) => void;
-    promote: () => void;
   };
   selectedPiece?: GamePiece;
   options: ControllerOptions;
@@ -35,7 +34,6 @@ export class Controller {
     match: LocalMatch | OnlineMatch;
     events: {
       setMessage: (message: Message | null) => void;
-      promote: () => void;
     };
     options: ControllerOptions;
   }) {
@@ -115,11 +113,7 @@ export class Controller {
       turnHistory: history,
       gameScene,
     });
-    if (history.type === "promotion") {
-      this.events.promote();
-    } else {
-      this.onMoveSuccess();
-    }
+    this.onMoveSuccess();
   }
 
   displayMoves(piece: GamePiece | undefined) {
@@ -250,11 +244,6 @@ export class Controller {
       });
       return doMovesMatch(meshPoint, point);
     });
-  }
-
-  handlePromotionEvent(selection: Piece) {
-    this.match.setPromotion(selection);
-    this.handleNextTurn();
   }
 
   updateMeshesRender() {

@@ -99,8 +99,4 @@ export class BaseMatch {
       })
     );
   }
-
-  setPromotion(selection: Piece) {
-    this.game.setPromotionPiece(selection);
-  }
 }

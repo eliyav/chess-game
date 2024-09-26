@@ -84,10 +84,6 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
     return this.getGame().nextTurn();
   }
 
-  setPromotion(selection: Piece) {
-    this.getGame().setPromotionPiece(selection);
-  }
-
   subscribeMatchEvents({
     controller,
     setMessage,

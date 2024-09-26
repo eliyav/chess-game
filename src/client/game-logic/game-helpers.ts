@@ -1,4 +1,4 @@
-import { Piece, Point } from "../../shared/game";
+import { Point } from "../../shared/game";
 import { TEAM } from "../../shared/match";
 import GamePiece from "./game-piece";
 
@@ -8,6 +8,7 @@ export type TurnHistory =
       origin: Point;
       target: Point;
       originPiece: GamePiece;
+      promote?: boolean;
     }
   | {
       type: "capture";
@@ -15,6 +16,7 @@ export type TurnHistory =
       target: Point;
       originPiece: GamePiece;
       targetPiece: GamePiece;
+      promote?: boolean;
     }
   | {
       type: "castle";
@@ -32,14 +34,6 @@ export type TurnHistory =
       originPiece: GamePiece;
       targetPiece: GamePiece;
       enPassant: EnPassantResult;
-    }
-  | {
-      type: "promotion";
-      origin: Point;
-      target: Point;
-      originPiece: GamePiece;
-      targetPiece: GamePiece;
-      promotionPiece: Piece;
     };
 
 type EnPassantResult = {

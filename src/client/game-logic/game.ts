@@ -56,6 +56,13 @@ class Game {
     if (lastTurn) {
       lastTurn.originPiece.resetPieceMovement();
       lastTurn.originPiece.point = lastTurn.origin;
+      //Undo Promotion
+      if (lastTurn.type === "movement" || lastTurn.type === "capture") {
+        if (lastTurn.promote) {
+          this.current.board.removePieceByPoint(lastTurn.target);
+          this.current.board.addPiece(lastTurn.originPiece);
+        }
+      }
       if (lastTurn.type === "castle") {
         lastTurn.targetPiece.point = lastTurn.target;
         lastTurn.targetPiece.resetPieceMovement();
@@ -101,15 +108,18 @@ class Game {
         const castlingResult = this.resolveCastling({ origin, target });
         result = castlingResult;
         break;
-      // case "promotion":
-      //   return;
     }
     if (result) {
+      if (result.type === "movement" || result.type === "capture") {
+        if (result.promote) {
+          this.setPromotionPiece(result, Piece.Q);
+        }
+      }
       // const annotation = this.annotate(result);
       // this.current.annotations.push(result);
       this.current.turnHistory.push(result);
+      return result;
     }
-    return result;
   }
 
   resolveMovement({
@@ -124,12 +134,12 @@ class Game {
     //Check if valid move can be resolved
     if (this.canValidMoveResolve({ origin, target })) {
       originPiece.update();
-      //Once move resolved check if pawn promotion is relevant
       return {
         type: "movement",
         origin,
         target,
         originPiece,
+        promote: originPiece.checkPromotion(),
       };
     } else {
       return;
@@ -149,13 +159,13 @@ class Game {
     //Check if valid move can be resolved
     if (this.canValidMoveResolve({ origin, target })) {
       originPiece.update();
-      //Once move resolved check if pawn promotion is relevant
       return {
         type: "capture",
         origin,
         target,
         originPiece,
         targetPiece,
+        promote: originPiece.checkPromotion(),
       };
     }
   }
@@ -175,6 +185,7 @@ class Game {
     if (enPassant.result) {
       if (doMovesMatch(enPassant.enPassantPoint, target)) {
         if (this.canValidMoveResolve({ origin, target })) {
+          originPiece.update();
           const enPassantPiece = lastTurnHistory.originPiece;
           this.current.board.removePieceByPoint(enPassantPiece.point);
           return {
@@ -499,19 +510,11 @@ class Game {
     return returnResult;
   }
 
-  setPromotionPiece(selection: Piece) {
-    const turnHistory = this.current.turnHistory.at(-1);
-    if (turnHistory && turnHistory.type === "promotion") {
-      const square = this.current.board.getSquare(turnHistory.target);
-      turnHistory.promotionPiece = selection;
-      const { team, point } = turnHistory.originPiece!;
-      this.current.board.removePieceByPoint(point);
-      const promotedPiece = new GamePiece({ type: selection, team, point });
-      this.current.board.addPiece(promotedPiece);
-      const symbol = promotedPiece.getSymbol();
-      const annotations = this.current.annotations;
-      annotations[annotations.length - 1] = `${square.name}${symbol}`;
-    }
+  setPromotionPiece(history: TurnHistory, selection: Piece) {
+    const { team, point } = history.originPiece;
+    this.current.board.removePieceByPoint(point);
+    const promotedPiece = new GamePiece({ type: selection, team, point });
+    this.current.board.addPiece(promotedPiece);
   }
 
   resetGame() {
@@ -548,6 +551,13 @@ class Game {
 
 //     return annotation;
 //   }
+
+//Additional promotion possible annotations
+// const square = this.current.board.getSquare(history.target);
+
+// const symbol = promotedPiece.getSymbol();
+// const annotations = this.current.annotations;
+// annotations[annotations.length - 1] = `${square.name}${symbol}`;
 // }
 
 export default Game;
