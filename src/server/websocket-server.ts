@@ -126,13 +126,13 @@ export function createWebsocketServer({
     });
 
     //Undo Move
-    socket.on("undoMoveRequest", ({ lobbyKey }) => {
-      socket.to(lobbyKey).emit("undoMoveRequested");
+    socket.on("undoTurnRequest", ({ lobbyKey }) => {
+      socket.to(lobbyKey).emit("undoTurnRequested");
     });
 
-    socket.on("undoMoveResponse", ({ answer, lobbyKey }) => {
-      socket.to(lobbyKey).emit("undoMoveResolve", { answer });
-      socket.emit("undoMoveResolve", { answer });
+    socket.on("undoTurnResponse", ({ answer, lobbyKey }) => {
+      socket.to(lobbyKey).emit("undoTurnResolve", { answer });
+      socket.emit("undoTurnResolve", { answer });
     });
   });
 

@@ -32,9 +32,8 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
         targetPoint,
         key: this.lobby.key,
       });
-    } else {
-      return isValidMove;
     }
+    return isValidMove;
   }
 
   resetRequest() {
@@ -43,7 +42,7 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
   }
 
   undoTurnRequest() {
-    websocket.emit("resetMatchRequest", { lobbyKey: this.lobby.key });
+    websocket.emit("undoTurnRequest", { lobbyKey: this.lobby.key });
     return false;
   }
 

@@ -3,7 +3,8 @@ import { PickingInfo } from "@babylonjs/core/Collisions/pickingInfo";
 import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { Nullable } from "@babylonjs/core/types";
-import { Piece, Point } from "../../shared/game";
+import { Point } from "../../shared/game";
+import { ControllerOptions, LOBBY_TYPE } from "../../shared/match";
 import { Message } from "../components/modals/message-modal";
 import { doMovesMatch, TurnHistory } from "../game-logic/game-helpers";
 import GamePiece from "../game-logic/game-piece";
@@ -13,7 +14,6 @@ import { displayPieceMoves, findByPoint } from "../scenes/scene-helpers";
 import { GameScene, SceneManager, Scenes } from "../scenes/scene-manager";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
-import { ControllerOptions, LOBBY_TYPE } from "../../shared/match";
 
 export class Controller {
   sceneManager: SceneManager;
@@ -75,28 +75,24 @@ export class Controller {
   }
 
   async resolveMove(move: Point[]) {
-    if (move) {
-      const [originPoint, targetPoint] = move;
-      const validTurn = this.match.requestResolveMove({
-        originPoint,
-        targetPoint,
-      });
-      if (validTurn) {
-        this.handleValidMove({ history: validTurn });
-      }
+    const [originPoint, targetPoint] = move;
+    const validTurn = this.match.requestResolveMove({
+      originPoint,
+      targetPoint,
+    });
+    if (validTurn) {
+      this.handleValidMove({ history: validTurn });
     }
   }
 
   async handleResolvedMove(move: Point[]) {
-    if (move) {
-      const [originPoint, targetPoint] = move;
-      const validTurn = this.match.resolveMove({
-        originPoint,
-        targetPoint,
-      });
-      if (validTurn) {
-        this.handleValidMove({ history: validTurn });
-      }
+    const [originPoint, targetPoint] = move;
+    const validTurn = this.match.resolveMove({
+      originPoint,
+      targetPoint,
+    });
+    if (validTurn) {
+      this.handleValidMove({ history: validTurn });
     }
   }
 

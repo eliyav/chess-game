@@ -31,8 +31,7 @@ export function requestMatchReset({
 
   websocket.on("resetMatchResolve", ({ answer }) => {
     if (answer) {
-      controller.match.reset();
-      controller.resetView();
+      controller.resetMatchAndView();
 
       setMessage({
         text: "Match reset successfully!",
