@@ -3,7 +3,7 @@ import chessData from "./chess-data-import";
 import GamePiece from "./game-piece";
 
 export type Grid = {
-  square: string;
+  name: string;
 }[][];
 
 class Board {
@@ -36,7 +36,7 @@ class Board {
   createGrid() {
     return Array.from({ length: this.boardSize }, (_, idx) =>
       Array.from({ length: this.boardSize }, (_, idx2) => ({
-        square: this.columnNames[idx] + (idx2 + 1),
+        name: this.columnNames[idx] + (idx2 + 1),
       }))
     );
   }

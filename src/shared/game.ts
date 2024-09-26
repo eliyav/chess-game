@@ -1,6 +1,13 @@
 export type Point = [number, number];
 
-export type Move = [Point, string];
+export type MoveType =
+  | "movement"
+  | "capture"
+  | "castle"
+  | "enPassant"
+  | "promotion";
+
+export type Move = [Point, MoveType];
 
 export enum Piece {
   P = "Pawn",

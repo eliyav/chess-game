@@ -107,8 +107,7 @@ export class Controller {
     if (!gameScene) return;
     if (this.options.playGameSounds) {
       const moveType = history.type;
-      const captured = moveType === "standard" && history.targetPiece;
-      if (captured || moveType === "enPassant") {
+      if (moveType === "capture" || moveType === "enPassant") {
         gameScene.data.audio.crumble?.play();
       }
     }
@@ -116,7 +115,7 @@ export class Controller {
       turnHistory: history,
       gameScene,
     });
-    if (history.promotion) {
+    if (history.type === "promotion") {
       this.events.promote();
     } else {
       this.onMoveSuccess();

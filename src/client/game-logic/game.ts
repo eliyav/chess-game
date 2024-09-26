@@ -1,12 +1,11 @@
 import { Move, Piece, Point } from "../../shared/game";
 import { TEAM } from "../../shared/match";
 import Board from "./board";
-import * as gameHelpers from "./game-helpers";
 import {
   doMovesMatch,
-  LocationsInfo,
+  getX,
+  isEnPassantAvailable,
   TurnHistory,
-  undoUpdateLocation,
 } from "./game-helpers";
 import GamePiece from "./game-piece";
 import * as movementHelpers from "./movement-helpers";
@@ -52,155 +51,205 @@ class Game {
     return true;
   }
 
-  undoTurn() {
-    const lastTurn = this.current.turnHistory.at(-1);
-    if (lastTurn !== undefined) {
-      if (lastTurn.originPiece) {
-        lastTurn.originPiece.resetPieceMovement();
-        this.current.board.addPiece(lastTurn.originPiece);
-        if (lastTurn.targetPiece)
-          this.current.board.addPiece(lastTurn.targetPiece);
-        lastTurn.originPiece.point = lastTurn.origin;
-        this.current.turnHistory.length = this.current.turnHistory.length - 1;
-        this.current.annotations.length = this.current.annotations.length - 1;
-        this.current.turn--;
-      }
-      return true;
-    }
-    return false;
+  // undoTurn() {
+  //   const lastTurn = this.current.turnHistory.at(-1);
+  //   if (lastTurn) {
+  //     if (lastTurn.originPiece) {
+  //       lastTurn.originPiece.resetPieceMovement();
+
+  //       this.current.board.addPiece(lastTurn.originPiece);
+  //       if (lastTurn.targetPiece)
+  //         this.current.board.addPiece(lastTurn.targetPiece);
+  //       lastTurn.originPiece.point = lastTurn.origin;
+  //       this.current.turnHistory.length = this.current.turnHistory.length - 1;
+  //       this.current.annotations.length = this.current.annotations.length - 1;
+  //       this.current.turn--;
+  //     }
+  //     return true;
+  //   }
+  //   return false;
+  // }
+
+  getMoveType(origin: Point, target: Point) {
+    const originPiece = this.lookupPiece(origin);
+    if (!originPiece) return;
+    const availableMoves = this.calculateAvailableMoves(originPiece, true);
+    console.log(availableMoves);
+    const move = availableMoves.find((move) => doMovesMatch(move[0], target));
+    return move?.[1];
   }
 
-  resolveMove(originPoint: Point, targetPoint: Point): TurnHistory | false {
-    const locationsInfo = this.getLocationsInfo(originPoint, targetPoint);
-    //Resolve a castling Move
-    const castlingResult = this.resolveCastling(locationsInfo);
-    if (castlingResult) {
-      const annotation = this.annotate(castlingResult);
-      this.current.annotations.push(annotation);
-      this.current.turnHistory.push(castlingResult);
-      return castlingResult;
+  resolveMove(origin: Point, target: Point): TurnHistory | undefined {
+    //Get move type from origin and target points
+    const moveType = this.getMoveType(origin, target);
+    console.log(moveType);
+    switch (moveType) {
+      case "movement":
+        const turnHistory = this.resolveMovement({ origin, target });
+        // const annotation = this.annotate(enPassantResult);
+        // this.current.annotations.push(annotation);
+        if (turnHistory) this.current.turnHistory.push(turnHistory);
+        return turnHistory;
+      case "capture":
+        const captureResult = this.resolveCapture({ origin, target });
+        // const annotation = this.annotate(captureResult);
+        // this.current.annotations.push(annotation);
+        if (captureResult) this.current.turnHistory.push(captureResult);
+        return captureResult;
+      case "enPassant":
+        const enPassantResult = this.resolveEnPassant({ origin, target });
+        // const annotation = this.annotate(enPassantResult);
+        // this.current.annotations.push(annotation);
+        if (enPassantResult) this.current.turnHistory.push(enPassantResult);
+        return enPassantResult;
+      case "castle":
+        const castlingResult = this.resolveCastling({ origin, target });
+        // const annotation = this.annotate(castlingResult);
+        // this.current.annotations.push(annotation);
+        if (castlingResult) this.current.turnHistory.push(castlingResult);
+        return castlingResult;
+      // case "promotion":
+      //   return;
+      default:
+        return;
     }
-    //Resolve a EnPassant Move
-    const enPassantResult = this.resolveEnPassant(locationsInfo);
-    if (enPassantResult) {
-      const annotation = this.annotate(enPassantResult);
-      this.current.annotations.push(annotation);
-      this.current.turnHistory.push(enPassantResult);
-      return enPassantResult;
-    }
-    //Resolve a standard movement/capture move
-    const standardResult = this.resolveStandard(locationsInfo);
-    if (standardResult) {
-      const annotation = this.annotate(standardResult);
-      this.current.annotations.push(annotation);
-      this.current.turnHistory.push(standardResult);
-      return standardResult;
-    }
-
-    return false;
   }
 
-  resolveStandard(locationsInfo: LocationsInfo) {
-    const { originPiece } = locationsInfo;
+  resolveMovement({
+    origin,
+    target,
+  }: {
+    origin: Point;
+    target: Point;
+  }): TurnHistory | undefined {
+    const originPiece = this.lookupPiece(origin);
+    if (!originPiece) return;
     //Check if valid move can be resolved
-    if (this.canValidMoveResolve(locationsInfo)) {
-      originPiece!.update();
+    if (this.canValidMoveResolve({ origin, target })) {
+      originPiece.update();
       //Once move resolved check if pawn promotion is relevant
-      const promotion = originPiece!.checkPromotion();
-      return gameHelpers.generateTurnHistory("standard", locationsInfo, {
-        promotion,
-      });
+      return {
+        type: "movement",
+        origin,
+        target,
+        originPiece,
+      };
+    } else {
+      return;
     }
   }
 
-  resolveEnPassant(locationsInfo: LocationsInfo) {
-    const { originPiece, targetPoint } = locationsInfo;
-    const lastTurnHistory =
-      this.current.turnHistory[this.current.turnHistory.length - 1];
-    const enPassant = gameHelpers.isEnPassantAvailable(lastTurnHistory);
+  resolveCapture({
+    origin,
+    target,
+  }: {
+    origin: Point;
+    target: Point;
+  }): TurnHistory | undefined {
+    const originPiece = this.lookupPiece(origin);
+    const targetPiece = this.lookupPiece(target);
+    if (!originPiece || !targetPiece) return;
+    //Check if valid move can be resolved
+    if (this.canValidMoveResolve({ origin, target })) {
+      originPiece.update();
+      //Once move resolved check if pawn promotion is relevant
+      return {
+        type: "capture",
+        origin,
+        target,
+        originPiece,
+        targetPiece,
+      };
+    }
+  }
+
+  resolveEnPassant({
+    origin,
+    target,
+  }: {
+    origin: Point;
+    target: Point;
+  }): TurnHistory | undefined {
+    const originPiece = this.lookupPiece(origin);
+    if (!originPiece) return;
+    const lastTurnHistory = this.current.turnHistory.at(-1);
+    if (!lastTurnHistory) return;
+    const enPassant = isEnPassantAvailable(lastTurnHistory);
     if (enPassant.result) {
-      if (gameHelpers.doMovesMatch(enPassant.enPassantPoint, targetPoint)) {
-        if (this.canValidMoveResolve(locationsInfo)) {
-          const enPassantPiece = lastTurnHistory.targetPiece;
-          const promotion = originPiece!.checkPromotion();
-          return gameHelpers.generateTurnHistory("enPassant", locationsInfo, {
+      if (doMovesMatch(enPassant.enPassantPoint, target)) {
+        if (this.canValidMoveResolve({ origin, target })) {
+          const enPassantPiece = lastTurnHistory.originPiece;
+          this.current.board.removePieceByPoint(enPassantPiece.point);
+          return {
+            type: "enPassant",
+            origin,
+            target,
+            originPiece,
+            targetPiece: enPassantPiece,
             enPassant,
-            enPassantPiece,
-            lastTurnHistorySquare: lastTurnHistory.targetSquare,
-            promotion,
-          });
+          };
         }
       }
     }
   }
 
-  resolveCastling(locationsInfo: LocationsInfo) {
-    const { originPiece, targetPiece, originPoint, targetPoint } =
-      locationsInfo;
+  resolveCastling({
+    origin,
+    target,
+  }: {
+    origin: Point;
+    target: Point;
+  }): TurnHistory | undefined {
+    const originPiece = this.lookupPiece(origin);
+    if (!originPiece) return;
+    const targetPiece = this.lookupPiece(target);
     const castling =
-      originPiece!.type === Piece.K && originPiece!.team === this.getTeam();
+      originPiece.type === Piece.K && originPiece.team === this.getTeam();
     let castling2 = false;
-    if (targetPiece !== undefined) {
+    if (targetPiece) {
       castling2 =
         targetPiece.type === Piece.R && targetPiece.team === this.getTeam();
       if (castling && castling2) {
-        const a = gameHelpers.getX(originPoint);
-        const b = gameHelpers.getX(targetPoint);
+        const a = getX(origin);
+        const b = getX(target);
         let c = a - b;
         c < 0 ? (c = 1) : (c = -1);
         const castlingResult = castlingMove(
           c,
-          locationsInfo,
+          { originPiece, targetPiece },
           this.current.board
         );
-        const promotion = originPiece!.checkPromotion();
-        return gameHelpers.generateTurnHistory("castling", locationsInfo, {
+        return {
+          type: "castle",
           direction: c,
-          castlingResult,
-          promotion,
-        });
+          origin,
+          target,
+          originPiece,
+          targetPiece,
+          castling: castlingResult,
+        };
       }
     }
 
     function castlingMove(
       direction: number,
-      locationsInfo: LocationsInfo,
+      {
+        originPiece,
+        targetPiece,
+      }: { originPiece: GamePiece; targetPiece: GamePiece },
       board: Board
     ) {
-      const { originPiece, targetPiece } = locationsInfo;
-      const {
-        type: originType,
-        team: originTeam,
-        point: originPoint,
-      } = originPiece!;
-      const { type: targetType, team: targetTeam } = targetPiece!;
       //Move King 2 Spaces from current location in the direction of rook
       //Move the Rook 1 space in that same direction from the kings original location
-      const [x, y] = originPoint;
+      const [x, y] = originPiece.point;
       const newKingX = x + direction * 2;
       const newRookX = x + direction;
       const newKingPoint: Point = [newKingX, y];
       const newRookPoint: Point = [newRookX, y];
-
-      //Remove origin piece and target piece
-      board.removePieceByPoint(originPoint);
-      board.removePieceByPoint(targetPoint);
-      board.addPiece(
-        new GamePiece({
-          type: originType,
-          team: originTeam,
-          point: newKingPoint,
-          update: true,
-        })
-      );
-      board.addPiece(
-        new GamePiece({
-          type: targetType,
-          team: targetTeam,
-          point: newRookPoint,
-          update: true,
-        })
-      );
+      originPiece.point = newKingPoint;
+      targetPiece.point = newRookPoint;
+      originPiece.update();
+      targetPiece.update();
       return [board.getSquare(newKingPoint), board.getSquare(newRookPoint)];
     }
   }
@@ -254,11 +303,29 @@ class Game {
     return availableMoves;
   }
 
-  canValidMoveResolve(locationsInfo: LocationsInfo) {
+  canValidMoveResolve(
+    { origin, target }: { origin: Point; target: Point },
+    reset?: boolean
+  ) {
     //Switch piece between squares
-    gameHelpers.updateLocation(locationsInfo);
+    const originPiece = this.lookupPiece(origin);
+    if (!originPiece) return false;
+    const targetPiece = this.lookupPiece(target);
+    if (targetPiece) {
+      this.current.board.removePieceByPoint(target);
+    }
+    originPiece.point = target;
+
     //Check if resolving above switch would put player in check
-    return this.isChecked(true) ? false : true;
+    const result = this.isChecked(true) ? false : true;
+    if (reset) {
+      //Undo switch
+      originPiece.point = origin;
+      if (targetPiece) {
+        this.current.board.addPiece(targetPiece);
+      }
+    }
+    return result;
   }
 
   isChecked(currentPlayer: boolean) {
@@ -266,7 +333,7 @@ class Game {
     const opponentsPieces = this.getPieces(!currentPlayer);
     const opponentsAvailableMoves = this.getMoves(opponentsPieces);
     const isKingChecked = opponentsAvailableMoves.find((move) =>
-      gameHelpers.doMovesMatch(move[0], king.point)
+      doMovesMatch(move[0], king.point)
     );
     //Returns an array with the kings location if checked
     return isKingChecked;
@@ -291,9 +358,13 @@ class Game {
     const validMoves = moves
       .map((move) => {
         //Check for checkmate if move resolves
-        const locationsInfo = this.getLocationsInfo(piece.point, move[0]);
-        const validMove = this.canValidMoveResolve(locationsInfo);
-        undoUpdateLocation(locationsInfo);
+        const validMove = this.canValidMoveResolve(
+          {
+            origin: piece.point,
+            target: move[0],
+          },
+          true
+        );
         return validMove ? move : null;
       })
       .filter((move) => move !== null);
@@ -315,25 +386,6 @@ class Game {
     return pieces.filter((piece) => {
       return piece.team === this.getTeam(currentPlayer);
     });
-  }
-
-  getLocationsInfo(originPoint: Point, targetPoint: Point): LocationsInfo {
-    const originSquare =
-      this.current.board.grid[gameHelpers.getX(originPoint)][
-        gameHelpers.getY(originPoint)
-      ];
-    const targetSquare =
-      this.current.board.grid[gameHelpers.getX(targetPoint)][
-        gameHelpers.getY(targetPoint)
-      ];
-    return {
-      originSquare,
-      targetSquare,
-      originPiece: this.current.board.getPieceByPoint(originPoint),
-      targetPiece: this.current.board.getPieceByPoint(targetPoint),
-      originPoint,
-      targetPoint,
-    };
   }
 
   findPieces(name: string, color: string) {
@@ -365,9 +417,13 @@ class Game {
       const availableMoves = this.calculateAvailableMoves(piece);
       //For each available move, check if resolving it results in player still being in check
       const isItCheckmate = availableMoves.map((move) => {
-        const locationsInfo = this.getLocationsInfo(piece.point, move[0]);
-        const result = this.canValidMoveResolve(locationsInfo);
-        gameHelpers.undoUpdateLocation(locationsInfo);
+        const result = this.canValidMoveResolve(
+          {
+            origin: piece.point,
+            target: move[0],
+          },
+          true
+        );
         return result ? false : true;
       });
       finalResults.push.apply(finalResults, isItCheckmate);
@@ -389,7 +445,7 @@ class Game {
     const playersRooks = this.findPieces("Rook", this.getTeam());
     if (playersRooks.length) {
       playersRooks.forEach((rook) => {
-        checkCastlingMove(piece!, rook);
+        checkCastlingMove(piece, rook);
       });
     }
   }
@@ -398,7 +454,7 @@ class Game {
     const isKingChecked = this.isChecked(true);
     if (!isKingChecked) {
       const [kingX, kingY] = originPoint;
-      const rookX = gameHelpers.getX(targetPoint);
+      const rookX = getX(targetPoint);
       const spaceBetween = kingX - rookX;
       let distance;
       spaceBetween < 0
@@ -428,10 +484,7 @@ class Game {
           const square = squaresInBetween[i];
           for (let k = 0; k < opponentsAvailableMoves.length; k++) {
             const availableMove = opponentsAvailableMoves[k];
-            const doesMoveMatchSquare = gameHelpers.doMovesMatch(
-              availableMove[0],
-              square
-            );
+            const doesMoveMatchSquare = doMovesMatch(availableMove[0], square);
             doesMoveMatchSquare
               ? isThereOverlap.push(doesMoveMatchSquare)
               : null;
@@ -439,33 +492,28 @@ class Game {
         }
         if (!isThereOverlap.length) {
           //If there is no overlap, return the possible castling move
-          const returnResult: [boolean, Move] = [
-            true,
-            [targetPoint, "castling"],
-          ];
+          const returnResult: [boolean, Move] = [true, [targetPoint, "castle"]];
           return returnResult;
         }
       }
     }
     //If overlap, return false for possible castling move
-    const returnResult: [boolean, Move] = [false, [targetPoint, "castling"]];
+    const returnResult: [boolean, Move] = [false, [targetPoint, "castle"]];
     return returnResult;
   }
 
   setPromotionPiece(selection: Piece) {
     const turnHistory = this.current.turnHistory.at(-1);
-    if (turnHistory !== undefined) {
-      const square = turnHistory.targetSquare.square;
-      turnHistory.promotedPiece = selection;
+    if (turnHistory && turnHistory.type === "promotion") {
+      const square = this.current.board.getSquare(turnHistory.target);
+      turnHistory.promotionPiece = selection;
       const { team, point } = turnHistory.originPiece!;
-      // turnHistory.targetSquare.on = new GamePiece({
-      //   type: selection,
-      //   team,
-      //   point,
-      // });
-      // const symbol = turnHistory.targetSquare.on.getSymbol();
+      this.current.board.removePieceByPoint(point);
+      const promotedPiece = new GamePiece({ type: selection, team, point });
+      this.current.board.addPiece(promotedPiece);
+      const symbol = promotedPiece.getSymbol();
       const annotations = this.current.annotations;
-      annotations[annotations.length - 1] = `${square}${"placeholder"}`;
+      annotations[annotations.length - 1] = `${square.name}${symbol}`;
     }
   }
 
@@ -476,33 +524,33 @@ class Game {
   getHistory() {
     return this.current.turnHistory;
   }
-
-  annotate(result: TurnHistory) {
-    let annotation;
-    const type = result.type;
-    const promotion = result.promotion;
-    const pieceName = result.originPiece!.type;
-    const square = result.targetSquare.square;
-    const isCapturing = result.targetPiece !== undefined ? true : false;
-    const symbol = result.originPiece?.getSymbol();
-    if (type === "castling") {
-      annotation = result.direction === 1 ? "O-O" : "O-O-O";
-    } else if (promotion) {
-      annotation = `${square}=${symbol}`;
-    } else if (isCapturing) {
-      if (pieceName === "Pawn") {
-        annotation = `${result.originSquare.square.charAt(0)}x${square}`;
-      } else {
-        annotation = `${symbol}x${square}`;
-      }
-    } else {
-      annotation = `${symbol}${square}`;
-    }
-    const isCheck = this.isChecked(false);
-    if (isCheck) annotation = `${annotation}+`;
-
-    return annotation;
-  }
 }
+//   annotate(result: TurnHistory) {
+//     let annotation;
+//     const type = result.type;
+//     const promotion = result.promotion;
+//     const pieceName = result.originPiece!.type;
+//     const square = result.targetSquare.square;
+//     const isCapturing = result.targetPiece !== undefined ? true : false;
+//     const symbol = result.originPiece?.getSymbol();
+//     if (type === "castling") {
+//       annotation = result.direction === 1 ? "O-O" : "O-O-O";
+//     } else if (promotion) {
+//       annotation = `${square}=${symbol}`;
+//     } else if (isCapturing) {
+//       if (pieceName === "Pawn") {
+//         annotation = `${result.originSquare.square.charAt(0)}x${square}`;
+//       } else {
+//         annotation = `${symbol}x${square}`;
+//       }
+//     } else {
+//       annotation = `${symbol}${square}`;
+//     }
+//     const isCheck = this.isChecked(false);
+//     if (isCheck) annotation = `${annotation}+`;
+
+//     return annotation;
+//   }
+// }
 
 export default Game;

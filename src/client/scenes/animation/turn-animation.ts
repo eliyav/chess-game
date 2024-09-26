@@ -21,10 +21,7 @@ export default async function calcTurnAnimation({
 
   if (!movingMesh) return;
 
-  if (
-    turnHistory.targetPiece &&
-    (turnHistory.type === "standard" || turnHistory.type === "enPassant")
-  ) {
+  if (turnHistory.type === "capture" || turnHistory.type === "enPassant") {
     pieceBreakAnimation({
       target: turnHistory.targetPiece,
     });
@@ -32,7 +29,7 @@ export default async function calcTurnAnimation({
 
   //Animate Piece Movement
   const animateZ = movingMesh.name === "Knight" ? false : true;
-  if (turnHistory.type === "castling") {
+  if (turnHistory.type === "castle") {
     const targetMesh = findMeshFromPoint(target);
     if (!targetMesh) return;
     return await animateMovements({
@@ -55,11 +52,11 @@ export default async function calcTurnAnimation({
       meshes.forEach((mesh, i) => {
         let position;
         let targetPosition;
-        if (turnHistory.type === "castling" && mesh.name === "King") {
+        if (turnHistory.type === "castle" && mesh.name === "King") {
           const {
             point: [x, y],
-          } = turnHistory.originPiece!;
-          const direction = turnHistory.direction!;
+          } = turnHistory.originPiece;
+          const direction = turnHistory.direction;
           const newKingX = x + direction * 2;
           const newKingPoint: Point = [newKingX, y];
           position = findByPoint({
@@ -72,11 +69,11 @@ export default async function calcTurnAnimation({
             point: newKingPoint,
             externalMesh: true,
           });
-        } else if (turnHistory.type === "castling" && mesh.name === "Rook") {
+        } else if (turnHistory.type === "castle" && mesh.name === "Rook") {
           const {
             point: [x, y],
-          } = turnHistory.originPiece!;
-          const direction = turnHistory.direction!;
+          } = turnHistory.originPiece;
+          const direction = turnHistory.direction;
           const newRookX = x + direction;
           const newRookPoint: Point = [newRookX, y];
           position = findByPoint({

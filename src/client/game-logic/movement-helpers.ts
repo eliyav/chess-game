@@ -8,15 +8,18 @@ import {
 } from "./game-helpers";
 import GamePiece from "./game-piece";
 
-type MovesObj = {
-  up?: Point[];
-  down?: Point[];
-  right?: Point[];
-  left?: Point[];
-  upRight?: Point[];
-  upLeft?: Point[];
-  downRight?: Point[];
-  downLeft?: Point[];
+type MovementsDirection =
+  | "up"
+  | "down"
+  | "right"
+  | "left"
+  | "upRight"
+  | "upLeft"
+  | "downRight"
+  | "downLeft";
+
+type Movements = {
+  [direction in MovementsDirection]?: Point[];
 };
 
 const calcRookMoves = (piece: GamePiece, board: Board) => {
@@ -172,7 +175,7 @@ const calcBishopMoves = (piece: GamePiece, board: Board) => {
 const filterToFinalMoves = (
   board: Board,
   team: TEAM,
-  movesObj: MovesObj,
+  movesObj: Movements,
   targetArray: Move[]
 ) => {
   const movementsArrays = Object.values(movesObj);
@@ -199,7 +202,7 @@ const calcHorizontalMovements = (
   grid: Grid,
   currentPoint: Point,
   movement: number,
-  finalObj: MovesObj
+  finalObj: Movements
 ) => {
   for (const [key, value] of Object.entries(finalObj)) {
     const moves: Point[] = value;
@@ -229,7 +232,7 @@ const calcVerticalMovements = (
   grid: Grid,
   currentPoint: Point,
   movement: number,
-  finalObj: MovesObj
+  finalObj: Movements
 ) => {
   for (const [key, value] of Object.entries(finalObj)) {
     const moves: Point[] = value;
@@ -350,8 +353,7 @@ const calcKingMovements = (
   });
 };
 
-const bounds = (num: number, grid: Grid) =>
-  num >= grid.length - grid.length && num <= grid.length - 1;
+const bounds = (num: number, grid: Grid) => num >= 0 && num <= grid.length - 1;
 
 const calcUpRight = (
   grid: Grid,
