@@ -82,7 +82,6 @@ class Game {
       piece: originPiece,
       returnOnlyValid: true,
     });
-    console.log(availableMoves);
     const move = availableMoves.find((move) => doMovesMatch(move[0], target));
     return move?.[1];
   }
