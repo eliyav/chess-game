@@ -75,15 +75,12 @@ class Game {
     const originPiece = this.lookupPiece(origin);
     if (!originPiece) return;
     const availableMoves = this.calculateAvailableMoves(originPiece, true);
-    console.log(availableMoves);
     const move = availableMoves.find((move) => doMovesMatch(move[0], target));
     return move?.[1];
   }
 
   resolveMove(origin: Point, target: Point): TurnHistory | undefined {
-    //Get move type from origin and target points
     const moveType = this.getMoveType(origin, target);
-    console.log(moveType);
     let result: TurnHistory | undefined;
     switch (moveType) {
       case "movement":
