@@ -25,6 +25,7 @@ export const Game: React.FC<{
           player: lobby.players.find((player) => player.id === websocket.id)!,
         })
   );
+  console.log(match.current);
   const controller = useRef(
     new Controller({
       sceneManager,
@@ -64,11 +65,11 @@ export const Game: React.FC<{
           },
           {
             text: "restart",
-            onClick: () => controller.current.requestMatchReset(),
+            onClick: () => match.current.resetRequest(),
           },
           {
             text: "undo",
-            onClick: () => controller.current.undoMove(),
+            onClick: () => match.current.undoTurnRequest(),
           },
           {
             text: "camera",
