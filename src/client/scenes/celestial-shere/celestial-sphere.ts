@@ -15,6 +15,7 @@ import noiseUrl from "../../../../assets/space/noise.png";
 import StarDataJSON from "../../../../assets/space/star-data.json";
 import starUrl from "../../../../assets/space/star.png";
 import tubeUrl from "../../../../assets/space/tube.png";
+import { isPhone } from "../../index";
 
 export interface StarData {
   rightAscension: number[];
@@ -231,7 +232,7 @@ export function createCelestialSphere(scene: Scene) {
     scene,
     starData: StarDataJSON,
     radius: 300,
-    starLimit: 5000,
+    starLimit: isPhone ? 2500 : 5000,
     starScale: 0.5,
     twinkleStars: true,
   });
