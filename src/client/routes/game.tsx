@@ -65,11 +65,11 @@ export const Game: React.FC<{
           },
           {
             text: "restart",
-            onClick: () => match.current.resetRequest(),
+            onClick: () => controller.current.requestMatchReset(),
           },
           {
             text: "undo",
-            onClick: () => match.current.undoTurnRequest(),
+            onClick: () => controller.current.requestUndoTurn(),
           },
           {
             text: "camera",

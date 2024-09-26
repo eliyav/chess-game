@@ -189,12 +189,17 @@ export class Controller {
     };
   }
 
-  undoMove() {
+  undoTurn() {
     if (this.match.getGameHistory().length === 0) return;
     const isValidUndo = this.match.undoTurn();
     if (isValidUndo) {
-      this.updateMeshesRender();
-      this.rotateCamera();
+      this.resetView();
+    }
+  }
+
+  requestUndoTurn() {
+    if (this.match.undoTurnRequest()) {
+      this.undoTurn();
     }
   }
 
@@ -211,7 +216,11 @@ export class Controller {
 
   resetView() {
     this.updateMeshesRender();
-    this.resetCamera();
+    if (this.match.lobby.mode === LOBBY_TYPE.LOCAL) {
+      this.rotateCamera();
+    } else {
+      this.resetCamera();
+    }
   }
 
   turnAnimation({

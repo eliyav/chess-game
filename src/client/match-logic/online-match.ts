@@ -7,7 +7,7 @@ import { BaseMatch, MatchLogic } from "./base-match";
 import { Controller } from "./controller";
 import { requestMatchReset } from "./online-events/request-match-reset";
 import { requestResolveMove } from "./online-events/request-resolve-move";
-import { requestUndoMove } from "./online-events/request-undo-move";
+import { requestUndoTurn } from "./online-events/request-undo-turn";
 
 export class OnlineMatch extends BaseMatch implements MatchLogic {
   mode: LOBBY_TYPE.ONLINE;
@@ -37,13 +37,11 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
   }
 
   resetRequest() {
-    console.log("resetRequest");
     websocket.emit("resetMatchRequest", { lobbyKey: this.lobby.key });
     return false;
   }
 
   undoTurnRequest() {
-    console.log("undoTurnRequest");
     websocket.emit("undoTurnRequest", { lobbyKey: this.lobby.key });
     return false;
   }
@@ -95,7 +93,7 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
       setMessage,
       controller,
     });
-    const matchUndoEvents = requestUndoMove({
+    const matchUndoEvents = requestUndoTurn({
       setMessage,
       controller,
     });

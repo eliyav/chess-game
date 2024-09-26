@@ -41,7 +41,7 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
   }
 
   undoTurnRequest() {
-    return this.getGame().undoTurn();
+    return true;
   }
 
   isPlayersTurn() {

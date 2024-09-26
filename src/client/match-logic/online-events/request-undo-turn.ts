@@ -2,7 +2,7 @@ import { Message } from "../../components/modals/message-modal";
 import { Controller } from "../controller";
 import { websocket } from "../../websocket-client";
 
-export function requestUndoMove({
+export function requestUndoTurn({
   setMessage,
   controller,
 }: {
@@ -31,8 +31,7 @@ export function requestUndoMove({
 
   websocket.on("undoTurnResolve", ({ answer }) => {
     if (answer) {
-      controller.match.undoTurn();
-      controller.resetView();
+      controller.undoTurn();
 
       setMessage({
         text: "Last move has been undone successfully!",
