@@ -53,12 +53,6 @@ export default async function calcTurnAnimation({
         let position;
         let targetPosition;
         if (turnHistory.type === "castle" && mesh.name === "King") {
-          const {
-            point: [x, y],
-          } = turnHistory.originPiece;
-          const direction = turnHistory.direction;
-          const newKingX = x + direction * 2;
-          const newKingPoint: Point = [newKingX, y];
           position = findByPoint({
             get: "position",
             point: origin,
@@ -66,16 +60,10 @@ export default async function calcTurnAnimation({
           });
           targetPosition = findByPoint({
             get: "position",
-            point: newKingPoint,
+            point: turnHistory.originPiece.point,
             externalMesh: true,
           });
         } else if (turnHistory.type === "castle" && mesh.name === "Rook") {
-          const {
-            point: [x, y],
-          } = turnHistory.originPiece;
-          const direction = turnHistory.direction;
-          const newRookX = x + direction;
-          const newRookPoint: Point = [newRookX, y];
           position = findByPoint({
             get: "position",
             point: target,
@@ -83,7 +71,7 @@ export default async function calcTurnAnimation({
           });
           targetPosition = findByPoint({
             get: "position",
-            point: newRookPoint,
+            point: turnHistory.targetPiece.point,
             externalMesh: true,
           });
         } else {
