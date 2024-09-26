@@ -303,8 +303,8 @@ class Game {
     return isKingChecked;
   }
 
-  isValidMove(movingPiece: GamePiece, point: Point) {
-    return this.calculateAvailableMoves(movingPiece).find((move) =>
+  isValidMove(movingPiece: GamePiece, point: Point, flag: boolean) {
+    return this.calculateAvailableMoves(movingPiece, flag).find((move) =>
       doMovesMatch(move[0], point)
     );
   }
