@@ -13,7 +13,7 @@ const animationsGltf = [
   { id: Piece.P, animation: pawnAnimation },
   { id: Piece.R, animation: rookAnimation },
   { id: Piece.B, animation: bishopAnimation },
-  { id: Piece.K, animation: knightAnimation },
+  { id: Piece.N, animation: knightAnimation },
   { id: Piece.Q, animation: queenAnimation },
 ];
 

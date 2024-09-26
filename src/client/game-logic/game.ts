@@ -27,10 +27,14 @@ class Game {
     };
   }
 
-  getTeam(currentPlayer = true) {
+  getTeam() {
     const remainder = this.current.turn % 2;
-    const index = currentPlayer ? (remainder ? 0 : 1) : remainder ? 1 : 0;
+    const index = remainder ? 0 : 1;
     return this.teams[index];
+  }
+
+  getOpponentTeam(team: TEAM) {
+    return team === TEAM.WHITE ? TEAM.BLACK : TEAM.WHITE;
   }
 
   getWinner() {
@@ -74,7 +78,10 @@ class Game {
   getMoveType(origin: Point, target: Point) {
     const originPiece = this.lookupPiece(origin);
     if (!originPiece) return;
-    const availableMoves = this.calculateAvailableMoves(originPiece, true);
+    const availableMoves = this.getMoves({
+      piece: originPiece,
+      returnOnlyValid: true,
+    });
     const move = availableMoves.find((move) => doMovesMatch(move[0], target));
     return move?.[1];
   }
@@ -84,20 +91,16 @@ class Game {
     let result: TurnHistory | undefined;
     switch (moveType) {
       case "movement":
-        const turnHistory = this.resolveMovement({ origin, target });
-        result = turnHistory;
+        result = this.resolveMovement({ origin, target });
         break;
       case "capture":
-        const captureResult = this.resolveCapture({ origin, target });
-        result = captureResult;
+        result = this.resolveCapture({ origin, target });
         break;
       case "enPassant":
-        const enPassantResult = this.resolveEnPassant({ origin, target });
-        result = enPassantResult;
+        result = this.resolveEnPassant({ origin, target });
         break;
       case "castle":
-        const castlingResult = this.resolveCastling({ origin, target });
-        result = castlingResult;
+        result = this.resolveCastling({ origin, target });
         break;
     }
     if (result) {
@@ -122,7 +125,7 @@ class Game {
     const originPiece = this.lookupPiece(origin);
     if (!originPiece) return;
     //Check if valid move can be resolved
-    if (this.canValidMoveResolve({ origin, target })) {
+    if (this.isMoveResolvable({ origin, target }, false)) {
       originPiece.update();
       return {
         type: "movement",
@@ -147,7 +150,7 @@ class Game {
     const targetPiece = this.lookupPiece(target);
     if (!originPiece || !targetPiece) return;
     //Check if valid move can be resolved
-    if (this.canValidMoveResolve({ origin, target })) {
+    if (this.isMoveResolvable({ origin, target }, false)) {
       originPiece.update();
       return {
         type: "capture",
@@ -174,7 +177,7 @@ class Game {
     const enPassant = isEnPassantAvailable(lastTurnHistory);
     if (enPassant.result) {
       if (doMovesMatch(enPassant.enPassantPoint, target)) {
-        if (this.canValidMoveResolve({ origin, target })) {
+        if (this.isMoveResolvable({ origin, target }, false)) {
           originPiece.update();
           const enPassantPiece = lastTurnHistory.originPiece;
           this.current.board.removePieceByPoint(enPassantPiece.point);
@@ -212,11 +215,21 @@ class Game {
         const [targetX] = target;
         let c = originX - targetX;
         c < 0 ? (c = 1) : (c = -1);
-        const castlingResult = castlingMove(
-          c,
-          { originPiece, targetPiece },
-          this.current.board
-        );
+        //Move King 2 Spaces from current location in the direction of rook
+        //Move the Rook 1 space in that same direction from the kings original location
+        const [x, y] = originPiece.point;
+        const newKingX = x + c * 2;
+        const newRookX = x + c;
+        const newKingPoint: Point = [newKingX, y];
+        const newRookPoint: Point = [newRookX, y];
+        originPiece.point = newKingPoint;
+        targetPiece.point = newRookPoint;
+        originPiece.update();
+        targetPiece.update();
+        const castlingResult = [
+          this.current.board.getSquare(newKingPoint),
+          this.current.board.getSquare(newRookPoint),
+        ];
         return {
           type: "castle",
           direction: c,
@@ -228,45 +241,45 @@ class Game {
         };
       }
     }
-
-    function castlingMove(
-      direction: number,
-      {
-        originPiece,
-        targetPiece,
-      }: { originPiece: GamePiece; targetPiece: GamePiece },
-      board: Board
-    ) {
-      //Move King 2 Spaces from current location in the direction of rook
-      //Move the Rook 1 space in that same direction from the kings original location
-      const [x, y] = originPiece.point;
-      const newKingX = x + direction * 2;
-      const newRookX = x + direction;
-      const newKingPoint: Point = [newKingX, y];
-      const newRookPoint: Point = [newRookX, y];
-      originPiece.point = newKingPoint;
-      targetPiece.point = newRookPoint;
-      originPiece.update();
-      targetPiece.update();
-      return [board.getSquare(newKingPoint), board.getSquare(newRookPoint)];
-    }
   }
 
-  calculateAvailableMoves(piece: GamePiece, flag = false): Move[] {
+  getMoves({
+    piece,
+    returnOnlyValid,
+    checkCastling = true,
+  }: {
+    piece: GamePiece;
+    returnOnlyValid: boolean;
+    checkCastling?: boolean;
+  }): Move[] {
     const lastTurnHistory = this.current.turnHistory.at(-1);
     const availableMoves = getPieceMoves({
       piece,
       board: this.current.board,
       lastTurnHistory,
       calcCastling: this.calcCastling.bind(this),
-      flag,
+      checkCastling,
     });
+    if (returnOnlyValid) {
+      return availableMoves.filter((move) => {
+        return this.isMoveResolvable(
+          { origin: piece.point, target: move[0] },
+          true
+        );
+      });
+    }
     return availableMoves;
   }
 
-  canValidMoveResolve(
+  isMove(piece: GamePiece, point: Point) {
+    return this.getMoves({ piece, returnOnlyValid: true }).find((move) =>
+      doMovesMatch(move[0], point)
+    );
+  }
+
+  isMoveResolvable(
     { origin, target }: { origin: Point; target: Point },
-    reset?: boolean
+    reset = true
   ) {
     //Switch piece between squares
     const originPiece = this.lookupPiece(origin);
@@ -278,7 +291,7 @@ class Game {
     originPiece.point = target;
 
     //Check if resolving above switch would put player in check
-    const result = this.isChecked(true) ? false : true;
+    const isMoveResolvable = this.isChecked(this.getTeam()) ? false : true;
     if (reset) {
       //Undo switch
       originPiece.point = origin;
@@ -286,73 +299,28 @@ class Game {
         this.current.board.addPiece(targetPiece);
       }
     }
-    return result;
+    return isMoveResolvable;
   }
 
-  isChecked(currentPlayer: boolean) {
-    const king = this.findKing(currentPlayer);
-    const opponentsPieces = this.getPieces(!currentPlayer);
-    const opponentsAvailableMoves = this.getMoves(opponentsPieces);
-    const isKingChecked = opponentsAvailableMoves.find((move) =>
-      doMovesMatch(move[0], king.point)
-    );
-    //Returns an array with the kings location if checked
-    return isKingChecked;
-  }
-
-  isValidMove(movingPiece: GamePiece, point: Point, flag: boolean) {
-    return this.calculateAvailableMoves(movingPiece, flag).find((move) =>
-      doMovesMatch(move[0], point)
-    );
-  }
-  getMoves(gamePieces: GamePiece[]) {
-    const availableMoves = gamePieces
-      .map((piece) => this.calculateAvailableMoves(piece))
-      .flat()
-      .filter((move) => (move[0] !== undefined ? true : false));
-    return availableMoves;
-  }
-
-  getValidMoves(piece: GamePiece) {
-    const moves = this.calculateAvailableMoves(piece, true);
-    //Add filter to display only moves that can resolve
-    const validMoves = moves
-      .map((move) => {
-        //Check for checkmate if move resolves
-        const validMove = this.canValidMoveResolve(
-          {
-            origin: piece.point,
-            target: move[0],
-          },
-          true
-        );
-        return validMove ? move : null;
-      })
-      .filter((move) => move !== null);
-    return validMoves;
-  }
-
-  findKing(currentPlayer: boolean) {
-    const pieces = this.getAllPieces();
+  findKing(team: TEAM) {
+    const pieces = this.getPiecesByTeam(team);
     const king = pieces.find((piece) => {
-      return (
-        piece.type === "King" && piece.team === this.getTeam(currentPlayer)
-      );
+      return piece.type === Piece.K;
     })!;
     return king;
   }
 
-  getPieces(currentPlayer: boolean) {
+  getPiecesByTeam(team: TEAM) {
     const pieces = this.getAllPieces();
     return pieces.filter((piece) => {
-      return piece.team === this.getTeam(currentPlayer);
+      return piece.team === team;
     });
   }
 
-  findPieces(name: string, color: string) {
-    const pieces = this.getAllPieces();
+  findPieces(name: string, team: TEAM) {
+    const pieces = this.getPiecesByTeam(team);
     const foundPieces = pieces.filter((piece) => {
-      return piece.type === name && piece.team === color;
+      return piece.type === name;
     });
     return foundPieces;
   }
@@ -365,102 +333,104 @@ class Game {
     return this.current.board.getPieceByPoint(location);
   }
 
+  isChecked(team: TEAM) {
+    const king = this.findKing(team);
+    const opponentsPieces = this.getPiecesByTeam(this.getOpponentTeam(team));
+    const opponentsAvailableMoves = opponentsPieces
+      .map((piece) =>
+        this.getMoves({ piece, returnOnlyValid: false, checkCastling: false })
+      )
+      .flat();
+    const isKingChecked = opponentsAvailableMoves.find((move) =>
+      doMovesMatch(move[0], king.point)
+    );
+    //Returns an array with the kings location if checked
+    return isKingChecked;
+  }
+
   isCheckmate() {
     return this.simulateCheckmate() ? true : false;
   }
 
   simulateCheckmate() {
-    const finalResults: boolean[] = [];
     //Find all current Pieces
-    const currentPlayerPieces = this.getPieces(true);
+    const currentPlayerPieces = this.getPiecesByTeam(this.getTeam());
     //For each piece, iterate on its available moves
     currentPlayerPieces.forEach((piece) => {
-      const availableMoves = this.calculateAvailableMoves(piece);
+      const availableMoves = this.getMoves({ piece, returnOnlyValid: true });
       //For each available move, check if resolving it results in player still being in check
-      const isItCheckmate = availableMoves.map((move) => {
-        const result = this.canValidMoveResolve(
-          {
-            origin: piece.point,
-            target: move[0],
-          },
-          true
-        );
-        return result ? false : true;
-      });
-      finalResults.push.apply(finalResults, isItCheckmate);
+      return availableMoves.length ? true : false;
     });
-    const validMoves = finalResults.filter((result) => result === false);
+    return false;
     //If any valid moves, you are not in checkmate
-    return validMoves.length ? false : true;
   }
 
   calcCastling(piece: GamePiece, movesObj: Move[]) {
-    const checkCastlingMove = (piece: GamePiece, targetPiece: GamePiece) => {
-      //Check for castling move
-      if (!targetPiece.moved) {
-        const resolve = this.canCastlingResolve(piece.point, targetPiece.point);
-        //If castling resolve returns true, push the move into available moves
-        resolve[0] ? movesObj.push(resolve[1]) : null;
-      }
-    };
-    const playersRooks = this.findPieces("Rook", this.getTeam());
+    const playersRooks = this.findPieces(Piece.R, this.getTeam());
     if (playersRooks.length) {
       playersRooks.forEach((rook) => {
-        checkCastlingMove(piece, rook);
+        //Check for castling move
+        if (!rook.moved) {
+          const resolve = this.canCastlingResolve(piece.point, rook.point);
+          if (resolve) {
+            //If castling resolve returns true, push the move into available moves
+            resolve[0] ? movesObj.push(resolve[1]) : null;
+          }
+        }
       });
     }
   }
 
   canCastlingResolve(originPoint: Point, targetPoint: Point) {
-    const isKingChecked = this.isChecked(true);
-    if (!isKingChecked) {
-      const [kingX, kingY] = originPoint;
-      const [rookX] = targetPoint;
-      const spaceBetween = kingX - rookX;
-      let distance;
-      spaceBetween < 0
-        ? (distance = spaceBetween * -1 - 1)
-        : (distance = spaceBetween - 1);
+    const [kingX, kingY] = originPoint;
+    const [rookX] = targetPoint;
+    const spaceBetween = kingX - rookX;
+    let distance;
+    spaceBetween < 0
+      ? (distance = spaceBetween * -1 - 1)
+      : (distance = spaceBetween - 1);
 
-      //Calculate the squares in between King and Rook
-      const squaresInBetween: Point[] = [];
-      for (let step = 1; step <= distance; step++) {
-        let stepDirection;
-        spaceBetween < 0
-          ? (stepDirection = step * 1)
-          : (stepDirection = step * -1);
-        const point: Point = [kingX + stepDirection, kingY];
-        squaresInBetween.push(point);
+    //Calculate the squares in between King and Rook
+    const squaresInBetween: Point[] = [];
+
+    for (let step = 1; step <= distance; step++) {
+      let stepDirection;
+      spaceBetween < 0
+        ? (stepDirection = step * 1)
+        : (stepDirection = step * -1);
+      const point: Point = [kingX + stepDirection, kingY];
+      squaresInBetween.push(point);
+    }
+    //Check if squares in between are used by any pieces
+    const pieceInBetween = squaresInBetween.filter((point) => {
+      return this.current.board.getPieceByPoint(point) ? true : false;
+    });
+    if (!pieceInBetween.length) {
+      const squaresInUse = [...squaresInBetween, originPoint, targetPoint];
+      //Check if opponents pieces, threathen any of the spaces in between
+      const opponentsPieces = this.getPiecesByTeam(
+        this.getOpponentTeam(this.getTeam())
+      );
+      const opponentsAvailableMoves = opponentsPieces
+        .map((piece) =>
+          this.getMoves({ piece, returnOnlyValid: false, checkCastling: false })
+        )
+        .flat();
+      const isThereOverlap = [];
+      for (let i = 0; i < squaresInUse.length; i++) {
+        const square = squaresInUse[i];
+        for (let k = 0; k < opponentsAvailableMoves.length; k++) {
+          const availableMove = opponentsAvailableMoves[k];
+          const doesMoveMatchSquare = doMovesMatch(availableMove[0], square);
+          doesMoveMatchSquare ? isThereOverlap.push(doesMoveMatchSquare) : null;
+        }
       }
-      //Check if squares in between are used by any pieces
-      const squaresInUse = squaresInBetween.filter((point) => {
-        return this.current.board.getPieceByPoint(point) ? true : false;
-      });
-      if (!squaresInUse.length) {
-        //Check if opponents pieces, threathen any of the spaces in between
-        const opponentsPieces = this.getPieces(false);
-        const opponentsAvailableMoves = this.getMoves(opponentsPieces);
-        const isThereOverlap = [];
-        for (let i = 0; i < squaresInBetween.length; i++) {
-          const square = squaresInBetween[i];
-          for (let k = 0; k < opponentsAvailableMoves.length; k++) {
-            const availableMove = opponentsAvailableMoves[k];
-            const doesMoveMatchSquare = doMovesMatch(availableMove[0], square);
-            doesMoveMatchSquare
-              ? isThereOverlap.push(doesMoveMatchSquare)
-              : null;
-          }
-        }
-        if (!isThereOverlap.length) {
-          //If there is no overlap, return the possible castling move
-          const returnResult: [boolean, Move] = [true, [targetPoint, "castle"]];
-          return returnResult;
-        }
+      if (!isThereOverlap.length) {
+        //If there is no overlap, return the possible castling move
+        const returnResult: [boolean, Move] = [true, [targetPoint, "castle"]];
+        return returnResult;
       }
     }
-    //If overlap, return false for possible castling move
-    const returnResult: [boolean, Move] = [false, [targetPoint, "castle"]];
-    return returnResult;
   }
 
   setPromotionPiece(history: TurnHistory, selection: Piece) {
@@ -504,7 +474,7 @@ class Game {
     } else {
       annotation = `${symbol}${targetSquare}`;
     }
-    const isCheck = this.isChecked(false);
+    const isCheck = this.isChecked(this.getOpponentTeam(this.getTeam()));
     if (isCheck) annotation = `${annotation}+`;
 
     this.current.annotations.push(annotation);
