@@ -51,24 +51,24 @@ class Game {
     return true;
   }
 
-  // undoTurn() {
-  //   const lastTurn = this.current.turnHistory.at(-1);
-  //   if (lastTurn) {
-  //     if (lastTurn.originPiece) {
-  //       lastTurn.originPiece.resetPieceMovement();
-
-  //       this.current.board.addPiece(lastTurn.originPiece);
-  //       if (lastTurn.targetPiece)
-  //         this.current.board.addPiece(lastTurn.targetPiece);
-  //       lastTurn.originPiece.point = lastTurn.origin;
-  //       this.current.turnHistory.length = this.current.turnHistory.length - 1;
-  //       this.current.annotations.length = this.current.annotations.length - 1;
-  //       this.current.turn--;
-  //     }
-  //     return true;
-  //   }
-  //   return false;
-  // }
+  undoTurn() {
+    const lastTurn = this.current.turnHistory.at(-1);
+    if (lastTurn) {
+      lastTurn.originPiece.resetPieceMovement();
+      lastTurn.originPiece.point = lastTurn.origin;
+      if (lastTurn.type === "castle") {
+        lastTurn.targetPiece.point = lastTurn.target;
+        lastTurn.targetPiece.resetPieceMovement();
+      } else if (lastTurn.type === "capture" || lastTurn.type === "enPassant") {
+        this.current.board.addPiece(lastTurn.targetPiece);
+      }
+      this.current.turnHistory.pop();
+      this.current.annotations.pop();
+      this.current.turn--;
+      return true;
+    }
+    return false;
+  }
 
   getMoveType(origin: Point, target: Point) {
     const originPiece = this.lookupPiece(origin);
@@ -83,36 +83,33 @@ class Game {
     //Get move type from origin and target points
     const moveType = this.getMoveType(origin, target);
     console.log(moveType);
+    let result: TurnHistory | undefined;
     switch (moveType) {
       case "movement":
         const turnHistory = this.resolveMovement({ origin, target });
-        // const annotation = this.annotate(enPassantResult);
-        // this.current.annotations.push(annotation);
-        if (turnHistory) this.current.turnHistory.push(turnHistory);
-        return turnHistory;
+        result = turnHistory;
+        break;
       case "capture":
         const captureResult = this.resolveCapture({ origin, target });
-        // const annotation = this.annotate(captureResult);
-        // this.current.annotations.push(annotation);
-        if (captureResult) this.current.turnHistory.push(captureResult);
-        return captureResult;
+        result = captureResult;
+        break;
       case "enPassant":
         const enPassantResult = this.resolveEnPassant({ origin, target });
-        // const annotation = this.annotate(enPassantResult);
-        // this.current.annotations.push(annotation);
-        if (enPassantResult) this.current.turnHistory.push(enPassantResult);
-        return enPassantResult;
+        result = enPassantResult;
+        break;
       case "castle":
         const castlingResult = this.resolveCastling({ origin, target });
-        // const annotation = this.annotate(castlingResult);
-        // this.current.annotations.push(annotation);
-        if (castlingResult) this.current.turnHistory.push(castlingResult);
-        return castlingResult;
+        result = castlingResult;
+        break;
       // case "promotion":
       //   return;
-      default:
-        return;
     }
+    if (result) {
+      // const annotation = this.annotate(result);
+      // this.current.annotations.push(result);
+      this.current.turnHistory.push(result);
+    }
+    return result;
   }
 
   resolveMovement({
