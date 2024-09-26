@@ -42,17 +42,17 @@ export function getPieceMoves({
   piece,
   lastTurnHistory,
   calcCastling,
-  flag,
+  checkCastling,
 }: {
   board: Board;
-  flag: boolean;
   piece: GamePiece;
   lastTurnHistory: TurnHistory | undefined;
   calcCastling: (piece: GamePiece, movesObj: Move[]) => void;
+  checkCastling: boolean;
 }) {
   switch (piece.type) {
     case Piece.P:
-      return calcPawnMoves(piece, flag, board, lastTurnHistory);
+      return calcPawnMoves(piece, board, lastTurnHistory);
     case Piece.R:
       return calcRookMoves(piece, board);
     case Piece.B:
@@ -62,7 +62,7 @@ export function getPieceMoves({
     case Piece.Q:
       return calcQueenMoves(piece, board);
     case Piece.K:
-      return calcKingMoves(piece, flag, board, calcCastling);
+      return calcKingMoves(piece, board, calcCastling, checkCastling);
   }
 }
 
@@ -96,7 +96,6 @@ function calcQueenMoves(piece: GamePiece, board: Board) {
 
 function calcPawnMoves(
   piece: GamePiece,
-  boolean: boolean,
   board: Board,
   turnHistory: TurnHistory | undefined
 ) {
@@ -151,9 +150,9 @@ function calcKnightMoves(piece: GamePiece, board: Board) {
 
 function calcKingMoves(
   piece: GamePiece,
-  castling: boolean,
   board: Board,
-  calcCastling: (piece: GamePiece, movesObj: Move[]) => void
+  calcCastling: (piece: GamePiece, movesObj: Move[]) => void,
+  checkCastling: boolean
 ) {
   const kingMoves: Point[] = [
     [0, 1],
@@ -171,7 +170,7 @@ function calcKingMoves(
   calcKingMovements(board, piece.point, piece.team, kingMoves, availableMoves);
 
   if (!piece.moved) {
-    castling ? calcCastling(piece, availableMoves) : null;
+    checkCastling ? calcCastling(piece, availableMoves) : null;
   }
 
   return availableMoves;

@@ -1,8 +1,8 @@
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { Move, Piece, Point, TurnHistory } from "../../shared/game";
+import { Point, TurnHistory } from "../../shared/game";
+import GamePiece from "../../shared/game-piece";
 import { Lobby, Player, TEAM } from "../../shared/match";
 import Game from "../game-logic/game";
-import GamePiece from "../../shared/game-piece";
 import { findByPoint } from "../scenes/scene-helpers";
 
 export interface MatchLogic {
@@ -15,15 +15,7 @@ export interface MatchLogic {
   }): TurnHistory | undefined;
   isPlayersTurn(): boolean;
   getPlayerTeam(): TEAM | undefined;
-  nextTurn(): void;
   isCurrentPlayersPiece(piece: GamePiece): boolean;
-  isValidMove({
-    pickedPiece,
-    selectedPiece,
-  }: {
-    pickedPiece: GamePiece;
-    selectedPiece: GamePiece;
-  }): Move | undefined;
   resetRequest(): boolean;
   undoTurnRequest(): boolean;
 }
@@ -85,8 +77,22 @@ export class BaseMatch {
     return this.game.undoTurn();
   }
 
-  getValidMoves(gamePiece: GamePiece) {
-    return this.game.getValidMoves(gamePiece);
+  nextTurn() {
+    return this.game.nextTurn();
+  }
+
+  isValidMove({
+    pickedPiece,
+    selectedPiece,
+  }: {
+    pickedPiece: GamePiece;
+    selectedPiece: GamePiece;
+  }) {
+    return this.game.isMove(selectedPiece, pickedPiece.point);
+  }
+
+  getValidMoves(piece: GamePiece) {
+    return this.game.getMoves({ piece, returnOnlyValid: true });
   }
 
   lookupGamePiece(pickedMesh: AbstractMesh, externalMesh: boolean) {

@@ -46,21 +46,6 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
     return false;
   }
 
-  isValidMove({
-    pickedPiece,
-    selectedPiece,
-  }: {
-    pickedPiece: GamePiece;
-    selectedPiece: GamePiece;
-  }) {
-    const isCurrentPlayersPiece = this.isCurrentPlayersPiece(pickedPiece);
-    return this.getGame().isValidMove(
-      selectedPiece,
-      pickedPiece.point,
-      isCurrentPlayersPiece
-    );
-  }
-
   isPlayersTurn() {
     const currentTeam = this.getGame().getTeam();
     const playingPlayerId = this.lobby.teams[currentTeam];
@@ -76,10 +61,6 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
 
   isCurrentPlayersPiece(piece: GamePiece) {
     return piece.team === this.getPlayerTeam();
-  }
-
-  nextTurn() {
-    return this.getGame().nextTurn();
   }
 
   subscribeMatchEvents({
