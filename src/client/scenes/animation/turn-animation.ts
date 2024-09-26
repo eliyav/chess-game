@@ -21,10 +21,7 @@ export default async function calcTurnAnimation({
 
   if (!movingMesh) return;
 
-  if (
-    turnHistory.targetPiece &&
-    (turnHistory.type === "standard" || turnHistory.type === "enPassant")
-  ) {
+  if (turnHistory.type === "capture" || turnHistory.type === "enPassant") {
     pieceBreakAnimation({
       target: turnHistory.targetPiece,
     });
@@ -32,7 +29,7 @@ export default async function calcTurnAnimation({
 
   //Animate Piece Movement
   const animateZ = movingMesh.name === "Knight" ? false : true;
-  if (turnHistory.type === "castling") {
+  if (turnHistory.type === "castle") {
     const targetMesh = findMeshFromPoint(target);
     if (!targetMesh) return;
     return await animateMovements({
@@ -55,13 +52,7 @@ export default async function calcTurnAnimation({
       meshes.forEach((mesh, i) => {
         let position;
         let targetPosition;
-        if (turnHistory.type === "castling" && mesh.name === "King") {
-          const {
-            point: [x, y],
-          } = turnHistory.originPiece!;
-          const direction = turnHistory.direction!;
-          const newKingX = x + direction * 2;
-          const newKingPoint: Point = [newKingX, y];
+        if (turnHistory.type === "castle" && mesh.name === "King") {
           position = findByPoint({
             get: "position",
             point: origin,
@@ -69,16 +60,10 @@ export default async function calcTurnAnimation({
           });
           targetPosition = findByPoint({
             get: "position",
-            point: newKingPoint,
+            point: turnHistory.originPiece.point,
             externalMesh: true,
           });
-        } else if (turnHistory.type === "castling" && mesh.name === "Rook") {
-          const {
-            point: [x, y],
-          } = turnHistory.originPiece!;
-          const direction = turnHistory.direction!;
-          const newRookX = x + direction;
-          const newRookPoint: Point = [newRookX, y];
+        } else if (turnHistory.type === "castle" && mesh.name === "Rook") {
           position = findByPoint({
             get: "position",
             point: target,
@@ -86,7 +71,7 @@ export default async function calcTurnAnimation({
           });
           targetPosition = findByPoint({
             get: "position",
-            point: newRookPoint,
+            point: turnHistory.targetPiece.point,
             externalMesh: true,
           });
         } else {
@@ -194,7 +179,7 @@ export default async function calcTurnAnimation({
 
   function pieceBreakAnimation({ target }: { target: GamePiece }) {
     //Look up animation group based on piece breaking,
-    const { name, color: team, point } = target;
+    const { type, team, point } = target;
     const targetMesh = gameScene.data.meshesToRender.find((mesh) => {
       const meshPoint = findByPoint({
         get: "index",
@@ -207,7 +192,7 @@ export default async function calcTurnAnimation({
     if (targetMesh) {
       gameScene.scene.removeMesh(targetMesh);
     }
-    const animationContainer = gameScene.data.animationsContainer[name];
+    const animationContainer = gameScene.data.animationsContainer[type];
     animatePieceBreak({
       container: animationContainer,
       point,

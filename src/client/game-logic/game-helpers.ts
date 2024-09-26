@@ -1,90 +1,44 @@
 import { Point } from "../../shared/game";
-import { Square } from "./board";
+import { TEAM } from "../../shared/match";
 import GamePiece from "./game-piece";
 
-export interface TurnHistory {
-  result: boolean;
-  type: string;
-  direction?: number;
-  enPassant?: EnPassantResult;
-  castling?: Square[];
-  origin: Point;
-  target: Point;
-  originPiece: GamePiece | undefined;
-  targetPiece: GamePiece | undefined;
-  originSquare: Square;
-  targetSquare: Square;
-  promotion: boolean;
-  promotedPiece?: string;
-  turn?: number;
-}
+export type TurnHistory =
+  | {
+      type: "movement";
+      origin: Point;
+      target: Point;
+      originPiece: GamePiece;
+      promote?: boolean;
+    }
+  | {
+      type: "capture";
+      origin: Point;
+      target: Point;
+      originPiece: GamePiece;
+      targetPiece: GamePiece;
+      promote?: boolean;
+    }
+  | {
+      type: "castle";
+      origin: Point;
+      target: Point;
+      originPiece: GamePiece;
+      targetPiece: GamePiece;
+      direction: number;
+      castling: { name: string }[];
+    }
+  | {
+      type: "enPassant";
+      origin: Point;
+      target: Point;
+      originPiece: GamePiece;
+      targetPiece: GamePiece;
+      enPassant: EnPassantResult;
+    };
 
 type EnPassantResult = {
   result: boolean;
   enPassantPoint: Point;
-};
-
-export interface LocationsInfo {
-  originSquare: Square;
-  targetSquare: Square;
-  originPiece: GamePiece | undefined;
-  targetPiece: GamePiece | undefined;
-  originPoint: Point;
-  targetPoint: Point;
-}
-
-const generateTurnHistory = (
-  type: string,
-  LocationsInfo: LocationsInfo,
-  options: {
-    promotion: boolean;
-    enPassant?: EnPassantResult;
-    enPassantPiece?: GamePiece | undefined;
-    lastTurnHistorySquare?: Square;
-    direction?: number;
-    castlingResult?: Square[];
-  }
-): TurnHistory | undefined => {
-  if (type === "standard") {
-    return {
-      result: true,
-      type: type,
-      origin: LocationsInfo.originPoint,
-      target: LocationsInfo.targetPoint,
-      originPiece: LocationsInfo.originPiece,
-      targetPiece: LocationsInfo.targetPiece,
-      originSquare: LocationsInfo.originSquare,
-      targetSquare: LocationsInfo.targetSquare,
-      promotion: options.promotion,
-    };
-  } else if (type === "enPassant") {
-    return {
-      result: true,
-      type: "enPassant",
-      enPassant: options.enPassant,
-      origin: LocationsInfo.originPoint,
-      target: LocationsInfo.targetPoint,
-      originPiece: LocationsInfo.originPiece,
-      targetPiece: options.enPassantPiece,
-      originSquare: LocationsInfo.originSquare,
-      targetSquare: options.lastTurnHistorySquare!,
-      promotion: options.promotion,
-    };
-  } else if (type === "castling") {
-    return {
-      result: true,
-      type: "castling",
-      direction: options.direction,
-      castling: options.castlingResult,
-      origin: LocationsInfo.originPoint,
-      target: LocationsInfo.targetPoint,
-      originPiece: LocationsInfo.originPiece,
-      targetPiece: LocationsInfo.targetPiece,
-      originSquare: LocationsInfo.originSquare,
-      targetSquare: LocationsInfo.targetSquare,
-      promotion: options.promotion,
-    };
-  }
 };
 
 const isEnPassantAvailable = (turnHistory: TurnHistory): EnPassantResult => {
@@ -93,41 +47,18 @@ const isEnPassantAvailable = (turnHistory: TurnHistory): EnPassantResult => {
   let noMove = -1;
   let x = noMove;
   let y = noMove;
-  turnHistory === undefined
-    ? null
-    : (() => {
-        if (turnHistory.originPiece!.name === "Pawn") {
-          const targetY = turnHistory.target[1];
-          const originY = turnHistory.origin[1];
-          moved = Math.abs(targetY - originY);
-          direction = turnHistory.originPiece!.color === "White" ? 1 : -1;
-          x = turnHistory.target[0];
-          y = turnHistory.origin[1] + direction;
-        }
-      })();
+  if (turnHistory.originPiece.type === "Pawn") {
+    const targetY = turnHistory.target[1];
+    const originY = turnHistory.origin[1];
+    moved = Math.abs(targetY - originY);
+    direction = turnHistory.originPiece.team === TEAM.WHITE ? 1 : -1;
+    x = turnHistory.target[0];
+    y = turnHistory.origin[1] + direction;
+  }
   return {
     result: moved === 2 ? true : false,
     enPassantPoint: [x, y],
   };
-};
-
-//Functions to switch game pieces back and forth between squares once move is entered
-const updateLocation = (LocationsInfo: LocationsInfo) => {
-  const { originSquare, targetSquare, originPiece, targetPoint } =
-    LocationsInfo;
-  targetSquare.on = originPiece;
-  targetSquare.on!.point = [getX(targetPoint), getY(targetPoint)];
-  originSquare.on = undefined;
-  return true;
-};
-
-const undoUpdateLocation = (LocationsInfo: LocationsInfo) => {
-  const { originSquare, targetSquare, originPiece, targetPiece, originPoint } =
-    LocationsInfo;
-  originSquare.on = originPiece;
-  originSquare.on!.point = [getX(originPoint), getY(originPoint)];
-  targetSquare.on = targetPiece;
-  return true;
 };
 
 //General Helper functions
@@ -144,12 +75,4 @@ const getY = (point: Point) => {
 const doMovesMatch = (move: Point, move2: Point) =>
   getX(move) == getX(move2) && getY(move) == getY(move2);
 
-export {
-  getX,
-  getY,
-  doMovesMatch,
-  updateLocation,
-  undoUpdateLocation,
-  isEnPassantAvailable,
-  generateTurnHistory,
-};
+export { doMovesMatch, getX, getY, isEnPassantAvailable };

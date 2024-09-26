@@ -1,17 +1,15 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { LOBBY_TYPE, Lobby } from "../../shared/match";
+import { AppRoutes } from "../../shared/routes";
 import { MenuOverlay } from "../components/game-overlay/menu-overlay";
 import * as icons from "../components/game-overlay/overlay-icons";
+import { Message } from "../components/modals/message-modal";
 import { Controller } from "../match-logic/controller";
 import { LocalMatch } from "../match-logic/local-match";
 import { OnlineMatch } from "../match-logic/online-match";
-import { Message } from "../components/modals/message-modal";
-import PromotionModal from "../components/modals/promotion-modal";
 import { SceneManager, Scenes } from "../scenes/scene-manager";
 import { websocket } from "../websocket-client";
-import App from "../app";
-import { AppRoutes } from "../../shared/routes";
 
 export const Game: React.FC<{
   sceneManager: SceneManager;
@@ -19,7 +17,6 @@ export const Game: React.FC<{
   setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
 }> = ({ sceneManager, setMessage, lobby }) => {
   const navigate = useNavigate();
-  const [promotion, setPromotion] = useState(false);
   const match = useRef(
     lobby.mode === LOBBY_TYPE.LOCAL
       ? new LocalMatch({ lobby, player: lobby.players[0] })
@@ -28,13 +25,13 @@ export const Game: React.FC<{
           player: lobby.players.find((player) => player.id === websocket.id)!,
         })
   );
+  console.log(match.current);
   const controller = useRef(
     new Controller({
       sceneManager,
       match: match.current,
       events: {
         setMessage: (message: Message | null) => setMessage(message),
-        promote: () => setPromotion(true),
       },
       options: lobby.controllerOptions,
     })
@@ -72,7 +69,7 @@ export const Game: React.FC<{
           },
           {
             text: "undo",
-            onClick: () => controller.current.undoMove(),
+            onClick: () => controller.current.requestUndoTurn(),
           },
           {
             text: "camera",
@@ -85,14 +82,6 @@ export const Game: React.FC<{
         ]}
         icons={icons}
       />
-      {promotion && (
-        <PromotionModal
-          submitSelection={(e) => {
-            controller.current.handlePromotionEvent(e.target.innerText);
-            setPromotion(false);
-          }}
-        />
-      )}
     </>
   );
 };

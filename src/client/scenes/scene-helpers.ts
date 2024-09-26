@@ -1,12 +1,11 @@
 import { Material } from "@babylonjs/core/Materials/material";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import type { Move } from "../game-logic/game-piece";
 import { GameScene } from "./scene-manager";
 import { pointIndexMap, pointPositionMap } from "../data/point-map-data";
 import GamePiece from "../game-logic/game-piece";
 import { Scene } from "@babylonjs/core/scene";
-import { Point } from "../../shared/game";
+import { Move, Point } from "../../shared/game";
 
 const Y_ABOVE_FLOOR = 0.51;
 

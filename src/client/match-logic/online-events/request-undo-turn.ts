@@ -1,26 +1,26 @@
 import { Message } from "../../components/modals/message-modal";
-import { Controller } from "../controller";
 import { websocket } from "../../websocket-client";
+import { Controller } from "../controller";
 
-export function requestUndoMove({
+export function requestUndoTurn({
   setMessage,
   controller,
 }: {
   setMessage: (value: React.SetStateAction<Message | null>) => void;
   controller: Controller;
 }): string[] {
-  websocket.on("undoMoveRequested", () => {
+  websocket.on("undoTurnRequested", () => {
     setMessage({
       text: "Opponent requested to undo the last game move. Do you accept?",
       onConfirm: () => {
-        websocket.emit("undoMoveResponse", {
+        websocket.emit("undoTurnResponse", {
           answer: true,
           lobbyKey: controller.match.lobby.key,
         });
         setMessage(null);
       },
       onReject: () => {
-        websocket.emit("undoMoveResponse", {
+        websocket.emit("undoTurnResponse", {
           answer: false,
           lobbyKey: controller.match.lobby.key,
         });
@@ -29,10 +29,9 @@ export function requestUndoMove({
     });
   });
 
-  websocket.on("undoMoveResolve", ({ answer }) => {
+  websocket.on("undoTurnResolve", ({ answer }) => {
     if (answer) {
-      controller.match.undoTurn();
-      controller.resetView();
+      controller.undoTurn();
 
       setMessage({
         text: "Last move has been undone successfully!",

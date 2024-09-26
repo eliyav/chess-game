@@ -1,7 +1,6 @@
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { Scene } from "@babylonjs/core/scene.js";
-import { FresnelParameters } from "@babylonjs/core/Materials/fresnelParameters.js";
 import { Color3 } from "@babylonjs/core/Maths/math.color.js";
+import { Scene } from "@babylonjs/core/scene.js";
 
 const materials = [
   {
@@ -25,7 +24,7 @@ const materials = [
     specularColor: new Color3(0.15, 0.15, 0.15),
   },
   {
-    name: "castling",
+    name: "castle",
     diffuseColor: new Color3(0, 0.2, 0.8),
     specularColor: new Color3(0.15, 0.15, 0.15),
   },
@@ -60,4 +59,4 @@ function createMeshMaterials(scene: Scene): Materials {
 
   return { white, black };
 }
-export { createMovementMaterials, createMeshMaterials };
+export { createMeshMaterials, createMovementMaterials };

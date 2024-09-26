@@ -41,7 +41,7 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
   }
 
   undoTurnRequest() {
-    return this.getGame().undoTurn();
+    return true;
   }
 
   isPlayersTurn() {
@@ -50,11 +50,11 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
   }
 
   getPlayerTeam() {
-    return this.getGame().getCurrentTeam();
+    return this.getGame().getTeam();
   }
 
   isCurrentPlayersPiece(piece: GamePiece) {
-    return piece.color === this.getPlayerTeam();
+    return piece.team === this.getPlayerTeam();
   }
 
   nextTurn() {

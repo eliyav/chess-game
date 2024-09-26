@@ -4,6 +4,7 @@ import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { Nullable } from "@babylonjs/core/types";
 import { Point } from "../../shared/game";
+import { ControllerOptions, LOBBY_TYPE } from "../../shared/match";
 import { Message } from "../components/modals/message-modal";
 import { doMovesMatch, TurnHistory } from "../game-logic/game-helpers";
 import GamePiece from "../game-logic/game-piece";
@@ -13,14 +14,12 @@ import { displayPieceMoves, findByPoint } from "../scenes/scene-helpers";
 import { GameScene, SceneManager, Scenes } from "../scenes/scene-manager";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
-import { ControllerOptions, LOBBY_TYPE } from "../../shared/match";
 
 export class Controller {
   sceneManager: SceneManager;
   match: LocalMatch | OnlineMatch;
   events: {
     setMessage: (message: Message | null) => void;
-    promote: () => void;
   };
   selectedPiece?: GamePiece;
   options: ControllerOptions;
@@ -35,7 +34,6 @@ export class Controller {
     match: LocalMatch | OnlineMatch;
     events: {
       setMessage: (message: Message | null) => void;
-      promote: () => void;
     };
     options: ControllerOptions;
   }) {
@@ -62,13 +60,12 @@ export class Controller {
       if (!this.match.isPlayersTurn()) return;
       const pickedMesh = pickResult?.pickedMesh;
       if (!pickedMesh) return;
-      if (this.options.playGameSounds) {
-        gameScene.data.audio.select?.play();
-      }
+
       const pickedPiece = this.match.lookupGamePiece(
         pickedMesh,
         pickedMesh.metadata !== null
       );
+
       if (pickedPiece) {
         this.handlePieceInput(pickedPiece);
       } else {
@@ -78,28 +75,24 @@ export class Controller {
   }
 
   async resolveMove(move: Point[]) {
-    if (move) {
-      const [originPoint, targetPoint] = move;
-      const validTurn = this.match.requestResolveMove({
-        originPoint,
-        targetPoint,
-      });
-      if (validTurn) {
-        this.handleValidMove({ history: validTurn });
-      }
+    const [originPoint, targetPoint] = move;
+    const validTurn = this.match.requestResolveMove({
+      originPoint,
+      targetPoint,
+    });
+    if (validTurn) {
+      this.handleValidMove({ history: validTurn });
     }
   }
 
   async handleResolvedMove(move: Point[]) {
-    if (move) {
-      const [originPoint, targetPoint] = move;
-      const validTurn = this.match.resolveMove({
-        originPoint,
-        targetPoint,
-      });
-      if (validTurn) {
-        this.handleValidMove({ history: validTurn });
-      }
+    const [originPoint, targetPoint] = move;
+    const validTurn = this.match.resolveMove({
+      originPoint,
+      targetPoint,
+    });
+    if (validTurn) {
+      this.handleValidMove({ history: validTurn });
     }
   }
 
@@ -108,8 +101,7 @@ export class Controller {
     if (!gameScene) return;
     if (this.options.playGameSounds) {
       const moveType = history.type;
-      const captured = moveType === "standard" && history.targetPiece;
-      if (captured || moveType === "enPassant") {
+      if (moveType === "capture" || moveType === "enPassant") {
         gameScene.data.audio.crumble?.play();
       }
     }
@@ -117,11 +109,7 @@ export class Controller {
       turnHistory: history,
       gameScene,
     });
-    if (history.promotion) {
-      this.events.promote();
-    } else {
-      this.onMoveSuccess();
-    }
+    this.onMoveSuccess();
   }
 
   displayMoves(piece: GamePiece | undefined) {
@@ -130,6 +118,9 @@ export class Controller {
     if (!piece) return;
     const currentPlayersPiece = this.match.isCurrentPlayersPiece(piece);
     if (currentPlayersPiece) {
+      if (this.options.playGameSounds) {
+        gameScene.data.audio.select?.play();
+      }
       const moves = this.match.getValidMoves(piece);
       this.selectedPiece = piece;
       this.updateMeshesRender();
@@ -198,12 +189,17 @@ export class Controller {
     };
   }
 
-  undoMove() {
+  undoTurn() {
     if (this.match.getGameHistory().length === 0) return;
     const isValidUndo = this.match.undoTurn();
     if (isValidUndo) {
-      this.updateMeshesRender();
-      this.rotateCamera();
+      this.resetView();
+    }
+  }
+
+  requestUndoTurn() {
+    if (this.match.undoTurnRequest()) {
+      this.undoTurn();
     }
   }
 
@@ -220,7 +216,11 @@ export class Controller {
 
   resetView() {
     this.updateMeshesRender();
-    this.resetCamera();
+    if (this.match.lobby.mode === LOBBY_TYPE.LOCAL) {
+      this.rotateCamera();
+    } else {
+      this.resetCamera();
+    }
   }
 
   turnAnimation({
@@ -251,11 +251,6 @@ export class Controller {
     });
   }
 
-  handlePromotionEvent(selection: string) {
-    this.match.setPromotion(selection);
-    this.handleNextTurn();
-  }
-
   updateMeshesRender() {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
@@ -275,13 +270,13 @@ export class Controller {
     }
 
     //For each active piece, creates a mesh clone and places on board
-    this.match.getAllGamePieces().forEach((square) => {
-      const { name, color, point } = square.on!;
+    this.match.getAllGamePieces().forEach((piece) => {
+      const { type, team, point } = piece;
       const foundMesh = gameScene.scene.meshes.find(
-        (mesh) => mesh.name === name && mesh.metadata.color === color
+        (mesh) => mesh.name === type && mesh.metadata.color === team
       );
       if (!foundMesh) return;
-      const clone = foundMesh.clone(name, null);
+      const clone = foundMesh.clone(type, null);
       if (!clone) return;
       [clone.position.z, clone.position.x] = findByPoint({
         get: "position",

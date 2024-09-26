@@ -1,22 +1,34 @@
-import { Point } from "../../shared/game";
+import { Piece, Point } from "../../shared/game";
+import { TEAM } from "../../shared/match";
 
 class GamePiece {
-  name: string;
-  color: string;
+  type: Piece;
+  team: TEAM;
   point: Point;
   movement: number[];
   moved: boolean;
   moveCounter: number;
   direction: number;
 
-  constructor(name: string, color: string, point: Point, movement: number[]) {
-    this.name = name;
-    this.color = color;
+  constructor({
+    type,
+    team,
+    point,
+    update,
+  }: {
+    type: Piece;
+    team: TEAM;
+    point: Point;
+    update?: boolean;
+  }) {
+    this.type = type;
+    this.team = team;
     this.point = point;
-    this.movement = movement;
+    this.movement = [1, 2, 3, 4, 5, 6, 7];
     this.moved = false;
     this.moveCounter = 0;
-    this.direction = this.color === "White" ? 1 : -1;
+    this.direction = this.team === TEAM.WHITE ? 1 : -1;
+    if (update) this.update();
   }
 
   resetPieceMovement() {
@@ -25,35 +37,20 @@ class GamePiece {
   }
 
   update() {
-    this.moved ? null : (this.moved = true);
+    this.moved = true;
     this.moveCounter++;
   }
 
   checkPromotion() {
-    if (this.name === "Pawn" && (this.point[1] === 0 || this.point[1] === 7)) {
+    if (this.type === Piece.P && (this.point[1] === 0 || this.point[1] === 7)) {
       return true;
     }
     return false;
   }
 
   getSymbol() {
-    switch (this.name) {
-      case "King":
-        return "K";
-      case "Queen":
-        return "Q";
-      case "Knight":
-        return "N";
-      case "Bishop":
-        return "B";
-      case "Rook":
-        return "R";
-      default:
-        return "";
-    }
+    return Object.entries(Piece).find(([_, value]) => value === this.type)?.[0];
   }
 }
-
-export type Move = [Point, string];
 
 export default GamePiece;

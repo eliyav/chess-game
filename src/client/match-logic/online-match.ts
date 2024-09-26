@@ -1,13 +1,13 @@
 import { Point } from "../../shared/game";
 import { Lobby, LOBBY_TYPE, Player, TEAM } from "../../shared/match";
-import { websocket } from "../websocket-client";
-import GamePiece from "../game-logic/game-piece";
 import { Message } from "../components/modals/message-modal";
+import GamePiece from "../game-logic/game-piece";
+import { websocket } from "../websocket-client";
 import { BaseMatch, MatchLogic } from "./base-match";
 import { Controller } from "./controller";
 import { requestMatchReset } from "./online-events/request-match-reset";
 import { requestResolveMove } from "./online-events/request-resolve-move";
-import { requestUndoMove } from "./online-events/request-undo-move";
+import { requestUndoTurn } from "./online-events/request-undo-turn";
 
 export class OnlineMatch extends BaseMatch implements MatchLogic {
   mode: LOBBY_TYPE.ONLINE;
@@ -32,10 +32,8 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
         targetPoint,
         key: this.lobby.key,
       });
-      return isValidMove;
-    } else {
-      return false;
     }
+    return isValidMove;
   }
 
   resetRequest() {
@@ -44,7 +42,7 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
   }
 
   undoTurnRequest() {
-    websocket.emit("resetMatchRequest", { lobbyKey: this.lobby.key });
+    websocket.emit("undoTurnRequest", { lobbyKey: this.lobby.key });
     return false;
   }
 
@@ -64,7 +62,7 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
   }
 
   isPlayersTurn() {
-    const currentTeam = this.getGame().getCurrentTeam();
+    const currentTeam = this.getGame().getTeam();
     const playingPlayerId = this.lobby.teams[currentTeam];
     return playingPlayerId === this.player.id;
   }
@@ -77,15 +75,11 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
   }
 
   isCurrentPlayersPiece(piece: GamePiece) {
-    return piece.color === this.getPlayerTeam();
+    return piece.team === this.getPlayerTeam();
   }
 
   nextTurn() {
     return this.getGame().nextTurn();
-  }
-
-  setPromotion(selection: string) {
-    this.getGame().setPromotionPiece(selection);
   }
 
   subscribeMatchEvents({
@@ -99,7 +93,7 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
       setMessage,
       controller,
     });
-    const matchUndoEvents = requestUndoMove({
+    const matchUndoEvents = requestUndoTurn({
       setMessage,
       controller,
     });
