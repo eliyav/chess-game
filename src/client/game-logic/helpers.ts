@@ -1,12 +1,7 @@
-import { Move, Point } from "../../shared/game";
+import { EnPassantResult, Move, Point, TurnHistory } from "../../shared/game";
+import GamePiece from "../../shared/game-piece";
 import { TEAM } from "../../shared/match";
 import Board, { type Grid } from "./board";
-import {
-  TurnHistory,
-  doMovesMatch,
-  isEnPassantAvailable,
-} from "./game-helpers";
-import GamePiece from "./game-piece";
 
 type MovementsDirection =
   | "up"
@@ -455,7 +450,32 @@ const calcLeft = (
   bounds(leftX, grid) ? finalObj.push([leftX, y]) : null;
 };
 
+const isEnPassantAvailable = (turnHistory: TurnHistory): EnPassantResult => {
+  let moved;
+  let direction;
+  let noMove = -1;
+  let x = noMove;
+  let y = noMove;
+  if (turnHistory.originPiece.type === "Pawn") {
+    const targetY = turnHistory.target[1];
+    const originY = turnHistory.origin[1];
+    moved = Math.abs(targetY - originY);
+    direction = turnHistory.originPiece.team === TEAM.WHITE ? 1 : -1;
+    x = turnHistory.target[0];
+    y = turnHistory.origin[1] + direction;
+  }
+  return {
+    result: moved === 2 ? true : false,
+    enPassantPoint: [x, y],
+  };
+};
+
+const doMovesMatch = (move: Point, move2: Point) =>
+  move[0] == move2[0] && move[1] == move2[1];
+
 export {
+  doMovesMatch,
+  isEnPassantAvailable,
   calcBishopMoves,
   calcKingMoves,
   calcKnightMoves,

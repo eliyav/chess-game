@@ -1,14 +1,23 @@
-import { Move, Piece, Point } from "../../shared/game";
+import {
+  EnPassantResult,
+  Move,
+  Piece,
+  Point,
+  TurnHistory,
+} from "../../shared/game";
 import { TEAM } from "../../shared/match";
 import Board from "./board";
+import GamePiece from "../../shared/game-piece";
 import {
+  calcBishopMoves,
+  calcKingMoves,
+  calcKnightMoves,
+  calcPawnMoves,
+  calcQueenMoves,
+  calcRookMoves,
   doMovesMatch,
-  getX,
   isEnPassantAvailable,
-  TurnHistory,
-} from "./game-helpers";
-import GamePiece from "./game-piece";
-import * as movementHelpers from "./movement-helpers";
+} from "./helpers";
 
 class Game {
   teams: TEAM[];
@@ -217,9 +226,9 @@ class Game {
       castling2 =
         targetPiece.type === Piece.R && targetPiece.team === this.getTeam();
       if (castling && castling2) {
-        const a = getX(origin);
-        const b = getX(target);
-        let c = a - b;
+        const [originX] = origin;
+        const [targetX] = target;
+        let c = originX - targetX;
         c < 0 ? (c = 1) : (c = -1);
         const castlingResult = castlingMove(
           c,
@@ -267,7 +276,7 @@ class Game {
       this.current.turnHistory[this.current.turnHistory.length - 1];
     switch (piece.type) {
       case "Pawn":
-        availableMoves = movementHelpers.calcPawnMoves(
+        availableMoves = calcPawnMoves(
           piece,
           flag,
           this.current.board,
@@ -275,31 +284,19 @@ class Game {
         );
         break;
       case "Rook":
-        availableMoves = movementHelpers.calcRookMoves(
-          piece,
-          this.current.board
-        );
+        availableMoves = calcRookMoves(piece, this.current.board);
         break;
       case "Bishop":
-        availableMoves = movementHelpers.calcBishopMoves(
-          piece,
-          this.current.board
-        );
+        availableMoves = calcBishopMoves(piece, this.current.board);
         break;
       case "Knight":
-        availableMoves = movementHelpers.calcKnightMoves(
-          piece,
-          this.current.board
-        );
+        availableMoves = calcKnightMoves(piece, this.current.board);
         break;
       case "Queen":
-        availableMoves = movementHelpers.calcQueenMoves(
-          piece,
-          this.current.board
-        );
+        availableMoves = calcQueenMoves(piece, this.current.board);
         break;
       case "King":
-        availableMoves = movementHelpers.calcKingMoves(
+        availableMoves = calcKingMoves(
           piece,
           flag,
           this.current.board,
@@ -461,7 +458,7 @@ class Game {
     const isKingChecked = this.isChecked(true);
     if (!isKingChecked) {
       const [kingX, kingY] = originPoint;
-      const rookX = getX(targetPoint);
+      const [rookX] = targetPoint;
       const spaceBetween = kingX - rookX;
       let distance;
       spaceBetween < 0
