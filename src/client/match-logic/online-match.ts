@@ -18,14 +18,14 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
     this.mode = LOBBY_TYPE.ONLINE;
   }
 
-  requestResolveMove({
+  requestMove({
     originPoint,
     targetPoint,
   }: {
     originPoint: Point;
     targetPoint: Point;
   }) {
-    const isValidMove = this.resolveMove({ originPoint, targetPoint });
+    const isValidMove = this.move({ originPoint, targetPoint });
     if (isValidMove) {
       websocket.emit("resolvedMove", {
         originPoint,

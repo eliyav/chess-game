@@ -75,29 +75,29 @@ export class Controller {
     };
   }
 
-  async resolveMove(move: Point[]) {
+  async move(move: Point[]) {
     const [originPoint, targetPoint] = move;
-    const validTurn = this.match.requestResolveMove({
+    const validTurn = this.match.requestMove({
       originPoint,
       targetPoint,
     });
     if (validTurn) {
-      this.handleValidMove({ history: validTurn });
+      this.handleValidTurn({ history: validTurn });
     }
   }
 
   async handleResolvedMove(move: Point[]) {
     const [originPoint, targetPoint] = move;
-    const validTurn = this.match.resolveMove({
+    const validTurn = this.match.move({
       originPoint,
       targetPoint,
     });
     if (validTurn) {
-      this.handleValidMove({ history: validTurn });
+      this.handleValidTurn({ history: validTurn });
     }
   }
 
-  async handleValidMove({ history }: { history: TurnHistory }) {
+  async handleValidTurn({ history }: { history: TurnHistory }) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
     if (this.options.playGameSounds) {
@@ -113,6 +113,17 @@ export class Controller {
     this.onMoveSuccess();
   }
 
+  onMoveSuccess() {
+    this.selectedPiece = undefined;
+    this.updateMeshesRender();
+    const gameStatus = this.match.getGame().getState();
+    if (gameStatus === GAMESTATUS.CHECKMATE) {
+      this.events.setMessage(this.createMatchEndPrompt());
+    } else {
+      this.rotateCamera();
+    }
+  }
+
   displayMoves(piece: GamePiece | undefined) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
@@ -122,7 +133,7 @@ export class Controller {
       if (this.options.playGameSounds) {
         gameScene.data.audio.select?.play();
       }
-      const moves = this.match.getValidMoves(piece);
+      const moves = this.match.getMoves(piece);
       this.selectedPiece = piece;
       this.updateMeshesRender();
       displayPieceMoves({
@@ -145,12 +156,12 @@ export class Controller {
     //If you select the same piece as before deselect it
     if (this.selectedPiece === pickedPiece) return this.unselectCurrentPiece();
     //If you select a different piece check if its a valid move and resolve or display new moves
-    const validMove = this.match.isValidMove({
+    const validMove = this.match.isMove({
       selectedPiece: this.selectedPiece,
       pickedPiece,
     });
     if (validMove) {
-      return this.resolveMove([this.selectedPiece.point, pickedPiece.point]);
+      return this.move([this.selectedPiece.point, pickedPiece.point]);
     }
     return this.displayMoves(pickedPiece);
   }
@@ -164,21 +175,7 @@ export class Controller {
         point: [pickedMesh.position.z, pickedMesh.position.x],
         externalMesh: false,
       });
-      return this.resolveMove([this.selectedPiece.point, point]);
-    }
-  }
-
-  onMoveSuccess() {
-    this.handleNextTurn();
-    this.rotateCamera();
-  }
-
-  handleNextTurn() {
-    this.selectedPiece = undefined;
-    this.updateMeshesRender();
-    const gameStatus = this.match.getGame().getState();
-    if (gameStatus === GAMESTATUS.CHECKMATE) {
-      this.events.setMessage(this.createMatchEndPrompt());
+      return this.move([this.selectedPiece.point, point]);
     }
   }
 

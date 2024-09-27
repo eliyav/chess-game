@@ -6,7 +6,7 @@ import Game from "../game-logic/game";
 import { findByPoint } from "../scenes/scene-helpers";
 
 export interface MatchLogic {
-  requestResolveMove({
+  requestMove({
     originPoint,
     targetPoint,
   }: {
@@ -31,7 +31,7 @@ export class BaseMatch {
     this.player = player;
   }
 
-  resolveMove({
+  move({
     originPoint,
     targetPoint,
   }: {
@@ -39,6 +39,20 @@ export class BaseMatch {
     targetPoint: Point;
   }) {
     return this.getGame().move(originPoint, targetPoint);
+  }
+
+  isMove({
+    pickedPiece,
+    selectedPiece,
+  }: {
+    pickedPiece: GamePiece;
+    selectedPiece: GamePiece;
+  }) {
+    return this.game.isMove(selectedPiece, pickedPiece.point);
+  }
+
+  getMoves(piece: GamePiece) {
+    return this.game.getResolvableMoves({ piece });
   }
 
   reset() {
@@ -75,24 +89,6 @@ export class BaseMatch {
 
   undoTurn() {
     return this.game.undoTurn();
-  }
-
-  nextTurn() {
-    return this.game.nextTurn();
-  }
-
-  isValidMove({
-    pickedPiece,
-    selectedPiece,
-  }: {
-    pickedPiece: GamePiece;
-    selectedPiece: GamePiece;
-  }) {
-    return this.game.isMove(selectedPiece, pickedPiece.point);
-  }
-
-  getValidMoves(piece: GamePiece) {
-    return this.game.getResolvableMoves({ piece });
   }
 
   lookupGamePiece(pickedMesh: AbstractMesh, externalMesh: boolean) {

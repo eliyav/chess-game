@@ -11,14 +11,14 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
     this.mode = LOBBY_TYPE.LOCAL;
   }
 
-  requestResolveMove({
+  requestMove({
     originPoint,
     targetPoint,
   }: {
     originPoint: Point;
     targetPoint: Point;
   }) {
-    return this.resolveMove({ originPoint, targetPoint });
+    return this.move({ originPoint, targetPoint });
   }
 
   resetRequest() {
