@@ -9,9 +9,11 @@ export interface MatchLogic {
   requestMove({
     originPoint,
     targetPoint,
+    emit,
   }: {
     originPoint: Point;
     targetPoint: Point;
+    emit: boolean;
   }): TurnHistory | undefined;
   isPlayersTurn(): boolean;
   getPlayerTeam(): TEAM | undefined;
@@ -39,16 +41,6 @@ export class BaseMatch {
     targetPoint: Point;
   }) {
     return this.getGame().move(originPoint, targetPoint);
-  }
-
-  isMove({
-    pickedPiece,
-    selectedPiece,
-  }: {
-    pickedPiece: GamePiece;
-    selectedPiece: GamePiece;
-  }) {
-    return this.game.isMove(selectedPiece, pickedPiece.point);
   }
 
   getMoves(piece: GamePiece) {

@@ -128,7 +128,7 @@ class Game {
     const originPiece = this.lookupPiece(origin);
     if (!originPiece) return;
     //Check if valid move can be resolved
-    if (this.isMoveResolvable({ origin, target }, false)) {
+    if (this.canMoveResolve({ origin, target }, false)) {
       originPiece.update();
       return {
         type: "movement",
@@ -153,7 +153,7 @@ class Game {
     const targetPiece = this.lookupPiece(target);
     if (!originPiece || !targetPiece) return;
     //Check if valid move can be resolved
-    if (this.isMoveResolvable({ origin, target }, false)) {
+    if (this.canMoveResolve({ origin, target }, false)) {
       originPiece.update();
       return {
         type: "capture",
@@ -180,7 +180,7 @@ class Game {
     const enPassant = isEnPassantAvailable(lastTurnHistory);
     if (enPassant.result) {
       if (doMovesMatch(enPassant.enPassantPoint, target)) {
-        if (this.isMoveResolvable({ origin, target }, false)) {
+        if (this.canMoveResolve({ origin, target }, false)) {
           originPiece.update();
           const enPassantPiece = lastTurnHistory.originPiece;
           this.current.board.removePieceByPoint(enPassantPiece.point);
@@ -275,20 +275,14 @@ class Game {
   }): Move[] {
     const availableMoves = this.getPossibleMoves({ piece, checkCastling });
     return availableMoves.filter((move) => {
-      return this.isMoveResolvable(
+      return this.canMoveResolve(
         { origin: piece.point, target: move[0] },
         true
       );
     });
   }
 
-  isMove(piece: GamePiece, point: Point) {
-    return this.getResolvableMoves({ piece }).find((move) =>
-      doMovesMatch(move[0], point)
-    );
-  }
-
-  isMoveResolvable(
+  canMoveResolve(
     { origin, target }: { origin: Point; target: Point },
     reset = true
   ) {

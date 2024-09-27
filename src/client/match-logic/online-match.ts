@@ -21,12 +21,14 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
   requestMove({
     originPoint,
     targetPoint,
+    emit,
   }: {
     originPoint: Point;
     targetPoint: Point;
+    emit: boolean;
   }) {
     const isValidMove = this.move({ originPoint, targetPoint });
-    if (isValidMove) {
+    if (isValidMove && emit) {
       websocket.emit("resolvedMove", {
         originPoint,
         targetPoint,

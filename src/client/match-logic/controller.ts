@@ -75,45 +75,36 @@ export class Controller {
     };
   }
 
-  async move(move: Point[]) {
+  async move(move: Point[], emit = true) {
     const [originPoint, targetPoint] = move;
-    const validTurn = this.match.requestMove({
+    const turnHistory = this.match.requestMove({
       originPoint,
       targetPoint,
+      emit,
     });
-    if (validTurn) {
-      this.handleValidTurn({ history: validTurn });
+    if (turnHistory) {
+      this.handleValidTurn({ turnHistory });
     }
+    return turnHistory;
   }
 
-  async handleResolvedMove(move: Point[]) {
-    const [originPoint, targetPoint] = move;
-    const validTurn = this.match.move({
-      originPoint,
-      targetPoint,
-    });
-    if (validTurn) {
-      this.handleValidTurn({ history: validTurn });
-    }
-  }
-
-  async handleValidTurn({ history }: { history: TurnHistory }) {
+  async handleValidTurn({ turnHistory }: { turnHistory: TurnHistory }) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
     if (this.options.playGameSounds) {
-      const moveType = history.type;
+      const moveType = turnHistory.type;
       if (moveType === "capture" || moveType === "enPassant") {
         gameScene.data.audio.crumble?.play();
       }
     }
     await this.turnAnimation({
-      turnHistory: history,
+      turnHistory,
       gameScene,
     });
-    this.onMoveSuccess();
+    this.prepNextView();
   }
 
-  onMoveSuccess() {
+  prepNextView() {
     this.selectedPiece = undefined;
     this.updateMeshesRender();
     const gameStatus = this.match.getGame().getState();
@@ -156,14 +147,10 @@ export class Controller {
     //If you select the same piece as before deselect it
     if (this.selectedPiece === pickedPiece) return this.unselectCurrentPiece();
     //If you select a different piece check if its a valid move and resolve or display new moves
-    const validMove = this.match.isMove({
-      selectedPiece: this.selectedPiece,
-      pickedPiece,
-    });
-    if (validMove) {
-      return this.move([this.selectedPiece.point, pickedPiece.point]);
+    const validMove = this.move([this.selectedPiece.point, pickedPiece.point]);
+    if (!validMove) {
+      return this.displayMoves(pickedPiece);
     }
-    return this.displayMoves(pickedPiece);
   }
 
   handleMovementSquareInput(pickedMesh: AbstractMesh) {
