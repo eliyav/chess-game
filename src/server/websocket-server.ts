@@ -26,7 +26,7 @@ export function createWebsocketServer({
     socket.on("disconnect", () => {
       const lobbyEntries = lobbies.entries();
       for (const [key, lobby] of lobbyEntries) {
-        const player = lobby.players.find((player) => player.id !== socket.id);
+        const player = lobby.players.find((player) => player.id === socket.id);
         if (player) {
           lobby.players = lobby.players.filter(
             (player) => player.id !== socket.id
