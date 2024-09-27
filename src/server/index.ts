@@ -3,7 +3,7 @@ import express from "express";
 import { fileURLToPath } from "node:url";
 import path from "path";
 import { LOBBY_TYPE, Lobby, buildDefaultOptions } from "../shared/match";
-import { Resources } from "../shared/resources";
+import { RESOURCES } from "../shared/resources";
 import { generateKey } from "./helpers";
 import { createWebsocketServer } from "./websocket-server";
 
@@ -20,7 +20,7 @@ app.use(express.static(clientPath));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.text());
 
-app.get(Resources.CREATE_LOBBY, (req, res) => {
+app.get(RESOURCES.CREATE_LOBBY, (req, res) => {
   const key = generateKey();
   const lobby = {
     mode: LOBBY_TYPE.ONLINE,
@@ -34,7 +34,7 @@ app.get(Resources.CREATE_LOBBY, (req, res) => {
   res.send(key);
 });
 
-app.get(Resources.JOIN_LOBBY, (req, res) => {
+app.get(RESOURCES.JOIN_LOBBY, (req, res) => {
   const lobbyKey = req.query.key as string;
   if (!lobbyKey) {
     res.status(400).send("Lobby key is required");

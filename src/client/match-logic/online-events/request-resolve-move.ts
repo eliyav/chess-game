@@ -7,7 +7,7 @@ export function requestResolveMove({
   controller: Controller;
 }): string[] {
   websocket.on("resolvedMove", ({ originPoint, targetPoint }) => {
-    controller.handleResolvedMove([originPoint, targetPoint]);
+    controller.move([originPoint, targetPoint], false);
   });
 
   return ["resolved-move"];

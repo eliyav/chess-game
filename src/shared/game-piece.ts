@@ -1,8 +1,8 @@
-import { Piece, Point } from "./game";
+import { PIECE, Point } from "./game";
 import { TEAM } from "./match";
 
 class GamePiece {
-  type: Piece;
+  type: PIECE;
   team: TEAM;
   point: Point;
   movement: number[];
@@ -16,7 +16,7 @@ class GamePiece {
     point,
     update,
   }: {
-    type: Piece;
+    type: PIECE;
     team: TEAM;
     point: Point;
     update?: boolean;
@@ -42,14 +42,14 @@ class GamePiece {
   }
 
   checkPromotion() {
-    if (this.type === Piece.P && (this.point[1] === 0 || this.point[1] === 7)) {
+    if (this.type === PIECE.P && (this.point[1] === 0 || this.point[1] === 7)) {
       return true;
     }
     return false;
   }
 
   getSymbol() {
-    return Object.entries(Piece).find(([_, value]) => value === this.type)?.[0];
+    return Object.entries(PIECE).find(([_, value]) => value === this.type)?.[0];
   }
 }
 

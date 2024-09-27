@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { LOBBY_TYPE, Lobby } from "../../shared/match";
-import { AppRoutes } from "../../shared/routes";
+import { APP_ROUTES } from "../../shared/routes";
 import { MenuOverlay } from "../components/game-overlay/menu-overlay";
 import * as icons from "../components/game-overlay/overlay-icons";
 import { Message } from "../components/modals/message-modal";
@@ -59,7 +59,7 @@ export const Game: React.FC<{
           {
             text: "home",
             onClick: () => {
-              navigate(AppRoutes.Home);
+              navigate(APP_ROUTES.Home);
               sceneManager.switchScene(Scenes.HOME);
             },
           },

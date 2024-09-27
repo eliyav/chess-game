@@ -3,7 +3,7 @@ import { PickingInfo } from "@babylonjs/core/Collisions/pickingInfo";
 import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { Nullable } from "@babylonjs/core/types";
-import { Point, TurnHistory } from "../../shared/game";
+import { GAMESTATUS, Point, TurnHistory } from "../../shared/game";
 import { ControllerOptions, LOBBY_TYPE } from "../../shared/match";
 import { Message } from "../components/modals/message-modal";
 import GamePiece from "../../shared/game-piece";
@@ -75,42 +75,44 @@ export class Controller {
     };
   }
 
-  async resolveMove(move: Point[]) {
+  async move(move: Point[], emit = true) {
     const [originPoint, targetPoint] = move;
-    const validTurn = this.match.requestResolveMove({
+    const turnHistory = this.match.requestMove({
       originPoint,
       targetPoint,
+      emit,
     });
-    if (validTurn) {
-      this.handleValidMove({ history: validTurn });
+    if (turnHistory) {
+      this.handleValidTurn({ turnHistory });
     }
+    return turnHistory;
   }
 
-  async handleResolvedMove(move: Point[]) {
-    const [originPoint, targetPoint] = move;
-    const validTurn = this.match.resolveMove({
-      originPoint,
-      targetPoint,
-    });
-    if (validTurn) {
-      this.handleValidMove({ history: validTurn });
-    }
-  }
-
-  async handleValidMove({ history }: { history: TurnHistory }) {
+  async handleValidTurn({ turnHistory }: { turnHistory: TurnHistory }) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
     if (this.options.playGameSounds) {
-      const moveType = history.type;
+      const moveType = turnHistory.type;
       if (moveType === "capture" || moveType === "enPassant") {
         gameScene.data.audio.crumble?.play();
       }
     }
     await this.turnAnimation({
-      turnHistory: history,
+      turnHistory,
       gameScene,
     });
-    this.onMoveSuccess();
+    this.prepNextView();
+  }
+
+  prepNextView() {
+    this.selectedPiece = undefined;
+    this.updateMeshesRender();
+    const gameStatus = this.match.getGame().getState();
+    if (gameStatus === GAMESTATUS.CHECKMATE) {
+      this.events.setMessage(this.createMatchEndPrompt());
+    } else {
+      this.rotateCamera();
+    }
   }
 
   displayMoves(piece: GamePiece | undefined) {
@@ -122,11 +124,15 @@ export class Controller {
       if (this.options.playGameSounds) {
         gameScene.data.audio.select?.play();
       }
-      const moves = this.match.getValidMoves(piece);
+      const moves = this.match.getMoves(piece);
       this.selectedPiece = piece;
       this.updateMeshesRender();
-      const visibleMoves = this.options.displayAvailableMoves;
-      displayPieceMoves({ piece, moves, gameScene, visibleMoves });
+      displayPieceMoves({
+        piece,
+        moves,
+        gameScene,
+        visibleMoves: this.options.displayAvailableMoves,
+      });
     }
   }
 
@@ -141,14 +147,10 @@ export class Controller {
     //If you select the same piece as before deselect it
     if (this.selectedPiece === pickedPiece) return this.unselectCurrentPiece();
     //If you select a different piece check if its a valid move and resolve or display new moves
-    const validMove = this.match.isValidMove({
-      selectedPiece: this.selectedPiece,
-      pickedPiece,
-    });
-    if (validMove) {
-      return this.resolveMove([this.selectedPiece.point, pickedPiece.point]);
+    const validMove = this.move([this.selectedPiece.point, pickedPiece.point]);
+    if (!validMove) {
+      return this.displayMoves(pickedPiece);
     }
-    return this.displayMoves(pickedPiece);
   }
 
   handleMovementSquareInput(pickedMesh: AbstractMesh) {
@@ -160,20 +162,8 @@ export class Controller {
         point: [pickedMesh.position.z, pickedMesh.position.x],
         externalMesh: false,
       });
-      return this.resolveMove([this.selectedPiece.point, point]);
+      return this.move([this.selectedPiece.point, point]);
     }
-  }
-
-  onMoveSuccess() {
-    this.handleNextTurn();
-    this.rotateCamera();
-  }
-
-  handleNextTurn() {
-    this.selectedPiece = undefined;
-    this.updateMeshesRender();
-    const nextTurn = this.match.nextTurn();
-    if (!nextTurn) return this.events.setMessage(this.createMatchEndPrompt());
   }
 
   createMatchEndPrompt() {

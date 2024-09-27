@@ -5,8 +5,8 @@ import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
 import { Message } from "../components/modals/message-modal";
 import { Divider } from "../components/svg/divider";
-import { AppRoutes } from "../../shared/routes";
-import { Resources } from "../../shared/resources";
+import { APP_ROUTES } from "../../shared/routes";
+import { RESOURCES } from "../../shared/resources";
 
 export const LobbySelect: React.FC<{
   setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
@@ -20,7 +20,7 @@ export const LobbySelect: React.FC<{
         <BackButton
           customClass={"bottom-left"}
           size={30}
-          onClick={() => navigate(AppRoutes.Home)}
+          onClick={() => navigate(APP_ROUTES.Home)}
         />
         <h1>Select Lobby</h1>
       </div>
@@ -28,7 +28,7 @@ export const LobbySelect: React.FC<{
         <SelectionButton
           text={LOBBY_TYPE.LOCAL}
           onClick={() => {
-            navigate(AppRoutes.OfflineLobby);
+            navigate(APP_ROUTES.OfflineLobby);
           }}
         />
         <Divider />
@@ -49,13 +49,13 @@ export const LobbySelect: React.FC<{
             onClick={async () => {
               try {
                 const response = await fetch(
-                  `${Resources.JOIN_LOBBY}?key=${lobbyKey}`,
+                  `${RESOURCES.JOIN_LOBBY}?key=${lobbyKey}`,
                   {}
                 );
                 if (!response.ok) {
                   throw new Error("Failed to join lobby");
                 }
-                navigate(`${AppRoutes.OnlineLobby}?key=${lobbyKey}`);
+                navigate(`${APP_ROUTES.OnlineLobby}?key=${lobbyKey}`);
               } catch (e) {
                 if (e instanceof Error) {
                   setMessage({
@@ -77,9 +77,9 @@ export const LobbySelect: React.FC<{
           text={`Create ${LOBBY_TYPE.ONLINE}`}
           onClick={async () => {
             try {
-              const response = await fetch(Resources.CREATE_LOBBY);
+              const response = await fetch(RESOURCES.CREATE_LOBBY);
               const lobbyKey = await response.text();
-              navigate(`${AppRoutes.OnlineLobby}?key=${lobbyKey}`);
+              navigate(`${APP_ROUTES.OnlineLobby}?key=${lobbyKey}`);
             } catch (e) {
               if (e instanceof Error) {
                 setMessage({

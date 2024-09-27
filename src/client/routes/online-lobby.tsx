@@ -8,7 +8,7 @@ import PlayerCard from "../components/lobby/player-card";
 import { ControllerOptionsList } from "../components/lobby/controller-options-list";
 import { Pawn } from "../components/svg/pawn";
 import { Switch } from "../components/svg/switch";
-import { AppRoutes } from "../../shared/routes";
+import { APP_ROUTES } from "../../shared/routes";
 
 export const OnlineLobby: React.FC<{
   lobby: Lobby | undefined;
@@ -48,7 +48,7 @@ export const OnlineLobby: React.FC<{
         <BackButton
           customClass={"bottom-left"}
           size={30}
-          onClick={() => navigate(AppRoutes.Lobby)}
+          onClick={() => navigate(APP_ROUTES.Lobby)}
         />
         <h1>Online Lobby</h1>
       </div>

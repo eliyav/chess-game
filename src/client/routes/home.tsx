@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { SvgGithub } from "../components/svg/svg-github";
 import { SelectionButton } from "../components/buttons/start-button";
-import { AppRoutes } from "../../shared/routes";
+import { APP_ROUTES } from "../../shared/routes";
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ export const Home: React.FC = () => {
       <SelectionButton
         customClass="mgn-1"
         text="Play"
-        onClick={() => navigate(AppRoutes.Lobby)}
+        onClick={() => navigate(APP_ROUTES.Lobby)}
       />
     </div>
   );

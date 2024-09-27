@@ -1,7 +1,7 @@
 import {
   EnPassantResult,
   Move,
-  Piece,
+  PIECE,
   Point,
   TurnHistory,
 } from "../../shared/game";
@@ -51,17 +51,17 @@ export function getPieceMoves({
   checkCastling: boolean;
 }) {
   switch (piece.type) {
-    case Piece.P:
+    case PIECE.P:
       return calcPawnMoves(piece, board, lastTurnHistory);
-    case Piece.R:
+    case PIECE.R:
       return calcRookMoves(piece, board);
-    case Piece.B:
+    case PIECE.B:
       return calcBishopMoves(piece, board);
-    case Piece.N:
+    case PIECE.N:
       return calcKnightMoves(piece, board);
-    case Piece.Q:
+    case PIECE.Q:
       return calcQueenMoves(piece, board);
-    case Piece.K:
+    case PIECE.K:
       return calcKingMoves(piece, board, calcCastling, checkCastling);
   }
 }

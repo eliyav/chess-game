@@ -18,15 +18,17 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
     this.mode = LOBBY_TYPE.ONLINE;
   }
 
-  requestResolveMove({
+  requestMove({
     originPoint,
     targetPoint,
+    emit,
   }: {
     originPoint: Point;
     targetPoint: Point;
+    emit: boolean;
   }) {
-    const isValidMove = this.resolveMove({ originPoint, targetPoint });
-    if (isValidMove) {
+    const isValidMove = this.move({ originPoint, targetPoint });
+    if (isValidMove && emit) {
       websocket.emit("resolvedMove", {
         originPoint,
         targetPoint,
@@ -47,7 +49,7 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
   }
 
   isPlayersTurn() {
-    const currentTeam = this.getGame().getTeam();
+    const currentTeam = this.getGame().getCurrentTeam();
     const playingPlayerId = this.lobby.teams[currentTeam];
     return playingPlayerId === this.player.id;
   }

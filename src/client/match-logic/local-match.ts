@@ -11,14 +11,14 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
     this.mode = LOBBY_TYPE.LOCAL;
   }
 
-  requestResolveMove({
+  requestMove({
     originPoint,
     targetPoint,
   }: {
     originPoint: Point;
     targetPoint: Point;
   }) {
-    return this.resolveMove({ originPoint, targetPoint });
+    return this.move({ originPoint, targetPoint });
   }
 
   resetRequest() {
@@ -35,7 +35,7 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
   }
 
   getPlayerTeam() {
-    return this.getGame().getTeam();
+    return this.getGame().getCurrentTeam();
   }
 
   isCurrentPlayersPiece(piece: GamePiece) {
