@@ -125,8 +125,12 @@ export class Controller {
       const moves = this.match.getValidMoves(piece);
       this.selectedPiece = piece;
       this.updateMeshesRender();
-      const visibleMoves = this.options.displayAvailableMoves;
-      displayPieceMoves({ piece, moves, gameScene, visibleMoves });
+      displayPieceMoves({
+        piece,
+        moves,
+        gameScene,
+        visibleMoves: this.options.displayAvailableMoves,
+      });
     }
   }
 

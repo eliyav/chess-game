@@ -29,20 +29,20 @@ class Game {
     };
   }
 
-  getTeam() {
+  getCurrentTeam() {
     const remainder = this.current.turn % 2;
     const index = remainder ? 0 : 1;
     return this.teams[index];
   }
 
-  getOpponentTeam(team: TEAM) {
-    return team === TEAM.WHITE ? TEAM.BLACK : TEAM.WHITE;
+  getOpponentTeam() {
+    const remainder = this.current.turn % 2;
+    const index = remainder ? 1 : 0;
+    return this.teams[index];
   }
 
-  getWinner() {
-    //Refactor this to not depend on looking at previous turn and emit a winner
-    const index = this.current.turn % 2 ? 1 : 0;
-    return this.teams[index];
+  getState() {
+    return this.current.state;
   }
 
   nextTurn() {
@@ -52,11 +52,8 @@ class Game {
     }
   }
 
-  getState() {
-    return this.current.state;
-  }
-
   undoTurn() {
+    //#Refactor turn history to be a set of instructions so this can be undone easier and more clear
     const lastTurn = this.current.turnHistory.at(-1);
     if (lastTurn) {
       lastTurn.originPiece.resetPieceMovement();
@@ -83,12 +80,9 @@ class Game {
   }
 
   getMoveType(origin: Point, target: Point) {
-    const originPiece = this.lookupPiece(origin);
-    if (!originPiece) return;
-    const availableMoves = this.getMoves({
-      piece: originPiece,
-      returnOnlyValid: true,
-    });
+    const piece = this.lookupPiece(origin);
+    if (!piece) return;
+    const availableMoves = this.getResolvableMoves({ piece });
     const move = availableMoves.find((move) => doMovesMatch(move[0], target));
     return move?.[1];
   }
@@ -214,11 +208,13 @@ class Game {
     if (!originPiece) return;
     const targetPiece = this.lookupPiece(target);
     const castling =
-      originPiece.type === PIECE.K && originPiece.team === this.getTeam();
+      originPiece.type === PIECE.K &&
+      originPiece.team === this.getCurrentTeam();
     let castling2 = false;
     if (targetPiece) {
       castling2 =
-        targetPiece.type === PIECE.R && targetPiece.team === this.getTeam();
+        targetPiece.type === PIECE.R &&
+        targetPiece.team === this.getCurrentTeam();
       if (castling && castling2) {
         const [originX] = origin;
         const [targetX] = target;
@@ -252,13 +248,11 @@ class Game {
     }
   }
 
-  getMoves({
+  getPossibleMoves({
     piece,
-    returnOnlyValid,
     checkCastling = true,
   }: {
     piece: GamePiece;
-    returnOnlyValid: boolean;
     checkCastling?: boolean;
   }): Move[] {
     const lastTurnHistory = this.current.turnHistory.at(-1);
@@ -269,19 +263,27 @@ class Game {
       calcCastling: this.calcCastling.bind(this),
       checkCastling,
     });
-    if (returnOnlyValid) {
-      return availableMoves.filter((move) => {
-        return this.isMoveResolvable(
-          { origin: piece.point, target: move[0] },
-          true
-        );
-      });
-    }
     return availableMoves;
   }
 
+  getResolvableMoves({
+    piece,
+    checkCastling = true,
+  }: {
+    piece: GamePiece;
+    checkCastling?: boolean;
+  }): Move[] {
+    const availableMoves = this.getPossibleMoves({ piece, checkCastling });
+    return availableMoves.filter((move) => {
+      return this.isMoveResolvable(
+        { origin: piece.point, target: move[0] },
+        true
+      );
+    });
+  }
+
   isMove(piece: GamePiece, point: Point) {
-    return this.getMoves({ piece, returnOnlyValid: true }).find((move) =>
+    return this.getResolvableMoves({ piece }).find((move) =>
       doMovesMatch(move[0], point)
     );
   }
@@ -300,7 +302,9 @@ class Game {
     originPiece.point = target;
 
     //Check if resolving above switch would put player in check
-    const isMoveResolvable = this.isChecked(this.getTeam()) ? false : true;
+    const isMoveResolvable = this.isChecked(this.getCurrentTeam())
+      ? false
+      : true;
     if (reset) {
       //Undo switch
       originPiece.point = origin;
@@ -344,10 +348,13 @@ class Game {
 
   isChecked(team: TEAM) {
     const king = this.findKing(team);
-    const opponentsPieces = this.getPiecesByTeam(this.getOpponentTeam(team));
+    const opponentsPieces = this.getPiecesByTeam(this.getOpponentTeam());
     const opponentsAvailableMoves = opponentsPieces
       .map((piece) =>
-        this.getMoves({ piece, returnOnlyValid: false, checkCastling: false })
+        this.getPossibleMoves({
+          piece,
+          checkCastling: false,
+        })
       )
       .flat();
     const isKingChecked = opponentsAvailableMoves.find((move) =>
@@ -363,10 +370,10 @@ class Game {
 
   simulateCheckmate() {
     //Find all current Pieces
-    const currentPlayerPieces = this.getPiecesByTeam(this.getTeam());
+    const currentPlayerPieces = this.getPiecesByTeam(this.getCurrentTeam());
     //For each piece, iterate on its available moves
     currentPlayerPieces.forEach((piece) => {
-      const availableMoves = this.getMoves({ piece, returnOnlyValid: true });
+      const availableMoves = this.getResolvableMoves({ piece });
       //For each available move, check if resolving it results in player still being in check
       return availableMoves.length ? true : false;
     });
@@ -375,7 +382,7 @@ class Game {
   }
 
   calcCastling(piece: GamePiece, movesObj: Move[]) {
-    const playersRooks = this.findPieces(PIECE.R, this.getTeam());
+    const playersRooks = this.findPieces(PIECE.R, this.getCurrentTeam());
     if (playersRooks.length) {
       playersRooks.forEach((rook) => {
         //Check for castling move
@@ -417,12 +424,13 @@ class Game {
     if (!pieceInBetween.length) {
       const squaresInUse = [...squaresInBetween, originPoint, targetPoint];
       //Check if opponents pieces, threathen any of the spaces in between
-      const opponentsPieces = this.getPiecesByTeam(
-        this.getOpponentTeam(this.getTeam())
-      );
+      const opponentsPieces = this.getPiecesByTeam(this.getOpponentTeam());
       const opponentsAvailableMoves = opponentsPieces
         .map((piece) =>
-          this.getMoves({ piece, returnOnlyValid: false, checkCastling: false })
+          this.getPossibleMoves({
+            piece,
+            checkCastling: false,
+          })
         )
         .flat();
       const isThereOverlap = [];
@@ -483,7 +491,7 @@ class Game {
     } else {
       annotation = `${symbol}${targetSquare}`;
     }
-    const isCheck = this.isChecked(this.getOpponentTeam(this.getTeam()));
+    const isCheck = this.isChecked(this.getOpponentTeam());
     if (isCheck) annotation = `${annotation}+`;
 
     this.current.annotations.push(annotation);

@@ -62,7 +62,7 @@ export class BaseMatch {
   }
 
   getWinner() {
-    return this.game.getWinner();
+    return this.game.getOpponentTeam();
   }
 
   getGameHistory() {
@@ -92,7 +92,7 @@ export class BaseMatch {
   }
 
   getValidMoves(piece: GamePiece) {
-    return this.game.getMoves({ piece, returnOnlyValid: true });
+    return this.game.getResolvableMoves({ piece });
   }
 
   lookupGamePiece(pickedMesh: AbstractMesh, externalMesh: boolean) {
