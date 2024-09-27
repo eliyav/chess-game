@@ -5,7 +5,7 @@ import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
 import { ControllerOptionsList } from "../components/lobby/controller-options-list";
 import PlayerCard from "../components/lobby/player-card";
-import { AppRoutes } from "../../shared/routes";
+import { APP_ROUTES } from "../../shared/routes";
 
 export const OfflineLobby: React.FC<{
   lobby: Lobby | undefined;
@@ -53,7 +53,7 @@ export const OfflineLobby: React.FC<{
         <BackButton
           customClass={"bottom-left"}
           size={30}
-          onClick={() => navigate(AppRoutes.Lobby)}
+          onClick={() => navigate(APP_ROUTES.Lobby)}
         />
         <h1>Offline Lobby</h1>
       </div>

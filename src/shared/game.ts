@@ -1,5 +1,13 @@
 import GamePiece from "./game-piece";
 
+export enum GAMESTATUS {
+  INPROGRESS = "In Progress",
+  CHECKMATE = "Checkmate",
+  STALEMATE = "Stalemate",
+  DRAW = "Draw",
+  PLAYING = "Playing",
+}
+
 export type Point = [number, number];
 
 export type MoveType =
@@ -11,7 +19,7 @@ export type MoveType =
 
 export type Move = [Point, MoveType];
 
-export enum Piece {
+export enum PIECE {
   P = "Pawn",
   R = "Rook",
   B = "Bishop",

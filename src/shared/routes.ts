@@ -1,4 +1,4 @@
-export const enum AppRoutes {
+export const enum APP_ROUTES {
   Home = "/",
   Lobby = "/lobby",
   OfflineLobby = "/lobby-offline",

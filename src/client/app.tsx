@@ -11,7 +11,7 @@ import { LobbySelect } from "./routes/lobby-select";
 import { OfflineLobby } from "./routes/offline-lobby";
 import { OnlineLobby } from "./routes/online-lobby";
 import { websocket } from "./websocket-client";
-import { AppRoutes } from "../shared/routes";
+import { APP_ROUTES } from "../shared/routes";
 
 const App: React.FC<{}> = () => {
   const navigate = useNavigate();
@@ -72,21 +72,21 @@ const App: React.FC<{}> = () => {
       )}
       {!isInitialized && <LoadingScreen text="..." />}
       <Routes>
-        <Route path={AppRoutes.Home} element={<Home />} />
+        <Route path={APP_ROUTES.Home} element={<Home />} />
         <Route
-          path={AppRoutes.Lobby}
+          path={APP_ROUTES.Lobby}
           element={<LobbySelect setMessage={setMessage} />}
         />
         <Route
-          path={AppRoutes.OfflineLobby}
+          path={APP_ROUTES.OfflineLobby}
           element={<OfflineLobby setLobby={setLobby} lobby={lobby} />}
         />
         <Route
-          path={AppRoutes.OnlineLobby}
+          path={APP_ROUTES.OnlineLobby}
           element={<OnlineLobby lobby={lobby} />}
         />
         <Route
-          path={AppRoutes.Game}
+          path={APP_ROUTES.Game}
           element={
             canGameViewRender ? (
               <Game

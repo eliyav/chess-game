@@ -38,7 +38,7 @@ export class BaseMatch {
     originPoint: Point;
     targetPoint: Point;
   }) {
-    return this.getGame().resolveMove(originPoint, targetPoint);
+    return this.getGame().move(originPoint, targetPoint);
   }
 
   reset() {

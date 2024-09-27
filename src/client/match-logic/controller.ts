@@ -3,7 +3,7 @@ import { PickingInfo } from "@babylonjs/core/Collisions/pickingInfo";
 import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { Nullable } from "@babylonjs/core/types";
-import { Point, TurnHistory } from "../../shared/game";
+import { GAMESTATUS, Point, TurnHistory } from "../../shared/game";
 import { ControllerOptions, LOBBY_TYPE } from "../../shared/match";
 import { Message } from "../components/modals/message-modal";
 import GamePiece from "../../shared/game-piece";
@@ -172,8 +172,10 @@ export class Controller {
   handleNextTurn() {
     this.selectedPiece = undefined;
     this.updateMeshesRender();
-    const nextTurn = this.match.nextTurn();
-    if (!nextTurn) return this.events.setMessage(this.createMatchEndPrompt());
+    const gameStatus = this.match.getGame().getState();
+    if (gameStatus === GAMESTATUS.CHECKMATE) {
+      this.events.setMessage(this.createMatchEndPrompt());
+    }
   }
 
   createMatchEndPrompt() {

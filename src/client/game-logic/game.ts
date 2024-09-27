@@ -1,4 +1,4 @@
-import { Move, Piece, Point, TurnHistory } from "../../shared/game";
+import { GAMESTATUS, Move, PIECE, Point, TurnHistory } from "../../shared/game";
 import GamePiece from "../../shared/game-piece";
 import { TEAM } from "../../shared/match";
 import Board from "./board";
@@ -11,6 +11,7 @@ class Game {
     annotations: string[];
     turnHistory: TurnHistory[];
     turn: number;
+    state: GAMESTATUS;
   };
 
   constructor() {
@@ -24,6 +25,7 @@ class Game {
       annotations: [],
       turnHistory: [],
       turn: 1,
+      state: GAMESTATUS.PLAYING,
     };
   }
 
@@ -45,8 +47,13 @@ class Game {
 
   nextTurn() {
     this.current.turn++;
-    if (this.isCheckmate()) return false;
-    return true;
+    if (this.isCheckmate()) {
+      this.current.state = GAMESTATUS.CHECKMATE;
+    }
+  }
+
+  getState() {
+    return this.current.state;
   }
 
   undoTurn() {
@@ -86,7 +93,8 @@ class Game {
     return move?.[1];
   }
 
-  resolveMove(origin: Point, target: Point): TurnHistory | undefined {
+  move(origin: Point, target: Point): TurnHistory | undefined {
+    if (this.current.state === GAMESTATUS.CHECKMATE) return;
     const moveType = this.getMoveType(origin, target);
     let result: TurnHistory | undefined;
     switch (moveType) {
@@ -106,11 +114,12 @@ class Game {
     if (result) {
       if (result.type === "movement" || result.type === "capture") {
         if (result.promote) {
-          this.setPromotionPiece(result, Piece.Q);
+          this.setPromotionPiece(result, PIECE.Q);
         }
       }
       this.annotate(result);
       this.current.turnHistory.push(result);
+      this.nextTurn();
       return result;
     }
   }
@@ -205,11 +214,11 @@ class Game {
     if (!originPiece) return;
     const targetPiece = this.lookupPiece(target);
     const castling =
-      originPiece.type === Piece.K && originPiece.team === this.getTeam();
+      originPiece.type === PIECE.K && originPiece.team === this.getTeam();
     let castling2 = false;
     if (targetPiece) {
       castling2 =
-        targetPiece.type === Piece.R && targetPiece.team === this.getTeam();
+        targetPiece.type === PIECE.R && targetPiece.team === this.getTeam();
       if (castling && castling2) {
         const [originX] = origin;
         const [targetX] = target;
@@ -305,7 +314,7 @@ class Game {
   findKing(team: TEAM) {
     const pieces = this.getPiecesByTeam(team);
     const king = pieces.find((piece) => {
-      return piece.type === Piece.K;
+      return piece.type === PIECE.K;
     })!;
     return king;
   }
@@ -366,7 +375,7 @@ class Game {
   }
 
   calcCastling(piece: GamePiece, movesObj: Move[]) {
-    const playersRooks = this.findPieces(Piece.R, this.getTeam());
+    const playersRooks = this.findPieces(PIECE.R, this.getTeam());
     if (playersRooks.length) {
       playersRooks.forEach((rook) => {
         //Check for castling move
@@ -433,7 +442,7 @@ class Game {
     }
   }
 
-  setPromotionPiece(history: TurnHistory, selection: Piece) {
+  setPromotionPiece(history: TurnHistory, selection: PIECE) {
     const { team, point } = history.originPiece;
     this.current.board.removePieceByPoint(point);
     const promotedPiece = new GamePiece({ type: selection, team, point });

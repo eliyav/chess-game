@@ -7,7 +7,7 @@ import {
 } from "../shared/websocket";
 import { Server } from "socket.io";
 import { Lobby } from "../shared/match";
-import { AppRoutes } from "../shared/routes";
+import { APP_ROUTES } from "../shared/routes";
 
 export function createWebsocketServer({
   server,
@@ -78,7 +78,7 @@ export function createWebsocketServer({
         lobby.matchStarted = true;
         io.to(lobbyKey).emit("lobbyInfo", lobby);
         io.to(lobbyKey).emit("redirect", {
-          path: AppRoutes.Game,
+          path: APP_ROUTES.Game,
           message: "Match started!",
         });
       }
