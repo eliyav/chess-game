@@ -479,6 +479,11 @@ input[type="radio"]:checked + label {
   margin: 0 0.25em;
 }
 
+.ready label {
+  display: inline-block;
+  width: 100%;
+}
+
 .ready:has(input[type="checkbox"]:checked) {
   background-color: var(--green-highlight);
 }
