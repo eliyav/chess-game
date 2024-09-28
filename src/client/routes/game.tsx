@@ -25,7 +25,6 @@ export const Game: React.FC<{
           player: lobby.players.find((player) => player.id === websocket.id)!,
         })
   );
-  console.log(match.current);
   const controller = useRef(
     new Controller({
       sceneManager,

@@ -21,7 +21,7 @@ export class Controller {
   events: {
     setMessage: (message: Message | null) => void;
   };
-  selectedPiece?: GamePiece;
+  selectedPoint?: Point;
   options: ControllerOptions;
 
   constructor({
@@ -62,13 +62,15 @@ export class Controller {
       const pickedMesh = pickResult?.pickedMesh;
       if (!pickedMesh) return;
 
-      const pickedPiece = this.match.lookupGamePiece(
+      const point = this.match.getMeshGamePoint(
         pickedMesh,
         pickedMesh.metadata !== null
       );
+      const piece = this.match.lookupGamePiece(pickedMesh, true);
 
-      if (pickedPiece) {
-        this.handlePieceInput(pickedPiece);
+      console.log(point);
+      if (point) {
+        this.handlePieceInput(point, piece);
       } else {
         this.handleMovementSquareInput(pickedMesh);
       }
@@ -105,7 +107,7 @@ export class Controller {
   }
 
   prepNextView() {
-    this.selectedPiece = undefined;
+    this.selectedPoint = undefined;
     this.updateMeshesRender();
     const gameStatus = this.match.getGame().getState();
     if (gameStatus === GAMESTATUS.CHECKMATE) {
@@ -115,20 +117,20 @@ export class Controller {
     }
   }
 
-  displayMoves(piece: GamePiece | undefined) {
+  displayMoves(point: Point | undefined, piece: GamePiece | undefined) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!gameScene) return;
-    if (!piece) return;
+    if (!point || !piece) return;
     const currentPlayersPiece = this.match.isCurrentPlayersPiece(piece);
     if (currentPlayersPiece) {
       if (this.options.playGameSounds) {
         gameScene.data.audio.select?.play();
       }
-      const moves = this.match.getMoves(piece);
-      this.selectedPiece = piece;
+      const moves = this.match.getMoves(piece, point);
+      this.selectedPoint = point;
       this.updateMeshesRender();
       displayPieceMoves({
-        piece,
+        point,
         moves,
         gameScene,
         visibleMoves: this.options.displayAvailableMoves,
@@ -137,24 +139,24 @@ export class Controller {
   }
 
   unselectCurrentPiece() {
-    this.selectedPiece = undefined;
+    this.selectedPoint = undefined;
     this.updateMeshesRender();
   }
 
-  handlePieceInput(pickedPiece: GamePiece) {
+  handlePieceInput(point: Point, piece: GamePiece | undefined) {
     //If no selection
-    if (!this.selectedPiece) return this.displayMoves(pickedPiece);
+    if (!this.selectedPoint) return this.displayMoves(point, piece);
     //If you select the same piece as before deselect it
-    if (this.selectedPiece === pickedPiece) return this.unselectCurrentPiece();
+    if (this.selectedPoint === point) return this.unselectCurrentPiece();
     //If you select a different piece check if its a valid move and resolve or display new moves
-    const validMove = this.move([this.selectedPiece.point, pickedPiece.point]);
+    const validMove = this.move([this.selectedPoint, point]);
     if (!validMove) {
-      return this.displayMoves(pickedPiece);
+      return this.displayMoves(point, piece);
     }
   }
 
   handleMovementSquareInput(pickedMesh: AbstractMesh) {
-    if (!this.selectedPiece) return;
+    if (!this.selectedPoint) return;
     if (pickedMesh.id === "plane") {
       //If the second mesh selected is one of the movement squares
       const point = findByPoint({
@@ -162,7 +164,7 @@ export class Controller {
         point: [pickedMesh.position.z, pickedMesh.position.x],
         externalMesh: false,
       });
-      return this.move([this.selectedPiece.point, point]);
+      return this.move([this.selectedPoint, point]);
     }
   }
 
@@ -261,8 +263,9 @@ export class Controller {
     }
 
     //For each active piece, creates a mesh clone and places on board
-    this.match.getAllGamePieces().forEach((piece) => {
-      const { type, team, point } = piece;
+    this.match.getAllGamePieces().forEach(({ piece, point }) => {
+      if (!piece) return;
+      const { type, team } = piece;
       const foundMesh = gameScene.scene.meshes.find(
         (mesh) => mesh.name === type && mesh.metadata.color === team
       );

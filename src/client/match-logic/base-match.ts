@@ -43,8 +43,8 @@ export class BaseMatch {
     return this.getGame().move(originPoint, targetPoint);
   }
 
-  getMoves(piece: GamePiece) {
-    return this.game.getResolvableMoves({ piece });
+  getMoves(piece: GamePiece, point: Point) {
+    return this.game.getResolvableMoves({ piece, point });
   }
 
   reset() {
@@ -81,6 +81,14 @@ export class BaseMatch {
 
   undoTurn() {
     return this.game.undoTurn();
+  }
+
+  getMeshGamePoint(pickedMesh: AbstractMesh, externalMesh: boolean) {
+    return findByPoint({
+      get: "index",
+      point: [pickedMesh.position.z, pickedMesh.position.x],
+      externalMesh,
+    });
   }
 
   lookupGamePiece(pickedMesh: AbstractMesh, externalMesh: boolean) {
