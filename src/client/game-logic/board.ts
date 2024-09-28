@@ -21,16 +21,14 @@ class Board {
     this.setPieces();
   }
 
-  // populateGrid() {
-  //   const grid = this.createGrid();
-  //   this.pieces.forEach((piece) => {
-  //     const {
-  //       point: [x, y],
-  //     } = piece;
-  //     grid[x][y].on = piece;
-  //   });
-  //   return grid;
-  // }
+  deepCloneGrid() {
+    return this.grid.map((row) =>
+      row.map((square) => ({
+        ...square,
+        on: square.on ? new GamePiece({ ...square.on }) : undefined,
+      }))
+    );
+  }
 
   setPieces() {
     this.initialPositions.forEach((positions) => {
