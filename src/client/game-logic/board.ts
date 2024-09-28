@@ -21,13 +21,12 @@ class Board {
     this.setPieces();
   }
 
-  deepCloneGrid() {
-    return this.grid.map((row) =>
-      row.map((square) => ({
-        ...square,
-        on: square.on ? new GamePiece({ ...square.on }) : undefined,
-      }))
+  cloneBoard() {
+    const newBoard = new Board();
+    newBoard.grid = this.grid.map((row) =>
+      row.map((square) => ({ ...square }))
     );
+    return newBoard;
   }
 
   setPieces() {

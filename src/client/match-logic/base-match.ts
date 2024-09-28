@@ -44,7 +44,7 @@ export class BaseMatch {
   }
 
   getMoves(piece: GamePiece, point: Point) {
-    return this.game.getMoves({ piece, point });
+    return this.game.getMoves({ piece, point, board: this.game.current.board });
   }
 
   reset() {

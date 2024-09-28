@@ -49,7 +49,7 @@ export function getPieceMoves({
   point: Point;
   piece: GamePiece;
   lastTurnHistory: TurnHistory | undefined;
-  calcCastling: (kingPoint: Point, movesObj: Move[]) => void;
+  calcCastling: (kingPoint: Point, board: Board, movesObj: Move[]) => void;
   checkCastling: boolean;
 }) {
   switch (piece.type) {
@@ -104,9 +104,8 @@ function calcPawnMoves(
 ) {
   const availableMoves: Move[] = [];
   calcPawnMovement(board, piece, point, availableMoves);
-  let result;
   if (turnHistory) {
-    result = isEnPassantAvailable(turnHistory);
+    const result = isEnPassantAvailable(turnHistory);
     if (result.result) {
       const targetSquare = result.enPassantPoint;
       const [x, y] = point;
@@ -149,7 +148,7 @@ function calcKingMoves(
   point: Point,
   piece: GamePiece,
   board: Board,
-  calcCastling: (kingPoint: Point, movesObj: Move[]) => void,
+  calcCastling: (kingPoint: Point, board: Board, movesObj: Move[]) => void,
   checkCastling: boolean
 ) {
   const kingMoves: Point[] = [
@@ -168,7 +167,7 @@ function calcKingMoves(
   calcKingMovements(board, point, piece.team, kingMoves, availableMoves);
 
   if (!piece.moved) {
-    checkCastling ? calcCastling(point, availableMoves) : null;
+    checkCastling ? calcCastling(point, board, availableMoves) : null;
   }
 
   return availableMoves;
@@ -292,7 +291,7 @@ const calcPawnMovement = (
   point: Point,
   finalObj: Move[]
 ) => {
-  const { direction, moved, team } = piece;
+  const { direction, team } = piece;
   //Calculate Pawn Movement based on current point
   let range = 1;
   const [x, y] = point;
@@ -303,7 +302,7 @@ const calcPawnMovement = (
       ? finalObj.push([movePoint1, "movement"])
       : null;
     //If he hasnt moved, then can move 2 spaces
-    if (!moved) {
+    if ((team === TEAM.WHITE && y === 1) || (team === TEAM.BLACK && y === 6)) {
       range = 2;
       const movePoint2: Point = [x, y + range * direction];
       const [moveX2, moveY2] = movePoint2;
