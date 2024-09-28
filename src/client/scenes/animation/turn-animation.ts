@@ -21,8 +21,15 @@ export default async function calcTurnAnimation({
 
   if (!movingMesh) return;
 
-  if (turnHistory.type === "capture" || turnHistory.type === "enPassant") {
+  if (turnHistory.type === "capture") {
     pieceBreakAnimation({
+      point: turnHistory.target,
+      target: turnHistory.targetPiece,
+    });
+  } else if (turnHistory.type === "enPassant") {
+    //Update enpassant turn history to have the enpassant point
+    pieceBreakAnimation({
+      point: turnHistory.target,
       target: turnHistory.targetPiece,
     });
   }
@@ -60,7 +67,7 @@ export default async function calcTurnAnimation({
           });
           targetPosition = findByPoint({
             get: "position",
-            point: turnHistory.originPiece.point,
+            point: turnHistory.origin,
             externalMesh: true,
           });
         } else if (turnHistory.type === "castle" && mesh.name === "Rook") {
@@ -71,7 +78,7 @@ export default async function calcTurnAnimation({
           });
           targetPosition = findByPoint({
             get: "position",
-            point: turnHistory.targetPiece.point,
+            point: turnHistory.target,
             externalMesh: true,
           });
         } else {
@@ -177,9 +184,15 @@ export default async function calcTurnAnimation({
     });
   }
 
-  function pieceBreakAnimation({ target }: { target: GamePiece }) {
+  function pieceBreakAnimation({
+    target,
+    point,
+  }: {
+    point: Point;
+    target: GamePiece;
+  }) {
     //Look up animation group based on piece breaking,
-    const { type, team, point } = target;
+    const { type, team } = target;
     const targetMesh = gameScene.data.meshesToRender.find((mesh) => {
       const meshPoint = findByPoint({
         get: "index",

@@ -73,7 +73,7 @@ class Board {
       .filter(({ piece }) => piece !== undefined);
   }
 
-  removePiece(point: Point) {
+  removePiece({ point }: { point: Point }) {
     const square = this.getSquare(point);
     square.on = undefined;
   }
@@ -113,19 +113,13 @@ class Board {
     origin,
     target,
     originPiece,
-    targetPiece,
   }: {
     origin: Point;
     target: Point;
     originPiece: GamePiece;
-    targetPiece?: GamePiece;
   }) {
     this.addPiece({ point: origin, piece: originPiece });
-    if (targetPiece) {
-      if (targetPiece) {
-        this.addPiece({ point: target, piece: targetPiece });
-      }
-    }
+    this.removePiece({ point: target });
   }
 
   resetBoard() {

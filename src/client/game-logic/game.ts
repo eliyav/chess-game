@@ -64,7 +64,7 @@ class Game {
       //Undo Promotion
       if (lastTurn.type === "movement" || lastTurn.type === "capture") {
         if (lastTurn.promote) {
-          this.current.board.removePiece(lastTurn.target);
+          this.current.board.removePiece({ point: lastTurn.target });
           this.current.board.addPiece({
             point: lastTurn.origin,
             piece: lastTurn.originPiece,
@@ -196,7 +196,7 @@ class Game {
         if (this.canMoveResolve({ origin, target }, false)) {
           originPiece.update();
           const enPassantPiece = lastTurnHistory.originPiece;
-          this.current.board.removePiece(lastTurnHistory.target);
+          this.current.board.removePiece({ point: lastTurnHistory.target });
           return {
             type: "enPassant",
             origin,
@@ -247,8 +247,8 @@ class Game {
           point: newRookPoint,
           piece: targetPiece,
         });
-        this.current.board.removePiece(origin);
-        this.current.board.removePiece(target);
+        this.current.board.removePiece({ point: origin });
+        this.current.board.removePiece({ point: target });
         originPiece.update();
         targetPiece.update();
         const castlingResult = [
@@ -326,7 +326,6 @@ class Game {
         origin,
         target,
         originPiece: pieces.originPiece!,
-        targetPiece: pieces.targetPiece,
       });
     }
     return isMoveResolvable;
@@ -479,7 +478,7 @@ class Game {
 
   setPromotionPiece(history: TurnHistory, selection: PIECE) {
     const { origin, originPiece, target } = history;
-    this.current.board.removePiece(origin);
+    this.current.board.removePiece({ point: origin });
     const promotedPiece = new GamePiece({
       type: selection,
       team: originPiece.team,
