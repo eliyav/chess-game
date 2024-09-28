@@ -10,12 +10,7 @@ export enum GAMESTATUS {
 
 export type Point = [number, number];
 
-export type MoveType =
-  | "movement"
-  | "capture"
-  | "castle"
-  | "enPassant"
-  | "promotion";
+export type MoveType = "movement" | "capture" | "castle" | "enPassant";
 
 export type Move = [Point, MoveType];
 

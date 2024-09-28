@@ -117,8 +117,8 @@ function calcPawnMoves(
       const potential1: Point = [x1, newY];
       const potential2: Point = [x2, newY];
       if (
-        doMovesMatch(potential1, targetSquare) ||
-        doMovesMatch(potential2, targetSquare)
+        doPointsMatch(potential1, targetSquare) ||
+        doPointsMatch(potential2, targetSquare)
       ) {
         availableMoves.push([targetSquare, "enPassant"]);
       }
@@ -527,5 +527,5 @@ export const isEnPassantAvailable = (
   };
 };
 
-export const doMovesMatch = (move: Point, move2: Point) =>
-  move[0] == move2[0] && move[1] == move2[1];
+export const doPointsMatch = (point: Point, point2: Point) =>
+  point[0] == point2[0] && point[1] == point2[1];

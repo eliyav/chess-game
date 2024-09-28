@@ -40,11 +40,11 @@ export class BaseMatch {
     originPoint: Point;
     targetPoint: Point;
   }) {
-    return this.getGame().move(originPoint, targetPoint);
+    return this.getGame().move({ origin: originPoint, target: targetPoint });
   }
 
   getMoves(piece: GamePiece, point: Point) {
-    return this.game.getResolvableMoves({ piece, point });
+    return this.game.getMoves({ piece, point });
   }
 
   reset() {

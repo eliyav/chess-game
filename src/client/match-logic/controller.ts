@@ -13,7 +13,7 @@ import { displayPieceMoves, findByPoint } from "../scenes/scene-helpers";
 import { GameScene, SceneManager, Scenes } from "../scenes/scene-manager";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
-import { doMovesMatch } from "../game-logic/helpers";
+import { doPointsMatch } from "../game-logic/helpers";
 
 export class Controller {
   sceneManager: SceneManager;
@@ -69,7 +69,7 @@ export class Controller {
         return this.displayMoves(point, piece);
       } else {
         //If you select the same piece as before deselect it
-        if (doMovesMatch(this.selectedPoint, point)) {
+        if (doPointsMatch(this.selectedPoint, point)) {
           return this.unselectCurrentPiece();
         } else {
           //If you select a different piece check if its a valid move and resolve or display new moves
@@ -218,7 +218,7 @@ export class Controller {
         point: [mesh.position.z, mesh.position.x],
         externalMesh: true,
       });
-      return doMovesMatch(meshPoint, point);
+      return doPointsMatch(meshPoint, point);
     });
   }
 
