@@ -49,7 +49,7 @@ export function getPieceMoves({
   point: Point;
   piece: GamePiece;
   lastTurnHistory: TurnHistory | undefined;
-  calcCastling: (piece: GamePiece, movesObj: Move[]) => void;
+  calcCastling: (kingPoint: Point, movesObj: Move[]) => void;
   checkCastling: boolean;
 }) {
   switch (piece.type) {
@@ -149,7 +149,7 @@ function calcKingMoves(
   point: Point,
   piece: GamePiece,
   board: Board,
-  calcCastling: (piece: GamePiece, movesObj: Move[]) => void,
+  calcCastling: (kingPoint: Point, movesObj: Move[]) => void,
   checkCastling: boolean
 ) {
   const kingMoves: Point[] = [
@@ -168,7 +168,7 @@ function calcKingMoves(
   calcKingMovements(board, point, piece.team, kingMoves, availableMoves);
 
   if (!piece.moved) {
-    checkCastling ? calcCastling(piece, availableMoves) : null;
+    checkCastling ? calcCastling(point, availableMoves) : null;
   }
 
   return availableMoves;
