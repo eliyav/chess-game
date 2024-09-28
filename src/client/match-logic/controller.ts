@@ -66,17 +66,15 @@ export class Controller {
       const piece = this.match.lookupGamePiece(pickedMesh, true);
       //If no selection
       if (!this.selectedPoint) {
-        if (!piece) return;
         return this.displayMoves(point, piece);
       } else {
         //If you select the same piece as before deselect it
-        if (this.selectedPoint === point) {
+        if (doMovesMatch(this.selectedPoint, point)) {
           return this.unselectCurrentPiece();
         } else {
           //If you select a different piece check if its a valid move and resolve or display new moves
-          const validMove = this.move([this.selectedPoint, point]);
+          const validMove = await this.move([this.selectedPoint, point]);
           if (!validMove) {
-            if (!piece) return;
             return this.displayMoves(point, piece);
           }
         }
@@ -124,8 +122,9 @@ export class Controller {
     }
   }
 
-  displayMoves(point: Point, piece: GamePiece) {
+  displayMoves(point: Point, piece: GamePiece | undefined) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
+    if (!piece) return;
     const currentPlayersPiece = this.match.isCurrentPlayersPiece(piece);
     if (!gameScene || !currentPlayersPiece) return;
     if (this.options.playGameSounds) {
