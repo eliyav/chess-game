@@ -258,10 +258,7 @@ class Game {
           move,
           board: this.current.board,
         });
-        const castlingResult = [
-          this.current.board.getSquare(newKingPoint),
-          this.current.board.getSquare(newRookPoint),
-        ];
+        const castlingResult: [Point, Point] = [newKingPoint, newRookPoint];
         return {
           type: "castle",
           direction: c,
@@ -307,14 +304,16 @@ class Game {
     origin,
     move,
     board,
+    dontUpdatePiece = false,
   }: {
     origin: Point;
     move: Move;
     board: Board;
+    dontUpdatePiece?: boolean;
   }) {
     const [target, moveType] = move;
     const originPiece = board.getPiece(origin)!;
-    originPiece.update();
+    if (!dontUpdatePiece) originPiece.update();
     if (moveType === "movement") {
       board.addPiece({ point: target, piece: originPiece });
       board.removePiece({ point: origin });
@@ -328,7 +327,7 @@ class Game {
       // board.removePiece({ point: lastTurnHistory.target });
     } else if (moveType === "castle") {
       const targetPiece = board.getPiece(target);
-      targetPiece?.update();
+      if (!dontUpdatePiece) targetPiece?.update();
       const [originX, OriginY] = origin;
       const [targetX] = target;
       let c = originX - targetX;
@@ -346,7 +345,7 @@ class Game {
 
   canMoveResolve({ origin, move }: { origin: Point; move: Move }) {
     const board = this.current.board.cloneBoard();
-    this.updateBoard({ origin, move, board });
+    this.updateBoard({ origin, move, board, dontUpdatePiece: true });
     //Check if resolving above switch would put player in check
     const isMoveResolvable = this.isChecked(this.getCurrentTeam(), board)
       ? false

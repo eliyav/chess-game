@@ -67,7 +67,7 @@ export default async function calcTurnAnimation({
           });
           targetPosition = findByPoint({
             get: "position",
-            point: turnHistory.origin,
+            point: turnHistory.castling[0],
             externalMesh: true,
           });
         } else if (turnHistory.type === "castle" && mesh.name === "Rook") {
@@ -78,7 +78,7 @@ export default async function calcTurnAnimation({
           });
           targetPosition = findByPoint({
             get: "position",
-            point: turnHistory.target,
+            point: turnHistory.castling[1],
             externalMesh: true,
           });
         } else {

@@ -46,7 +46,7 @@ export type TurnHistory =
       originPiece: GamePiece;
       targetPiece: GamePiece;
       direction: number;
-      castling: { name: string }[];
+      castling: [Point, Point];
     }
   | {
       type: "enPassant";

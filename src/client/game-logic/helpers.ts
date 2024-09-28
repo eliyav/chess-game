@@ -587,7 +587,7 @@ function canCastlingResolve({
   }
   //Check if squares in between are used by any pieces
   const pieceInBetween = squaresInBetween.filter((point) => {
-    return board.getPiece(point);
+    return board.getPiece(point) !== undefined;
   });
   if (!pieceInBetween.length) {
     const squaresInUse = [...squaresInBetween, kingPoint, rookPoint];
