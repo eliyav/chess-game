@@ -98,7 +98,9 @@ class Game {
     if (!move) return;
     const resolved = this.resolveMove({ origin, move });
     if (!resolved) return;
-    this.annotate(resolved);
+    const isOpponentInCheck =
+      this.isChecked(this.getOpponentTeam(), this.current.board) !== undefined;
+    this.annotate(resolved, isOpponentInCheck);
     this.current.turnHistory.push(resolved);
     this.nextTurn();
     return resolved;
@@ -387,22 +389,27 @@ class Game {
   }
 
   isCheckmate() {
-    // return this.simulateCheckmate() ? true : false;
-    return false;
+    return this.simulateCheckmate() ? true : false;
   }
 
-  // simulateCheckmate() {
-  //   //Find all current Pieces
-  //   const currentPlayerPieces = this.getPiecesByTeam(this.getCurrentTeam());
-  //   //For each piece, iterate on its available moves
-  //   currentPlayerPieces.forEach(({ piece, point }) => {
-  //     const availableMoves = this.getMoves({ piece, point, board: this.current.board });
-  //     //For each available move, check if resolving it results in player still being in check
-  //     return availableMoves.length ? true : false;
-  //   });
-  //   return false;
-  //   //If any valid moves, you are not in checkmate
-  // }
+  simulateCheckmate() {
+    //Find teams current pieces
+    const currentPlayerPieces = this.getAllPieces().filter(
+      ({ piece }) => piece?.team === this.getCurrentTeam()
+    );
+    //For each piece, iterate on its available moves
+    currentPlayerPieces.forEach(({ piece, point }) => {
+      const availableMoves = this.getMoves({
+        piece,
+        point,
+        board: this.current.board,
+      });
+      //For each available move, check if resolving it results in player still being in check
+      return availableMoves.length ? true : false;
+    });
+    return false;
+    //If any valid moves, you are not in checkmate
+  }
 
   checkPromotion({ piece, point }: { piece: GamePiece; point: Point }) {
     if (piece.type === PIECE.P && (point[1] === 0 || point[1] === 7)) {
@@ -436,7 +443,7 @@ class Game {
     return this.current.turnHistory;
   }
 
-  annotate(result: TurnHistory) {
+  annotate(result: TurnHistory, isOpponentInCheck: boolean) {
     let annotation;
     const type = result.type;
     const promotion =
@@ -462,9 +469,7 @@ class Game {
     } else {
       annotation = `${symbol}${targetSquare}`;
     }
-    // const isCheck = this.isChecked(this.getOpponentTeam(), this.current.board);
-    // if (isCheck) annotation = `${annotation}+`;
-
+    if (isOpponentInCheck) annotation = `${annotation}+`;
     this.current.annotations.push(annotation);
   }
 }
