@@ -42,15 +42,11 @@ export function getPieceMoves({
   point,
   piece,
   lastTurnHistory,
-  calcCastling,
-  checkCastling,
 }: {
   board: Board;
   point: Point;
   piece: GamePiece;
   lastTurnHistory: TurnHistory | undefined;
-  calcCastling: (kingPoint: Point, board: Board, movesObj: Move[]) => void;
-  checkCastling: boolean;
 }) {
   switch (piece.type) {
     case PIECE.P:
@@ -64,7 +60,7 @@ export function getPieceMoves({
     case PIECE.Q:
       return calcQueenMoves(piece, point, board);
     case PIECE.K:
-      return calcKingMoves(point, piece, board, calcCastling, checkCastling);
+      return calcKingMoves(point, piece, board, lastTurnHistory);
   }
 }
 
@@ -148,8 +144,7 @@ function calcKingMoves(
   point: Point,
   piece: GamePiece,
   board: Board,
-  calcCastling: (kingPoint: Point, board: Board, movesObj: Move[]) => void,
-  checkCastling: boolean
+  lastTurnHistory: TurnHistory | undefined
 ) {
   const kingMoves: Point[] = [
     [0, 1],
@@ -167,7 +162,7 @@ function calcKingMoves(
   calcKingMovements(board, point, piece.team, kingMoves, availableMoves);
 
   if (!piece.moved) {
-    checkCastling ? calcCastling(point, board, availableMoves) : null;
+    calcCastling(point, piece.team, board, lastTurnHistory, availableMoves);
   }
 
   return availableMoves;
@@ -528,3 +523,101 @@ export const isEnPassantAvailable = (
 
 export const doPointsMatch = (point: Point, point2: Point) =>
   point[0] == point2[0] && point[1] == point2[1];
+
+function calcCastling(
+  kingPoint: Point,
+  team: TEAM,
+  board: Board,
+  lastTurnHistory: TurnHistory | undefined,
+  movesObj: Move[]
+) {
+  const playersRooks = board.getPieces().filter(({ piece }) => {
+    return piece?.type === PIECE.R && piece?.team === team;
+  });
+  if (playersRooks.length) {
+    playersRooks.forEach(({ piece: rook, point: rookPoint }) => {
+      if (!rook) return;
+      //Check for castling move
+      if (!rook.moved) {
+        const resolve = canCastlingResolve({
+          kingPoint,
+          rookPoint,
+          team,
+          board,
+          lastTurnHistory,
+        });
+        if (resolve) {
+          //If castling resolve returns true, push the move into available moves
+          resolve[0] ? movesObj.push(resolve[1]) : null;
+        }
+      }
+    });
+  }
+}
+
+function canCastlingResolve({
+  kingPoint,
+  rookPoint,
+  team,
+  board,
+  lastTurnHistory,
+}: {
+  kingPoint: Point;
+  rookPoint: Point;
+  team: TEAM;
+  board: Board;
+  lastTurnHistory: TurnHistory | undefined;
+}) {
+  const [kingX, kingY] = kingPoint;
+  const [rookX] = rookPoint;
+  const spaceBetween = kingX - rookX;
+  let distance;
+  spaceBetween < 0
+    ? (distance = spaceBetween * -1 - 1)
+    : (distance = spaceBetween - 1);
+
+  //Calculate the squares in between King and Rook
+  const squaresInBetween: Point[] = [];
+
+  for (let step = 1; step <= distance; step++) {
+    let stepDirection;
+    spaceBetween < 0 ? (stepDirection = step * 1) : (stepDirection = step * -1);
+    const point: Point = [kingX + stepDirection, kingY];
+    squaresInBetween.push(point);
+  }
+  //Check if squares in between are used by any pieces
+  const pieceInBetween = squaresInBetween.filter((point) => {
+    return board.getPiece(point);
+  });
+  if (!pieceInBetween.length) {
+    const squaresInUse = [...squaresInBetween, kingPoint, rookPoint];
+    //Check if opponents pieces, threathen any of the spaces in between
+    const opponentsPieces = board.getPieces().filter(({ piece }) => {
+      return piece && piece.team !== team;
+    }) as { piece: GamePiece; point: Point }[];
+    const opponentsAvailableMoves = opponentsPieces
+      .map(({ piece, point }) =>
+        getPieceMoves({
+          piece,
+          point,
+          board,
+          lastTurnHistory,
+        })
+      )
+      .flat();
+    const isThereOverlap = [];
+    for (let i = 0; i < squaresInUse.length; i++) {
+      const square = squaresInUse[i];
+      for (let k = 0; k < opponentsAvailableMoves.length; k++) {
+        const availableMove = opponentsAvailableMoves[k];
+        const doesMoveMatchSquare = doPointsMatch(availableMove[0], square);
+        doesMoveMatchSquare ? isThereOverlap.push(doesMoveMatchSquare) : null;
+      }
+    }
+    if (!isThereOverlap.length) {
+      //If there is no overlap, return the possible castling move
+      const returnResult: [boolean, Move] = [true, [rookPoint, "castle"]];
+      return returnResult;
+    }
+  }
+}

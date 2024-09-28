@@ -55,40 +55,40 @@ class Game {
   undoTurn() {
     //#Refactor turn history to be a set of instructions so this can be undone easier and more clear
     const lastTurn = this.current.turnHistory.at(-1);
-    if (lastTurn) {
-      lastTurn.originPiece.resetPieceMovement();
-      this.current.board.movePiece({
-        origin: lastTurn.target,
-        target: lastTurn.origin,
-      });
-      //Undo Promotion
-      if (lastTurn.type === "movement" || lastTurn.type === "capture") {
-        if (lastTurn.promote) {
-          this.current.board.removePiece({ point: lastTurn.target });
-          this.current.board.addPiece({
-            point: lastTurn.origin,
-            piece: lastTurn.originPiece,
-          });
-        }
-      }
-      if (lastTurn.type === "castle") {
-        this.current.board.movePiece({
-          origin: lastTurn.origin,
-          target: lastTurn.target,
-          shouldSwitch: true,
-        });
-        lastTurn.targetPiece.resetPieceMovement();
-      } else if (lastTurn.type === "capture" || lastTurn.type === "enPassant") {
-        this.current.board.addPiece({
-          point: lastTurn.target,
-          piece: lastTurn.targetPiece,
-        });
-      }
-      this.current.turnHistory.pop();
-      this.current.annotations.pop();
-      this.current.turn--;
-      return true;
-    }
+    // if (lastTurn) {
+    //   lastTurn.originPiece.resetPieceMovement();
+    //   this.current.board.movePiece({
+    //     origin: lastTurn.target,
+    //     target: lastTurn.origin,
+    //   });
+    //   //Undo Promotion
+    //   if (lastTurn.type === "movement" || lastTurn.type === "capture") {
+    //     if (lastTurn.promote) {
+    //       this.current.board.removePiece({ point: lastTurn.target });
+    //       this.current.board.addPiece({
+    //         point: lastTurn.origin,
+    //         piece: lastTurn.originPiece,
+    //       });
+    //     }
+    //   }
+    //   if (lastTurn.type === "castle") {
+    //     this.current.board.movePiece({
+    //       origin: lastTurn.origin,
+    //       target: lastTurn.target,
+    //       shouldSwitch: true,
+    //     });
+    //     lastTurn.targetPiece.resetPieceMovement();
+    //   } else if (lastTurn.type === "capture" || lastTurn.type === "enPassant") {
+    //     this.current.board.addPiece({
+    //       point: lastTurn.target,
+    //       piece: lastTurn.targetPiece,
+    //     });
+    //   }
+    //   this.current.turnHistory.pop();
+    //   this.current.annotations.pop();
+    //   this.current.turn--;
+    //   return true;
+    // }
     return false;
   }
 
@@ -279,14 +279,12 @@ class Game {
     piece,
     point,
     board,
-    skipResolveCheck = false,
-    checkCastling = true,
+    skipResolveCheck,
   }: {
     piece: GamePiece | undefined;
     point: Point;
     board: Board;
     skipResolveCheck?: boolean;
-    checkCastling?: boolean;
   }): Move[] {
     if (!piece) return [];
     const lastTurnHistory = this.current.turnHistory.at(-1);
@@ -295,8 +293,6 @@ class Game {
       piece,
       board,
       lastTurnHistory,
-      calcCastling: this.calcCastling.bind(this),
-      checkCastling,
     });
     if (!skipResolveCheck) {
       return availableMoves.filter((move) => {
@@ -381,7 +377,6 @@ class Game {
           point,
           board,
           skipResolveCheck: true,
-          checkCastling: false,
         })
       )
       .flat();
@@ -409,95 +404,6 @@ class Game {
   //   return false;
   //   //If any valid moves, you are not in checkmate
   // }
-
-  calcCastling(kingPoint: Point, board: Board, movesObj: Move[]) {
-    const playersRooks = board.getPieces().filter(({ piece }) => {
-      return piece?.type === PIECE.R && piece?.team === this.getCurrentTeam();
-    });
-    if (playersRooks.length) {
-      playersRooks.forEach(({ piece: rook, point: rookPoint }) => {
-        if (!rook) return;
-        //Check for castling move
-        if (!rook.moved) {
-          const resolve = this.canCastlingResolve({
-            kingPoint,
-            rookPoint,
-            board,
-          });
-          if (resolve) {
-            //If castling resolve returns true, push the move into available moves
-            resolve[0] ? movesObj.push(resolve[1]) : null;
-          }
-        }
-      });
-    }
-  }
-
-  canCastlingResolve({
-    kingPoint,
-    rookPoint,
-    board,
-  }: {
-    kingPoint: Point;
-    rookPoint: Point;
-    board: Board;
-  }) {
-    const [kingX, kingY] = kingPoint;
-    const [rookX] = rookPoint;
-    const spaceBetween = kingX - rookX;
-    let distance;
-    spaceBetween < 0
-      ? (distance = spaceBetween * -1 - 1)
-      : (distance = spaceBetween - 1);
-
-    //Calculate the squares in between King and Rook
-    const squaresInBetween: Point[] = [];
-
-    for (let step = 1; step <= distance; step++) {
-      let stepDirection;
-      spaceBetween < 0
-        ? (stepDirection = step * 1)
-        : (stepDirection = step * -1);
-      const point: Point = [kingX + stepDirection, kingY];
-      squaresInBetween.push(point);
-    }
-    //Check if squares in between are used by any pieces
-    const pieceInBetween = squaresInBetween.filter((point) => {
-      return board.getPiece(point);
-    });
-    if (!pieceInBetween.length) {
-      const squaresInUse = [...squaresInBetween, kingPoint, rookPoint];
-      //Check if opponents pieces, threathen any of the spaces in between
-      const opponentsPieces = board.getPieces().filter(({ piece }) => {
-        return piece?.team === this.getOpponentTeam();
-      });
-      const opponentsAvailableMoves = opponentsPieces
-        .map(({ piece, point }) =>
-          this.getMoves({
-            piece,
-            point,
-            board,
-            skipResolveCheck: true,
-            checkCastling: false,
-          })
-        )
-        .flat();
-      const isThereOverlap = [];
-      for (let i = 0; i < squaresInUse.length; i++) {
-        const square = squaresInUse[i];
-        for (let k = 0; k < opponentsAvailableMoves.length; k++) {
-          const availableMove = opponentsAvailableMoves[k];
-          const doesMoveMatchSquare = doPointsMatch(availableMove[0], square);
-          doesMoveMatchSquare ? isThereOverlap.push(doesMoveMatchSquare) : null;
-        }
-      }
-      if (!isThereOverlap.length) {
-        //If there is no overlap, return the possible castling move
-        const returnResult: [boolean, Move] = [true, [rookPoint, "castle"]];
-        return returnResult;
-      }
-    }
-  }
 
   checkPromotion({ piece, point }: { piece: GamePiece; point: Point }) {
     if (piece.type === PIECE.P && (point[1] === 0 || point[1] === 7)) {

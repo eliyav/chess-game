@@ -80,43 +80,23 @@ class Board {
     square.on = piece;
   }
 
+  switchPieces({ origin, target }: { origin: Point; target: Point }) {
+    const { originPiece, targetPiece } = this.getPieceOnSquares({
+      origin,
+      target,
+    });
+    if (!originPiece || !targetPiece) return;
+    this.removePiece({ point: origin });
+    this.removePiece({ point: target });
+    this.addPiece({ point: origin, piece: targetPiece });
+    this.addPiece({ point: target, piece: originPiece });
+  }
+
   getPieceOnSquares({ origin, target }: { origin: Point; target: Point }) {
     return {
       originPiece: this.getSquare(origin).on,
       targetPiece: this.getSquare(target).on,
     };
-  }
-
-  movePiece({
-    origin,
-    target,
-    shouldSwitch,
-  }: {
-    origin: Point;
-    target: Point;
-    shouldSwitch?: boolean;
-  }) {
-    const originSquare = this.getSquare(origin);
-    const targetSquare = this.getSquare(target);
-    targetSquare.on = originSquare.on;
-    if (shouldSwitch) {
-      originSquare.on = targetSquare.on;
-    } else {
-      originSquare.on = undefined;
-    }
-  }
-
-  unmovePiece({
-    origin,
-    target,
-    originPiece,
-  }: {
-    origin: Point;
-    target: Point;
-    originPiece: GamePiece;
-  }) {
-    this.addPiece({ point: origin, piece: originPiece });
-    this.removePiece({ point: target });
   }
 
   resetBoard() {
