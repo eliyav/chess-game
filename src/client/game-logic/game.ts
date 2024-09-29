@@ -4,6 +4,9 @@ import { TEAM } from "../../shared/match";
 import Board from "./board";
 import { doPointsMatch, getPieceMoves, isEnPassantAvailable } from "./helpers";
 
+//Check why checkmate is not working
+//Why bishops wont animate correctly
+
 class Game {
   teams: TEAM[];
   current: {
@@ -343,6 +346,7 @@ class Game {
   }
 
   private canMoveResolve({ origin, move }: { origin: Point; move: Move }) {
+    //Clone board to test if move is resolvable without affecting current board
     const board = this.current.board.cloneBoard();
     this.resolveBoard({ origin, move, board, dontUpdatePiece: true });
     //Check if resolving above switch would put player in check
@@ -386,26 +390,22 @@ class Game {
   }
 
   private isCheckmate() {
-    return this.simulateCheckmate() ? true : false;
-  }
-
-  private simulateCheckmate() {
     //Find teams current pieces
     const currentPlayerPieces = this.getAllPieces().filter(
       ({ piece }) => piece?.team === this.getCurrentTeam()
     );
     //For each piece, iterate on its available moves
-    currentPlayerPieces.forEach(({ piece, point }) => {
-      const availableMoves = this.getMoves({
-        piece,
-        point,
-        board: this.current.board,
-      });
-      //For each available move, check if resolving it results in player still being in check
-      return availableMoves.length ? true : false;
-    });
-    return false;
-    //If any valid moves, you are not in checkmate
+    const anyAvailableMoves = currentPlayerPieces
+      .map(({ piece, point }) => {
+        return this.getMoves({
+          piece,
+          point,
+          board: this.current.board,
+        });
+      })
+      .flat();
+    //If you have available moves, you are not in checkmate so return false
+    return anyAvailableMoves.length ? false : true;
   }
 
   private checkPromotion({ piece, point }: { piece: GamePiece; point: Point }) {
