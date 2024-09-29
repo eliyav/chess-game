@@ -452,9 +452,8 @@ class Game {
     if (moveType === "castle") {
       annotation = history.direction === 1 ? "O-O" : "O-O-O";
     } else if (promotion) {
-      //Add promoted piece so can get symbol
-      // const symbol = promotedPiece.getSymbol();
-      annotation = `${targetSquare}${symbol}`;
+      //TO DO: Change to Q for now, will need to update to allow for selection
+      annotation = `${targetSquare}${"Q"}`;
     } else if (isCapturing) {
       if (originPiece?.type === "Pawn") {
         annotation = `${originSquare.name.charAt(0)}x${targetSquare}`;
