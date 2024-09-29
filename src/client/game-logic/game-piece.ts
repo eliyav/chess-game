@@ -1,13 +1,11 @@
-import { PIECE, Point } from "./game";
-import { TEAM } from "./match";
+import { PIECE } from "../../shared/game";
+import { TEAM } from "../../shared/match";
 
 class GamePiece {
   type: PIECE;
   team: TEAM;
-  movement: number[];
   moved: boolean;
   moveCounter: number;
-  direction: number;
 
   constructor({
     type,
@@ -20,10 +18,8 @@ class GamePiece {
   }) {
     this.type = type;
     this.team = team;
-    this.movement = [1, 2, 3, 4, 5, 6, 7];
     this.moved = false;
     this.moveCounter = 0;
-    this.direction = this.team === TEAM.WHITE ? 1 : -1;
     if (update) this.update();
   }
 

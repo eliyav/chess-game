@@ -1,7 +1,7 @@
 import { Point } from "../../shared/game";
 import { Lobby, LOBBY_TYPE, Player, TEAM } from "../../shared/match";
 import { Message } from "../components/modals/message-modal";
-import GamePiece from "../../shared/game-piece";
+import GamePiece from "../game-logic/game-piece";
 import { websocket } from "../websocket-client";
 import { BaseMatch, MatchLogic } from "./base-match";
 import { Controller } from "./controller";

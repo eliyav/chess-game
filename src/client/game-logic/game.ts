@@ -1,8 +1,8 @@
 import { GAMESTATUS, Move, PIECE, Point, TurnHistory } from "../../shared/game";
-import GamePiece from "../../shared/game-piece";
+import GamePiece from "./game-piece";
 import { TEAM } from "../../shared/match";
 import Board from "./board";
-import { doPointsMatch, getPieceMoves, isEnPassantAvailable } from "./helpers";
+import { doPointsMatch, getPieceMoves, isEnPassantAvailable } from "./moves";
 
 class Game {
   teams: TEAM[];
@@ -51,53 +51,6 @@ class Game {
 
   public getTurn() {
     return this.current.turnHistory.length + 1;
-  }
-
-  public undoTurn() {
-    const lastTurn = this.current.turnHistory.at(-1);
-    if (lastTurn) {
-      if (lastTurn.type === "movement") {
-        const { origin, target } = lastTurn;
-        this.current.board.addPiece({
-          point: origin,
-          piece: this.current.board.getPiece(target)!,
-        });
-        this.current.board.removePiece({ point: target });
-      } else if (lastTurn.type === "capture") {
-        const { origin, target, capturedPiece } = lastTurn;
-        this.current.board.addPiece({
-          point: origin,
-          piece: this.current.board.getPiece(target)!,
-        });
-        this.current.board.addPiece({ point: target, piece: capturedPiece });
-      } else if (lastTurn.type === "enPassant") {
-        const { origin, target, enPassant } = lastTurn;
-        this.current.board.addPiece({
-          point: origin,
-          piece: this.current.board.getPiece(target)!,
-        });
-        this.current.board.addPiece({
-          point: enPassant.capturedPiecePoint,
-          piece: enPassant.capturedPiece,
-        });
-        this.current.board.removePiece({ point: enPassant.enPassantPoint });
-      } else if (lastTurn.type === "castle") {
-        const { origin, target, castling } = lastTurn;
-        const [newKingPoint, newRookPoint] = castling;
-        const kingPiece = this.current.board.getPiece(newKingPoint)!;
-        const rookPiece = this.current.board.getPiece(newRookPoint)!;
-        kingPiece.resetPieceMovement();
-        rookPiece.resetPieceMovement();
-        this.current.board.addPiece({ point: origin, piece: kingPiece });
-        this.current.board.addPiece({ point: target, piece: rookPiece });
-        this.current.board.removePiece({ point: newKingPoint });
-        this.current.board.removePiece({ point: newRookPoint });
-      }
-      this.current.turnHistory.pop();
-      this.current.annotations.pop();
-      return true;
-    }
-    return false;
   }
 
   public move({ origin, target }: { origin: Point; target: Point }) {
@@ -263,43 +216,82 @@ class Game {
   }): TurnHistory | undefined {
     const [target] = move;
     const originPiece = this.lookupPiece(origin);
-    if (!originPiece) return;
     const targetPiece = this.lookupPiece(target);
-    const castling =
-      originPiece.type === PIECE.K &&
-      originPiece.team === this.getCurrentTeam();
-    let castling2 = false;
-    if (targetPiece) {
-      castling2 =
-        targetPiece.type === PIECE.R &&
-        targetPiece.team === this.getCurrentTeam();
-      if (castling && castling2) {
-        const [originX, OriginY] = origin;
-        const [targetX] = target;
-        const c = originX - targetX;
-        const dir = c < 0 ? 1 : -1;
-        const newKingX = originX + dir * 2;
-        const newRookX = originX + dir;
-        const newKingPoint: Point = [newKingX, OriginY];
-        const newRookPoint: Point = [newRookX, OriginY];
-        board.addPiece({ point: newKingPoint, piece: originPiece });
-        board.addPiece({ point: newRookPoint, piece: targetPiece });
-        board.removePiece({ point: origin });
-        board.removePiece({ point: target });
-        const castlingResult: [Point, Point] = [newKingPoint, newRookPoint];
-        const isOpponentInCheck =
-          this.isChecked(this.getCurrentTeamsOpponent(), this.current.board) !==
-          undefined;
-        return {
-          type: "castle",
-          direction: c,
-          origin,
-          target,
-          castling: castlingResult,
-          isOpponentInCheck,
-        };
+    if (!originPiece || !targetPiece) return;
+    const [originX, OriginY] = origin;
+    const [targetX] = target;
+    const c = originX - targetX;
+    const direction = c < 0 ? 1 : -1;
+    const newKingPoint: Point = [originX + direction * 2, OriginY];
+    const newRookPoint: Point = [originX + direction, OriginY];
+    board.addPiece({ point: newKingPoint, piece: originPiece });
+    board.addPiece({ point: newRookPoint, piece: targetPiece });
+    board.removePiece({ point: origin });
+    board.removePiece({ point: target });
+    const isOpponentInCheck =
+      this.isChecked(this.getCurrentTeamsOpponent(), this.current.board) !==
+      undefined;
+    return {
+      type: "castle",
+      origin,
+      target,
+      castling: {
+        direction,
+        kingTarget: newKingPoint,
+        rookTarget: newRookPoint,
+      },
+      isOpponentInCheck,
+    };
+  }
+
+  public undoTurn() {
+    const lastTurn = this.current.turnHistory.at(-1);
+    if (lastTurn) {
+      if (lastTurn.type === "movement") {
+        const { origin, target } = lastTurn;
+        this.current.board.addPiece({
+          point: origin,
+          piece: this.current.board.getPiece(target)!,
+        });
+        this.current.board.removePiece({ point: target });
+      } else if (lastTurn.type === "capture") {
+        const { origin, target, capturedPiece } = lastTurn;
+        this.current.board.addPiece({
+          point: origin,
+          piece: this.current.board.getPiece(target)!,
+        });
+        this.current.board.addPiece({
+          point: target,
+          piece: new GamePiece(capturedPiece),
+        });
+      } else if (lastTurn.type === "enPassant") {
+        const { origin, target, enPassant } = lastTurn;
+        this.current.board.addPiece({
+          point: origin,
+          piece: this.current.board.getPiece(target)!,
+        });
+        this.current.board.addPiece({
+          point: enPassant.capturedPiecePoint,
+          piece: new GamePiece(enPassant.capturedPiece),
+        });
+        this.current.board.removePiece({ point: enPassant.enPassantPoint });
+      } else if (lastTurn.type === "castle") {
+        const { origin, target, castling } = lastTurn;
+        const { kingTarget, rookTarget } = castling;
+        const kingPiece = this.current.board.getPiece(kingTarget)!;
+        const rookPiece = this.current.board.getPiece(rookTarget)!;
+        kingPiece.resetPieceMovement();
+        rookPiece.resetPieceMovement();
+        this.current.board.addPiece({ point: origin, piece: kingPiece });
+        this.current.board.addPiece({ point: target, piece: rookPiece });
+        this.current.board.removePiece({ point: kingTarget });
+        this.current.board.removePiece({ point: rookTarget });
       }
+      this.current.turnHistory.pop();
+      this.current.annotations.pop();
+      return true;
     }
+    return false;
   }
 
   public getMoves({
@@ -314,10 +306,11 @@ class Game {
     skipResolveCheck?: boolean;
   }): Move[] {
     if (!piece) return [];
+    const { type, team, moved } = piece;
     const lastTurnHistory = this.current.turnHistory.at(-1);
     const availableMoves = getPieceMoves({
       point,
-      piece,
+      piece: { type, team, moved },
       board,
       lastTurnHistory,
     });
@@ -450,7 +443,7 @@ class Game {
     const isCapturing = history.type === "capture";
     const symbol = originPiece?.getSymbol();
     if (moveType === "castle") {
-      annotation = history.direction === 1 ? "O-O" : "O-O-O";
+      annotation = history.castling.direction === 1 ? "O-O" : "O-O-O";
     } else if (promotion) {
       //TO DO: Change to Q for now, will need to update to allow for selection
       annotation = `${targetSquare}${"Q"}`;
