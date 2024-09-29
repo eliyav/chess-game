@@ -1,5 +1,5 @@
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { Point, TurnHistory } from "../../shared/game";
+import { GAMESTATUS, Point, TurnHistory } from "../../shared/game";
 import GamePiece from "../../shared/game-piece";
 import { Lobby, Player, TEAM } from "../../shared/match";
 import Game from "../game-logic/game";
@@ -64,7 +64,7 @@ export class BaseMatch {
   }
 
   isGameOver() {
-    return this.game.isCheckmate();
+    return this.game.getState() === GAMESTATUS.CHECKMATE;
   }
 
   getWinner() {

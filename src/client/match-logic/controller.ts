@@ -114,8 +114,8 @@ export class Controller {
   prepNextView() {
     this.selectedPoint = undefined;
     this.updateMeshesRender();
-    const gameStatus = this.match.getGame().getState();
-    if (gameStatus === GAMESTATUS.CHECKMATE) {
+    const isGameOver = this.match.isGameOver();
+    if (isGameOver) {
       this.events.setMessage(this.createMatchEndPrompt());
     } else {
       this.rotateCamera();
