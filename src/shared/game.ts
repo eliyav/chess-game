@@ -53,8 +53,11 @@ export type TurnHistory =
     } & BaseTurnHistory)
   | ({
       type: "castle";
-      direction: number;
-      castling: [Point, Point];
+      castling: {
+        direction: number;
+        kingTarget: Point;
+        rookTarget: Point;
+      };
     } & BaseTurnHistory)
   | ({
       type: "enPassant";
