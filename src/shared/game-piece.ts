@@ -4,7 +4,6 @@ import { TEAM } from "./match";
 class GamePiece {
   type: PIECE;
   team: TEAM;
-  point: Point;
   movement: number[];
   moved: boolean;
   moveCounter: number;
@@ -13,17 +12,14 @@ class GamePiece {
   constructor({
     type,
     team,
-    point,
     update,
   }: {
     type: PIECE;
     team: TEAM;
-    point: Point;
     update?: boolean;
   }) {
     this.type = type;
     this.team = team;
-    this.point = point;
     this.movement = [1, 2, 3, 4, 5, 6, 7];
     this.moved = false;
     this.moveCounter = 0;
@@ -39,13 +35,6 @@ class GamePiece {
   update() {
     this.moved = true;
     this.moveCounter++;
-  }
-
-  checkPromotion() {
-    if (this.type === PIECE.P && (this.point[1] === 0 || this.point[1] === 7)) {
-      return true;
-    }
-    return false;
   }
 
   getSymbol() {

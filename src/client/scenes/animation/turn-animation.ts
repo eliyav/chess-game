@@ -5,7 +5,7 @@ import { findByPoint } from "../scene-helpers";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { Point, TurnHistory } from "../../../shared/game";
-import { doMovesMatch } from "../../game-logic/helpers";
+import { doPointsMatch } from "../../game-logic/helpers";
 
 export default async function calcTurnAnimation({
   gameScene,
@@ -21,9 +21,16 @@ export default async function calcTurnAnimation({
 
   if (!movingMesh) return;
 
-  if (turnHistory.type === "capture" || turnHistory.type === "enPassant") {
+  if (turnHistory.type === "capture") {
     pieceBreakAnimation({
-      target: turnHistory.targetPiece,
+      point: turnHistory.target,
+      target: turnHistory.capturedPiece,
+    });
+  } else if (turnHistory.type === "enPassant") {
+    //Update enpassant turn history to have the enpassant point
+    pieceBreakAnimation({
+      point: turnHistory.enPassant.capturedPiecePoint,
+      target: turnHistory.enPassant.capturedPiece,
     });
   }
 
@@ -60,7 +67,7 @@ export default async function calcTurnAnimation({
           });
           targetPosition = findByPoint({
             get: "position",
-            point: turnHistory.originPiece.point,
+            point: turnHistory.castling[0],
             externalMesh: true,
           });
         } else if (turnHistory.type === "castle" && mesh.name === "Rook") {
@@ -71,7 +78,7 @@ export default async function calcTurnAnimation({
           });
           targetPosition = findByPoint({
             get: "position",
-            point: turnHistory.targetPiece.point,
+            point: turnHistory.castling[1],
             externalMesh: true,
           });
         } else {
@@ -177,16 +184,22 @@ export default async function calcTurnAnimation({
     });
   }
 
-  function pieceBreakAnimation({ target }: { target: GamePiece }) {
+  function pieceBreakAnimation({
+    target,
+    point,
+  }: {
+    point: Point;
+    target: GamePiece;
+  }) {
     //Look up animation group based on piece breaking,
-    const { type, team, point } = target;
+    const { type, team } = target;
     const targetMesh = gameScene.data.meshesToRender.find((mesh) => {
       const meshPoint = findByPoint({
         get: "index",
         point: [mesh.position.z, mesh.position.x],
         externalMesh: true,
       });
-      return doMovesMatch(meshPoint, point);
+      return doPointsMatch(meshPoint, point);
     });
 
     if (targetMesh) {

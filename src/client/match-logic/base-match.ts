@@ -1,5 +1,5 @@
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { Point, TurnHistory } from "../../shared/game";
+import { GAMESTATUS, Point, TurnHistory } from "../../shared/game";
 import GamePiece from "../../shared/game-piece";
 import { Lobby, Player, TEAM } from "../../shared/match";
 import Game from "../game-logic/game";
@@ -40,11 +40,11 @@ export class BaseMatch {
     originPoint: Point;
     targetPoint: Point;
   }) {
-    return this.getGame().move(originPoint, targetPoint);
+    return this.getGame().move({ origin: originPoint, target: targetPoint });
   }
 
-  getMoves(piece: GamePiece) {
-    return this.game.getResolvableMoves({ piece });
+  getMoves(piece: GamePiece, point: Point) {
+    return this.game.getMoves({ piece, point, board: this.game.current.board });
   }
 
   reset() {
@@ -64,11 +64,11 @@ export class BaseMatch {
   }
 
   isGameOver() {
-    return this.game.isCheckmate();
+    return this.game.getGameState().status === GAMESTATUS.CHECKMATE;
   }
 
   getWinner() {
-    return this.game.getOpponentTeam();
+    return this.game.getCurrentTeamsOpponent();
   }
 
   getGameHistory() {
@@ -81,6 +81,14 @@ export class BaseMatch {
 
   undoTurn() {
     return this.game.undoTurn();
+  }
+
+  getMeshGamePoint(pickedMesh: AbstractMesh, externalMesh: boolean) {
+    return findByPoint({
+      get: "index",
+      point: [pickedMesh.position.z, pickedMesh.position.x],
+      externalMesh,
+    });
   }
 
   lookupGamePiece(pickedMesh: AbstractMesh, externalMesh: boolean) {

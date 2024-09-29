@@ -4,6 +4,7 @@ import GamePiece from "../../shared/game-piece";
 
 export type Grid = {
   name: string;
+  on?: GamePiece;
 }[][];
 
 class Board {
@@ -11,15 +12,21 @@ class Board {
   boardSize: number;
   columnNames: string[];
   grid: Grid;
-  private pieces: GamePiece[];
 
   constructor() {
     this.initialPositions = chessData.initialPositions;
     this.boardSize = chessData.boardSize;
     this.columnNames = chessData.columnNames;
     this.grid = this.createGrid();
-    this.pieces = [];
     this.setPieces();
+  }
+
+  cloneBoard() {
+    const newBoard = new Board();
+    newBoard.grid = this.grid.map((row) =>
+      row.map((square) => ({ ...square }))
+    );
+    return newBoard;
   }
 
   setPieces() {
@@ -27,13 +34,16 @@ class Board {
       const { type } = positions;
       positions.teams.forEach((team) => {
         team.startingPoints.forEach((point) => {
-          this.addPiece(new GamePiece({ type, team: team.name, point }));
+          this.addPiece({
+            point: point,
+            piece: new GamePiece({ type, team: team.name }),
+          });
         });
       });
     });
   }
 
-  createGrid() {
+  createGrid(): Grid {
     return Array.from({ length: this.boardSize }, (_, idx) =>
       Array.from({ length: this.boardSize }, (_, idx2) => ({
         name: this.columnNames[idx] + (idx2 + 1),
@@ -41,32 +51,37 @@ class Board {
     );
   }
 
-  getSquare(point: Point) {
-    return this.grid[point[0]][point[1]];
+  getSquare([x, y]: Point) {
+    return this.grid[x][y];
   }
 
-  addPiece(piece: GamePiece) {
-    this.pieces.push(piece);
+  getPiece(point: Point) {
+    return this.getSquare(point).on;
   }
 
   getPieces() {
-    return this.pieces;
+    return this.grid
+      .flatMap((row, x) =>
+        row.map((square, y) => ({
+          piece: square.on,
+          point: [x, y] as Point,
+        }))
+      )
+      .filter(({ piece }) => piece !== undefined);
   }
 
-  getPieceByPoint(point: Point) {
-    return this.pieces.find(
-      (piece) => piece.point[0] === point[0] && piece.point[1] === point[1]
-    );
+  removePiece({ point }: { point: Point }) {
+    const square = this.getSquare(point);
+    square.on = undefined;
   }
 
-  removePieceByPoint(point: Point) {
-    this.pieces = this.pieces.filter(
-      (piece) => piece.point[0] !== point[0] || piece.point[1] !== point[1]
-    );
+  addPiece({ point, piece }: { point: Point; piece: GamePiece }) {
+    const square = this.getSquare(point);
+    square.on = piece;
   }
 
   resetBoard() {
-    this.pieces = [];
+    this.grid = this.createGrid();
     this.setPieces();
   }
 }

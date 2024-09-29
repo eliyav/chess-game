@@ -10,17 +10,17 @@ import { Move, Point } from "../../shared/game";
 const Y_ABOVE_FLOOR = 0.51;
 
 export const displayPieceMoves = ({
-  piece,
+  point,
   moves,
   gameScene,
   visibleMoves,
 }: {
-  piece: GamePiece;
+  point: Point;
   moves: Move[];
   gameScene: GameScene;
   visibleMoves: boolean;
 }) => {
-  highlightPiece({ move: piece.point, gameScene });
+  highlightPiece({ move: point, gameScene });
   moves.forEach((move) => {
     highlightValidMoves({ move, gameScene, visibleMoves });
   });

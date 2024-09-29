@@ -13,7 +13,7 @@ import { displayPieceMoves, findByPoint } from "../scenes/scene-helpers";
 import { GameScene, SceneManager, Scenes } from "../scenes/scene-manager";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
-import { doMovesMatch } from "../game-logic/helpers";
+import { doPointsMatch } from "../game-logic/helpers";
 
 export class Controller {
   sceneManager: SceneManager;
@@ -21,7 +21,7 @@ export class Controller {
   events: {
     setMessage: (message: Message | null) => void;
   };
-  selectedPiece?: GamePiece;
+  selectedPoint?: Point;
   options: ControllerOptions;
 
   constructor({
@@ -61,16 +61,23 @@ export class Controller {
       if (!this.match.isPlayersTurn()) return;
       const pickedMesh = pickResult?.pickedMesh;
       if (!pickedMesh) return;
-
-      const pickedPiece = this.match.lookupGamePiece(
-        pickedMesh,
-        pickedMesh.metadata !== null
-      );
-
-      if (pickedPiece) {
-        this.handlePieceInput(pickedPiece);
+      const externalMesh = pickedMesh.metadata !== null;
+      const point = this.match.getMeshGamePoint(pickedMesh, externalMesh);
+      const piece = this.match.lookupGamePiece(pickedMesh, true);
+      //If no selection
+      if (!this.selectedPoint) {
+        return this.displayMoves(point, piece);
       } else {
-        this.handleMovementSquareInput(pickedMesh);
+        //If you select the same piece as before deselect it
+        if (doPointsMatch(this.selectedPoint, point)) {
+          return this.unselectCurrentPiece();
+        } else {
+          //If you select a different piece check if its a valid move and resolve or display new moves
+          const validMove = await this.move([this.selectedPoint, point]);
+          if (!validMove) {
+            return this.displayMoves(point, piece);
+          }
+        }
       }
     };
   }
@@ -105,65 +112,38 @@ export class Controller {
   }
 
   prepNextView() {
-    this.selectedPiece = undefined;
+    this.selectedPoint = undefined;
     this.updateMeshesRender();
-    const gameStatus = this.match.getGame().getState();
-    if (gameStatus === GAMESTATUS.CHECKMATE) {
+    const isGameOver = this.match.isGameOver();
+    if (isGameOver) {
       this.events.setMessage(this.createMatchEndPrompt());
     } else {
       this.rotateCamera();
     }
   }
 
-  displayMoves(piece: GamePiece | undefined) {
+  displayMoves(point: Point, piece: GamePiece | undefined) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
-    if (!gameScene) return;
     if (!piece) return;
     const currentPlayersPiece = this.match.isCurrentPlayersPiece(piece);
-    if (currentPlayersPiece) {
-      if (this.options.playGameSounds) {
-        gameScene.data.audio.select?.play();
-      }
-      const moves = this.match.getMoves(piece);
-      this.selectedPiece = piece;
-      this.updateMeshesRender();
-      displayPieceMoves({
-        piece,
-        moves,
-        gameScene,
-        visibleMoves: this.options.displayAvailableMoves,
-      });
+    if (!gameScene || !currentPlayersPiece) return;
+    if (this.options.playGameSounds) {
+      gameScene.data.audio.select?.play();
     }
+    const moves = this.match.getMoves(piece, point);
+    this.selectedPoint = point;
+    this.updateMeshesRender();
+    displayPieceMoves({
+      point,
+      moves,
+      gameScene,
+      visibleMoves: this.options.displayAvailableMoves,
+    });
   }
 
   unselectCurrentPiece() {
-    this.selectedPiece = undefined;
+    this.selectedPoint = undefined;
     this.updateMeshesRender();
-  }
-
-  handlePieceInput(pickedPiece: GamePiece) {
-    //If no selection
-    if (!this.selectedPiece) return this.displayMoves(pickedPiece);
-    //If you select the same piece as before deselect it
-    if (this.selectedPiece === pickedPiece) return this.unselectCurrentPiece();
-    //If you select a different piece check if its a valid move and resolve or display new moves
-    const validMove = this.move([this.selectedPiece.point, pickedPiece.point]);
-    if (!validMove) {
-      return this.displayMoves(pickedPiece);
-    }
-  }
-
-  handleMovementSquareInput(pickedMesh: AbstractMesh) {
-    if (!this.selectedPiece) return;
-    if (pickedMesh.id === "plane") {
-      //If the second mesh selected is one of the movement squares
-      const point = findByPoint({
-        get: "index",
-        point: [pickedMesh.position.z, pickedMesh.position.x],
-        externalMesh: false,
-      });
-      return this.move([this.selectedPiece.point, point]);
-    }
   }
 
   createMatchEndPrompt() {
@@ -238,7 +218,7 @@ export class Controller {
         point: [mesh.position.z, mesh.position.x],
         externalMesh: true,
       });
-      return doMovesMatch(meshPoint, point);
+      return doPointsMatch(meshPoint, point);
     });
   }
 
@@ -261,8 +241,9 @@ export class Controller {
     }
 
     //For each active piece, creates a mesh clone and places on board
-    this.match.getAllGamePieces().forEach((piece) => {
-      const { type, team, point } = piece;
+    this.match.getAllGamePieces().forEach(({ piece, point }) => {
+      if (!piece) return;
+      const { type, team } = piece;
       const foundMesh = gameScene.scene.meshes.find(
         (mesh) => mesh.name === type && mesh.metadata.color === team
       );
