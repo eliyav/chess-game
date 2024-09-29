@@ -4,9 +4,6 @@ import { TEAM } from "../../shared/match";
 import Board from "./board";
 import { doPointsMatch, getPieceMoves, isEnPassantAvailable } from "./helpers";
 
-//Check why checkmate is not working
-//Why bishops wont animate correctly
-
 class Game {
   teams: TEAM[];
   current: {
