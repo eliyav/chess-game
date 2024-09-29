@@ -172,8 +172,18 @@ function calcPawnMoves({
   //Calculates Capture points and pushes them in final movement obj if are valid
   const capturePoint1: Point = [x - direction, y + direction];
   const capturePoint2: Point = [x + direction, y + direction];
-  const captureMove = getStandardMove({ point: capturePoint1, team, board });
-  const captureMove2 = getStandardMove({ point: capturePoint2, team, board });
+  const captureMove = getStandardMove({
+    point: capturePoint1,
+    team,
+    board,
+    onlyCapture: true,
+  });
+  const captureMove2 = getStandardMove({
+    point: capturePoint2,
+    team,
+    board,
+    onlyCapture: true,
+  });
   if (captureMove) {
     availableMoves.push(captureMove);
   }
@@ -307,8 +317,12 @@ const getMoves = ({
     for (let i = 0; i < array.length; i++) {
       const point = array[i];
       const move = getStandardMove({ point, team, board });
+      if (!move) break;
       if (move) {
         availableMoves.push(move);
+        if (move[1] === "capture") {
+          break;
+        }
       }
     }
   });
@@ -399,11 +413,13 @@ function getStandardMove({
   board,
   team,
   onlyMovement,
+  onlyCapture,
 }: {
   point: Point;
   board: Board;
   team: TEAM;
   onlyMovement?: boolean;
+  onlyCapture?: boolean;
 }): Move | undefined {
   const [x, y] = point;
   const isInBounds = bounds(x, board.grid) && bounds(y, board.grid);
@@ -415,6 +431,7 @@ function getStandardMove({
       return [point, "capture"];
     }
   } else {
+    if (onlyCapture) return;
     return [point, "movement"];
   }
 }
