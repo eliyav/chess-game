@@ -64,11 +64,11 @@ export class BaseMatch {
   }
 
   isGameOver() {
-    return this.game.getState() === GAMESTATUS.CHECKMATE;
+    return this.game.getGameState().status === GAMESTATUS.CHECKMATE;
   }
 
   getWinner() {
-    return this.game.getOpponentTeam();
+    return this.game.getCurrentTeamsOpponent();
   }
 
   getGameHistory() {

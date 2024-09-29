@@ -10,7 +10,7 @@ class Game {
     board: Board;
     annotations: string[];
     turnHistory: TurnHistory[];
-    state: GAMESTATUS;
+    status: GAMESTATUS;
   };
 
   constructor() {
@@ -18,42 +18,42 @@ class Game {
     this.current = this.createGame();
   }
 
-  createGame() {
+  private createGame() {
     return {
       board: new Board(),
       annotations: [],
       turnHistory: [],
-      state: GAMESTATUS.PLAYING,
+      status: GAMESTATUS.PLAYING,
     };
   }
 
-  getCurrentTeam() {
+  public getCurrentTeam() {
     const remainder = this.getTurn() % 2;
     const index = remainder ? 0 : 1;
     return this.teams[index];
   }
 
-  getOpponentTeam() {
+  public getCurrentTeamsOpponent() {
     const remainder = this.getTurn() % 2;
     const index = remainder ? 1 : 0;
     return this.teams[index];
   }
 
-  getState() {
-    return this.current.state;
+  public getGameState() {
+    return this.current;
   }
 
   private nextTurn() {
     if (this.isCheckmate()) {
-      this.current.state = GAMESTATUS.CHECKMATE;
+      this.current.status = GAMESTATUS.CHECKMATE;
     }
   }
 
-  getTurn() {
+  public getTurn() {
     return this.current.turnHistory.length + 1;
   }
 
-  undoTurn() {
+  public undoTurn() {
     const lastTurn = this.current.turnHistory.at(-1);
     if (lastTurn) {
       if (lastTurn.type === "movement") {
@@ -101,7 +101,7 @@ class Game {
   }
 
   public move({ origin, target }: { origin: Point; target: Point }) {
-    if (this.current.state === GAMESTATUS.CHECKMATE) return;
+    if (this.current.status === GAMESTATUS.CHECKMATE) return;
     const move = this.findMove({ origin, target });
     if (!move) return;
     const resolved = this.resolveBoard({
@@ -115,7 +115,7 @@ class Game {
     return resolved;
   }
 
-  resolveBoard({
+  private resolveBoard({
     origin,
     move,
     board,
@@ -142,7 +142,7 @@ class Game {
     }
   }
 
-  resolveMovement({
+  private resolveMovement({
     origin,
     move,
     board,
@@ -169,7 +169,8 @@ class Game {
       });
     }
     const isOpponentInCheck =
-      this.isChecked(this.getOpponentTeam(), this.current.board) !== undefined;
+      this.isChecked(this.getCurrentTeamsOpponent(), this.current.board) !==
+      undefined;
     return {
       type: "movement",
       origin,
@@ -179,7 +180,7 @@ class Game {
     };
   }
 
-  resolveCapture({
+  private resolveCapture({
     origin,
     move,
     board,
@@ -207,7 +208,8 @@ class Game {
       });
     }
     const isOpponentInCheck =
-      this.isChecked(this.getOpponentTeam(), this.current.board) !== undefined;
+      this.isChecked(this.getCurrentTeamsOpponent(), this.current.board) !==
+      undefined;
     return {
       type: "capture",
       origin,
@@ -218,7 +220,7 @@ class Game {
     };
   }
 
-  resolveEnPassant({
+  private resolveEnPassant({
     origin,
     move,
     board,
@@ -238,7 +240,7 @@ class Game {
       board.removePiece({ point: origin });
       board.removePiece({ point: enPassant.capturedPiecePoint });
       const isOpponentInCheck =
-        this.isChecked(this.getOpponentTeam(), this.current.board) !==
+        this.isChecked(this.getCurrentTeamsOpponent(), this.current.board) !==
         undefined;
       return {
         type: "enPassant",
@@ -250,7 +252,7 @@ class Game {
     }
   }
 
-  resolveCastling({
+  private resolveCastling({
     origin,
     move,
     board,
@@ -286,7 +288,7 @@ class Game {
         board.removePiece({ point: target });
         const castlingResult: [Point, Point] = [newKingPoint, newRookPoint];
         const isOpponentInCheck =
-          this.isChecked(this.getOpponentTeam(), this.current.board) !==
+          this.isChecked(this.getCurrentTeamsOpponent(), this.current.board) !==
           undefined;
         return {
           type: "castle",
@@ -300,7 +302,7 @@ class Game {
     }
   }
 
-  getMoves({
+  public getMoves({
     piece,
     point,
     board,
@@ -340,7 +342,7 @@ class Game {
     return move;
   }
 
-  canMoveResolve({ origin, move }: { origin: Point; move: Move }) {
+  private canMoveResolve({ origin, move }: { origin: Point; move: Move }) {
     const board = this.current.board.cloneBoard();
     this.resolveBoard({ origin, move, board, dontUpdatePiece: true });
     //Check if resolving above switch would put player in check
@@ -350,21 +352,21 @@ class Game {
     return isMoveResolvable;
   }
 
-  getAllPieces() {
+  public getAllPieces() {
     return this.current.board.getPieces();
   }
 
-  lookupPiece(point: Point) {
+  public lookupPiece(point: Point) {
     return this.current.board.getPiece(point);
   }
 
-  isChecked(team: TEAM, board: Board) {
+  private isChecked(team: TEAM, board: Board) {
     const pieces = board.getPieces();
     const king = pieces.find(({ piece }) => {
       return piece?.type === PIECE.K && piece?.team === team;
     })!;
     const opponentsPieces = board.getPieces().filter(({ piece }) => {
-      return piece?.team === this.getOpponentTeam();
+      return piece?.team === this.getCurrentTeamsOpponent();
     });
     const opponentsAvailableMoves = opponentsPieces
       .map(({ piece, point }) =>
@@ -383,11 +385,11 @@ class Game {
     return isKingChecked;
   }
 
-  isCheckmate() {
+  private isCheckmate() {
     return this.simulateCheckmate() ? true : false;
   }
 
-  simulateCheckmate() {
+  private simulateCheckmate() {
     //Find teams current pieces
     const currentPlayerPieces = this.getAllPieces().filter(
       ({ piece }) => piece?.team === this.getCurrentTeam()
@@ -406,14 +408,14 @@ class Game {
     //If any valid moves, you are not in checkmate
   }
 
-  checkPromotion({ piece, point }: { piece: GamePiece; point: Point }) {
+  private checkPromotion({ piece, point }: { piece: GamePiece; point: Point }) {
     if (piece.type === PIECE.P && (point[1] === 0 || point[1] === 7)) {
       return true;
     }
     return false;
   }
 
-  setPromotionPiece({
+  private setPromotionPiece({
     target,
     originPiece,
     selection,
@@ -432,15 +434,15 @@ class Game {
     board.addPiece({ point: target, piece: promotedPiece });
   }
 
-  resetGame() {
+  public resetGame() {
     this.current = this.createGame();
   }
 
-  getHistory() {
+  public getHistory() {
     return this.current.turnHistory;
   }
 
-  annotate(history: TurnHistory) {
+  private annotate(history: TurnHistory) {
     let annotation;
     const moveType = history.type;
     const promotion = history.promotion;
