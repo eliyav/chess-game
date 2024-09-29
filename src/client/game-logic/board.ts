@@ -1,4 +1,5 @@
 import { Point } from "../../shared/game";
+import { TEAM } from "../../shared/match";
 import chessData from "./chess-data-import";
 import GamePiece from "./game-piece";
 
@@ -78,6 +79,10 @@ class Board {
   addPiece({ point, piece }: { point: Point; piece: GamePiece }) {
     const square = this.getSquare(point);
     square.on = piece;
+  }
+
+  getDirection(team: TEAM) {
+    return team === TEAM.WHITE ? 1 : -1;
   }
 
   resetBoard() {

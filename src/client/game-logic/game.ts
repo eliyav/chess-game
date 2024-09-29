@@ -306,10 +306,11 @@ class Game {
     skipResolveCheck?: boolean;
   }): Move[] {
     if (!piece) return [];
+    const { type, team, moved } = piece;
     const lastTurnHistory = this.current.turnHistory.at(-1);
     const availableMoves = getPieceMoves({
       point,
-      piece,
+      piece: { type, team, moved },
       board,
       lastTurnHistory,
     });
