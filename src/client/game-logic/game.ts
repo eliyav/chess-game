@@ -10,7 +10,6 @@ class Game {
     board: Board;
     annotations: string[];
     turnHistory: TurnHistory[];
-    turn: number;
     state: GAMESTATUS;
   };
 
@@ -24,19 +23,18 @@ class Game {
       board: new Board(),
       annotations: [],
       turnHistory: [],
-      turn: 1,
       state: GAMESTATUS.PLAYING,
     };
   }
 
   getCurrentTeam() {
-    const remainder = this.current.turn % 2;
+    const remainder = this.getTurn() % 2;
     const index = remainder ? 0 : 1;
     return this.teams[index];
   }
 
   getOpponentTeam() {
-    const remainder = this.current.turn % 2;
+    const remainder = this.getTurn() % 2;
     const index = remainder ? 1 : 0;
     return this.teams[index];
   }
@@ -46,10 +44,13 @@ class Game {
   }
 
   private nextTurn() {
-    this.current.turn++;
     if (this.isCheckmate()) {
       this.current.state = GAMESTATUS.CHECKMATE;
     }
+  }
+
+  getTurn() {
+    return this.current.turnHistory.length + 1;
   }
 
   undoTurn() {
@@ -94,7 +95,6 @@ class Game {
       }
       this.current.turnHistory.pop();
       this.current.annotations.pop();
-      this.current.turn--;
       return true;
     }
     return false;
