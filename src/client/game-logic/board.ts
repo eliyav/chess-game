@@ -1,6 +1,6 @@
 import { Point } from "../../shared/game";
 import chessData from "./chess-data-import";
-import GamePiece from "../../shared/game-piece";
+import GamePiece from "./game-piece";
 
 export type Grid = {
   name: string;

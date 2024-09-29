@@ -1,6 +1,6 @@
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { GAMESTATUS, Point, TurnHistory } from "../../shared/game";
-import GamePiece from "../../shared/game-piece";
+import GamePiece from "../game-logic/game-piece";
 import { Lobby, Player, TEAM } from "../../shared/match";
 import Game from "../game-logic/game";
 import { findByPoint } from "../scenes/scene-helpers";

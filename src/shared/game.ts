@@ -1,4 +1,5 @@
-import GamePiece from "./game-piece";
+import GamePiece from "../client/game-logic/game-piece";
+import { TEAM } from "./match";
 
 export enum GAMESTATUS {
   INPROGRESS = "In Progress",
@@ -33,7 +34,10 @@ type BaseTurnHistory = {
 export type EnPassant = {
   enPassantPoint: Point;
   capturedPiecePoint: Point;
-  capturedPiece: GamePiece;
+  capturedPiece: {
+    type: PIECE;
+    team: TEAM;
+  };
 };
 
 export type TurnHistory =
@@ -42,7 +46,10 @@ export type TurnHistory =
     } & BaseTurnHistory)
   | ({
       type: "capture";
-      capturedPiece: GamePiece;
+      capturedPiece: {
+        type: PIECE;
+        team: TEAM;
+      };
     } & BaseTurnHistory)
   | ({
       type: "castle";

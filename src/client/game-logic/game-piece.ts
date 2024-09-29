@@ -1,5 +1,5 @@
-import { PIECE, Point } from "./game";
-import { TEAM } from "./match";
+import { PIECE } from "../../shared/game";
+import { TEAM } from "../../shared/match";
 
 class GamePiece {
   type: PIECE;

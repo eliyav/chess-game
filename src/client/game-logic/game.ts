@@ -1,5 +1,5 @@
 import { GAMESTATUS, Move, PIECE, Point, TurnHistory } from "../../shared/game";
-import GamePiece from "../../shared/game-piece";
+import GamePiece from "./game-piece";
 import { TEAM } from "../../shared/match";
 import Board from "./board";
 import { doPointsMatch, getPieceMoves, isEnPassantAvailable } from "./helpers";
@@ -69,7 +69,10 @@ class Game {
           point: origin,
           piece: this.current.board.getPiece(target)!,
         });
-        this.current.board.addPiece({ point: target, piece: capturedPiece });
+        this.current.board.addPiece({
+          point: target,
+          piece: new GamePiece(capturedPiece),
+        });
       } else if (lastTurn.type === "enPassant") {
         const { origin, target, enPassant } = lastTurn;
         this.current.board.addPiece({
@@ -78,7 +81,7 @@ class Game {
         });
         this.current.board.addPiece({
           point: enPassant.capturedPiecePoint,
-          piece: enPassant.capturedPiece,
+          piece: new GamePiece(enPassant.capturedPiece),
         });
         this.current.board.removePiece({ point: enPassant.enPassantPoint });
       } else if (lastTurn.type === "castle") {

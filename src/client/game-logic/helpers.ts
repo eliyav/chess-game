@@ -1,5 +1,5 @@
 import { EnPassant, Move, PIECE, Point, TurnHistory } from "../../shared/game";
-import GamePiece from "../../shared/game-piece";
+import GamePiece from "./game-piece";
 import { TEAM } from "../../shared/match";
 import Board, { type Grid } from "./board";
 

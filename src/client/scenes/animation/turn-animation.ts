@@ -1,11 +1,12 @@
 import { Animation } from "@babylonjs/core/Animations/animation.js";
-import GamePiece from "../../../shared/game-piece";
+import GamePiece from "../../game-logic/game-piece";
 import { GameScene } from "../scene-manager";
 import { findByPoint } from "../scene-helpers";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { AssetContainer } from "@babylonjs/core/assetContainer";
-import { Point, TurnHistory } from "../../../shared/game";
+import { PIECE, Point, TurnHistory } from "../../../shared/game";
 import { doPointsMatch } from "../../game-logic/helpers";
+import { TEAM } from "../../../shared/match";
 
 export default async function calcTurnAnimation({
   gameScene,
@@ -185,14 +186,17 @@ export default async function calcTurnAnimation({
   }
 
   function pieceBreakAnimation({
-    target,
     point,
+    target,
   }: {
     point: Point;
-    target: GamePiece;
+    target: {
+      type: PIECE;
+      team: TEAM;
+    };
   }) {
-    //Look up animation group based on piece breaking,
     const { type, team } = target;
+    //Look up animation group based on piece breaking,
     const targetMesh = gameScene.data.meshesToRender.find((mesh) => {
       const meshPoint = findByPoint({
         get: "index",

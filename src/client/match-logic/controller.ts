@@ -6,7 +6,7 @@ import type { Nullable } from "@babylonjs/core/types";
 import { GAMESTATUS, Point, TurnHistory } from "../../shared/game";
 import { ControllerOptions, LOBBY_TYPE } from "../../shared/match";
 import { Message } from "../components/modals/message-modal";
-import GamePiece from "../../shared/game-piece";
+import GamePiece from "../game-logic/game-piece";
 import { rotateCamera } from "../scenes/animation/camera";
 import calcTurnAnimation from "../scenes/animation/turn-animation";
 import { displayPieceMoves, findByPoint } from "../scenes/scene-helpers";
