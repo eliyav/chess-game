@@ -22,7 +22,7 @@ export function getPieceMoves({
     case PIECE.P:
       return calcPawnMoves({
         point,
-        team: team,
+        team,
         board,
         turnHistory: lastTurnHistory,
       });
