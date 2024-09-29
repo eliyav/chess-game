@@ -30,6 +30,12 @@ type BaseTurnHistory = {
   promotion?: boolean;
 };
 
+export type EnPassant = {
+  enPassantPoint: Point;
+  capturedPiecePoint: Point;
+  capturedPiece: GamePiece;
+};
+
 export type TurnHistory =
   | ({
       type: "movement";
@@ -45,6 +51,5 @@ export type TurnHistory =
     } & BaseTurnHistory)
   | ({
       type: "enPassant";
-      capturedPiece: GamePiece;
-      enPassantPoint: Point;
+      enPassant: EnPassant;
     } & BaseTurnHistory);

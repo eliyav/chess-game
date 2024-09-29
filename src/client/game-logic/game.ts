@@ -1,7 +1,7 @@
 import { GAMESTATUS, Move, PIECE, Point, TurnHistory } from "../../shared/game";
 import GamePiece from "../../shared/game-piece";
 import { TEAM } from "../../shared/match";
-import Board, { Grid } from "./board";
+import Board from "./board";
 import { doPointsMatch, getPieceMoves, isEnPassantAvailable } from "./helpers";
 
 class Game {
@@ -214,13 +214,11 @@ class Game {
     if (!originPiece) return;
     const lastTurnHistory = this.current.turnHistory.at(-1);
     if (!lastTurnHistory) return;
-    const enPassantPoint = isEnPassantAvailable(lastTurnHistory, board);
-    if (enPassantPoint) {
-      const enPassantPiece = board.getPiece(enPassantPoint);
-      if (!enPassantPiece) return;
+    const enPassant = isEnPassantAvailable(lastTurnHistory, board);
+    if (enPassant) {
       board.addPiece({ point: target, piece: originPiece });
       board.removePiece({ point: origin });
-      board.removePiece({ point: enPassantPoint });
+      board.removePiece({ point: enPassant.capturedPiecePoint });
       const isOpponentInCheck =
         this.isChecked(this.getOpponentTeam(), this.current.board) !==
         undefined;
@@ -228,9 +226,8 @@ class Game {
         type: "enPassant",
         origin,
         target,
-        enPassantPoint,
         isOpponentInCheck,
-        capturedPiece: enPassantPiece,
+        enPassant,
       };
     }
   }
