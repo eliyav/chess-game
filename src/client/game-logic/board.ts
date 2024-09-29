@@ -80,25 +80,6 @@ class Board {
     square.on = piece;
   }
 
-  switchPieces({ origin, target }: { origin: Point; target: Point }) {
-    const { originPiece, targetPiece } = this.getPieceOnSquares({
-      origin,
-      target,
-    });
-    if (!originPiece || !targetPiece) return;
-    this.removePiece({ point: origin });
-    this.removePiece({ point: target });
-    this.addPiece({ point: origin, piece: targetPiece });
-    this.addPiece({ point: target, piece: originPiece });
-  }
-
-  getPieceOnSquares({ origin, target }: { origin: Point; target: Point }) {
-    return {
-      originPiece: this.getSquare(origin).on,
-      targetPiece: this.getSquare(target).on,
-    };
-  }
-
   resetBoard() {
     this.grid = this.createGrid();
     this.setPieces();
