@@ -13,7 +13,7 @@ import { displayPieceMoves, findByPoint } from "../scenes/scene-helpers";
 import { GameScene, SceneManager, Scenes } from "../scenes/scene-manager";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
-import { doPointsMatch } from "../game-logic/helpers";
+import { doPointsMatch } from "../game-logic/moves";
 
 export class Controller {
   sceneManager: SceneManager;

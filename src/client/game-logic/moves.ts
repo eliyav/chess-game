@@ -6,8 +6,6 @@ import Board, { type Grid } from "./board";
 type LateralDirection = "up" | "down" | "right" | "left";
 type DiagonalDirection = "upRight" | "upLeft" | "downRight" | "downLeft";
 type Movements = Partial<Record<LateralDirection | DiagonalDirection, Point[]>>;
-type LateralMovements = Record<LateralDirection, Point[]>;
-type DiagonalMovements = Record<DiagonalDirection, Point[]>;
 
 export function getPieceMoves({
   board,
@@ -87,11 +85,10 @@ function calcRookMoves({
 }) {
   const movements = [1, 2, 3, 4, 5, 6, 7];
   const lateralMovements = calcLateralMovements({
-    grid: board.grid,
-    currentPoint: point,
+    point,
     movements,
   });
-  return getMoves({ board, team, movements: lateralMovements });
+  return getMovePath({ board, team, movements: lateralMovements });
 }
 
 function calcQueenMoves({
@@ -105,21 +102,19 @@ function calcQueenMoves({
 }) {
   const movements = [1, 2, 3, 4, 5, 6, 7];
   const lateralMovements = calcLateralMovements({
-    grid: board.grid,
-    currentPoint: point,
+    point,
     movements,
   });
   const diagonalMovements = calcDiagonalMovements({
-    grid: board.grid,
-    currentPoint: point,
+    point,
     movements,
   });
-  const lateralMoves = getMoves({
+  const lateralMoves = getMovePath({
     board,
     team,
     movements: lateralMovements,
   });
-  const diagonalMoves = getMoves({
+  const diagonalMoves = getMovePath({
     board,
     team,
     movements: diagonalMovements,
@@ -294,15 +289,14 @@ function calcBishopMoves({
 }) {
   const movements = [1, 2, 3, 4, 5, 6, 7];
   const diagonalMovements = calcDiagonalMovements({
-    grid: board.grid,
-    currentPoint: point,
+    point,
     movements,
   });
-  return getMoves({ board, team, movements: diagonalMovements });
+  return getMovePath({ board, team, movements: diagonalMovements });
 }
 
 //Filters the moves from the final movements object and enters them in the available moves array
-const getMoves = ({
+const getMovePath = ({
   board,
   team,
   movements,
@@ -314,12 +308,14 @@ const getMoves = ({
   const availableMoves: Move[] = [];
   const movementsArrays = Object.values(movements);
   movementsArrays.forEach((array) => {
-    for (let i = 0; i < array.length; i++) {
+    for (let i = 0; i < movementsArrays.length; i++) {
       const point = array[i];
       const move = getStandardMove({ point, team, board });
+      //If no move it means your own piece is blocking the path or out of bounds
       if (!move) break;
       if (move) {
         availableMoves.push(move);
+        //Since you cant skip over pieces, if a piece is found in the path, break the loop
         if (move[1] === "capture") {
           break;
         }
@@ -331,81 +327,74 @@ const getMoves = ({
 
 //Calculates Horizontal Movements by calculating each direction from the current point and adds them to the final movements object
 const calcDiagonalMovements = ({
-  grid,
-  currentPoint,
+  point,
   movements,
 }: {
-  grid: Grid;
-  currentPoint: Point;
+  point: Point;
   movements: number[];
 }) => {
-  const finalObj: DiagonalMovements = {
-    upRight: [],
-    upLeft: [],
-    downRight: [],
-    downLeft: [],
+  const upRight = calculateMovements({
+    direction: "upRight",
+    point,
+    movements,
+  });
+  const upLeft = calculateMovements({
+    direction: "upLeft",
+    point,
+    movements,
+  });
+  const downRight = calculateMovements({
+    direction: "downRight",
+    point,
+    movements,
+  });
+  const downLeft = calculateMovements({
+    direction: "downLeft",
+    point,
+    movements,
+  });
+  return {
+    upRight,
+    upLeft,
+    downRight,
+    downLeft,
   };
-  for (const [key, value] of Object.entries(finalObj)) {
-    const moves: Point[] = value;
-    switch (key) {
-      case "upRight":
-        calcUpRight(currentPoint, movements, moves);
-        break;
-      case "upLeft":
-        calcUpLeft(currentPoint, movements, moves);
-        break;
-      case "downRight":
-        calcDownRight(currentPoint, movements, moves);
-        break;
-      case "downLeft":
-        calcDownLeft(currentPoint, movements, moves);
-        break;
-      default:
-        throw new Error(
-          "Unknown horizontal movement, please use upRight, upLeft, downRight, downLeft as key names for finalObj"
-        );
-    }
-  }
-  return finalObj;
 };
 
 //Calculates Vertical Movements by calculating each direction from the current point and adds them to the final movements object
 const calcLateralMovements = ({
-  grid,
-  currentPoint,
+  point,
   movements,
 }: {
-  grid: Grid;
-  currentPoint: Point;
+  point: Point;
   movements: number[];
 }) => {
-  const finalObj: LateralMovements = {
-    up: [],
-    down: [],
-    right: [],
-    left: [],
+  const up = calculateMovements({
+    direction: "up",
+    point,
+    movements,
+  });
+  const down = calculateMovements({
+    direction: "down",
+    point,
+    movements,
+  });
+  const right = calculateMovements({
+    direction: "right",
+    point,
+    movements,
+  });
+  const left = calculateMovements({
+    direction: "left",
+    point,
+    movements,
+  });
+  return {
+    up,
+    down,
+    right,
+    left,
   };
-  for (const key of Object.keys(finalObj)) {
-    switch (key) {
-      case "up":
-        calcUp(currentPoint, movements, finalObj[key]);
-        break;
-      case "down":
-        calcDown(currentPoint, movements, finalObj[key]);
-        break;
-      case "right":
-        calcRight(currentPoint, movements, finalObj[key]);
-        break;
-      case "left":
-        calcLeft(currentPoint, movements, finalObj[key]);
-        break;
-      default:
-        throw new Error(
-          "Unknown vertical movement, please use up, down, right, left as key names for finalObj"
-        );
-    }
-  }
-  return finalObj;
 };
 
 function getStandardMove({
@@ -438,88 +427,42 @@ function getStandardMove({
 
 const bounds = (num: number, grid: Grid) => num >= 0 && num <= grid.length - 1;
 
-const calcUpRight = (
-  currentPoint: Point,
-  movement: number[],
-  finalObj: Point[]
-) => {
-  const [x, y] = currentPoint;
-  movement.forEach((move) => {
-    finalObj.push([x + move, y + move]);
-  });
+type Direction =
+  | "up"
+  | "down"
+  | "right"
+  | "left"
+  | "upRight"
+  | "upLeft"
+  | "downRight"
+  | "downLeft";
+
+const directionMap: {
+  [key: string]: (x: number, y: number, move: number) => Point;
+} = {
+  upRight: (x, y, move) => [x + move, y + move],
+  upLeft: (x, y, move) => [x - move, y + move],
+  downRight: (x, y, move) => [x + move, y - move],
+  downLeft: (x, y, move) => [x - move, y - move],
+  up: (x, y, move) => [x, y + move],
+  down: (x, y, move) => [x, y - move],
+  right: (x, y, move) => [x + move, y],
+  left: (x, y, move) => [x - move, y],
 };
 
-const calcUpLeft = (
-  currentPoint: Point,
-  movement: number[],
-  finalObj: Point[]
-) => {
-  const [x, y] = currentPoint;
-  movement.forEach((move) => {
-    finalObj.push([x - move, y + move]);
-  });
-};
-
-const calcDownRight = (
-  currentPoint: Point,
-  movement: number[],
-  finalObj: Point[]
-) => {
-  const [x, y] = currentPoint;
-  movement.forEach((move) => {
-    finalObj.push([x + move, y - move]);
-  });
-};
-
-const calcDownLeft = (
-  currentPoint: Point,
-  movement: number[],
-  finalObj: Point[]
-) => {
-  const [x, y] = currentPoint;
-  movement.forEach((move) => {
-    finalObj.push([x - move, y - move]);
-  });
-};
-
-const calcUp = (currentPoint: Point, movement: number[], finalObj: Point[]) => {
-  const [x, y] = currentPoint;
-  movement.forEach((move) => {
-    finalObj.push([x, y + move]);
-  });
-};
-
-const calcDown = (
-  currentPoint: Point,
-  movement: number[],
-  finalObj: Point[]
-) => {
-  const [x, y] = currentPoint;
-  movement.forEach((move) => {
-    finalObj.push([x, y - move]);
-  });
-};
-
-const calcRight = (
-  currentPoint: Point,
-  movement: number[],
-  finalObj: Point[]
-) => {
-  const [x, y] = currentPoint;
-  movement.forEach((move) => {
-    finalObj.push([x + move, y]);
-  });
-};
-
-const calcLeft = (
-  currentPoint: Point,
-  movement: number[],
-  finalObj: Point[]
-) => {
-  const [x, y] = currentPoint;
-  movement.forEach((move) => {
-    finalObj.push([x - move, y]);
-  });
+const calculateMovements = ({
+  direction,
+  point,
+  movements,
+}: {
+  direction: Direction;
+  point: Point;
+  movements: number[];
+}): Point[] => {
+  const [x, y] = point;
+  const transform = directionMap[direction];
+  if (!transform) throw new Error(`Invalid direction: ${direction}`);
+  return movements.map((move) => transform(x, y, move));
 };
 
 function calcCastling(

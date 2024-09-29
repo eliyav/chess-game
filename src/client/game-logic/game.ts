@@ -2,7 +2,7 @@ import { GAMESTATUS, Move, PIECE, Point, TurnHistory } from "../../shared/game";
 import GamePiece from "./game-piece";
 import { TEAM } from "../../shared/match";
 import Board from "./board";
-import { doPointsMatch, getPieceMoves, isEnPassantAvailable } from "./helpers";
+import { doPointsMatch, getPieceMoves, isEnPassantAvailable } from "./moves";
 
 class Game {
   teams: TEAM[];
