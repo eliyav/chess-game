@@ -53,42 +53,50 @@ class Game {
   }
 
   undoTurn() {
-    //#Refactor turn history to be a set of instructions so this can be undone easier and more clear
     const lastTurn = this.current.turnHistory.at(-1);
-    // if (lastTurn) {
-    //   lastTurn.originPiece.resetPieceMovement();
-    //   this.current.board.movePiece({
-    //     origin: lastTurn.target,
-    //     target: lastTurn.origin,
-    //   });
-    //   //Undo Promotion
-    //   if (lastTurn.type === "movement" || lastTurn.type === "capture") {
-    //     if (lastTurn.promote) {
-    //       this.current.board.removePiece({ point: lastTurn.target });
-    //       this.current.board.addPiece({
-    //         point: lastTurn.origin,
-    //         piece: lastTurn.originPiece,
-    //       });
-    //     }
-    //   }
-    //   if (lastTurn.type === "castle") {
-    //     this.current.board.movePiece({
-    //       origin: lastTurn.origin,
-    //       target: lastTurn.target,
-    //       shouldSwitch: true,
-    //     });
-    //     lastTurn.targetPiece.resetPieceMovement();
-    //   } else if (lastTurn.type === "capture" || lastTurn.type === "enPassant") {
-    //     this.current.board.addPiece({
-    //       point: lastTurn.target,
-    //       piece: lastTurn.targetPiece,
-    //     });
-    //   }
-    //   this.current.turnHistory.pop();
-    //   this.current.annotations.pop();
-    //   this.current.turn--;
-    //   return true;
-    // }
+    if (lastTurn) {
+      if (lastTurn.type === "movement") {
+        const { origin, target } = lastTurn;
+        this.current.board.addPiece({
+          point: origin,
+          piece: this.current.board.getPiece(target)!,
+        });
+        this.current.board.removePiece({ point: target });
+      } else if (lastTurn.type === "capture") {
+        const { origin, target, capturedPiece } = lastTurn;
+        this.current.board.addPiece({
+          point: origin,
+          piece: this.current.board.getPiece(target)!,
+        });
+        this.current.board.addPiece({ point: target, piece: capturedPiece });
+      } else if (lastTurn.type === "enPassant") {
+        const { origin, target, enPassant } = lastTurn;
+        this.current.board.addPiece({
+          point: origin,
+          piece: this.current.board.getPiece(target)!,
+        });
+        this.current.board.addPiece({
+          point: enPassant.capturedPiecePoint,
+          piece: enPassant.capturedPiece,
+        });
+        this.current.board.removePiece({ point: enPassant.enPassantPoint });
+      } else if (lastTurn.type === "castle") {
+        const { origin, target, castling } = lastTurn;
+        const [newKingPoint, newRookPoint] = castling;
+        const kingPiece = this.current.board.getPiece(newKingPoint)!;
+        const rookPiece = this.current.board.getPiece(newRookPoint)!;
+        kingPiece.resetPieceMovement();
+        rookPiece.resetPieceMovement();
+        this.current.board.addPiece({ point: origin, piece: kingPiece });
+        this.current.board.addPiece({ point: target, piece: rookPiece });
+        this.current.board.removePiece({ point: newKingPoint });
+        this.current.board.removePiece({ point: newRookPoint });
+      }
+      this.current.turnHistory.pop();
+      this.current.annotations.pop();
+      this.current.turn--;
+      return true;
+    }
     return false;
   }
 
@@ -153,7 +161,12 @@ class Game {
       point: target,
     });
     if (promotion) {
-      this.setPromotionPiece({ target, originPiece, selection: PIECE.Q });
+      this.setPromotionPiece({
+        target,
+        originPiece,
+        selection: PIECE.Q,
+        board,
+      });
     }
     const isOpponentInCheck =
       this.isChecked(this.getOpponentTeam(), this.current.board) !== undefined;
@@ -186,7 +199,12 @@ class Game {
       point: target,
     });
     if (promotion) {
-      this.setPromotionPiece({ target, originPiece, selection: PIECE.Q });
+      this.setPromotionPiece({
+        target,
+        originPiece,
+        selection: PIECE.Q,
+        board,
+      });
     }
     const isOpponentInCheck =
       this.isChecked(this.getOpponentTeam(), this.current.board) !== undefined;
@@ -399,17 +417,19 @@ class Game {
     target,
     originPiece,
     selection,
+    board,
   }: {
     target: Point;
     originPiece: GamePiece;
     selection: PIECE;
+    board: Board;
   }) {
-    this.current.board.removePiece({ point: target });
+    board.removePiece({ point: target });
     const promotedPiece = new GamePiece({
       type: selection,
       team: originPiece.team,
     });
-    this.current.board.addPiece({ point: target, piece: promotedPiece });
+    board.addPiece({ point: target, piece: promotedPiece });
   }
 
   resetGame() {
