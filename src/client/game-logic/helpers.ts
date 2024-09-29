@@ -50,7 +50,7 @@ export function getPieceMoves({
     case PIECE.B:
       return calcBishopMoves(piece, point, board);
     case PIECE.N:
-      return calcKnightMoves(piece, point, board);
+      return calcKnightMoves({ board, team: piece.team, point });
     case PIECE.Q:
       return calcQueenMoves(piece, point, board);
     case PIECE.K:
@@ -115,8 +115,17 @@ function calcPawnMoves(
   return availableMoves;
 }
 
-function calcKnightMoves(piece: GamePiece, point: Point, board: Board) {
-  const knightMoves: Point[] = [
+function calcKnightMoves({
+  team,
+  point,
+  board,
+}: {
+  team: TEAM;
+  point: Point;
+  board: Board;
+}) {
+  const availableMoves: Move[] = [];
+  const movements: Point[] = [
     [1, 2],
     [2, 1],
     [2, -1],
@@ -126,9 +135,20 @@ function calcKnightMoves(piece: GamePiece, point: Point, board: Board) {
     [-2, -1],
     [-1, -2],
   ];
-
-  const availableMoves: Move[] = [];
-  calcKnightMovement(board, point, piece.team, knightMoves, availableMoves);
+  const [x, y] = point;
+  movements.forEach(([moveX, moveY]) => {
+    const result: Point = [x + moveX, y + moveY];
+    if (bounds(result[0], board.grid) && bounds(result[1], board.grid)) {
+      const pieceOnPoint = board.getPiece(result);
+      if (pieceOnPoint) {
+        if (pieceOnPoint.team !== team) {
+          availableMoves.push([result, "capture"]);
+        }
+      } else {
+        availableMoves.push([result, "movement"]);
+      }
+    }
+  });
 
   return availableMoves;
 }
@@ -324,30 +344,6 @@ const checkForValidPawnCapture = (
       ? finalObj.push([capturePoint, "capture"])
       : null;
   }
-};
-
-const calcKnightMovement = (
-  board: Board,
-  currentPoint: number[],
-  team: TEAM,
-  moves: Point[],
-  finalObj: Move[]
-) => {
-  let [x, y] = currentPoint;
-  moves.forEach((move) => {
-    const [moveX, moveY] = move;
-    const resultX = x + moveX;
-    const resultY = y + moveY;
-    if (bounds(resultX, board.grid) && bounds(resultY, board.grid)) {
-      const result: Point = [resultX, resultY];
-      const pieceOnPoint = board.getPiece(result);
-      if (pieceOnPoint) {
-        pieceOnPoint.team !== team ? finalObj.push([result, "capture"]) : null;
-      } else {
-        finalObj.push([result, "movement"]);
-      }
-    }
-  });
 };
 
 const calcKingMovements = (
