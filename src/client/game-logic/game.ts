@@ -96,52 +96,58 @@ class Game {
     if (this.current.state === GAMESTATUS.CHECKMATE) return;
     const move = this.findMove({ origin, target });
     if (!move) return;
-    const resolved = this.resolveMove({ origin, move });
+    const resolved = this.resolveBoard({
+      origin,
+      move,
+      board: this.current.board,
+    });
     if (!resolved) return;
-    const isOpponentInCheck =
-      this.isChecked(this.getOpponentTeam(), this.current.board) !== undefined;
-    this.annotate(resolved, isOpponentInCheck);
-    this.current.turnHistory.push(resolved);
+    this.annotate(resolved);
     this.nextTurn();
     return resolved;
   }
 
-  resolveMove({ origin, move }: { origin: Point; move: Move }) {
-    const [_, moveType] = move;
-    switch (moveType) {
-      case "movement":
-        return this.resolveMovement({ origin, move });
-      case "capture":
-        return this.resolveCapture({ origin, move });
-      case "enPassant":
-        return this.resolveEnPassant({ origin, move });
-      case "castle":
-        return this.resolveCastling({ origin, move });
+  resolveBoard({
+    origin,
+    move,
+    board,
+    dontUpdatePiece = false,
+  }: {
+    origin: Point;
+    move: Move;
+    board: Board;
+    dontUpdatePiece?: boolean;
+  }) {
+    const [target, moveType] = move;
+    const originPiece = board.getPiece(origin)!;
+    if (!dontUpdatePiece) originPiece.update();
+    if (moveType === "movement") {
+      return this.resolveMovement({ origin, move, board });
+    } else if (moveType === "capture") {
+      return this.resolveCapture({ origin, move, board });
+    } else if (moveType === "enPassant") {
+      return this.resolveEnPassant({ origin, move, board });
+    } else if (moveType === "castle") {
+      const targetPiece = board.getPiece(target);
+      if (!dontUpdatePiece) targetPiece?.update();
+      return this.resolveCastling({ origin, move, board });
     }
-  }
-
-  private findMove({ origin, target }: { origin: Point; target: Point }) {
-    const piece = this.lookupPiece(origin);
-    if (!piece) return;
-    const availableMoves = this.getMoves({
-      piece,
-      point: origin,
-      board: this.current.board,
-    });
-    const move = availableMoves.find((move) => doPointsMatch(move[0], target));
-    return move;
   }
 
   resolveMovement({
     origin,
     move,
+    board,
   }: {
     origin: Point;
     move: Move;
+    board: Board;
   }): TurnHistory | undefined {
     const [target] = move;
     const originPiece = this.lookupPiece(origin);
     if (!originPiece) return;
+    board.addPiece({ point: target, piece: originPiece });
+    board.removePiece({ point: origin });
     const promotion = this.checkPromotion({
       piece: originPiece,
       point: target,
@@ -149,30 +155,32 @@ class Game {
     if (promotion) {
       this.setPromotionPiece({ target, originPiece, selection: PIECE.Q });
     }
-    this.updateBoard({
-      origin,
-      move,
-      board: this.current.board,
-    });
+    const isOpponentInCheck =
+      this.isChecked(this.getOpponentTeam(), this.current.board) !== undefined;
     return {
       type: "movement",
       origin,
       target,
-      originPiece,
+      promotion,
+      isOpponentInCheck,
     };
   }
 
   resolveCapture({
     origin,
     move,
+    board,
   }: {
     origin: Point;
     move: Move;
+    board: Board;
   }): TurnHistory | undefined {
     const [target] = move;
     const originPiece = this.lookupPiece(origin);
     const targetPiece = this.lookupPiece(target);
     if (!originPiece || !targetPiece) return;
+    board.addPiece({ point: target, piece: originPiece });
+    board.removePiece({ point: origin });
     const promotion = this.checkPromotion({
       piece: originPiece,
       point: target,
@@ -180,59 +188,61 @@ class Game {
     if (promotion) {
       this.setPromotionPiece({ target, originPiece, selection: PIECE.Q });
     }
-    this.updateBoard({
-      origin,
-      move,
-      board: this.current.board,
-    });
+    const isOpponentInCheck =
+      this.isChecked(this.getOpponentTeam(), this.current.board) !== undefined;
     return {
       type: "capture",
       origin,
       target,
-      originPiece,
-      targetPiece,
+      promotion,
+      isOpponentInCheck,
+      capturedPiece: targetPiece,
     };
   }
 
   resolveEnPassant({
     origin,
     move,
+    board,
   }: {
     origin: Point;
     move: Move;
+    board: Board;
   }): TurnHistory | undefined {
     const [target] = move;
     const originPiece = this.lookupPiece(origin);
     if (!originPiece) return;
     const lastTurnHistory = this.current.turnHistory.at(-1);
     if (!lastTurnHistory) return;
-    const enPassant = isEnPassantAvailable(lastTurnHistory);
-    if (enPassant.result) {
-      if (doPointsMatch(enPassant.enPassantPoint, target)) {
-        const enPassantPiece = this.lookupPiece(enPassant.enPassantPoint)!;
-        this.updateBoard({
-          origin,
-          move,
-          board: this.current.board,
-        });
-        return {
-          type: "enPassant",
-          origin,
-          target,
-          originPiece,
-          targetPiece: enPassantPiece,
-          enPassant,
-        };
-      }
+    const enPassantPoint = isEnPassantAvailable(lastTurnHistory, board);
+    if (enPassantPoint) {
+      const enPassantPiece = board.getPiece(enPassantPoint);
+      if (!enPassantPiece) return;
+      board.addPiece({ point: target, piece: originPiece });
+      board.removePiece({ point: origin });
+      board.removePiece({ point: enPassantPoint });
+      const isOpponentInCheck =
+        this.isChecked(this.getOpponentTeam(), this.current.board) !==
+        undefined;
+      return {
+        type: "enPassant",
+        origin,
+        target,
+        enPassantPoint,
+        isOpponentInCheck,
+        capturedPiece: enPassantPiece,
+      };
     }
   }
 
   resolveCastling({
     origin,
     move,
+    board,
   }: {
     origin: Point;
     move: Move;
+    board: Board;
   }): TurnHistory | undefined {
     const [target] = move;
     const originPiece = this.lookupPiece(origin);
@@ -249,26 +259,27 @@ class Game {
       if (castling && castling2) {
         const [originX, OriginY] = origin;
         const [targetX] = target;
-        let c = originX - targetX;
-        c < 0 ? (c = 1) : (c = -1);
-        const newKingX = originX + c * 2;
-        const newRookX = originX + c;
+        const c = originX - targetX;
+        const dir = c < 0 ? 1 : -1;
+        const newKingX = originX + dir * 2;
+        const newRookX = originX + dir;
         const newKingPoint: Point = [newKingX, OriginY];
         const newRookPoint: Point = [newRookX, OriginY];
-        this.updateBoard({
-          origin,
-          move,
-          board: this.current.board,
-        });
+        board.addPiece({ point: newKingPoint, piece: originPiece });
+        board.addPiece({ point: newRookPoint, piece: targetPiece });
+        board.removePiece({ point: origin });
+        board.removePiece({ point: target });
         const castlingResult: [Point, Point] = [newKingPoint, newRookPoint];
+        const isOpponentInCheck =
+          this.isChecked(this.getOpponentTeam(), this.current.board) !==
+          undefined;
         return {
           type: "castle",
           direction: c,
           origin,
           target,
-          originPiece,
-          targetPiece,
           castling: castlingResult,
+          isOpponentInCheck,
         };
       }
     }
@@ -302,52 +313,21 @@ class Game {
     }
   }
 
-  updateBoard({
-    origin,
-    move,
-    board,
-    dontUpdatePiece = false,
-  }: {
-    origin: Point;
-    move: Move;
-    board: Board;
-    dontUpdatePiece?: boolean;
-  }) {
-    const [target, moveType] = move;
-    const originPiece = board.getPiece(origin)!;
-    if (!dontUpdatePiece) originPiece.update();
-    if (moveType === "movement") {
-      board.addPiece({ point: target, piece: originPiece });
-      board.removePiece({ point: origin });
-    } else if (moveType === "capture") {
-      board.addPiece({ point: target, piece: originPiece });
-      board.removePiece({ point: origin });
-    } else if (moveType === "enPassant") {
-      board.addPiece({ point: target, piece: originPiece });
-      board.removePiece({ point: origin });
-      board.removePiece({ point: target });
-      // board.removePiece({ point: lastTurnHistory.target });
-    } else if (moveType === "castle") {
-      const targetPiece = board.getPiece(target);
-      if (!dontUpdatePiece) targetPiece?.update();
-      const [originX, OriginY] = origin;
-      const [targetX] = target;
-      let c = originX - targetX;
-      c < 0 ? (c = 1) : (c = -1);
-      const newKingX = originX + c * 2;
-      const newRookX = originX + c;
-      const newKingPoint: Point = [newKingX, OriginY];
-      const newRookPoint: Point = [newRookX, OriginY];
-      board.addPiece({ point: newKingPoint, piece: originPiece! });
-      board.addPiece({ point: newRookPoint, piece: targetPiece! });
-      board.removePiece({ point: origin });
-      board.removePiece({ point: target });
-    }
+  private findMove({ origin, target }: { origin: Point; target: Point }) {
+    const piece = this.lookupPiece(origin);
+    if (!piece) return;
+    const availableMoves = this.getMoves({
+      piece,
+      point: origin,
+      board: this.current.board,
+    });
+    const move = availableMoves.find((move) => doPointsMatch(move[0], target));
+    return move;
   }
 
   canMoveResolve({ origin, move }: { origin: Point; move: Move }) {
     const board = this.current.board.cloneBoard();
-    this.updateBoard({ origin, move, board, dontUpdatePiece: true });
+    this.resolveBoard({ origin, move, board, dontUpdatePiece: true });
     //Check if resolving above switch would put player in check
     const isMoveResolvable = this.isChecked(this.getCurrentTeam(), board)
       ? false
@@ -443,25 +423,24 @@ class Game {
     return this.current.turnHistory;
   }
 
-  annotate(result: TurnHistory, isOpponentInCheck: boolean) {
+  annotate(history: TurnHistory) {
     let annotation;
-    const type = result.type;
-    const promotion =
-      (result.type === "movement" || result.type === "capture") &&
-      result.promote;
-    const pieceName = result.originPiece.type;
-    const originSquare = this.current.board.getSquare(result.origin);
-    const targetSquare = this.current.board.getSquare(result.target);
-    const isCapturing = result.type === "capture";
-    const symbol = result.originPiece?.getSymbol();
-    if (type === "castle") {
-      annotation = result.direction === 1 ? "O-O" : "O-O-O";
+    const moveType = history.type;
+    const promotion = history.promotion;
+    const originPiece = this.current.board.getPiece(history.target);
+    const opponentInCheck = history.isOpponentInCheck;
+    const originSquare = this.current.board.getSquare(history.origin);
+    const targetSquare = this.current.board.getSquare(history.target);
+    const isCapturing = history.type === "capture";
+    const symbol = originPiece?.getSymbol();
+    if (moveType === "castle") {
+      annotation = history.direction === 1 ? "O-O" : "O-O-O";
     } else if (promotion) {
       //Add promoted piece so can get symbol
       // const symbol = promotedPiece.getSymbol();
       annotation = `${targetSquare}${symbol}`;
     } else if (isCapturing) {
-      if (pieceName === "Pawn") {
+      if (originPiece?.type === "Pawn") {
         annotation = `${originSquare.name.charAt(0)}x${targetSquare}`;
       } else {
         annotation = `${symbol}x${targetSquare}`;
@@ -469,8 +448,9 @@ class Game {
     } else {
       annotation = `${symbol}${targetSquare}`;
     }
-    if (isOpponentInCheck) annotation = `${annotation}+`;
+    if (opponentInCheck) annotation = `${annotation}+`;
     this.current.annotations.push(annotation);
+    this.current.turnHistory.push(history);
   }
 }
 

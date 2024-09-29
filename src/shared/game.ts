@@ -23,41 +23,28 @@ export enum PIECE {
   Q = "Queen",
 }
 
+type BaseTurnHistory = {
+  origin: Point;
+  target: Point;
+  isOpponentInCheck: boolean;
+  promotion?: boolean;
+};
+
 export type TurnHistory =
-  | {
+  | ({
       type: "movement";
-      origin: Point;
-      target: Point;
-      originPiece: GamePiece;
-      promote?: boolean;
-    }
-  | {
+    } & BaseTurnHistory)
+  | ({
       type: "capture";
-      origin: Point;
-      target: Point;
-      originPiece: GamePiece;
-      targetPiece: GamePiece;
-      promote?: boolean;
-    }
-  | {
+      capturedPiece: GamePiece;
+    } & BaseTurnHistory)
+  | ({
       type: "castle";
-      origin: Point;
-      target: Point;
-      originPiece: GamePiece;
-      targetPiece: GamePiece;
       direction: number;
       castling: [Point, Point];
-    }
-  | {
+    } & BaseTurnHistory)
+  | ({
       type: "enPassant";
-      origin: Point;
-      target: Point;
-      originPiece: GamePiece;
-      targetPiece: GamePiece;
-      enPassant: EnPassantResult;
-    };
-
-export type EnPassantResult = {
-  result: boolean;
-  enPassantPoint: Point;
-};
+      capturedPiece: GamePiece;
+      enPassantPoint: Point;
+    } & BaseTurnHistory);

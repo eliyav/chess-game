@@ -1,10 +1,4 @@
-import {
-  EnPassantResult,
-  Move,
-  PIECE,
-  Point,
-  TurnHistory,
-} from "../../shared/game";
+import { Move, PIECE, Point, TurnHistory } from "../../shared/game";
 import GamePiece from "../../shared/game-piece";
 import { TEAM } from "../../shared/match";
 import Board, { type Grid } from "./board";
@@ -101,9 +95,8 @@ function calcPawnMoves(
   const availableMoves: Move[] = [];
   calcPawnMovement(board, piece, point, availableMoves);
   if (turnHistory) {
-    const result = isEnPassantAvailable(turnHistory);
-    if (result.result) {
-      const targetSquare = result.enPassantPoint;
+    const enPassantPoint = isEnPassantAvailable(turnHistory, board);
+    if (enPassantPoint) {
       const [x, y] = point;
       const direction = piece.team === "White" ? 1 : -1;
       const x1 = x - 1;
@@ -112,10 +105,10 @@ function calcPawnMoves(
       const potential1: Point = [x1, newY];
       const potential2: Point = [x2, newY];
       if (
-        doPointsMatch(potential1, targetSquare) ||
-        doPointsMatch(potential2, targetSquare)
+        doPointsMatch(potential1, enPassantPoint) ||
+        doPointsMatch(potential2, enPassantPoint)
       ) {
-        availableMoves.push([targetSquare, "enPassant"]);
+        availableMoves.push([enPassantPoint, "enPassant"]);
       }
     }
   }
@@ -500,25 +493,25 @@ const calcLeft = (
 };
 
 export const isEnPassantAvailable = (
-  turnHistory: TurnHistory
-): EnPassantResult => {
-  let moved;
-  let direction;
-  let noMove = -1;
-  let x = noMove;
-  let y = noMove;
-  if (turnHistory.originPiece.type === "Pawn") {
-    const targetY = turnHistory.target[1];
-    const originY = turnHistory.origin[1];
-    moved = Math.abs(targetY - originY);
-    direction = turnHistory.originPiece.team === TEAM.WHITE ? 1 : -1;
-    x = turnHistory.target[0];
-    y = turnHistory.origin[1] + direction;
-  }
-  return {
-    result: moved === 2 ? true : false,
-    enPassantPoint: [x, y],
-  };
+  turnHistory: TurnHistory,
+  board: Board
+): Point | undefined => {
+  const { target } = turnHistory;
+  const pieceOnLastTurnTargetSquare = board.getPiece(target);
+  if (
+    !pieceOnLastTurnTargetSquare ||
+    pieceOnLastTurnTargetSquare.type !== "Pawn"
+  )
+    return;
+  const targetY = turnHistory.target[1];
+  const originY = turnHistory.origin[1];
+  const moved = Math.abs(targetY - originY);
+  if (moved !== 2) return;
+  const direction = pieceOnLastTurnTargetSquare.team === TEAM.WHITE ? 1 : -1;
+  const x = turnHistory.target[0];
+  const y = turnHistory.origin[1] + direction;
+  const enPassantPoint: Point = [x, y];
+  return enPassantPoint;
 };
 
 export const doPointsMatch = (point: Point, point2: Point) =>

@@ -24,13 +24,13 @@ export default async function calcTurnAnimation({
   if (turnHistory.type === "capture") {
     pieceBreakAnimation({
       point: turnHistory.target,
-      target: turnHistory.targetPiece,
+      target: turnHistory.capturedPiece,
     });
   } else if (turnHistory.type === "enPassant") {
     //Update enpassant turn history to have the enpassant point
     pieceBreakAnimation({
       point: turnHistory.target,
-      target: turnHistory.targetPiece,
+      target: turnHistory.capturedPiece,
     });
   }
 
