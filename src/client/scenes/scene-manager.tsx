@@ -101,8 +101,8 @@ export class SceneManager {
     window.addEventListener("resize", () => this.engine?.resize());
   }
 
-  public getScene<T extends Scenes>(scene: T): ScenesDict[T] | undefined {
-    return this.scenes?.[scene];
+  public getScene<T extends Scenes>(scene: T): ScenesDict[T] {
+    return this.scenes[scene];
   }
 
   public switchScene(path: APP_ROUTES, state?: string) {
@@ -115,13 +115,11 @@ export class SceneManager {
     return sceneRouting[path]?.[state ?? "/"];
   }
 
-  private setScene<T extends Scenes>(scene: T): ScenesDict[T] | undefined {
+  private setScene<T extends Scenes>(scene: T): ScenesDict[T] {
     this.activeSceneId = scene;
     const currentScene = this.getScene(scene);
-    if (currentScene) {
-      currentScene.scene.attachControl();
-      return currentScene;
-    }
+    currentScene?.scene.attachControl();
+    return currentScene;
   }
 
   private detachScene(scene: Scenes) {
