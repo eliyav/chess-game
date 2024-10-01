@@ -1,9 +1,7 @@
-import type { AudioEngine } from "@babylonjs/core/Audio/audioEngine";
-import type { GameScene } from "./scene-manager";
-import type { Scene } from "@babylonjs/core/scene";
-import { Sound } from "@babylonjs/core/Audio";
+import { type AudioEngine, Sound } from "@babylonjs/core/Audio";
 import selectSound from "../../../assets/audio/click.mp3";
 import crumbleSounds from "../../../assets/audio/crumble.mp3";
+import type { GameScene } from "./scene-manager";
 
 export function handleAudioUnlock(audioEngine: AudioEngine) {
   function unlockAudio() {

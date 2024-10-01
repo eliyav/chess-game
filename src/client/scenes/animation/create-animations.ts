@@ -1,4 +1,4 @@
-import "@babylonjs/core/Animations/animatable.js";
+import "@babylonjs/core/Animations/animatable";
 import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 import { Scene } from "@babylonjs/core/scene";

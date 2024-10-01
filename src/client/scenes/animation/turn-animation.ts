@@ -1,12 +1,11 @@
-import { Animation } from "@babylonjs/core/Animations/animation.js";
-import GamePiece from "../../game-logic/game-piece";
-import { GameScene } from "../scene-manager";
-import { findByPoint } from "../scene-helpers";
+import { Animation } from "@babylonjs/core/Animations/animation";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { PIECE, Point, TurnHistory } from "../../../shared/game";
-import { doPointsMatch } from "../../game-logic/moves";
 import { TEAM } from "../../../shared/match";
+import { doPointsMatch } from "../../game-logic/moves";
+import { findByPoint } from "../scene-helpers";
+import { GameScene } from "../scene-manager";
 
 export default async function calcTurnAnimation({
   gameScene,

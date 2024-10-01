@@ -1,5 +1,4 @@
-import { AudioEngine } from "@babylonjs/core/Audio/audioEngine";
-import type { Sound } from "@babylonjs/core/Audio/sound";
+import { type Sound, AudioEngine } from "@babylonjs/core/Audio";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import type { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";

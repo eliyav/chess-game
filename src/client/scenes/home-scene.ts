@@ -1,15 +1,15 @@
-import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera.js";
+import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Engine } from "@babylonjs/core/Engines/engine";
-import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight.js";
+import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import {
   ISceneLoaderAsyncResult,
   SceneLoader,
 } from "@babylonjs/core/Loading/sceneLoader";
 import { Material } from "@babylonjs/core/Materials/material";
 import { Space } from "@babylonjs/core/Maths/math.axis";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { Scene } from "@babylonjs/core/scene.js";
+import { Scene } from "@babylonjs/core/scene";
 import type { Nullable } from "@babylonjs/core/types";
 import bishop from "../../../assets/pieces/bishopv3.gltf";
 import board from "../../../assets/pieces/board.gltf";
@@ -22,7 +22,6 @@ import { createCelestialSphere } from "./celestial-shere/celestial-sphere";
 import { DisplayMesh } from "./display-mesh";
 import { createMeshMaterials } from "./materials";
 import { CustomScene } from "./scene-manager";
-import { StandardMaterial } from "@babylonjs/core";
 
 export const createHomeScene = async (
   engine: Engine
