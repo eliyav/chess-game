@@ -1,39 +1,25 @@
 import "@babylonjs/loaders/glTF";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Lobby } from "../shared/match";
 import { APP_ROUTES } from "../shared/routes";
-import LoadingScreen from "./components/loading-screen";
 import { Message, MessageModal } from "./components/modals/message-modal";
 import { Game } from "./routes/game";
 import { Home } from "./routes/home";
 import { LobbySelect } from "./routes/lobby-select";
 import { OfflineLobby } from "./routes/offline-lobby";
 import { OnlineLobby } from "./routes/online-lobby";
-import { createSceneManager, type SceneManager } from "./scenes/scene-manager";
+import { type SceneManager } from "./scenes/scene-manager";
 import { websocket } from "./websocket-client";
 
-const App: React.FC<{ canvas: HTMLCanvasElement }> = ({ canvas }) => {
+const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isInitialized, setIsInitialized] = useState(false);
   const [lobby, setLobby] = useState<Lobby>();
   const [message, setMessage] = useState<Message | null>(null);
-  const sceneManager = useRef<SceneManager>();
-  const canGameViewRender =
-    sceneManager.current !== undefined && lobby !== undefined;
 
   useEffect(() => {
-    if (!sceneManager.current) {
-      createSceneManager(canvas).then((manager) => {
-        sceneManager.current = manager;
-        setIsInitialized(true);
-      });
-    }
-  }, [canvas, setIsInitialized]);
-
-  useEffect(() => {
-    sceneManager.current?.switchScene(location.pathname as APP_ROUTES);
+    sceneManager.switchScene(location.pathname as APP_ROUTES);
   }, [location]);
 
   useEffect(() => {
@@ -68,7 +54,6 @@ const App: React.FC<{ canvas: HTMLCanvasElement }> = ({ canvas }) => {
           onReject={message.onReject}
         />
       )}
-      {!isInitialized && <LoadingScreen text="Loading..." />}
       <Routes>
         <Route path={APP_ROUTES.Home} element={<Home />} />
         <Route
@@ -86,9 +71,9 @@ const App: React.FC<{ canvas: HTMLCanvasElement }> = ({ canvas }) => {
         <Route
           path={APP_ROUTES.Game}
           element={
-            canGameViewRender ? (
+            lobby !== undefined ? (
               <Game
-                sceneManager={sceneManager.current!}
+                sceneManager={sceneManager}
                 lobby={lobby}
                 setMessage={setMessage}
               />

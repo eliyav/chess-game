@@ -60,7 +60,7 @@ const sceneRouting: Record<APP_ROUTES, { [state: string]: Scenes }> = {
 
 export async function createSceneManager(canvas: HTMLCanvasElement) {
   const engine = new Engine(canvas, true);
-  const audioEngine = new AudioEngine(null, window.AudioContext);
+  const audioEngine = new AudioEngine(null);
   const homeScreen = await createHomeScene(engine);
   const game = await createGameScene(canvas, engine, audioEngine);
   return new SceneManager({

@@ -22,6 +22,7 @@ import { createCelestialSphere } from "./celestial-shere/celestial-sphere";
 import { DisplayMesh } from "./display-mesh";
 import { createMeshMaterials } from "./materials";
 import { CustomScene } from "./scene-manager";
+import { StandardMaterial } from "@babylonjs/core";
 
 export const createHomeScene = async (
   engine: Engine
