@@ -8,7 +8,7 @@ import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
 import { Scene } from "@babylonjs/core/scene.js";
 import { createAnimations } from "./animation/create-animations";
-import { handleAudioEngine } from "./audio-engine";
+import { gameSceneAudio } from "./audio-engine";
 import { createCelestialSphere } from "./celestial-shere/celestial-sphere";
 import { loadGameAssets } from "./game-assets";
 import { createMeshMaterials, createMovementMaterials } from "./materials";
@@ -67,7 +67,7 @@ export const createGameScene = async (
     },
   };
 
-  handleAudioEngine({ audioEngine, gameScene, scene });
+  gameSceneAudio({ audioEngine, gameScene });
 
   return gameScene;
 };

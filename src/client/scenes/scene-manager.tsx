@@ -8,6 +8,7 @@ import { AnimationContainer } from "./animation/create-animations";
 import { createHomeScene } from "./home-scene";
 import { APP_ROUTES } from "../../shared/routes";
 import { createGameScene } from "./game-scene";
+import { handleAudioUnlock } from "./audio-engine";
 
 export type CustomScene<T> = {
   scene: Scene;
@@ -61,40 +62,31 @@ const sceneRouting: Record<APP_ROUTES, { [state: string]: Scenes }> = {
 export async function createSceneManager(canvas: HTMLCanvasElement) {
   const engine = new Engine(canvas, true);
   const audioEngine = new AudioEngine(null);
-  const homeScreen = await createHomeScene(engine);
-  const game = await createGameScene(canvas, engine, audioEngine);
+  handleAudioUnlock(audioEngine);
+  const homeScene = await createHomeScene(engine);
+  const gameScene = await createGameScene(canvas, engine, audioEngine);
   return new SceneManager({
-    canvas,
     engine,
-    audioEngine,
-    homeScene: homeScreen,
-    gameScene: game,
+    homeScene,
+    gameScene,
   });
 }
 
 export class SceneManager {
-  private canvas: HTMLCanvasElement;
   private engine: Engine;
   private scenes: ScenesDict;
   private activeSceneId: Scenes;
-  private audioEngine: AudioEngine;
 
   constructor({
-    canvas,
     homeScene,
     gameScene,
     engine,
-    audioEngine,
   }: {
     engine: Engine;
-    canvas: HTMLCanvasElement;
     homeScene: ScenesDict[Scenes.HOME];
     gameScene: ScenesDict[Scenes.GAME];
-    audioEngine: AudioEngine;
   }) {
     this.engine = engine;
-    this.audioEngine = audioEngine;
-    this.canvas = canvas;
     this.activeSceneId = Scenes.HOME;
     this.scenes = { [Scenes.HOME]: homeScene, [Scenes.GAME]: gameScene };
     this.render();
