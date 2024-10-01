@@ -191,6 +191,10 @@ canvas {
   gap: 2em;
 }
 
+.grow-1 {
+  flex-grow: 1;
+}
+
 #divider {
   transform: scale(0.5);
   user-select: none;
