@@ -11,6 +11,7 @@ import { OfflineLobby } from "./routes/offline-lobby";
 import { OnlineLobby } from "./routes/online-lobby";
 import { type SceneManager } from "./scenes/scene-manager";
 import { websocket } from "./websocket-client";
+import NotFound from "./routes/not-found";
 
 const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   const navigate = useNavigate();
@@ -80,6 +81,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
             ) : null
           }
         />
+        <Route path={"*"} element={<NotFound />} />
       </Routes>
     </div>
   );

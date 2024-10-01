@@ -53,9 +53,6 @@ const sceneRouting: Record<APP_ROUTES, { [state: string]: Scenes }> = {
   [APP_ROUTES.OfflineLobby]: {
     ["/"]: Scenes.HOME,
   },
-  [APP_ROUTES.NotFound]: {
-    ["/"]: Scenes.HOME,
-  },
 };
 
 export async function createSceneManager(canvas: HTMLCanvasElement) {
@@ -103,7 +100,7 @@ export class SceneManager {
   }
 
   private getActiveSceneId(path: APP_ROUTES, state?: string) {
-    return sceneRouting[path]?.[state ?? "/"];
+    return sceneRouting[path]?.[state ?? "/"] ?? Scenes.HOME;
   }
 
   private setScene<T extends Scenes>(scene: T): ScenesDict[T] {
