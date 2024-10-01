@@ -6,6 +6,7 @@ import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Scene } from "@babylonjs/core/scene";
 import { AnimationContainer } from "./animation/create-animations";
 import { createHomeScene } from "./home-scene";
+import { APP_ROUTES } from "../../shared/routes";
 
 export type CustomScene<T> = {
   scene: Scene;
@@ -25,11 +26,35 @@ export type GameScene = CustomScene<{
 export const enum Scenes {
   HOME,
   GAME,
+  PROMOTION,
 }
 
 export type ScenesDict = {
   [Scenes.HOME]?: CustomScene<{}>;
   [Scenes.GAME]?: GameScene;
+  [Scenes.PROMOTION]?: CustomScene<{}>;
+};
+
+const sceneRouting: Record<APP_ROUTES, { [state: string]: Scenes }> = {
+  [APP_ROUTES.Game]: {
+    ["/"]: Scenes.GAME,
+    ["promote"]: Scenes.PROMOTION,
+  },
+  [APP_ROUTES.Home]: {
+    ["/"]: Scenes.HOME,
+  },
+  [APP_ROUTES.Lobby]: {
+    ["/"]: Scenes.HOME,
+  },
+  [APP_ROUTES.OnlineLobby]: {
+    ["/"]: Scenes.HOME,
+  },
+  [APP_ROUTES.OfflineLobby]: {
+    ["/"]: Scenes.HOME,
+  },
+  [APP_ROUTES.NotFound]: {
+    ["/"]: Scenes.HOME,
+  },
 };
 
 export class SceneManager {
@@ -57,9 +82,18 @@ export class SceneManager {
     this.initGameScene();
   }
 
-  public switchScene<T extends Scenes>(scene: T): ScenesDict[T] | undefined {
+  public getScene<T extends Scenes>(scene: T): ScenesDict[T] | undefined {
+    return this.scenes?.[scene];
+  }
+
+  public switchScene(path: APP_ROUTES, state?: string) {
+    const id = this.getActiveSceneId(path, state);
     this.detachScene(this.activeSceneId);
-    return this.setScene(scene);
+    return this.setScene(id);
+  }
+
+  private getActiveSceneId(path: APP_ROUTES, state?: string) {
+    return sceneRouting[path]?.[state ?? "/"];
   }
 
   private setScene<T extends Scenes>(scene: T): ScenesDict[T] | undefined {
@@ -76,10 +110,6 @@ export class SceneManager {
     if (currentScene) {
       currentScene.scene.detachControl();
     }
-  }
-
-  public getScene<T extends Scenes>(scene: T): ScenesDict[T] | undefined {
-    return this.scenes?.[scene];
   }
 
   private async initHomeScene({

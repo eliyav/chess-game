@@ -1,20 +1,21 @@
 import "@babylonjs/loaders/glTF";
 import React, { useEffect, useRef, useState } from "react";
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Lobby } from "../shared/match";
+import { APP_ROUTES } from "../shared/routes";
 import LoadingScreen from "./components/loading-screen";
 import { Message, MessageModal } from "./components/modals/message-modal";
-import { SceneManager } from "./scenes/scene-manager";
 import { Game } from "./routes/game";
 import { Home } from "./routes/home";
 import { LobbySelect } from "./routes/lobby-select";
 import { OfflineLobby } from "./routes/offline-lobby";
 import { OnlineLobby } from "./routes/online-lobby";
+import { SceneManager } from "./scenes/scene-manager";
 import { websocket } from "./websocket-client";
-import { APP_ROUTES } from "../shared/routes";
 
 const App: React.FC<{}> = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isInitialized, setIsInitialized] = useState(false);
   const [lobby, setLobby] = useState<Lobby>();
   const [message, setMessage] = useState<Message | null>(null);
@@ -37,12 +38,6 @@ const App: React.FC<{}> = () => {
       setLobby(lobby);
     });
 
-    return () => {
-      websocket.off("lobbyInfo");
-    };
-  }, [websocket, setLobby]);
-
-  useEffect(() => {
     websocket.on("redirect", ({ path, message }) => {
       navigate(path);
       if (message) {
@@ -57,8 +52,13 @@ const App: React.FC<{}> = () => {
 
     return () => {
       websocket.off("redirect");
+      websocket.off("lobbyInfo");
     };
-  }, [websocket, navigate, setMessage]);
+  }, [websocket, navigate, setMessage, setLobby]);
+
+  useEffect(() => {
+    sceneManager.current?.switchScene(location.pathname as APP_ROUTES);
+  }, [location]);
 
   return (
     <div id="app">

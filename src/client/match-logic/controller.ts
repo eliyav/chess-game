@@ -45,7 +45,7 @@ export class Controller {
   }
 
   init() {
-    const gameScene = this.sceneManager.switchScene(Scenes.GAME);
+    const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (gameScene) {
       this.subscribeGameInput(gameScene);
       this.updateMeshesRender();
