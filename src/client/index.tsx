@@ -9,10 +9,12 @@ export const isPhone = window.matchMedia("(max-width: 600px)").matches;
 const container = document.getElementById("root") as HTMLDivElement;
 const root = ReactDOMClient.createRoot(container);
 
+const canvas = document.getElementById("app-canvas") as HTMLCanvasElement;
+
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <App canvas={canvas} />
     </BrowserRouter>
   </React.StrictMode>
 );

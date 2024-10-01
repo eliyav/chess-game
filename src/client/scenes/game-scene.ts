@@ -14,7 +14,7 @@ import { loadGameAssets } from "./game-assets";
 import { createMeshMaterials, createMovementMaterials } from "./materials";
 import { GameScene } from "./scene-manager";
 
-export const gameScene = async (
+export const createGameScene = async (
   canvas: HTMLCanvasElement,
   engine: Engine,
   audioEngine: AudioEngine

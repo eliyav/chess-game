@@ -7,6 +7,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { AnimationContainer } from "./animation/create-animations";
 import { createHomeScene } from "./home-scene";
 import { APP_ROUTES } from "../../shared/routes";
+import { createGameScene } from "./game-scene";
 
 export type CustomScene<T> = {
   scene: Scene;
@@ -30,8 +31,8 @@ export const enum Scenes {
 }
 
 export type ScenesDict = {
-  [Scenes.HOME]?: CustomScene<{}>;
-  [Scenes.GAME]?: GameScene;
+  [Scenes.HOME]: CustomScene<{}>;
+  [Scenes.GAME]: GameScene;
   [Scenes.PROMOTION]?: CustomScene<{}>;
 };
 
@@ -57,6 +58,20 @@ const sceneRouting: Record<APP_ROUTES, { [state: string]: Scenes }> = {
   },
 };
 
+export async function createSceneManager(canvas: HTMLCanvasElement) {
+  const engine = new Engine(canvas, true);
+  const audioEngine = new AudioEngine(null, window.AudioContext);
+  const homeScreen = await createHomeScene(engine);
+  const game = await createGameScene(canvas, engine, audioEngine);
+  return new SceneManager({
+    canvas,
+    engine,
+    audioEngine,
+    homeScene: homeScreen,
+    gameScene: game,
+  });
+}
+
 export class SceneManager {
   private canvas: HTMLCanvasElement;
   private engine: Engine;
@@ -66,20 +81,24 @@ export class SceneManager {
 
   constructor({
     canvas,
-    setInitialized,
+    homeScene,
+    gameScene,
+    engine,
+    audioEngine,
   }: {
+    engine: Engine;
     canvas: HTMLCanvasElement;
-    setInitialized: () => void;
+    homeScene: ScenesDict[Scenes.HOME];
+    gameScene: ScenesDict[Scenes.GAME];
+    audioEngine: AudioEngine;
   }) {
+    this.engine = engine;
+    this.audioEngine = audioEngine;
     this.canvas = canvas;
-    this.engine = new Engine(canvas, true);
-    this.scenes = {};
     this.activeSceneId = Scenes.HOME;
-    this.initHomeScene({ setInitialized });
+    this.scenes = { [Scenes.HOME]: homeScene, [Scenes.GAME]: gameScene };
     this.render();
     window.addEventListener("resize", () => this.engine?.resize());
-    this.audioEngine = new AudioEngine(null, window.AudioContext);
-    this.initGameScene();
   }
 
   public getScene<T extends Scenes>(scene: T): ScenesDict[T] | undefined {
@@ -110,25 +129,6 @@ export class SceneManager {
     if (currentScene) {
       currentScene.scene.detachControl();
     }
-  }
-
-  private async initHomeScene({
-    setInitialized,
-  }: {
-    setInitialized: () => void;
-  }) {
-    const homeScreen = await createHomeScene(this.engine);
-    this.scenes[Scenes.HOME] = homeScreen;
-    setInitialized();
-  }
-
-  private async initGameScene() {
-    const { gameScene } = await import("./game-scene");
-    this.scenes[Scenes.GAME] = await gameScene(
-      this.canvas,
-      this.engine,
-      this.audioEngine
-    );
   }
 
   private render() {
