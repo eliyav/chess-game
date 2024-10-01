@@ -57,7 +57,7 @@ app.get("*", function (req, res) {
 });
 
 const server = app.listen(port, function () {
-  console.log(`Example app listening on port ${port}!\n`);
+  console.log(`Server listening on port ${port}!\n`);
 });
 
 const lobbies = new Map<string, Lobby>();
