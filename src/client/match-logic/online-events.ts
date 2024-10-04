@@ -1,23 +1,24 @@
 import { Point } from "../../shared/game";
+import type { ServerToClientEvents } from "../../shared/websocket";
 import { websocket } from "../websocket-client";
 import type { Controller } from "./controller";
 
-type EventFunc = () => void;
-
 export type OnlineEvent = {
-  subscribe: (event: EventFunc) => void;
-  unsubscribe: (event: EventFunc) => void;
-  event: EventFunc;
+  name: keyof ServerToClientEvents;
+  event: (args: any) => void;
 };
 
-//Each event has its individual subscribe, unsubscribe because websocket does not export the Event Types and I get type checking from the .on .off methods
 export function getOnlineSubscribers(events: OnlineEvent[]) {
   const subscribe = () => {
-    events.forEach(({ subscribe, event }) => subscribe(event));
+    for (const { name, event } of events) {
+      websocket.on(name, event);
+    }
   };
 
   const unsubscribe = () => {
-    events.forEach(({ unsubscribe, event }) => unsubscribe(event));
+    for (const { name, event } of events) {
+      websocket.off(name, event);
+    }
   };
 
   return { subscribe, unsubscribe };
@@ -30,12 +31,7 @@ export function createMatchEvents({
 }): OnlineEvent[] {
   return [
     {
-      subscribe: (event: EventFunc) => {
-        websocket.on("resetMatchRequested", event);
-      },
-      unsubscribe: (event: EventFunc) => {
-        websocket.off("resetMatchRequested", event);
-      },
+      name: "resetMatchRequested",
       event: () => {
         controller.setMessage({
           text: "Opponent requested a match reset. Do you accept?",
@@ -57,12 +53,7 @@ export function createMatchEvents({
       },
     },
     {
-      subscribe: (event: EventFunc) => {
-        websocket.on("resetMatchResolve", event);
-      },
-      unsubscribe: (event: EventFunc) => {
-        websocket.off("resetMatchResolve", event);
-      },
+      name: "resetMatchResolve",
       event: ({ answer }: { answer: boolean }) => {
         if (answer) {
           controller.resetMatchAndView();
@@ -74,12 +65,7 @@ export function createMatchEvents({
       },
     },
     {
-      subscribe: (event: EventFunc) => {
-        websocket.on("resolvedMove", event);
-      },
-      unsubscribe: (event: EventFunc) => {
-        websocket.off("resolvedMove", event);
-      },
+      name: "resolvedMove",
       event: ({
         originPoint,
         targetPoint,
@@ -91,12 +77,7 @@ export function createMatchEvents({
       },
     },
     {
-      subscribe: (event: EventFunc) => {
-        websocket.on("undoTurnRequested", event);
-      },
-      unsubscribe: (event: EventFunc) => {
-        websocket.off("undoTurnRequested", event);
-      },
+      name: "undoTurnRequested",
       event: () => {
         controller.setMessage({
           text: "Opponent requested to undo the last game move. Do you accept?",
@@ -118,12 +99,7 @@ export function createMatchEvents({
       },
     },
     {
-      subscribe: (event: EventFunc) => {
-        websocket.on("undoTurnResolve", event);
-      },
-      unsubscribe: (event: EventFunc) => {
-        websocket.off("undoTurnResolve", event);
-      },
+      name: "undoTurnResolve",
       event: ({ answer }: { answer: boolean }) => {
         if (answer) {
           controller.undoTurn();
@@ -135,12 +111,7 @@ export function createMatchEvents({
       },
     },
     {
-      subscribe: (event: EventFunc) => {
-        websocket.on("opponentDisconnected", event);
-      },
-      unsubscribe: (event: EventFunc) => {
-        websocket.off("opponentDisconnected", event);
-      },
+      name: "opponentDisconnected",
       event: () => {
         controller.opponentLeftMatch();
         controller.setMessage({
@@ -151,5 +122,5 @@ export function createMatchEvents({
         });
       },
     },
-  ] as OnlineEvent[];
+  ];
 }

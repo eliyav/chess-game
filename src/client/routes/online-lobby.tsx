@@ -25,7 +25,9 @@ export const OnlineLobby: React.FC<{
     return () => {
       if (lobbyKey) {
         if (lobby) {
-          if (!lobby.matchStarted) {
+          console.log(location);
+          if (location.pathname !== APP_ROUTES.Game && !lobby.matchStarted) {
+            console.log(lobby.matchStarted);
             websocket.emit("leaveLobby", { lobbyKey });
           }
         }
