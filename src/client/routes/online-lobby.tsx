@@ -24,12 +24,14 @@ export const OnlineLobby: React.FC<{
 
     return () => {
       if (lobbyKey) {
-        if (lobby?.matchStarted === false) {
-          websocket.emit("leaveLobby", { lobbyKey });
+        if (lobby) {
+          if (!lobby.matchStarted) {
+            websocket.emit("leaveLobby", { lobbyKey });
+          }
         }
       }
     };
-  }, [lobbyKey, websocket]);
+  }, [lobbyKey, lobby?.matchStarted]);
 
   if (!lobby) return null;
 

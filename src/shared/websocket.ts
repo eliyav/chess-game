@@ -11,6 +11,7 @@ export interface ServerToClientEvents {
   resetMatchResolve: (data: { answer: boolean }) => void;
   undoTurnRequested: () => void;
   undoTurnResolve: (data: { answer: boolean }) => void;
+  opponentDisconnected: () => void;
 }
 
 export interface ClientToServerEvents {

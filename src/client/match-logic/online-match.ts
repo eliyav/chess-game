@@ -5,13 +5,10 @@ import GamePiece from "../game-logic/game-piece";
 import { websocket } from "../websocket-client";
 import { BaseMatch, MatchLogic } from "./base-match";
 import { Controller } from "./controller";
-import { requestMatchReset } from "./online-events/request-match-reset";
-import { requestResolveMove } from "./online-events/request-resolve-move";
-import { requestUndoTurn } from "./online-events/request-undo-turn";
+import { createMatchEvents, getOnlineSubscribers } from "./online-events";
 
 export class OnlineMatch extends BaseMatch implements MatchLogic {
   mode: LOBBY_TYPE.ONLINE;
-  listenerEvents: string[] = [];
 
   constructor({ lobby, player }: { lobby: Lobby; player: Player }) {
     super({ lobby, player });
@@ -65,34 +62,11 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
     return piece.team === this.getPlayerTeam();
   }
 
-  subscribeMatchEvents({
-    controller,
-    setMessage,
-  }: {
-    controller: Controller;
-    setMessage: (value: React.SetStateAction<Message | null>) => void;
-  }) {
-    const matchResetEvents = requestMatchReset({
-      setMessage,
+  getOnlineSubscribers({ controller }: { controller: Controller }) {
+    const events = createMatchEvents({
       controller,
     });
-    const matchUndoEvents = requestUndoTurn({
-      setMessage,
-      controller,
-    });
-    const resolveMoveEvent = requestResolveMove({
-      controller,
-    });
-    this.listenerEvents.push(
-      ...matchResetEvents,
-      ...matchUndoEvents,
-      ...resolveMoveEvent
-    );
-  }
-
-  unsubscribeMatchEvents() {
-    this.listenerEvents.forEach((event) => {
-      websocket.off(event as any);
-    });
+    const subscribers = getOnlineSubscribers(events);
+    return subscribers;
   }
 }

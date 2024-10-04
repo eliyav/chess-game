@@ -1,3 +1,4 @@
+import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { PickingInfo } from "@babylonjs/core/Collisions/pickingInfo";
 import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
 import type { Nullable } from "@babylonjs/core/types";
@@ -12,13 +13,15 @@ import { displayPieceMoves, findByPoint } from "../scenes/scene-helpers";
 import { GameScene, SceneManager, Scenes } from "../scenes/scene-manager";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
-import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
+import { APP_ROUTES } from "../../shared/routes";
+import { websocket } from "../websocket-client";
 
 export class Controller {
   sceneManager: SceneManager;
   match: LocalMatch | OnlineMatch;
   events: {
     setMessage: (message: Message | null) => void;
+    navigate: (route: APP_ROUTES) => void;
   };
   selectedPoint?: Point;
   options: ControllerOptions;
@@ -33,6 +36,7 @@ export class Controller {
     match: LocalMatch | OnlineMatch;
     events: {
       setMessage: (message: Message | null) => void;
+      navigate: (route: APP_ROUTES) => void;
     };
     options: ControllerOptions;
   }) {
@@ -257,6 +261,19 @@ export class Controller {
       }
       gameScene.data.meshesToRender.push(clone);
     });
+  }
+
+  setMessage(message: Message | null) {
+    this.events.setMessage(message);
+  }
+
+  opponentLeftMatch() {
+    this.events.navigate(APP_ROUTES.Home);
+  }
+
+  leaveMatch({ ws, key }: { ws: typeof websocket; key: string }) {
+    this.events.navigate(APP_ROUTES.Home);
+    ws.emit("leaveLobby", { lobbyKey: key });
   }
 
   shouldCameraRotate() {
