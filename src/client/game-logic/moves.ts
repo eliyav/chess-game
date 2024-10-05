@@ -148,22 +148,23 @@ function calcPawnMoves({
   });
   if (moveResult) {
     availableMoves.push(moveResult);
-  }
-  //If he hasnt moved, then can move 2 spaces
-  if ((team === TEAM.WHITE && y === 1) || (team === TEAM.BLACK && y === 6)) {
-    const extendedRange = 2;
-    const newY = y + extendedRange * direction;
-    const move2: Point = [x, newY];
-    const moveResult = getStandardMove({
-      point: move2,
-      team,
-      board,
-      onlyMovement: true,
-    });
-    if (moveResult) {
-      availableMoves.push(moveResult);
+    //If he has a move forward and hasnt moved, then can move 2 spaces
+    if ((team === TEAM.WHITE && y === 1) || (team === TEAM.BLACK && y === 6)) {
+      const extendedRange = 2;
+      const newY = y + extendedRange * direction;
+      const move2: Point = [x, newY];
+      const moveResult = getStandardMove({
+        point: move2,
+        team,
+        board,
+        onlyMovement: true,
+      });
+      if (moveResult) {
+        availableMoves.push(moveResult);
+      }
     }
   }
+
   //Calculates Capture points and pushes them in final movement obj if are valid
   const capturePoint1: Point = [x - direction, y + direction];
   const capturePoint2: Point = [x + direction, y + direction];
