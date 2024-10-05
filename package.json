@@ -27,7 +27,7 @@
   "author": "Eliya Vahl",
   "license": "ISC",
   "dependencies": {
-    "@babylonjs/core": "^7.27.1",
+    "@babylonjs/core": "^7.28.0",
     "@babylonjs/loaders": "^7.27.1",
     "compression": "^1.7.4",
     "express": "^4.21.0",
