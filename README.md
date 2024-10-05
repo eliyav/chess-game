@@ -2,6 +2,8 @@
 
 ## About The Project
 
+3D Chess PWA app built to easily play chess!
+
 ### Built With
 
 - [Babylon.js](https://www.babylonjs.com)
@@ -35,6 +37,7 @@ Install the latest node package manager before installing dependencies
    git clone https://github.com/eliyav/chess-game.git
    ```
 2. Install NPM packages
+
    ```sh
    npm install
    ```

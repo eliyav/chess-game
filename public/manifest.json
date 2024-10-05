@@ -1,0 +1,17 @@
+{
+  "lang": "en-us",
+  "name": "3D Chess",
+  "short_name": "3D Chess",
+  "description": "Play 3D Chess",
+  "start_url": "/",
+  "background_color": "#2f3d58",
+  "theme_color": "#2f3d58",
+  "orientation": "portrait",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "/pwa-icon.png",
+      "sizes": "512x512"
+    }
+  ]
+}
