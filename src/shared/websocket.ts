@@ -34,6 +34,7 @@ export interface ClientToServerEvents {
     lobbyKey: string;
     options: { [key: string]: boolean };
   }) => void;
+  abandonMatch: (data: { lobbyKey: string }) => void;
 }
 
 export interface InterServerEvents {

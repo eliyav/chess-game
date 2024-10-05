@@ -2,7 +2,7 @@ import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { PickingInfo } from "@babylonjs/core/Collisions/pickingInfo";
 import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
 import type { Nullable } from "@babylonjs/core/types";
-import { Point, TurnHistory } from "../../shared/game";
+import { GAMESTATUS, Point, TurnHistory } from "../../shared/game";
 import { ControllerOptions, LOBBY_TYPE } from "../../shared/match";
 import { Message } from "../components/modals/message-modal";
 import GamePiece from "../game-logic/game-piece";
@@ -267,13 +267,14 @@ export class Controller {
     this.events.setMessage(message);
   }
 
-  opponentLeftMatch() {
+  leaveMatch({ key }: { key: string }) {
     this.events.navigate(APP_ROUTES.Home);
-  }
-
-  leaveMatch({ ws, key }: { ws: typeof websocket; key: string }) {
-    this.events.navigate(APP_ROUTES.Home);
-    ws.emit("leaveLobby", { lobbyKey: key });
+    if (
+      this.match.mode === LOBBY_TYPE.ONLINE &&
+      this.match.getGame().getGameState().status === GAMESTATUS.INPROGRESS
+    ) {
+      websocket.emit("abandonMatch", { lobbyKey: key });
+    }
   }
 
   shouldCameraRotate() {

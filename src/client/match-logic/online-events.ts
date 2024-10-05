@@ -16,8 +16,8 @@ export function getOnlineSubscribers(events: OnlineEvent[]) {
   };
 
   const unsubscribe = () => {
-    for (const { name, event } of events) {
-      websocket.off(name, event);
+    for (const { name } of events) {
+      websocket.off(name);
     }
   };
 
@@ -108,18 +108,6 @@ export function createMatchEvents({
             onConfirm: () => controller.setMessage(null),
           });
         }
-      },
-    },
-    {
-      name: "opponentDisconnected",
-      event: () => {
-        controller.opponentLeftMatch();
-        controller.setMessage({
-          text: "Opponent has left the match",
-          onConfirm: () => {
-            controller.setMessage(null);
-          },
-        });
       },
     },
   ];

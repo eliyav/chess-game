@@ -10,7 +10,6 @@ import { LocalMatch } from "../match-logic/local-match";
 import { OnlineMatch } from "../match-logic/online-match";
 import { SceneManager } from "../scenes/scene-manager";
 import { websocket } from "../websocket-client";
-import { on } from "events";
 
 export const Game: React.FC<{
   sceneManager: SceneManager;
@@ -43,13 +42,10 @@ export const Game: React.FC<{
     return match.current.getOnlineSubscribers({
       controller: controller.current,
     });
-  }, []);
+  }, [controller.current, match.current]);
 
   useEffect(() => {
-    if (onlineSubscribers) {
-      onlineSubscribers?.subscribe();
-    }
-
+    onlineSubscribers?.subscribe();
     return () => {
       onlineSubscribers?.unsubscribe();
     };
@@ -62,8 +58,7 @@ export const Game: React.FC<{
         items={[
           {
             text: "home",
-            onClick: () =>
-              controller.current.leaveMatch({ ws: websocket, key: lobby.key }),
+            onClick: () => controller.current.leaveMatch({ key: lobby.key }),
           },
           {
             text: "restart",

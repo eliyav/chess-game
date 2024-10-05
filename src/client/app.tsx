@@ -1,17 +1,17 @@
 import "@babylonjs/loaders/glTF";
 import React, { useEffect, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import { Lobby } from "../shared/match";
+import { Lobby, LOBBY_TYPE } from "../shared/match";
 import { APP_ROUTES } from "../shared/routes";
 import { Message, MessageModal } from "./components/modals/message-modal";
 import { Game } from "./routes/game";
 import { Home } from "./routes/home";
 import { LobbySelect } from "./routes/lobby-select";
+import NotFound from "./routes/not-found";
 import { OfflineLobby } from "./routes/offline-lobby";
 import { OnlineLobby } from "./routes/online-lobby";
 import { type SceneManager } from "./scenes/scene-manager";
 import { websocket } from "./websocket-client";
-import NotFound from "./routes/not-found";
 
 const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   const navigate = useNavigate();
@@ -24,6 +24,31 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   }, [location]);
 
   useEffect(() => {
+    //If the user is in an online lobby and navigates away from the page without match having started, leave the lobby
+    if (
+      lobby &&
+      lobby.mode === LOBBY_TYPE.ONLINE &&
+      location.pathname !== APP_ROUTES.OnlineLobby &&
+      !lobby.matchStarted
+    ) {
+      websocket.emit("leaveLobby", { lobbyKey: lobby.key });
+      setLobby(undefined);
+    }
+    console.log(location);
+  }, [location.pathname, lobby, setLobby]);
+
+  useEffect(() => {
+    websocket.on("opponentDisconnected", () => {
+      navigate(APP_ROUTES.Home);
+      setLobby(undefined);
+      setMessage({
+        text: "Opponent has left the match",
+        onConfirm: () => {
+          setMessage(null);
+        },
+      });
+    });
+
     websocket.on("lobbyInfo", (lobby: Lobby) => {
       setLobby(lobby);
     });
@@ -43,6 +68,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
     return () => {
       websocket.off("redirect");
       websocket.off("lobbyInfo");
+      websocket.off("opponentDisconnected");
     };
   }, [websocket, navigate, setMessage, setLobby]);
 

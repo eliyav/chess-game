@@ -23,7 +23,7 @@ class Game {
       board: new Board(),
       annotations: [],
       turnHistory: [],
-      status: GAMESTATUS.PLAYING,
+      status: GAMESTATUS.INPROGRESS,
     };
   }
 
