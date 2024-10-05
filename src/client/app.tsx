@@ -34,7 +34,6 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
       websocket.emit("leaveLobby", { lobbyKey: lobby.key });
       setLobby(undefined);
     }
-    console.log(location);
   }, [location.pathname, lobby, setLobby]);
 
   useEffect(() => {
