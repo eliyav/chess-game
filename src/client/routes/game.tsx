@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { LOBBY_TYPE, Lobby } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
@@ -8,7 +8,7 @@ import { Message } from "../components/modals/message-modal";
 import { Controller } from "../match-logic/controller";
 import { LocalMatch } from "../match-logic/local-match";
 import { OnlineMatch } from "../match-logic/online-match";
-import { SceneManager, Scenes } from "../scenes/scene-manager";
+import { SceneManager } from "../scenes/scene-manager";
 import { websocket } from "../websocket-client";
 
 export const Game: React.FC<{
@@ -31,24 +31,25 @@ export const Game: React.FC<{
       match: match.current,
       events: {
         setMessage: (message: Message | null) => setMessage(message),
+        navigate: (route: APP_ROUTES) => navigate(route),
       },
       options: lobby.controllerOptions,
     })
   );
 
-  useEffect(() => {
-    if (match.current.mode === LOBBY_TYPE.ONLINE) {
-      match.current.subscribeMatchEvents({
-        controller: controller.current,
-        setMessage,
-      });
-    }
+  const onlineSubscribers = useMemo(() => {
+    if (match.current.mode !== LOBBY_TYPE.ONLINE) return;
+    return match.current.getOnlineSubscribers({
+      controller: controller.current,
+    });
+  }, [controller.current, match.current]);
 
+  useEffect(() => {
+    onlineSubscribers?.subscribe();
     return () => {
-      if (match.current.mode === LOBBY_TYPE.ONLINE)
-        match.current.unsubscribeMatchEvents();
+      onlineSubscribers?.unsubscribe();
     };
-  }, [match, controller]);
+  }, [onlineSubscribers]);
 
   //Game Overlay
   return (
@@ -57,10 +58,7 @@ export const Game: React.FC<{
         items={[
           {
             text: "home",
-            onClick: () => {
-              navigate(APP_ROUTES.Home);
-              sceneManager.switchScene(Scenes.HOME);
-            },
+            onClick: () => controller.current.leaveMatch({ key: lobby.key }),
           },
           {
             text: "restart",

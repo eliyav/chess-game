@@ -1,35 +1,27 @@
 import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Lobby, TEAM } from "../../shared/match";
+import { APP_ROUTES } from "../../shared/routes";
 import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
-import { websocket } from "../websocket-client";
-import PlayerCard from "../components/lobby/player-card";
 import { ControllerOptionsList } from "../components/lobby/controller-options-list";
+import PlayerCard from "../components/lobby/player-card";
 import { Pawn } from "../components/svg/pawn";
 import { Switch } from "../components/svg/switch";
-import { APP_ROUTES } from "../../shared/routes";
+import { websocket } from "../websocket-client";
 
 export const OnlineLobby: React.FC<{
   lobby: Lobby | undefined;
 }> = ({ lobby }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const lobbyKey = location.search.split("=")[1];
 
   useEffect(() => {
+    const lobbyKey = location.search.split("=")[1];
     if (lobbyKey) {
       websocket.emit("joinLobby", { lobbyKey });
     }
-
-    return () => {
-      if (lobbyKey) {
-        if (lobby?.matchStarted === false) {
-          websocket.emit("leaveLobby", { lobbyKey });
-        }
-      }
-    };
-  }, [lobbyKey, websocket]);
+  }, [websocket, location]);
 
   if (!lobby) return null;
 
@@ -59,14 +51,14 @@ export const OnlineLobby: React.FC<{
             <span
               onClick={() => {
                 try {
-                  const text = lobbyKey ?? "";
+                  const text = lobby.key ?? "";
                   navigator.clipboard.writeText(text);
                 } catch (e) {
                   console.error(e);
                 }
               }}
             >
-              {lobbyKey ?? "..."}
+              {lobby.key ?? "..."}
             </span>
           </p>
         </div>
@@ -100,7 +92,7 @@ export const OnlineLobby: React.FC<{
             <Switch
               className="gold-switch"
               onClick={() => {
-                websocket.emit("switchTeams", { lobbyKey });
+                websocket.emit("switchTeams", { lobbyKey: lobby.key });
               }}
             />
           )}
@@ -134,7 +126,7 @@ export const OnlineLobby: React.FC<{
           options={lobby.controllerOptions}
           onChange={(key: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
             websocket.emit("updateControllerOptions", {
-              lobbyKey,
+              lobbyKey: lobby.key,
               options: { [key]: e.target.checked },
             })}
         />
@@ -146,7 +138,7 @@ export const OnlineLobby: React.FC<{
             id="ready-checkbox"
             disabled={disableReadyButton}
             onClick={() => {
-              websocket.emit("readyPlayer", { lobbyKey });
+              websocket.emit("readyPlayer", { lobbyKey: lobby.key });
             }}
             style={{ display: "none" }}
           />
@@ -155,7 +147,7 @@ export const OnlineLobby: React.FC<{
         <SelectionButton
           text={"Start Game"}
           onClick={() => {
-            websocket.emit("requestMatchStart", { lobbyKey });
+            websocket.emit("requestMatchStart", { lobbyKey: lobby.key });
           }}
           disabled={disableMatchStart}
         />

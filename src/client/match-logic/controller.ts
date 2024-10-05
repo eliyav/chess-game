@@ -1,25 +1,27 @@
-import { ArcRotateCamera } from "@babylonjs/core";
+import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { PickingInfo } from "@babylonjs/core/Collisions/pickingInfo";
 import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { Nullable } from "@babylonjs/core/types";
 import { GAMESTATUS, Point, TurnHistory } from "../../shared/game";
 import { ControllerOptions, LOBBY_TYPE } from "../../shared/match";
 import { Message } from "../components/modals/message-modal";
 import GamePiece from "../game-logic/game-piece";
+import { doPointsMatch } from "../game-logic/moves";
 import { rotateCamera } from "../scenes/animation/camera";
 import calcTurnAnimation from "../scenes/animation/turn-animation";
 import { displayPieceMoves, findByPoint } from "../scenes/scene-helpers";
 import { GameScene, SceneManager, Scenes } from "../scenes/scene-manager";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
-import { doPointsMatch } from "../game-logic/moves";
+import { APP_ROUTES } from "../../shared/routes";
+import { websocket } from "../websocket-client";
 
 export class Controller {
   sceneManager: SceneManager;
   match: LocalMatch | OnlineMatch;
   events: {
     setMessage: (message: Message | null) => void;
+    navigate: (route: APP_ROUTES) => void;
   };
   selectedPoint?: Point;
   options: ControllerOptions;
@@ -34,6 +36,7 @@ export class Controller {
     match: LocalMatch | OnlineMatch;
     events: {
       setMessage: (message: Message | null) => void;
+      navigate: (route: APP_ROUTES) => void;
     };
     options: ControllerOptions;
   }) {
@@ -45,12 +48,10 @@ export class Controller {
   }
 
   init() {
-    const gameScene = this.sceneManager.switchScene(Scenes.GAME);
-    if (gameScene) {
-      this.subscribeGameInput(gameScene);
-      this.updateMeshesRender();
-      this.resetCamera();
-    }
+    const gameScene = this.sceneManager.getScene(Scenes.GAME);
+    this.subscribeGameInput(gameScene);
+    this.updateMeshesRender();
+    this.resetCamera();
   }
 
   subscribeGameInput(gameScene: GameScene) {
@@ -97,7 +98,6 @@ export class Controller {
 
   async handleValidTurn({ turnHistory }: { turnHistory: TurnHistory }) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
-    if (!gameScene) return;
     if (this.options.playGameSounds) {
       const moveType = turnHistory.type;
       if (moveType === "capture" || moveType === "enPassant") {
@@ -126,7 +126,7 @@ export class Controller {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (!piece) return;
     const currentPlayersPiece = this.match.isCurrentPlayersPiece(piece);
-    if (!gameScene || !currentPlayersPiece) return;
+    if (!currentPlayersPiece) return;
     if (this.options.playGameSounds) {
       gameScene.data.audio.select?.play();
     }
@@ -211,7 +211,6 @@ export class Controller {
 
   findMeshFromPoint(point: Point) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
-    if (!gameScene) return;
     return gameScene.data.meshesToRender.find((mesh) => {
       const meshPoint = findByPoint({
         get: "index",
@@ -224,7 +223,6 @@ export class Controller {
 
   updateMeshesRender() {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
-    if (!gameScene) return;
     //Clears old meshes/memory usage
     if (gameScene.data.meshesToRender.length) {
       for (let i = 0; i < gameScene.data.meshesToRender.length; i++) {
@@ -265,6 +263,20 @@ export class Controller {
     });
   }
 
+  setMessage(message: Message | null) {
+    this.events.setMessage(message);
+  }
+
+  leaveMatch({ key }: { key: string }) {
+    this.events.navigate(APP_ROUTES.Home);
+    if (
+      this.match.mode === LOBBY_TYPE.ONLINE &&
+      this.match.getGame().getGameState().status === GAMESTATUS.INPROGRESS
+    ) {
+      websocket.emit("abandonMatch", { lobbyKey: key });
+    }
+  }
+
   shouldCameraRotate() {
     if (this.match.lobby.mode === LOBBY_TYPE.LOCAL) {
       //Check for AI opponent here
@@ -277,7 +289,6 @@ export class Controller {
   rotateCamera() {
     if (!this.shouldCameraRotate()) return;
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
-    if (!gameScene) return;
     const camera = gameScene.scene.cameras[0] as ArcRotateCamera;
     const currentPlayer = this.match.getPlayerTeam();
     if (!currentPlayer) return;
@@ -289,7 +300,6 @@ export class Controller {
 
   resetCamera() {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
-    if (!gameScene) return;
     const camera = gameScene.scene.cameras[0] as ArcRotateCamera;
     const isWhitePlayer = this.match.getPlayerTeam() === "White";
     camera.alpha = isWhitePlayer ? Math.PI : 0;

@@ -1,13 +1,12 @@
-// import { Server } from "socket.io";
 import { Server as Webserver } from "node:http";
+import { Server } from "socket.io";
+import { Lobby } from "../shared/match";
+import { APP_ROUTES } from "../shared/routes";
 import {
   ClientToServerEvents,
   InterServerEvents,
   ServerToClientEvents,
 } from "../shared/websocket";
-import { Server } from "socket.io";
-import { Lobby } from "../shared/match";
-import { APP_ROUTES } from "../shared/routes";
 
 export function createWebsocketServer({
   server,
@@ -28,11 +27,16 @@ export function createWebsocketServer({
       for (const [key, lobby] of lobbyEntries) {
         const player = lobby.players.find((player) => player.id === socket.id);
         if (player) {
-          lobby.players = lobby.players.filter(
-            (player) => player.id !== socket.id
-          );
-          lobby.teams = { White: "", Black: "" };
-          io.to(key).emit("lobbyInfo", lobby);
+          if (lobby.matchStarted) {
+            socket.to(key).emit("opponentDisconnected");
+            lobbies.delete(key);
+          } else {
+            lobby.players = lobby.players.filter(
+              (player) => player.id !== socket.id
+            );
+            lobby.teams = { White: "", Black: "" };
+            socket.to(key).emit("lobbyInfo", lobby);
+          }
         }
       }
     });
@@ -66,6 +70,13 @@ export function createWebsocketServer({
       lobby.players = lobby.players.filter((player) => player.id !== socket.id);
       lobby.teams = { White: "", Black: "" };
       io.to(lobbyKey).emit("lobbyInfo", lobby);
+    });
+
+    socket.on("abandonMatch", ({ lobbyKey }) => {
+      const lobby = lobbies.get(lobbyKey);
+      if (!lobby) return;
+      socket.to(lobbyKey).emit("opponentDisconnected");
+      lobbies.delete(lobbyKey);
     });
 
     socket.on("requestMatchStart", ({ lobbyKey }) => {

@@ -1,27 +1,27 @@
-import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera.js";
+import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Engine } from "@babylonjs/core/Engines/engine";
-import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight.js";
+import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import {
   ISceneLoaderAsyncResult,
   SceneLoader,
 } from "@babylonjs/core/Loading/sceneLoader";
 import { Material } from "@babylonjs/core/Materials/material";
 import { Space } from "@babylonjs/core/Maths/math.axis";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { Scene } from "@babylonjs/core/scene.js";
+import { Scene } from "@babylonjs/core/scene";
 import type { Nullable } from "@babylonjs/core/types";
-import board from "../../../assets/pieces/board.gltf";
 import bishop from "../../../assets/pieces/bishopv3.gltf";
+import board from "../../../assets/pieces/board.gltf";
 import king from "../../../assets/pieces/kingv3.gltf";
 import knight from "../../../assets/pieces/knightv3.gltf";
 import pawn from "../../../assets/pieces/pawnv3.gltf";
 import queen from "../../../assets/pieces/queenv3.gltf";
 import rook from "../../../assets/pieces/rookv3.gltf";
-import { DisplayMesh } from "./display-mesh";
-import { CustomScene } from "./scene-manager";
 import { createCelestialSphere } from "./celestial-shere/celestial-sphere";
+import { DisplayMesh } from "./display-mesh";
 import { createMeshMaterials } from "./materials";
+import { CustomScene } from "./scene-manager";
 
 export const createHomeScene = async (
   engine: Engine

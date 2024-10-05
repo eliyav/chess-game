@@ -4,5 +4,4 @@ export const enum APP_ROUTES {
   OfflineLobby = "/lobby-offline",
   OnlineLobby = "/lobby-online",
   Game = "/game",
-  NotFound = "/404",
 }

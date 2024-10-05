@@ -1,16 +1,16 @@
 //Credit to https://github.com/brian-hay/celestial-sphere/tree/master
 //Slight reduction in code by removing asterisms and constellation lines and adding tree shaking
-import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData.js";
-import { TransformNode } from "@babylonjs/core/Meshes/transformNode.js";
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial.js";
-import { Texture } from "@babylonjs/core/Materials/Textures/texture.js";
-import { Scene } from "@babylonjs/core/scene.js";
-import { Mesh } from "@babylonjs/core/Meshes/mesh.js";
-import { CreateTube } from "@babylonjs/core/Meshes/Builders/tubeBuilder.js";
-import { GlowLayer } from "@babylonjs/core/Layers/glowLayer.js";
+import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { Scene } from "@babylonjs/core/scene";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { CreateTube } from "@babylonjs/core/Meshes/Builders/tubeBuilder";
+import { GlowLayer } from "@babylonjs/core/Layers/glowLayer";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector.js";
-import { Scalar } from "@babylonjs/core/Maths/math.scalar.js";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Scalar } from "@babylonjs/core/Maths/math.scalar";
 import noiseUrl from "../../../../assets/space/noise.png";
 import StarDataJSON from "../../../../assets/space/star-data.json";
 import starUrl from "../../../../assets/space/star.png";

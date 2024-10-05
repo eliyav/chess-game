@@ -1,20 +1,20 @@
 import type { AudioEngine } from "@babylonjs/core/Audio";
-import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera.js";
-import "@babylonjs/core/Culling/ray.js";
+import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
+import "@babylonjs/core/Culling/ray";
 import { Engine } from "@babylonjs/core/Engines/engine";
-import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight.js";
+import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
-import { Scene } from "@babylonjs/core/scene.js";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Scene } from "@babylonjs/core/scene";
 import { createAnimations } from "./animation/create-animations";
-import { handleAudioEngine } from "./audio-engine";
+import { gameSceneAudio } from "./audio-engine";
 import { createCelestialSphere } from "./celestial-shere/celestial-sphere";
 import { loadGameAssets } from "./game-assets";
 import { createMeshMaterials, createMovementMaterials } from "./materials";
 import { GameScene } from "./scene-manager";
 
-export const gameScene = async (
+export const createGameScene = async (
   canvas: HTMLCanvasElement,
   engine: Engine,
   audioEngine: AudioEngine
@@ -67,7 +67,7 @@ export const gameScene = async (
     },
   };
 
-  handleAudioEngine({ audioEngine, gameScene, scene });
+  gameSceneAudio({ audioEngine, gameScene });
 
   return gameScene;
 };

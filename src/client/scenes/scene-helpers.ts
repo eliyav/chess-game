@@ -1,5 +1,5 @@
 import { Material } from "@babylonjs/core/Materials/material";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Scene } from "@babylonjs/core/scene";
 import { Move, Point } from "../../shared/game";
@@ -108,8 +108,7 @@ export const findByPoint = ({
     const result: Point = [positionX.x, finalY];
     return result;
   } catch (error) {
-    // console.error(error);
-    //# Refactor this error handling
+    console.error(error);
     return point;
   }
 };

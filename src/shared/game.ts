@@ -1,4 +1,3 @@
-import GamePiece from "../client/game-logic/game-piece";
 import { TEAM } from "./match";
 
 export enum GAMESTATUS {
@@ -6,7 +5,6 @@ export enum GAMESTATUS {
   CHECKMATE = "Checkmate",
   STALEMATE = "Stalemate",
   DRAW = "Draw",
-  PLAYING = "Playing",
 }
 
 export type Point = [number, number];

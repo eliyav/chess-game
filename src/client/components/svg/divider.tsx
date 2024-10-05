@@ -5,7 +5,7 @@ export const Divider: React.FC<{
 }> = ({ className }) => {
   return (
     <svg
-      width="440"
+      width="350"
       height="40"
       viewBox="0 0 440 67"
       fill="none"

@@ -15,7 +15,7 @@ export const LobbySelect: React.FC<{
   const [lobbyKey, setLobbyKey] = useState("");
 
   return (
-    <div className="content">
+    <div className="content flex-column space-between">
       <div className="header glass-dark">
         <BackButton
           customClass={"bottom-left"}
@@ -24,7 +24,10 @@ export const LobbySelect: React.FC<{
         />
         <h1>Select Lobby</h1>
       </div>
-      <div className="flex-column gap-2 mt-3">
+      <div
+        className="flex-column gap-2 mt-3 grow-1 "
+        style={{ justifyContent: "flex-start" }}
+      >
         <SelectionButton
           text={LOBBY_TYPE.LOCAL}
           onClick={() => {

@@ -1,48 +1,57 @@
 import "@babylonjs/loaders/glTF";
-import React, { useEffect, useRef, useState } from "react";
-import { Route, Routes, useNavigate } from "react-router-dom";
-import { Lobby } from "../shared/match";
-import LoadingScreen from "./components/loading-screen";
+import React, { useEffect, useState } from "react";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { Lobby, LOBBY_TYPE } from "../shared/match";
+import { APP_ROUTES } from "../shared/routes";
 import { Message, MessageModal } from "./components/modals/message-modal";
-import { SceneManager } from "./scenes/scene-manager";
 import { Game } from "./routes/game";
 import { Home } from "./routes/home";
 import { LobbySelect } from "./routes/lobby-select";
+import NotFound from "./routes/not-found";
 import { OfflineLobby } from "./routes/offline-lobby";
 import { OnlineLobby } from "./routes/online-lobby";
+import { type SceneManager } from "./scenes/scene-manager";
 import { websocket } from "./websocket-client";
-import { APP_ROUTES } from "../shared/routes";
 
-const App: React.FC<{}> = () => {
+const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   const navigate = useNavigate();
-  const [isInitialized, setIsInitialized] = useState(false);
+  const location = useLocation();
   const [lobby, setLobby] = useState<Lobby>();
   const [message, setMessage] = useState<Message | null>(null);
-  const canvas = useRef<HTMLCanvasElement>(null);
-  const sceneManager = useRef<SceneManager>();
-  const canGameViewRender =
-    sceneManager.current !== undefined && lobby !== undefined;
 
   useEffect(() => {
-    if (!sceneManager.current) {
-      sceneManager.current = new SceneManager({
-        canvas: canvas.current!,
-        setInitialized: () => setIsInitialized(true),
-      });
+    sceneManager.switchScene(location.pathname as APP_ROUTES);
+  }, [location]);
+
+  useEffect(() => {
+    //If the user is in an online lobby and navigates away from the page without match having started, leave the lobby
+    if (
+      lobby &&
+      lobby.mode === LOBBY_TYPE.ONLINE &&
+      location.pathname !== APP_ROUTES.OnlineLobby &&
+      !lobby.matchStarted
+    ) {
+      websocket.emit("leaveLobby", { lobbyKey: lobby.key });
+      setLobby(undefined);
     }
-  }, [canvas.current, setIsInitialized]);
+  }, [location.pathname, lobby, setLobby]);
 
   useEffect(() => {
+    websocket.on("opponentDisconnected", () => {
+      navigate(APP_ROUTES.Home);
+      setLobby(undefined);
+      setMessage({
+        text: "Opponent has left the match",
+        onConfirm: () => {
+          setMessage(null);
+        },
+      });
+    });
+
     websocket.on("lobbyInfo", (lobby: Lobby) => {
       setLobby(lobby);
     });
 
-    return () => {
-      websocket.off("lobbyInfo");
-    };
-  }, [websocket, setLobby]);
-
-  useEffect(() => {
     websocket.on("redirect", ({ path, message }) => {
       navigate(path);
       if (message) {
@@ -57,12 +66,13 @@ const App: React.FC<{}> = () => {
 
     return () => {
       websocket.off("redirect");
+      websocket.off("lobbyInfo");
+      websocket.off("opponentDisconnected");
     };
-  }, [websocket, navigate, setMessage]);
+  }, [websocket, navigate, setMessage, setLobby]);
 
   return (
     <div id="app">
-      <canvas ref={canvas} style={{ backgroundColor: "black" }}></canvas>
       {message && (
         <MessageModal
           text={message.text}
@@ -70,7 +80,6 @@ const App: React.FC<{}> = () => {
           onReject={message.onReject}
         />
       )}
-      {!isInitialized && <LoadingScreen text="..." />}
       <Routes>
         <Route path={APP_ROUTES.Home} element={<Home />} />
         <Route
@@ -88,15 +97,16 @@ const App: React.FC<{}> = () => {
         <Route
           path={APP_ROUTES.Game}
           element={
-            canGameViewRender ? (
+            lobby !== undefined ? (
               <Game
-                sceneManager={sceneManager.current!}
+                sceneManager={sceneManager}
                 lobby={lobby}
                 setMessage={setMessage}
               />
             ) : null
           }
         />
+        <Route path={"*"} element={<NotFound />} />
       </Routes>
     </div>
   );
