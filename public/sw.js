@@ -59,10 +59,20 @@ self.addEventListener("fetch", (event) => {
       const cachedResponse = await cache.match(event.request);
       //If its not a 3d model or image or audio, then check if the resource is modified since cached
       if (
-        !event.request.url.includes(".gltf") ||
-        !event.request.url.includes(".png") ||
-        !event.request.url.includes(".mp3")
+        event.request.url.endsWith(".gltf") ||
+        event.request.url.endsWith(".png") ||
+        event.request.url.endsWith(".mp3")
       ) {
+        if (cachedResponse) {
+          return cachedResponse;
+        } else {
+          // If the resource was not in the cache, try the network.
+          const fetchResponse = await fetch(event.request);
+          // Save the resource in the cache and return it.
+          cache.put(event.request, fetchResponse.clone());
+          return fetchResponse;
+        }
+      } else {
         const request = event.request.clone();
         const modifiedRequest = new Request(request);
         if (cachedResponse) {
@@ -77,16 +87,6 @@ self.addEventListener("fetch", (event) => {
         // Cache the new response
         cache.put(event.request, response.clone());
         return response;
-      } else {
-        if (cachedResponse) {
-          return cachedResponse;
-        } else {
-          // If the resource was not in the cache, try the network.
-          const fetchResponse = await fetch(event.request);
-          // Save the resource in the cache and return it.
-          cache.put(event.request, fetchResponse.clone());
-          return fetchResponse;
-        }
       }
     })()
   );
