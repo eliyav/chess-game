@@ -73,20 +73,19 @@ self.addEventListener("fetch", (event) => {
           return fetchResponse;
         }
       } else {
-        const request = event.request.clone();
-        const modifiedRequest = new Request(request);
+        const modifiedRequest = new Request(event.request);
         if (cachedResponse) {
           const lastModified = cachedResponse.headers.get("Last-Modified");
           modifiedRequest.headers.set("If-Modified-Since", lastModified);
         }
-        const response = await fetch(modifiedRequest);
+        const fetchResponse = await fetch(modifiedRequest);
         //If response 304, then the resource is not modified since cached
         if (response.status === 304) {
           return cachedResponse;
         }
         // Cache the new response
-        cache.put(event.request, response.clone());
-        return response;
+        cache.put(event.request, fetchResponse.clone());
+        return fetchResponse;
       }
     })()
   );
