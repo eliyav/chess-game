@@ -80,7 +80,7 @@ self.addEventListener("fetch", (event) => {
         }
         const fetchResponse = await fetch(modifiedRequest);
         //If response 304, then the resource is not modified since cached
-        if (response.status === 304) {
+        if (fetchResponse.status === 304) {
           return cachedResponse;
         }
         // Cache the new response
