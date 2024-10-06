@@ -5,7 +5,7 @@
   "description": "Play 3D Chess",
   "start_url": "/",
   "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "theme_color": "#000000",
   "orientation": "portrait",
   "display": "standalone",
   "icons": [
