@@ -59,8 +59,10 @@ export async function createSceneManager(canvas: HTMLCanvasElement) {
   const engine = new Engine(canvas, true);
   const audioEngine = new AudioEngine(null);
   handleAudioUnlock(audioEngine);
-  const homeScene = await createHomeScene(engine);
-  const gameScene = await createGameScene(canvas, engine, audioEngine);
+  const [homeScene, gameScene] = await Promise.all([
+    createHomeScene(engine),
+    createGameScene(canvas, engine, audioEngine),
+  ]);
   return new SceneManager({
     engine,
     homeScene,

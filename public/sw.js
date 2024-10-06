@@ -59,25 +59,10 @@ self.addEventListener("fetch", (event) => {
       const cachedResponse = await cache.match(event.request);
       //If its not a 3d model or image or audio, then check if the resource is modified since cached
       if (
-        !event.request.url.includes(".gltf") ||
-        !event.request.url.includes(".png") ||
-        !event.request.url.includes(".mp3")
+        event.request.url.endsWith(".gltf") ||
+        event.request.url.endsWith(".png") ||
+        event.request.url.endsWith(".mp3")
       ) {
-        const request = event.request.clone();
-        const modifiedRequest = new Request(request);
-        if (cachedResponse) {
-          const lastModified = cachedResponse.headers.get("Last-Modified");
-          modifiedRequest.headers.set("If-Modified-Since", lastModified);
-        }
-        const response = await fetch(modifiedRequest);
-        //If response 304, then the resource is not modified since cached
-        if (response.status === 304) {
-          return cachedResponse;
-        }
-        // Cache the new response
-        cache.put(event.request, response.clone());
-        return response;
-      } else {
         if (cachedResponse) {
           return cachedResponse;
         } else {
@@ -87,6 +72,20 @@ self.addEventListener("fetch", (event) => {
           cache.put(event.request, fetchResponse.clone());
           return fetchResponse;
         }
+      } else {
+        const modifiedRequest = new Request(event.request);
+        if (cachedResponse) {
+          const lastModified = cachedResponse.headers.get("Last-Modified");
+          modifiedRequest.headers.set("If-Modified-Since", lastModified);
+        }
+        const fetchResponse = await fetch(modifiedRequest);
+        //If response 304, then the resource is not modified since cached
+        if (fetchResponse.status === 304) {
+          return cachedResponse;
+        }
+        // Cache the new response
+        cache.put(event.request, fetchResponse.clone());
+        return fetchResponse;
       }
     })()
   );
