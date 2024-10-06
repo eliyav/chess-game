@@ -83,10 +83,8 @@ function calcRookMoves({
   point: Point;
   board: Board;
 }) {
-  const movements = [1, 2, 3, 4, 5, 6, 7];
   const lateralMovements = calcLateralMovements({
     point,
-    movements,
   });
   return getMovePath({ board, team, movements: lateralMovements });
 }
@@ -100,14 +98,11 @@ function calcQueenMoves({
   point: Point;
   board: Board;
 }) {
-  const movements = [1, 2, 3, 4, 5, 6, 7];
   const lateralMovements = calcLateralMovements({
     point,
-    movements,
   });
   const diagonalMovements = calcDiagonalMovements({
     point,
-    movements,
   });
   const lateralMoves = getMovePath({
     board,
@@ -139,12 +134,11 @@ function calcPawnMoves({
   //Calculate Pawn Movement based on current point
   const range = 1;
   const newY = y + range * direction;
-  const move1: Point = [x, newY];
-  const moveResult = getStandardMove({
-    point: move1,
+  const moveResult = getSpecificMove({
+    type: "movement",
+    point: [x, newY],
     team,
     board,
-    onlyMovement: true,
   });
   if (moveResult) {
     availableMoves.push(moveResult);
@@ -152,12 +146,11 @@ function calcPawnMoves({
     if ((team === TEAM.WHITE && y === 1) || (team === TEAM.BLACK && y === 6)) {
       const extendedRange = 2;
       const newY = y + extendedRange * direction;
-      const move2: Point = [x, newY];
-      const moveResult = getStandardMove({
-        point: move2,
+      const moveResult = getSpecificMove({
+        type: "movement",
+        point: [x, newY],
         team,
         board,
-        onlyMovement: true,
       });
       if (moveResult) {
         availableMoves.push(moveResult);
@@ -166,23 +159,21 @@ function calcPawnMoves({
   }
 
   //Calculates Capture points and pushes them in final movement obj if are valid
-  const capturePoint1: Point = [x - direction, y + direction];
-  const capturePoint2: Point = [x + direction, y + direction];
-  const captureMove = getStandardMove({
-    point: capturePoint1,
+  const captureMove = getSpecificMove({
+    type: "capture",
+    point: [x - direction, y + direction],
     team,
     board,
-    onlyCapture: true,
-  });
-  const captureMove2 = getStandardMove({
-    point: capturePoint2,
-    team,
-    board,
-    onlyCapture: true,
   });
   if (captureMove) {
     availableMoves.push(captureMove);
   }
+  const captureMove2 = getSpecificMove({
+    type: "capture",
+    point: [x + direction, y + direction],
+    team,
+    board,
+  });
   if (captureMove2) {
     availableMoves.push(captureMove2);
   }
@@ -288,10 +279,8 @@ function calcBishopMoves({
   team: TEAM;
   board: Board;
 }) {
-  const movements = [1, 2, 3, 4, 5, 6, 7];
   const diagonalMovements = calcDiagonalMovements({
     point,
-    movements,
   });
   return getMovePath({ board, team, movements: diagonalMovements });
 }
@@ -307,52 +296,38 @@ const getMovePath = ({
   movements: Movements;
 }) => {
   const availableMoves: Move[] = [];
-  const movementsArrays = Object.values(movements);
-  movementsArrays.forEach((array) => {
-    for (let i = 0; i < movementsArrays.length; i++) {
-      const point = array[i];
-      const move = getStandardMove({ point, team, board });
+  for (const [_, points] of Object.entries(movements)) {
+    for (let i = 0; i < points.length; i++) {
+      const move = getStandardMove({ point: points[i], team, board });
       //If no move it means your own piece is blocking the path or out of bounds
       if (!move) break;
-      if (move) {
-        availableMoves.push(move);
-        //Since you cant skip over pieces, if a piece is found in the path, break the loop
-        if (move[1] === "capture") {
-          break;
-        }
+      availableMoves.push(move);
+      //Since you cant skip over pieces, if a piece is found in the path, break the loop
+      if (move[1] === "capture") {
+        break;
       }
     }
-  });
+  }
   return availableMoves;
 };
 
 //Calculates Horizontal Movements by calculating each direction from the current point and adds them to the final movements object
-const calcDiagonalMovements = ({
-  point,
-  movements,
-}: {
-  point: Point;
-  movements: number[];
-}) => {
+const calcDiagonalMovements = ({ point }: { point: Point }) => {
   const upRight = calculateMovements({
     direction: "upRight",
     point,
-    movements,
   });
   const upLeft = calculateMovements({
     direction: "upLeft",
     point,
-    movements,
   });
   const downRight = calculateMovements({
     direction: "downRight",
     point,
-    movements,
   });
   const downLeft = calculateMovements({
     direction: "downLeft",
     point,
-    movements,
   });
   return {
     upRight,
@@ -363,32 +338,22 @@ const calcDiagonalMovements = ({
 };
 
 //Calculates Vertical Movements by calculating each direction from the current point and adds them to the final movements object
-const calcLateralMovements = ({
-  point,
-  movements,
-}: {
-  point: Point;
-  movements: number[];
-}) => {
+const calcLateralMovements = ({ point }: { point: Point }) => {
   const up = calculateMovements({
     direction: "up",
     point,
-    movements,
   });
   const down = calculateMovements({
     direction: "down",
     point,
-    movements,
   });
   const right = calculateMovements({
     direction: "right",
     point,
-    movements,
   });
   const left = calculateMovements({
     direction: "left",
     point,
-    movements,
   });
   return {
     up,
@@ -402,27 +367,49 @@ function getStandardMove({
   point,
   board,
   team,
-  onlyMovement,
-  onlyCapture,
 }: {
   point: Point;
   board: Board;
   team: TEAM;
-  onlyMovement?: boolean;
-  onlyCapture?: boolean;
 }): Move | undefined {
   const [x, y] = point;
   const isInBounds = bounds(x, board.grid) && bounds(y, board.grid);
   if (!isInBounds) return;
   const pieceOnPoint = board.getPiece(point);
   if (pieceOnPoint) {
-    if (onlyMovement) return;
     if (pieceOnPoint.team !== team) {
       return [point, "capture"];
     }
   } else {
-    if (onlyCapture) return;
     return [point, "movement"];
+  }
+}
+
+function getSpecificMove({
+  type,
+  point,
+  board,
+  team,
+}: {
+  type: "movement" | "capture";
+  point: Point;
+  board: Board;
+  team: TEAM;
+}): Move | undefined {
+  const [x, y] = point;
+  const isInBounds = bounds(x, board.grid) && bounds(y, board.grid);
+  if (!isInBounds) return;
+  const pieceOnPoint = board.getPiece(point);
+  if (type === "capture") {
+    if (pieceOnPoint) {
+      if (pieceOnPoint.team !== team) {
+        return [point, "capture"];
+      }
+    }
+  } else {
+    if (!pieceOnPoint) {
+      return [point, "movement"];
+    }
   }
 }
 
@@ -454,12 +441,11 @@ const directionMap: {
 const calculateMovements = ({
   direction,
   point,
-  movements,
 }: {
   direction: Direction;
   point: Point;
-  movements: number[];
 }): Point[] => {
+  const movements = [1, 2, 3, 4, 5, 6, 7]; //Max number of squares a piece can move in a direction;
   const [x, y] = point;
   const transform = directionMap[direction];
   if (!transform) throw new Error(`Invalid direction: ${direction}`);
