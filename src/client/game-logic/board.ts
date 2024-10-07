@@ -1,7 +1,7 @@
-import { Point } from "../../shared/game";
-import { TEAM } from "../../shared/match";
-import chessData from "./chess-data-import";
-import GamePiece from "./game-piece";
+import { Point } from "../../shared/game.js";
+import { TEAM } from "../../shared/match.js";
+import chessData from "./chess-data-import.js";
+import GamePiece from "./game-piece.js";
 
 export type Grid = {
   name: string;

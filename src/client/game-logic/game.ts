@@ -1,8 +1,14 @@
-import { GAMESTATUS, Move, PIECE, Point, TurnHistory } from "../../shared/game";
-import GamePiece from "./game-piece";
-import { TEAM } from "../../shared/match";
-import Board from "./board";
-import { doPointsMatch, getPieceMoves, isEnPassantAvailable } from "./moves";
+import {
+  GAMESTATUS,
+  Move,
+  PIECE,
+  Point,
+  TurnHistory,
+} from "../../shared/game.js";
+import GamePiece from "./game-piece.js";
+import { TEAM } from "../../shared/match.js";
+import Board from "./board.js";
+import { doPointsMatch, getPieceMoves, isEnPassantAvailable } from "./moves.js";
 
 class Game {
   teams: TEAM[];

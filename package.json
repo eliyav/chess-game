@@ -20,7 +20,7 @@
     "build:prod": "npm run copy:public && npm run build:prod:client && npm run build:prod:server",
     "build:prod:client": "esbuild src/client/index.tsx --bundle --outdir=dist/client --target=es2022 --loader:.svg=file --loader:.mp3=file --loader:.gltf=file --loader:.png=file --loader:.webp=file --format=esm --minify",
     "build:prod:server": "esbuild src/server/index.ts --bundle --outdir=dist/server --packages=external --platform=node  --format=esm --minify",
-    "test": "node --test"
+    "test": "esbuild $(find src -name '*.ts') --outdir=build --platform=node --format=esm && node --test"
   },
   "browserslist": [
     "last 1 Chrome version"
