@@ -1,5 +1,5 @@
-import { PIECE, Point } from "../../shared/game";
-import { TEAM } from "../../shared/match";
+import { PIECE, Point } from "../../shared/game.js";
+import { TEAM } from "../../shared/match.js";
 
 type Data = {
   boardSize: number;
