@@ -7,19 +7,19 @@ import {
 } from "../../shared/game.js";
 import GamePiece from "./game-piece.js";
 import { TEAM } from "../../shared/match.js";
-import Board, { type Grid } from "./board.js";
+import { Board, type Grid } from "./board.js";
 
 type LateralDirection = "up" | "down" | "right" | "left";
 type DiagonalDirection = "upRight" | "upLeft" | "downRight" | "downLeft";
 type Movements = Partial<Record<LateralDirection | DiagonalDirection, Point[]>>;
 
 export function getPieceMoves({
-  board,
+  grid,
   point,
   piece: { type, team, moved },
   lastTurnHistory,
 }: {
-  board: Board;
+  grid: Grid;
   point: Point;
   piece: { type: PIECE; team: TEAM; moved: boolean };
   lastTurnHistory: TurnHistory | undefined;
@@ -29,21 +29,21 @@ export function getPieceMoves({
       return calcPawnMoves({
         point,
         team,
-        board,
+        grid,
         turnHistory: lastTurnHistory,
       });
     case PIECE.R:
-      return calcRookMoves({ team, point, board });
+      return calcRookMoves({ team, point, grid });
     case PIECE.B:
-      return calcBishopMoves({ team, point, board });
+      return calcBishopMoves({ team, point, grid });
     case PIECE.N:
-      return calcKnightMoves({ board, team, point });
+      return calcKnightMoves({ grid, team, point });
     case PIECE.Q:
-      return calcQueenMoves({ team, point, board });
+      return calcQueenMoves({ team, point, grid });
     case PIECE.K:
       return calcKingMoves({
         point,
-        board,
+        grid,
         moved,
         team,
         lastTurnHistory,
@@ -51,12 +51,15 @@ export function getPieceMoves({
   }
 }
 
-export const isEnPassantAvailable = (
-  turnHistory: TurnHistory,
-  board: Board
-): EnPassant | undefined => {
+export const isEnPassantAvailable = ({
+  turnHistory,
+  grid,
+}: {
+  turnHistory: TurnHistory;
+  grid: Grid;
+}): EnPassant | undefined => {
   const { target } = turnHistory;
-  const pieceOnLastTurnTargetSquare = board.getPiece(target);
+  const pieceOnLastTurnTargetSquare = Board.getPiece({ grid, point: target });
   if (
     !pieceOnLastTurnTargetSquare ||
     pieceOnLastTurnTargetSquare.type !== PIECE.P
@@ -83,26 +86,26 @@ export const doPointsMatch = (point: Point, point2: Point) =>
 function calcRookMoves({
   team,
   point,
-  board,
+  grid,
 }: {
   team: TEAM;
   point: Point;
-  board: Board;
+  grid: Grid;
 }) {
   const lateralMovements = calcLateralMovements({
     point,
   });
-  return getMovePath({ board, team, movements: lateralMovements });
+  return getMovePath({ grid, team, movements: lateralMovements });
 }
 
 function calcQueenMoves({
   team,
   point,
-  board,
+  grid,
 }: {
   team: TEAM;
   point: Point;
-  board: Board;
+  grid: Grid;
 }) {
   const lateralMovements = calcLateralMovements({
     point,
@@ -111,12 +114,12 @@ function calcQueenMoves({
     point,
   });
   const lateralMoves = getMovePath({
-    board,
+    grid,
     team,
     movements: lateralMovements,
   });
   const diagonalMoves = getMovePath({
-    board,
+    grid,
     team,
     movements: diagonalMovements,
   });
@@ -126,16 +129,16 @@ function calcQueenMoves({
 function calcPawnMoves({
   point,
   team,
-  board,
+  grid,
   turnHistory,
 }: {
   point: Point;
   team: TEAM;
-  board: Board;
+  grid: Grid;
   turnHistory: TurnHistory | undefined;
 }) {
   const availableMoves: Move[] = [];
-  const direction = board.getDirection(team);
+  const direction = Board.getDirection(team);
   const [x, y] = point;
   //Calculate Pawn Movement based on current point
   const range = 1;
@@ -144,7 +147,7 @@ function calcPawnMoves({
     type: "movement",
     point: [x, newY],
     team,
-    board,
+    grid,
   });
   if (moveResult) {
     availableMoves.push(moveResult);
@@ -156,7 +159,7 @@ function calcPawnMoves({
         type: "movement",
         point: [x, newY],
         team,
-        board,
+        grid,
       });
       if (moveResult) {
         availableMoves.push(moveResult);
@@ -169,7 +172,7 @@ function calcPawnMoves({
     type: "capture",
     point: [x - direction, y + direction],
     team,
-    board,
+    grid,
   });
   if (captureMove) {
     availableMoves.push(captureMove);
@@ -178,17 +181,17 @@ function calcPawnMoves({
     type: "capture",
     point: [x + direction, y + direction],
     team,
-    board,
+    grid,
   });
   if (captureMove2) {
     availableMoves.push(captureMove2);
   }
 
   if (turnHistory) {
-    const enPassant = isEnPassantAvailable(turnHistory, board);
+    const enPassant = isEnPassantAvailable({ turnHistory, grid });
     if (enPassant) {
       const [x, y] = point;
-      const direction = board.getDirection(team);
+      const direction = Board.getDirection(team);
       const x1 = x - 1;
       const x2 = x + 1;
       const newY = y + direction;
@@ -208,11 +211,11 @@ function calcPawnMoves({
 function calcKnightMoves({
   team,
   point,
-  board,
+  grid,
 }: {
   team: TEAM;
   point: Point;
-  board: Board;
+  grid: Grid;
 }) {
   const availableMoves: Move[] = [];
   const movements: Point[] = [
@@ -228,7 +231,7 @@ function calcKnightMoves({
   const [x, y] = point;
   movements.forEach(([moveX, moveY]) => {
     const point: Point = [x + moveX, y + moveY];
-    const moveResult = getStandardMove({ point: point, team, board });
+    const moveResult = getStandardMove({ point: point, team, grid });
     if (moveResult) {
       availableMoves.push(moveResult);
     }
@@ -238,13 +241,13 @@ function calcKnightMoves({
 
 function calcKingMoves({
   point,
-  board,
+  grid,
   lastTurnHistory,
   moved,
   team,
 }: {
   point: Point;
-  board: Board;
+  grid: Grid;
   lastTurnHistory: TurnHistory | undefined;
   moved: boolean;
   team: TEAM;
@@ -263,14 +266,20 @@ function calcKingMoves({
   const [x, y] = point;
   kingMovements.forEach(([moveX, moveY]) => {
     const point: Point = [x + moveX, y + moveY];
-    const moveResult = getStandardMove({ point, team, board });
+    const moveResult = getStandardMove({ point, team, grid });
     if (moveResult) {
       availableMoves.push(moveResult);
     }
   });
 
   if (!moved) {
-    calcCastling(point, team, board, lastTurnHistory, availableMoves);
+    calcCastling({
+      kingPoint: point,
+      team,
+      grid,
+      lastTurnHistory,
+      movesObj: availableMoves,
+    });
   }
 
   return availableMoves;
@@ -279,32 +288,32 @@ function calcKingMoves({
 function calcBishopMoves({
   point,
   team,
-  board,
+  grid,
 }: {
   point: Point;
   team: TEAM;
-  board: Board;
+  grid: Grid;
 }) {
   const diagonalMovements = calcDiagonalMovements({
     point,
   });
-  return getMovePath({ board, team, movements: diagonalMovements });
+  return getMovePath({ grid, team, movements: diagonalMovements });
 }
 
 //Filters the moves from the final movements object and enters them in the available moves array
 const getMovePath = ({
-  board,
+  grid,
   team,
   movements,
 }: {
-  board: Board;
+  grid: Grid;
   team: TEAM;
   movements: Movements;
 }) => {
   const availableMoves: Move[] = [];
   for (const [_, points] of Object.entries(movements)) {
     for (let i = 0; i < points.length; i++) {
-      const move = getStandardMove({ point: points[i], team, board });
+      const move = getStandardMove({ point: points[i], team, grid });
       //If no move it means your own piece is blocking the path or out of bounds
       if (!move) break;
       availableMoves.push(move);
@@ -371,17 +380,17 @@ const calcLateralMovements = ({ point }: { point: Point }) => {
 
 function getStandardMove({
   point,
-  board,
+  grid,
   team,
 }: {
   point: Point;
-  board: Board;
+  grid: Grid;
   team: TEAM;
 }): Move | undefined {
   const [x, y] = point;
-  const isInBounds = bounds(x, board.grid) && bounds(y, board.grid);
+  const isInBounds = bounds(x, grid) && bounds(y, grid);
   if (!isInBounds) return;
-  const pieceOnPoint = board.getPiece(point);
+  const pieceOnPoint = Board.getPiece({ grid, point });
   if (pieceOnPoint) {
     if (pieceOnPoint.team !== team) {
       return [point, "capture"];
@@ -394,18 +403,18 @@ function getStandardMove({
 function getSpecificMove({
   type,
   point,
-  board,
+  grid,
   team,
 }: {
   type: "movement" | "capture";
   point: Point;
-  board: Board;
+  grid: Grid;
   team: TEAM;
 }): Move | undefined {
   const [x, y] = point;
-  const isInBounds = bounds(x, board.grid) && bounds(y, board.grid);
+  const isInBounds = bounds(x, grid) && bounds(y, grid);
   if (!isInBounds) return;
-  const pieceOnPoint = board.getPiece(point);
+  const pieceOnPoint = Board.getPiece({ grid, point });
   if (type === "capture") {
     if (pieceOnPoint) {
       if (pieceOnPoint.team !== team) {
@@ -458,14 +467,20 @@ const calculateMovements = ({
   return movements.map((move) => transform(x, y, move));
 };
 
-function calcCastling(
-  kingPoint: Point,
-  team: TEAM,
-  board: Board,
-  lastTurnHistory: TurnHistory | undefined,
-  movesObj: Move[]
-) {
-  const playersRooks = board.getPieces().filter(({ piece }) => {
+function calcCastling({
+  kingPoint,
+  team,
+  grid,
+  lastTurnHistory,
+  movesObj,
+}: {
+  kingPoint: Point;
+  team: TEAM;
+  grid: Grid;
+  lastTurnHistory: TurnHistory | undefined;
+  movesObj: Move[];
+}) {
+  const playersRooks = Board.getPieces({ grid }).filter(({ piece }) => {
     return piece?.type === PIECE.R && piece?.team === team;
   });
   if (playersRooks.length) {
@@ -477,7 +492,7 @@ function calcCastling(
           kingPoint,
           rookPoint,
           team,
-          board,
+          grid,
           lastTurnHistory,
         });
         if (resolve) {
@@ -493,13 +508,13 @@ function canCastlingResolve({
   kingPoint,
   rookPoint,
   team,
-  board,
+  grid,
   lastTurnHistory,
 }: {
   kingPoint: Point;
   rookPoint: Point;
   team: TEAM;
-  board: Board;
+  grid: Grid;
   lastTurnHistory: TurnHistory | undefined;
 }) {
   const [kingX, kingY] = kingPoint;
@@ -521,12 +536,12 @@ function canCastlingResolve({
   }
   //Check if squares in between are used by any pieces
   const pieceInBetween = squaresInBetween.filter((point) => {
-    return board.getPiece(point) !== undefined;
+    return Board.getPiece({ grid, point }) !== undefined;
   });
   if (!pieceInBetween.length) {
     const squaresInUse = [...squaresInBetween, kingPoint, rookPoint];
     //Check if opponents pieces, threathen any of the spaces in between
-    const opponentsPieces = board.getPieces().filter(({ piece }) => {
+    const opponentsPieces = Board.getPieces({ grid }).filter(({ piece }) => {
       return piece && piece.team !== team;
     }) as { piece: GamePiece; point: Point }[];
     const opponentsAvailableMoves = opponentsPieces
@@ -534,7 +549,7 @@ function canCastlingResolve({
         getPieceMoves({
           piece,
           point,
-          board,
+          grid,
           lastTurnHistory,
         })
       )

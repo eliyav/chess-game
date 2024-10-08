@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "clean": "node -e \"fs.rmSync('dist', {recursive: true, force: true})\"",
+    "clean": "node -e \"fs.rmSync('dist', {recursive: true, force: true}); fs.rmSync('build', {recursive: true, force: true})\"",
     "start": "concurrently --names client,server,nodemon -c auto --kill-others \"npm:watch:client\" \"npm:watch:server\" \"npm:nodemon:server\"",
     "typecheck": "tsc --noEmit",
     "prebuild": "npm run clean",
@@ -20,7 +20,7 @@
     "build:prod": "npm run copy:public && npm run build:prod:client && npm run build:prod:server",
     "build:prod:client": "esbuild src/client/index.tsx --bundle --outdir=dist/client --target=es2022 --loader:.svg=file --loader:.mp3=file --loader:.gltf=file --loader:.png=file --loader:.webp=file --format=esm --minify",
     "build:prod:server": "esbuild src/server/index.ts --bundle --outdir=dist/server --packages=external --platform=node  --format=esm --minify",
-    "test": "esbuild $(find src -name '*.ts') --outdir=build --platform=node --format=esm && node --test"
+    "test": "esbuild \"src/**/*.ts\" --outdir=build --platform=node --format=esm && node --test"
   },
   "browserslist": [
     "last 1 Chrome version"
