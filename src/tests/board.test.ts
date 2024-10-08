@@ -1,33 +1,32 @@
 import { strict as assert } from "node:assert";
-import { describe, beforeEach, it } from "node:test";
-import Board from "../client/game-logic/board.js";
+import { beforeEach, describe, it } from "node:test";
+import { Board, Grid } from "../client/game-logic/board.js";
 import GamePiece from "../client/game-logic/game-piece.js";
 import { PIECE, Point } from "../shared/game.js";
 import { TEAM } from "../shared/match.js";
-import chessData from "../client/game-logic/chess-data-import.js";
 
 describe("Board", () => {
-  let board: Board;
+  const size = 8;
+  let grid: Grid;
 
   beforeEach(() => {
-    board = new Board();
-  });
-
-  it("should initialize with correct initial positions", () => {
-    assert.deepEqual(board.initialPositions, chessData.initialPositions);
-    assert.equal(board.boardSize, chessData.boardSize);
-    assert.deepEqual(board.columnNames, chessData.columnNames);
+    grid = Board.createGrid(size);
   });
 
   it("should create a grid of the correct size", () => {
-    assert.equal(board.grid.length, board.boardSize);
-    board.grid.forEach((row) => {
-      assert.equal(row.length, board.boardSize);
+    assert.equal(grid.length, size);
+    grid.forEach((row) => {
+      assert.equal(row.length, size);
     });
   });
 
+  it("should get the correct square name", () => {
+    const A4 = Board.getSquareName({ point: [0, 3] });
+    assert.equal(A4, "a4");
+  });
+
   it("should set pieces correctly on the board", () => {
-    const pieces = board.getPieces();
+    const pieces = Board.getPieces({ grid });
     assert.ok(pieces.length > 0);
     pieces.forEach(({ piece, point }) => {
       assert.ok(piece instanceof GamePiece);
@@ -35,23 +34,16 @@ describe("Board", () => {
     });
   });
 
-  it("should clone the board correctly", () => {
-    const clonedBoard = board.cloneBoard();
-    assert.notEqual(clonedBoard, board);
-    assert.notEqual(clonedBoard.grid, board.grid);
-    assert.deepEqual(clonedBoard.grid, board.grid);
-  });
-
-  it("should get the correct square", () => {
-    const point: Point = [0, 0];
-    const square = board.getSquare(point);
-    assert.ok(square);
-    assert.equal(square.name, board.columnNames[0] + "1");
+  it("should clone the grid correctly", () => {
+    const clonedGrid = Board.cloneGrid({ grid });
+    assert.notEqual(clonedGrid, grid);
+    assert.notEqual(clonedGrid, grid);
+    assert.deepEqual(clonedGrid, grid);
   });
 
   it("should get the correct piece", () => {
     const point: Point = [0, 0];
-    const piece = board.getPiece(point);
+    const piece = Board.getPiece({ point, grid });
     if (piece) {
       assert.ok(piece instanceof GamePiece);
     } else {
@@ -62,25 +54,15 @@ describe("Board", () => {
   it("should add and remove pieces correctly", () => {
     const point: Point = [0, 0];
     const piece = new GamePiece({ type: PIECE.P, team: TEAM.WHITE });
-    board.addPiece({ point, piece });
-    assert.equal(board.getPiece(point), piece);
+    Board.addPiece({ grid, point, piece });
+    assert.equal(Board.getPiece({ grid, point }), piece);
 
-    board.removePiece({ point });
-    assert.equal(board.getPiece(point), undefined);
+    Board.removePiece({ grid, point });
+    assert.equal(Board.getPiece({ grid, point }), undefined);
   });
 
   it("should return the correct direction for each team", () => {
-    assert.equal(board.getDirection(TEAM.WHITE), 1);
-    assert.equal(board.getDirection(TEAM.BLACK), -1);
-  });
-
-  it("should reset the board correctly", () => {
-    board.resetBoard();
-    const pieces = board.getPieces();
-    assert.ok(pieces.length > 0);
-    pieces.forEach(({ piece, point }) => {
-      assert.ok(piece instanceof GamePiece);
-      assert.ok(point);
-    });
+    assert.equal(Board.getDirection(TEAM.WHITE), 1);
+    assert.equal(Board.getDirection(TEAM.BLACK), -1);
   });
 });

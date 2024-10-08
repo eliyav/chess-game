@@ -44,7 +44,7 @@ export class BaseMatch {
   }
 
   getMoves(piece: GamePiece, point: Point) {
-    return this.game.getMoves({ piece, point, board: this.game.current.board });
+    return this.game.getMoves({ piece, point });
   }
 
   reset() {
@@ -92,12 +92,12 @@ export class BaseMatch {
   }
 
   lookupGamePiece(pickedMesh: AbstractMesh, externalMesh: boolean) {
-    return this.game.lookupPiece(
-      findByPoint({
+    return this.game.lookupPiece({
+      point: findByPoint({
         get: "index",
         point: [pickedMesh.position.z, pickedMesh.position.x],
         externalMesh,
-      })
-    );
+      }),
+    });
   }
 }
