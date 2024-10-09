@@ -9,6 +9,7 @@ import GamePiece from "./game-piece.js";
 import { TEAM } from "../../shared/match.js";
 import { Board, Grid } from "./board.js";
 import { doPointsMatch, getPieceMoves, isEnPassantAvailable } from "./moves.js";
+import { evaluateBoardPositions } from "./ai-opponent.js";
 
 class Game {
   teams: TEAM[];
@@ -523,6 +524,108 @@ class Game {
     if (opponentInCheck) annotation = `${annotation}+`;
     this.current.annotations.push(annotation);
     this.current.turnHistory.push(history);
+  }
+
+  getAIMove({ depth }: { depth: number }) {
+    let sum = 0;
+    const newGrid = Board.cloneGrid({ grid: this.current.grid });
+    const result = this.minimax(
+      newGrid,
+      depth,
+      false,
+      -Infinity,
+      Infinity,
+      sum
+    );
+    if (!result.bestMove) return;
+    const [origin, move] = result.bestMove;
+    return this.move({ origin, target: move[0] });
+  }
+
+  minimax(
+    grid: Grid,
+    depth: number,
+    maximizingPlayer: boolean,
+    alpha: number,
+    beta: number,
+    sum: number
+  ): { evaluation: number; bestMove?: [Point, Move] } {
+    if (depth === 0) {
+      return { evaluation: sum };
+    }
+    const availableMoves = Board.getPieces({ grid })
+      .map(({ piece, point }) => {
+        return getPieceMoves({
+          piece: {
+            type: piece!.type,
+            team: piece!.team,
+            moved: piece!.moved,
+          },
+          point,
+          grid,
+          lastTurnHistory: this.current.turnHistory.at(-1),
+        }).map((move) => [point, move] as [Point, Move]);
+      })
+      .flat();
+
+    let bestMove: [Point, Move] | undefined;
+    if (maximizingPlayer) {
+      let maxEval = -Infinity;
+      for (let i = 0; i < availableMoves.length; i++) {
+        const [origin, move] = availableMoves[i];
+        const clonedGrid = Board.cloneGrid({ grid });
+        this.resolveBoard({
+          origin,
+          move,
+          grid: clonedGrid,
+          dontUpdatePiece: true,
+        });
+        const newSum = sum + evaluateBoardPositions({ grid: clonedGrid });
+        const { evaluation } = this.minimax(
+          clonedGrid,
+          depth - 1,
+          false,
+          alpha,
+          beta,
+          newSum
+        );
+        if (evaluation > maxEval) {
+          maxEval = evaluation;
+          bestMove = [origin, move];
+        }
+        alpha = Math.max(alpha, evaluation);
+        if (beta <= alpha) break;
+      }
+      return { evaluation: maxEval, bestMove };
+    } else {
+      let minEval = Infinity;
+      for (let i = 0; i < availableMoves.length; i++) {
+        const [origin, move] = availableMoves[i];
+        const clonedGrid = Board.cloneGrid({ grid });
+        this.resolveBoard({
+          origin,
+          move,
+          grid: clonedGrid,
+          dontUpdatePiece: true,
+        });
+        const newSum = sum + evaluateBoardPositions({ grid: clonedGrid });
+        const { evaluation } = this.minimax(
+          clonedGrid,
+          depth - 1,
+          true,
+          alpha,
+          beta,
+          newSum
+        );
+        if (evaluation < minEval) {
+          minEval = evaluation;
+          bestMove = [origin, move];
+        }
+        beta = Math.min(beta, evaluation);
+        if (beta <= alpha) break;
+      }
+      return { evaluation: minEval, bestMove };
+    }
   }
 }
 
