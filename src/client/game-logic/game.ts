@@ -522,13 +522,12 @@ class Game {
 
   handleAIMove({ depth }: { depth: number }) {
     let sum = 0;
-    const newGrid = Board.cloneGrid({ grid: this.current.grid });
     const result = this.minimax({
-      grid: newGrid,
+      grid: this.current.grid,
       depth,
       maximizingPlayer: false,
-      alpha: -Infinity,
-      beta: Infinity,
+      alpha: Number.NEGATIVE_INFINITY,
+      beta: Number.POSITIVE_INFINITY,
       sum,
     });
     if (!result.bestMove) return;
@@ -581,7 +580,7 @@ class Game {
     for (let i = 0; i < availableMoves.length; i++) {
       const [origin, move] = availableMoves[i];
       this.move({ origin, target: move[0] });
-      const newSum = sum + evaluateBoardPositions({ grid: this.current.grid });
+      const newSum = evaluateBoardPositions({ sum, grid: this.current.grid });
       const { value: childValue } = this.minimax({
         grid: this.current.grid,
         depth: depth - 1,
