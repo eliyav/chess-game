@@ -1,4 +1,4 @@
-import { TEAM } from "./match.js";
+import { TEAM } from "./match";
 
 export enum GAMESTATUS {
   INPROGRESS = "In Progress",

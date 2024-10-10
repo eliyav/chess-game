@@ -1,9 +1,9 @@
 import { strict as assert } from "node:assert";
 import { beforeEach, describe, it } from "node:test";
-import { Board, Grid } from "../client/game-logic/board.js";
-import GamePiece from "../client/game-logic/game-piece.js";
-import { PIECE, Point } from "../shared/game.js";
-import { TEAM } from "../shared/match.js";
+import { Board, Grid } from "../client/game-logic/board";
+import GamePiece from "../client/game-logic/game-piece";
+import { PIECE, Point } from "../shared/game";
+import { TEAM } from "../shared/match";
 
 describe("Board", () => {
   const size = 8;

@@ -1,13 +1,7 @@
-import {
-  EnPassant,
-  Move,
-  PIECE,
-  Point,
-  TurnHistory,
-} from "../../shared/game.js";
-import GamePiece from "./game-piece.js";
-import { TEAM } from "../../shared/match.js";
-import { Board, type Grid } from "./board.js";
+import { EnPassant, Move, PIECE, Point, TurnHistory } from "../../shared/game";
+import GamePiece from "./game-piece";
+import { TEAM } from "../../shared/match";
+import { Board, type Grid } from "./board";
 
 type LateralDirection = "up" | "down" | "right" | "left";
 type DiagonalDirection = "upRight" | "upLeft" | "downRight" | "downLeft";
