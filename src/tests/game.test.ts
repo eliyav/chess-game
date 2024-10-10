@@ -1,8 +1,8 @@
 import { strict as assert } from "node:assert";
 import { describe, beforeEach, it } from "node:test";
-import Game from "../client/game-logic/game.js";
-import { GAMESTATUS } from "../shared/game.js";
-import { TEAM } from "../shared/match.js";
+import Game from "../client/game-logic/game";
+import { GAMESTATUS } from "../shared/game";
+import { TEAM } from "../shared/match";
 
 describe("Game Class", () => {
   let game: Game;
