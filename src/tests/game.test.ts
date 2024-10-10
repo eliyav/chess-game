@@ -36,4 +36,15 @@ describe("Game Class", () => {
     const gameState = game.getGameState();
     assert.equal(gameState.status, GAMESTATUS.CHECKMATE);
   });
+
+  it("should initialize and handle AI moves correctly", () => {
+    const gameState = game.getGameState();
+    assert.equal(gameState.status, GAMESTATUS.INPROGRESS);
+    assert.equal(gameState.turnHistory.length, 0);
+    assert.equal(gameState.annotations.length, 0);
+
+    game.move({ origin: [0, 1], target: [0, 3] });
+    game.handleAIMove({ depth: 3 });
+    assert.equal(game.getCurrentTeam(), TEAM.WHITE);
+  });
 });
