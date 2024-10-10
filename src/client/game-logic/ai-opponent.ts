@@ -99,11 +99,17 @@ const positionsBlack = {
   //   k_e: positionsWhite["k_e"].slice().reverse(),
 };
 
-export function evaluateBoardPositions({ grid }: { grid: Grid }) {
+export function evaluateBoardPositions({
+  sum,
+  grid,
+}: {
+  sum: number;
+  grid: Grid;
+}) {
   let score = 0;
   for (let i = 0; i < grid.length; i++) {
     for (let j = 0; j < grid[i].length; j++) {
-      const piece = grid[j][i]; //Reversed for now because apparently im dyslexic and flipped all the damn squares
+      const piece = grid[j][i]; //Reversed because of how my chess grid is built compared to the piece square tables (x,y) are flipped
       if (!piece) continue;
       const pieceType = piece.type;
       const pieceColor = piece.team;
@@ -118,13 +124,5 @@ export function evaluateBoardPositions({ grid }: { grid: Grid }) {
       }
     }
   }
-  return score;
+  return sum + score;
 }
-
-// const game = new Game();
-// game.move({ origin: [0, 1], target: [0, 3] });
-// console.log(game.handleAITurn({ depth: 2 }));
-
-// const grid = Board.createGrid();
-// const score = evaluateBoardPositions({ grid });
-// console.log(score);
