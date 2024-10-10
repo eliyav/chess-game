@@ -1,5 +1,5 @@
-import { PIECE } from "../../shared/game.js";
-import { TEAM } from "../../shared/match.js";
+import { PIECE } from "../../shared/game";
+import { TEAM } from "../../shared/match";
 
 class GamePiece {
   type: PIECE;
