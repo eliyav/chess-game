@@ -8,6 +8,7 @@
     "clean": "node -e \"fs.rmSync('dist', {recursive: true, force: true}); fs.rmSync('build', {recursive: true, force: true})\"",
     "start": "concurrently --names client,server,nodemon -c auto --kill-others \"npm:watch:client\" \"npm:watch:server\" \"npm:nodemon:server\"",
     "typecheck": "tsc --noEmit",
+    "test": "glob -c \"node --import tsx --test\" \"src/tests/**/*.test.ts\"",
     "prebuild": "npm run clean",
     "prestart": "npm run build",
     "copy:public": "node -e \"fs.cpSync('public', 'dist/client', {recursive: true})\"",
@@ -19,8 +20,7 @@
     "nodemon:server": "nodemon dist/server/index.js",
     "build:prod": "npm run copy:public && npm run build:prod:client && npm run build:prod:server",
     "build:prod:client": "esbuild src/client/index.tsx --bundle --outdir=dist/client --target=es2022 --loader:.svg=file --loader:.mp3=file --loader:.gltf=file --loader:.png=file --loader:.webp=file --format=esm --minify",
-    "build:prod:server": "esbuild src/server/index.ts --bundle --outdir=dist/server --packages=external --platform=node  --format=esm --minify",
-    "test": "esbuild \"src/**/*.ts\" --outdir=build --platform=node --format=esm && node --test"
+    "build:prod:server": "esbuild src/server/index.ts --bundle --outdir=dist/server --packages=external --platform=node  --format=esm --minify"
   },
   "browserslist": [
     "last 1 Chrome version"
@@ -46,6 +46,8 @@
     "@types/react-dom": "^18.3.0",
     "concurrently": "^9.0.1",
     "esbuild": "^0.24.0",
+    "glob": "^11.0.0",
+    "tsx": "^4.19.1",
     "typescript": "^5.6.2"
   }
 }
