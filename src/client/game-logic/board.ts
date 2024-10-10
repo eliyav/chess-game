@@ -45,8 +45,8 @@ export class Board {
     return grid[x][y];
   }
 
-  static getPieces({ grid }: { grid: Grid }) {
-    return grid
+  static getPieces({ grid, team }: { grid: Grid; team?: TEAM }) {
+    const pieces = grid
       .flatMap((row, x) =>
         row.map((piece, y) => ({
           piece,
@@ -54,6 +54,9 @@ export class Board {
         }))
       )
       .filter(({ piece }) => piece !== undefined);
+
+    if (!team) return pieces;
+    return pieces.filter(({ piece }) => piece?.team === team);
   }
 
   static removePiece({ grid, point }: { grid: Grid; point: Point }) {

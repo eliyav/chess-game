@@ -520,34 +520,47 @@ class Game {
     this.current.turnHistory.push(history);
   }
 
-  getAIMove({ depth }: { depth: number }) {
+  handleAIMove({ depth }: { depth: number }) {
     let sum = 0;
     const newGrid = Board.cloneGrid({ grid: this.current.grid });
-    const result = this.minimax(
-      newGrid,
+    const result = this.minimax({
+      grid: newGrid,
       depth,
-      false,
-      -Infinity,
-      Infinity,
-      sum
-    );
+      maximizingPlayer: false,
+      alpha: -Infinity,
+      beta: Infinity,
+      sum,
+    });
     if (!result.bestMove) return;
     const [origin, move] = result.bestMove;
     return this.move({ origin, target: move[0] });
   }
 
-  minimax(
-    grid: Grid,
-    depth: number,
-    maximizingPlayer: boolean,
-    alpha: number,
-    beta: number,
-    sum: number
-  ): { evaluation: number; bestMove?: [Point, Move] } {
+  minimax({
+    grid,
+    depth,
+    maximizingPlayer,
+    alpha,
+    beta,
+    sum,
+  }: {
+    grid: Grid;
+    depth: number;
+    maximizingPlayer: boolean;
+    alpha: number;
+    beta: number;
+    sum: number;
+  }): {
+    bestMove: [Point, Move] | null;
+    value: number;
+  } {
     if (depth === 0) {
-      return { evaluation: sum };
+      return { bestMove: null, value: sum };
     }
-    const availableMoves = Board.getPieces({ grid })
+    const availableMoves = Board.getPieces({
+      grid,
+      team: this.getCurrentTeam(),
+    })
       .map(({ piece, point }) => {
         return getPieceMoves({
           piece: {
@@ -562,63 +575,58 @@ class Game {
       })
       .flat();
 
-    let bestMove: [Point, Move] | undefined;
+    let bestMove: [Point, Move] | null = null;
+    let maxValue = Number.NEGATIVE_INFINITY;
+    let minValue = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < availableMoves.length; i++) {
+      const [origin, move] = availableMoves[i];
+      this.move({ origin, target: move[0] });
+      const newSum = sum + evaluateBoardPositions({ grid: this.current.grid });
+      const { value: childValue } = this.minimax({
+        grid: this.current.grid,
+        depth: depth - 1,
+        maximizingPlayer: !maximizingPlayer,
+        alpha,
+        beta,
+        sum: newSum,
+      });
+
+      this.undoTurn();
+
+      if (maximizingPlayer) {
+        if (childValue > maxValue) {
+          maxValue = childValue;
+          bestMove = availableMoves[i];
+        }
+        if (childValue > alpha) {
+          alpha = childValue;
+        }
+      } else {
+        if (childValue < minValue) {
+          minValue = childValue;
+          bestMove = availableMoves[i];
+        }
+        if (childValue < beta) {
+          beta = childValue;
+        }
+      }
+
+      // Alpha-beta pruning
+      if (alpha >= beta) {
+        break;
+      }
+    }
+
     if (maximizingPlayer) {
-      let maxEval = -Infinity;
-      for (let i = 0; i < availableMoves.length; i++) {
-        const [origin, move] = availableMoves[i];
-        const clonedGrid = Board.cloneGrid({ grid });
-        this.resolveBoard({
-          origin,
-          move,
-          grid: clonedGrid,
-          dontUpdatePiece: true,
-        });
-        const newSum = sum + evaluateBoardPositions({ grid: clonedGrid });
-        const { evaluation } = this.minimax(
-          clonedGrid,
-          depth - 1,
-          false,
-          alpha,
-          beta,
-          newSum
-        );
-        if (evaluation > maxEval) {
-          maxEval = evaluation;
-          bestMove = [origin, move];
-        }
-        alpha = Math.max(alpha, evaluation);
-        if (beta <= alpha) break;
-      }
-      return { evaluation: maxEval, bestMove };
+      return {
+        bestMove,
+        value: maxValue,
+      };
     } else {
-      let minEval = Infinity;
-      for (let i = 0; i < availableMoves.length; i++) {
-        const [origin, move] = availableMoves[i];
-        const clonedGrid = Board.cloneGrid({ grid });
-        this.resolveBoard({
-          origin,
-          move,
-          grid: clonedGrid,
-          dontUpdatePiece: true,
-        });
-        const newSum = sum + evaluateBoardPositions({ grid: clonedGrid });
-        const { evaluation } = this.minimax(
-          clonedGrid,
-          depth - 1,
-          true,
-          alpha,
-          beta,
-          newSum
-        );
-        if (evaluation < minEval) {
-          minEval = evaluation;
-          bestMove = [origin, move];
-        }
-        beta = Math.min(beta, evaluation);
-        if (beta <= alpha) break;
-      }
-      return { evaluation: minEval, bestMove };
+      return {
+        bestMove,
+        value: minValue,
+      };
     }
   }
 }
