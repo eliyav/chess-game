@@ -104,23 +104,13 @@ export class Controller {
         gameScene.data.audio.crumble?.play();
       }
     }
+    this.clearMeshes({ name: "plane" });
+    this.clearMeshes({ name: "torus" });
     await this.turnAnimation({
       turnHistory,
       gameScene,
     });
     this.prepNextView();
-    this.checkForAIOpponent();
-  }
-
-  checkForAIOpponent() {
-    if (this.match.mode === LOBBY_TYPE.LOCAL) {
-      if (!this.match.isPlayersTurn()) {
-        const turnHistory = this.match.requestAiMove();
-        if (turnHistory) {
-          this.handleValidTurn({ turnHistory });
-        }
-      }
-    }
   }
 
   prepNextView() {
@@ -131,6 +121,11 @@ export class Controller {
       this.events.setMessage(this.createMatchEndPrompt());
     } else {
       this.rotateCamera();
+      if (this.match.mode === LOBBY_TYPE.LOCAL) {
+        this.match.postTurnEvents({
+          handleValidTurn: this.handleValidTurn.bind(this),
+        });
+      }
     }
   }
 
@@ -273,6 +268,16 @@ export class Controller {
       }
       gameScene.data.meshesToRender.push(clone);
     });
+  }
+
+  clearMeshes({ name }: { name: string }) {
+    const gameScene = this.sceneManager.getScene(Scenes.GAME);
+    gameScene.data.meshesToRender
+      .filter((mesh) => mesh.name === name)
+      .forEach((mesh) => {
+        gameScene.scene.removeMesh(mesh);
+        mesh.dispose();
+      });
   }
 
   setMessage(message: Message | null) {
