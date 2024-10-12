@@ -34,14 +34,14 @@ const highlightValidMoves = ({
   gameScene: GameScene;
   visibleMoves: boolean;
 }) => {
-  const [point, type] = move;
+  const { target, type } = move;
   const plane = MeshBuilder.CreatePlane(`plane`, {
     width: 2.5,
     height: 2.5,
   });
   const [z, x] = findByPoint({
     get: "position",
-    point,
+    point: target,
     externalMesh: false,
   });
   plane.setPositionWithLocalVector(new Vector3(x, Y_ABOVE_FLOOR, z));

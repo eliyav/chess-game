@@ -109,6 +109,18 @@ export class Controller {
       gameScene,
     });
     this.prepNextView();
+    this.checkForAIOpponent();
+  }
+
+  checkForAIOpponent() {
+    if (this.match.mode === LOBBY_TYPE.LOCAL) {
+      if (!this.match.isPlayersTurn()) {
+        const turnHistory = this.match.requestAiMove();
+        if (turnHistory) {
+          this.handleValidTurn({ turnHistory });
+        }
+      }
+    }
   }
 
   prepNextView() {
@@ -119,15 +131,6 @@ export class Controller {
       this.events.setMessage(this.createMatchEndPrompt());
     } else {
       this.rotateCamera();
-    }
-
-    if (this.match.mode === LOBBY_TYPE.LOCAL) {
-      if (!this.match.isPlayersTurn()) {
-        const turnHistory = this.match.requestAiMove();
-        if (turnHistory) {
-          this.handleValidTurn({ turnHistory });
-        }
-      }
     }
   }
 

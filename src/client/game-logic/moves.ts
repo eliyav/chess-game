@@ -89,7 +89,12 @@ function calcRookMoves({
   const lateralMovements = calcLateralMovements({
     point,
   });
-  return getMovePath({ grid, team, movements: lateralMovements });
+  return getMovePath({
+    origin: point,
+    grid,
+    team,
+    movements: lateralMovements,
+  });
 }
 
 function calcQueenMoves({
@@ -108,11 +113,13 @@ function calcQueenMoves({
     point,
   });
   const lateralMoves = getMovePath({
+    origin: point,
     grid,
     team,
     movements: lateralMovements,
   });
   const diagonalMoves = getMovePath({
+    origin: point,
     grid,
     team,
     movements: diagonalMovements,
@@ -139,7 +146,8 @@ function calcPawnMoves({
   const newY = y + range * direction;
   const moveResult = getSpecificMove({
     type: "movement",
-    point: [x, newY],
+    origin: point,
+    target: [x, newY],
     team,
     grid,
   });
@@ -151,7 +159,8 @@ function calcPawnMoves({
       const newY = y + extendedRange * direction;
       const moveResult = getSpecificMove({
         type: "movement",
-        point: [x, newY],
+        origin: point,
+        target: [x, newY],
         team,
         grid,
       });
@@ -164,7 +173,8 @@ function calcPawnMoves({
   //Calculates Capture points and pushes them in final movement obj if are valid
   const captureMove = getSpecificMove({
     type: "capture",
-    point: [x - direction, y + direction],
+    origin: point,
+    target: [x - direction, y + direction],
     team,
     grid,
   });
@@ -173,7 +183,8 @@ function calcPawnMoves({
   }
   const captureMove2 = getSpecificMove({
     type: "capture",
-    point: [x + direction, y + direction],
+    origin: point,
+    target: [x + direction, y + direction],
     team,
     grid,
   });
@@ -195,7 +206,11 @@ function calcPawnMoves({
         doPointsMatch(potential1, enPassant.enPassantPoint) ||
         doPointsMatch(potential2, enPassant.enPassantPoint)
       ) {
-        availableMoves.push([enPassant.enPassantPoint, "enPassant"]);
+        availableMoves.push({
+          origin: point,
+          target: enPassant.enPassantPoint,
+          type: "enPassant",
+        });
       }
     }
   }
@@ -224,8 +239,8 @@ function calcKnightMoves({
   ];
   const [x, y] = point;
   movements.forEach(([moveX, moveY]) => {
-    const point: Point = [x + moveX, y + moveY];
-    const moveResult = getStandardMove({ point: point, team, grid });
+    const target: Point = [x + moveX, y + moveY];
+    const moveResult = getStandardMove({ origin: point, target, team, grid });
     if (moveResult) {
       availableMoves.push(moveResult);
     }
@@ -259,8 +274,8 @@ function calcKingMoves({
   const availableMoves: Move[] = [];
   const [x, y] = point;
   kingMovements.forEach(([moveX, moveY]) => {
-    const point: Point = [x + moveX, y + moveY];
-    const moveResult = getStandardMove({ point, team, grid });
+    const target: Point = [x + moveX, y + moveY];
+    const moveResult = getStandardMove({ origin: point, target, team, grid });
     if (moveResult) {
       availableMoves.push(moveResult);
     }
@@ -291,15 +306,22 @@ function calcBishopMoves({
   const diagonalMovements = calcDiagonalMovements({
     point,
   });
-  return getMovePath({ grid, team, movements: diagonalMovements });
+  return getMovePath({
+    origin: point,
+    grid,
+    team,
+    movements: diagonalMovements,
+  });
 }
 
 //Filters the moves from the final movements object and enters them in the available moves array
 const getMovePath = ({
+  origin,
   grid,
   team,
   movements,
 }: {
+  origin: Point;
   grid: Grid;
   team: TEAM;
   movements: Movements;
@@ -307,12 +329,17 @@ const getMovePath = ({
   const availableMoves: Move[] = [];
   for (const [_, points] of Object.entries(movements)) {
     for (let i = 0; i < points.length; i++) {
-      const move = getStandardMove({ point: points[i], team, grid });
+      const move = getStandardMove({
+        origin,
+        target: points[i],
+        team,
+        grid,
+      });
       //If no move it means your own piece is blocking the path or out of bounds
       if (!move) break;
       availableMoves.push(move);
       //Since you cant skip over pieces, if a piece is found in the path, break the loop
-      if (move[1] === "capture") {
+      if (move.type === "capture") {
         break;
       }
     }
@@ -373,51 +400,71 @@ const calcLateralMovements = ({ point }: { point: Point }) => {
 };
 
 function getStandardMove({
-  point,
+  origin,
+  target,
   grid,
   team,
 }: {
-  point: Point;
+  origin: Point;
+  target: Point;
   grid: Grid;
   team: TEAM;
 }): Move | undefined {
-  const [x, y] = point;
+  const [x, y] = target;
   const isInBounds = bounds(x, grid) && bounds(y, grid);
   if (!isInBounds) return;
-  const pieceOnPoint = Board.getPiece({ grid, point });
+  const pieceOnPoint = Board.getPiece({ grid, point: target });
   if (pieceOnPoint) {
     if (pieceOnPoint.team !== team) {
-      return [point, "capture"];
+      return {
+        origin,
+        target,
+        type: "capture",
+      };
     }
   } else {
-    return [point, "movement"];
+    return {
+      origin,
+      target,
+      type: "movement",
+    };
   }
 }
 
 function getSpecificMove({
   type,
-  point,
+  origin,
+  target,
   grid,
   team,
 }: {
   type: "movement" | "capture";
-  point: Point;
+  origin: Point;
+  target: Point;
   grid: Grid;
   team: TEAM;
 }): Move | undefined {
-  const [x, y] = point;
+  const [x, y] = target;
   const isInBounds = bounds(x, grid) && bounds(y, grid);
   if (!isInBounds) return;
-  const pieceOnPoint = Board.getPiece({ grid, point });
+  const pieceOnPoint = Board.getPiece({ grid, point: target });
   if (type === "capture") {
     if (pieceOnPoint) {
       if (pieceOnPoint.team !== team) {
-        return [point, "capture"];
+        return {
+          origin,
+          target,
+          type: "capture",
+        };
       }
     }
   } else {
     if (!pieceOnPoint) {
-      return [point, "movement"];
+      return {
+        origin,
+        target,
+        type: "movement",
+      };
     }
   }
 }
@@ -548,18 +595,25 @@ function canCastlingResolve({
         })
       )
       .flat();
-    const isThereOverlap = [];
+    let isThereOverlap = false;
     for (let i = 0; i < squaresInUse.length; i++) {
       const square = squaresInUse[i];
       for (let k = 0; k < opponentsAvailableMoves.length; k++) {
         const availableMove = opponentsAvailableMoves[k];
-        const doesMoveMatchSquare = doPointsMatch(availableMove[0], square);
-        doesMoveMatchSquare ? isThereOverlap.push(doesMoveMatchSquare) : null;
+        const doesMoveThreathenCastling = doPointsMatch(
+          availableMove.target,
+          square
+        );
+        doesMoveThreathenCastling ? (isThereOverlap = true) : null;
+        break;
       }
     }
-    if (!isThereOverlap.length) {
+    if (!isThereOverlap) {
       //If there is no overlap, return the possible castling move
-      const returnResult: [boolean, Move] = [true, [rookPoint, "castle"]];
+      const returnResult: [boolean, Move] = [
+        true,
+        { origin: kingPoint, target: rookPoint, type: "castle" },
+      ];
       return returnResult;
     }
   }

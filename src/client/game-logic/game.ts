@@ -88,7 +88,7 @@ class Game {
     grid: Grid;
     dontUpdatePiece?: boolean;
   }) {
-    const [target, moveType] = move;
+    const { target, type: moveType } = move;
     const originPiece = Board.getPiece({ grid, point: origin });
     if (!originPiece) return;
     if (!dontUpdatePiece) originPiece.update();
@@ -114,7 +114,7 @@ class Game {
     move: Move;
     grid: Grid;
   }): TurnHistory | undefined {
-    const [target] = move;
+    const { target } = move;
     const originPiece = this.lookupPiece({ grid, point: origin });
     if (!originPiece) return;
     Board.addPiece({ grid, point: target, piece: originPiece });
@@ -154,7 +154,7 @@ class Game {
     move: Move;
     grid: Grid;
   }): TurnHistory | undefined {
-    const [target] = move;
+    const { target } = move;
     const originPiece = this.lookupPiece({ grid, point: origin });
     const targetPiece = this.lookupPiece({ grid, point: target });
     if (!originPiece || !targetPiece) return;
@@ -194,7 +194,7 @@ class Game {
     move: Move;
     grid: Grid;
   }): TurnHistory | undefined {
-    const [target] = move;
+    const { target } = move;
     const originPiece = this.lookupPiece({ grid, point: origin });
     if (!originPiece) return;
     const lastTurnHistory = this.current.turnHistory.at(-1);
@@ -231,7 +231,7 @@ class Game {
     move: Move;
     grid: Grid;
   }): TurnHistory | undefined {
-    const [target] = move;
+    const { target } = move;
     const originPiece = this.lookupPiece({ grid, point: origin });
     const targetPiece = this.lookupPiece({ grid, point: target });
     if (!originPiece || !targetPiece) return;
@@ -338,12 +338,12 @@ class Game {
       grid,
       lastTurnHistory,
     });
-    if (!skipResolveCheck) {
+    if (skipResolveCheck) {
+      return availableMoves;
+    } else {
       return availableMoves.filter((move) => {
         return this.canMoveResolve({ origin: point, move });
       });
-    } else {
-      return availableMoves;
     }
   }
 
@@ -363,7 +363,9 @@ class Game {
       point: origin,
       grid,
     });
-    const move = availableMoves.find((move) => doPointsMatch(move[0], target));
+    const move = availableMoves.find(({ target: moveTarget }) =>
+      doPointsMatch(moveTarget, target)
+    );
     return move;
   }
 
@@ -426,8 +428,8 @@ class Game {
         })
       )
       .flat();
-    const isKingChecked = opponentsAvailableMoves.find((move) =>
-      doPointsMatch(move[0], king.point)
+    const isKingChecked = opponentsAvailableMoves.find(({ target }) =>
+      doPointsMatch(target, king.point)
     );
     //Returns an array with the kings location if checked
     return isKingChecked;
@@ -531,8 +533,8 @@ class Game {
       sum,
     });
     if (!result.bestMove) return;
-    const [origin, move] = result.bestMove;
-    return this.move({ origin, target: move[0] });
+    const { origin, target } = result.bestMove;
+    return this.move({ origin, target });
   }
 
   minimax({
@@ -550,7 +552,7 @@ class Game {
     beta: number;
     sum: number;
   }): {
-    bestMove: [Point, Move] | null;
+    bestMove: Move | null;
     value: number;
   } {
     if (depth === 0) {
@@ -558,21 +560,19 @@ class Game {
     }
     const currentTeam = this.getCurrentTeam();
     const pieces = Board.getPieces({ grid, team: currentTeam });
-    const availableMoves = pieces
-      .map(({ piece, point }) => {
-        return this.getMoves({
-          piece,
-          point,
-        }).map((move) => [point, move] as [Point, Move]);
-      })
-      .flat();
+    const availableMoves = pieces.flatMap(({ piece, point }) => {
+      return this.getMoves({
+        piece,
+        point,
+      });
+    });
 
-    let bestMove: [Point, Move] | null = null;
+    let bestMove: Move | null = null;
     let maxValue = Number.NEGATIVE_INFINITY;
     let minValue = Number.POSITIVE_INFINITY;
     for (let i = 0; i < availableMoves.length; i++) {
-      const [origin, move] = availableMoves[i];
-      this.move({ origin, target: move[0] });
+      const { origin, target } = availableMoves[i];
+      this.move({ origin, target });
       const newSum = evaluateBoardPositions({ sum, grid: this.current.grid });
       const { value: childValue } = this.minimax({
         grid: this.current.grid,
