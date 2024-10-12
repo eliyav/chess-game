@@ -556,20 +556,13 @@ class Game {
     if (depth === 0) {
       return { bestMove: null, value: sum };
     }
-    const availableMoves = Board.getPieces({
-      grid,
-      team: this.getCurrentTeam(),
-    })
+    const currentTeam = this.getCurrentTeam();
+    const pieces = Board.getPieces({ grid, team: currentTeam });
+    const availableMoves = pieces
       .map(({ piece, point }) => {
-        return getPieceMoves({
-          piece: {
-            type: piece!.type,
-            team: piece!.team,
-            moved: piece!.moved,
-          },
+        return this.getMoves({
+          piece,
           point,
-          grid,
-          lastTurnHistory: this.current.turnHistory.at(-1),
         }).map((move) => [point, move] as [Point, Move]);
       })
       .flat();
@@ -589,7 +582,6 @@ class Game {
         beta,
         sum: newSum,
       });
-
       this.undoTurn();
 
       if (maximizingPlayer) {
