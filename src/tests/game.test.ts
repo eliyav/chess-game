@@ -46,5 +46,7 @@ describe("Game Class", () => {
     game.move({ origin: [0, 1], target: [0, 3] });
     game.handleAIMove({ depth: 3 });
     assert.equal(game.getCurrentTeam(), TEAM.WHITE);
+    assert.equal(gameState.turnHistory.length, 2);
+    assert.equal(gameState.annotations.length, 2);
   });
 });

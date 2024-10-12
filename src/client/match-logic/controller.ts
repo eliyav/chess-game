@@ -120,6 +120,15 @@ export class Controller {
     } else {
       this.rotateCamera();
     }
+
+    if (this.match.mode === LOBBY_TYPE.LOCAL) {
+      if (!this.match.isPlayersTurn()) {
+        const turnHistory = this.match.requestAiMove();
+        if (turnHistory) {
+          this.handleValidTurn({ turnHistory });
+        }
+      }
+    }
   }
 
   displayMoves(point: Point, piece: GamePiece | undefined) {
@@ -279,7 +288,8 @@ export class Controller {
 
   shouldCameraRotate() {
     if (this.match.lobby.mode === LOBBY_TYPE.LOCAL) {
-      //Check for AI opponent here
+      if (this.match.lobby.players.find((player) => player.type === "AI"))
+        return false;
       return true;
     } else {
       return false;

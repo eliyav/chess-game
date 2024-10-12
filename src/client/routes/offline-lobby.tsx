@@ -32,13 +32,10 @@ export const OfflineLobby: React.FC<{
     setLobby({
       mode: LOBBY_TYPE.LOCAL,
       key: "",
-      players: [
-        { name: "Player 1", ready: false, id: "1", type: "Human" },
-        { name: "Player 2", ready: false, id: "2", type: "Human" },
-      ],
+      players: [{ name: "Player 1", ready: false, id: "1", type: "Human" }],
       teams: {
-        White: "",
-        Black: "",
+        White: "1",
+        Black: "2",
       },
       matchStarted: false,
       controllerOptions: buildDefaultOptions(),
@@ -65,6 +62,26 @@ export const OfflineLobby: React.FC<{
               <PlayerCard key={i} name={player.name} type={player.type} />
             ))}
           </div>
+          <button
+            onClick={() => {
+              updateLobby("players", [
+                lobby.players[0],
+                { name: "AI BOT", ready: false, id: "2", type: "AI" },
+              ]);
+            }}
+          >
+            VS AI
+          </button>
+          <button
+            onClick={() => {
+              updateLobby("players", [
+                lobby.players[0],
+                { name: "Player 2", ready: false, id: "2", type: "Human" },
+              ]);
+            }}
+          >
+            VS Player
+          </button>
         </div>
         <div>
           <h2 className="sub-title glass-dark">Settings</h2>
@@ -81,7 +98,7 @@ export const OfflineLobby: React.FC<{
       </div>
       <div className={"flex-align-end pb-1"}>
         <SelectionButton
-          disabled={lobby.mode !== LOBBY_TYPE.LOCAL}
+          disabled={lobby.mode !== LOBBY_TYPE.LOCAL || lobby.players.length < 2}
           text={"Start Game"}
           onClick={() => {
             navigate("/game");

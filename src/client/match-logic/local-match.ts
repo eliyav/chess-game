@@ -21,6 +21,10 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
     return this.move({ originPoint, targetPoint });
   }
 
+  requestAiMove() {
+    return this.getGame().handleAIMove({ depth: 3 });
+  }
+
   resetRequest() {
     return true;
   }
@@ -30,8 +34,12 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
   }
 
   isPlayersTurn() {
-    //Take into account AI opponent possibility
-    return true;
+    const currentTeam = this.getGame().getCurrentTeam();
+    const playingPlayerId = this.lobby.teams[currentTeam];
+    const playerType = this.lobby.players.find(
+      (player) => player.id === playingPlayerId
+    )?.type;
+    return playerType === "Human";
   }
 
   getPlayerTeam() {
