@@ -94,10 +94,12 @@ function animateMeshMovement({
 
       const frameRate = 1; // 1 second max to move across board
       const ratePerSquare = 1 / 7;
-
-      const distanceX = Math.abs(targetPosition[1] - position[1]) / 3;
+      const distancePerSquare = 3;
+      const distanceX =
+        Math.abs(targetPosition[1] - position[1]) / distancePerSquare;
       const directionX = targetPosition[1] - position[1] > 0 ? 1 : -1;
-      const distanceY = Math.abs(targetPosition[0] - position[0]) / 3;
+      const distanceY =
+        Math.abs(targetPosition[0] - position[0]) / distancePerSquare;
       const directionY = targetPosition[0] - position[0] > 0 ? 1 : -1;
 
       //Create keyframes based on distance
@@ -128,37 +130,40 @@ function animateMeshMovement({
         false
       );
 
-      const keyFramesX = [{ frame: 0, value: position[1] }];
-      keyFramesX.push(
+      const keyFramesX = [
+        { frame: 0, value: position[1] },
         ...Array.from({ length: distanceX }, (_, i) => {
+          const distanceToMove = directionX * distancePerSquare * (i + 1); //3 units per square
           return {
             frame: ratePerSquare * (i + 1),
-            value: position[1] + directionX * (3 * (i + 1)),
+            value: position[1] + distanceToMove,
           };
-        })
-      );
+        }),
+      ];
 
-      const keyFramesY = [{ frame: 0, value: position[0] }];
-      keyFramesY.push(
+      const keyFramesY = [
+        { frame: 0, value: position[0] },
         ...Array.from({ length: distanceY }, (_, i) => {
+          const distanceToMove = directionY * distancePerSquare * (i + 1); //3 units per square
           return {
             frame: ratePerSquare * (i + 1),
-            value: position[0] + directionY * (3 * (i + 1)),
+            value: position[0] + distanceToMove,
           };
-        })
-      );
+        }),
+      ];
 
+      //If knight, animate z
       const keyFramesZ = [
         {
           frame: 0,
           value: 0.5,
         },
         {
-          frame: frameRate / 2,
+          frame: ratePerSquare,
           value: 5,
         },
         {
-          frame: frameRate,
+          frame: ratePerSquare * 2,
           value: 0.5,
         },
       ];
