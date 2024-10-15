@@ -3,7 +3,7 @@ import { GAMESTATUS, Point, TurnHistory } from "../../shared/game";
 import GamePiece from "../game-logic/game-piece";
 import { Lobby, Player, TEAM } from "../../shared/match";
 import Game from "../game-logic/game";
-import { findByPoint } from "../scenes/scene-helpers";
+import { getPointFromPosition } from "../scenes/scene-helpers";
 
 export interface MatchLogic {
   requestMove({
@@ -84,18 +84,16 @@ export class BaseMatch {
   }
 
   getMeshGamePoint(pickedMesh: AbstractMesh, externalMesh: boolean) {
-    return findByPoint({
-      get: "index",
-      point: [pickedMesh.position.z, pickedMesh.position.x],
+    return getPointFromPosition({
+      position: [pickedMesh.position.z, pickedMesh.position.x],
       externalMesh,
     });
   }
 
   lookupGamePiece(pickedMesh: AbstractMesh, externalMesh: boolean) {
     return this.game.lookupPiece({
-      point: findByPoint({
-        get: "index",
-        point: [pickedMesh.position.z, pickedMesh.position.x],
+      point: getPointFromPosition({
+        position: [pickedMesh.position.z, pickedMesh.position.x],
         externalMesh,
       }),
     });

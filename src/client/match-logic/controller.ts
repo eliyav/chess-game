@@ -4,17 +4,21 @@ import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
 import type { Nullable } from "@babylonjs/core/types";
 import { GAMESTATUS, Point, TurnHistory } from "../../shared/game";
 import { ControllerOptions, LOBBY_TYPE } from "../../shared/match";
+import { APP_ROUTES } from "../../shared/routes";
 import { Message } from "../components/modals/message-modal";
 import GamePiece from "../game-logic/game-piece";
 import { doPointsMatch } from "../game-logic/moves";
 import { rotateCamera } from "../scenes/animation/camera";
 import calcTurnAnimation from "../scenes/animation/turn-animation";
-import { displayPieceMoves, findByPoint } from "../scenes/scene-helpers";
+import {
+  displayPieceMoves,
+  getPointFromPosition,
+  getPositionFromPoint,
+} from "../scenes/scene-helpers";
 import { GameScene, SceneManager, Scenes } from "../scenes/scene-manager";
+import { websocket } from "../websocket-client";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
-import { APP_ROUTES } from "../../shared/routes";
-import { websocket } from "../websocket-client";
 
 export class Controller {
   sceneManager: SceneManager;
@@ -212,9 +216,8 @@ export class Controller {
   findMeshFromPoint(point: Point) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     return gameScene.data.meshesToRender.find((mesh) => {
-      const meshPoint = findByPoint({
-        get: "index",
-        point: [mesh.position.z, mesh.position.x],
+      const meshPoint = getPointFromPosition({
+        position: [mesh.position.z, mesh.position.x],
         externalMesh: true,
       });
       return doPointsMatch(meshPoint, point);
@@ -248,8 +251,7 @@ export class Controller {
       if (!foundMesh) return;
       const clone = foundMesh.clone(type, null);
       if (!clone) return;
-      [clone.position.z, clone.position.x] = findByPoint({
-        get: "position",
+      [clone.position.z, clone.position.x] = getPositionFromPoint({
         point,
         externalMesh: true,
       });
