@@ -35,7 +35,7 @@ export default async function calcTurnAnimation({
   }
 
   //Animate Piece Movement
-  const animateZ = movingMesh.name === "Knight" ? false : true;
+  const animateZ = movingMesh.name === "Knight" ? true : false;
   const targetMesh = findMeshFromPoint(target)!;
   const meshes =
     turnHistory.type === "castle" ? [movingMesh, targetMesh] : [movingMesh];
@@ -92,7 +92,15 @@ function animateMeshMovement({
         });
       }
 
-      const frameRate = 1;
+      const frameRate = 1; // 1 second max to move across board
+      const ratePerSquare = 1 / 7;
+
+      const distanceX = Math.abs(targetPosition[1] - position[1]) / 3;
+      const directionX = targetPosition[1] - position[1] > 0 ? 1 : -1;
+      const distanceY = Math.abs(targetPosition[0] - position[0]) / 3;
+      const directionY = targetPosition[0] - position[0] > 0 ? 1 : -1;
+
+      //Create keyframes based on distance
 
       const myAnimX = new Animation(
         "moveSquaresX",
@@ -111,7 +119,6 @@ function animateMeshMovement({
         Animation.ANIMATIONLOOPMODE_CONSTANT,
         false
       );
-
       const myAnimZ = new Animation(
         "moveSquaresY",
         "position.y",
@@ -121,27 +128,25 @@ function animateMeshMovement({
         false
       );
 
-      const keyFramesX = [
-        {
-          frame: 0,
-          value: position[1],
-        },
-        {
-          frame: frameRate,
-          value: targetPosition[1],
-        },
-      ];
+      const keyFramesX = [{ frame: 0, value: position[1] }];
+      keyFramesX.push(
+        ...Array.from({ length: distanceX }, (_, i) => {
+          return {
+            frame: ratePerSquare * (i + 1),
+            value: position[1] + directionX * (3 * (i + 1)),
+          };
+        })
+      );
 
-      const keyFramesY = [
-        {
-          frame: 0,
-          value: position[0],
-        },
-        {
-          frame: frameRate,
-          value: targetPosition[0],
-        },
-      ];
+      const keyFramesY = [{ frame: 0, value: position[0] }];
+      keyFramesY.push(
+        ...Array.from({ length: distanceY }, (_, i) => {
+          return {
+            frame: ratePerSquare * (i + 1),
+            value: position[0] + directionY * (3 * (i + 1)),
+          };
+        })
+      );
 
       const keyFramesZ = [
         {
@@ -162,17 +167,18 @@ function animateMeshMovement({
       myAnimY.setKeys(keyFramesY);
       myAnimZ.setKeys(keyFramesZ);
 
-      const animations = animateZ
-        ? [myAnimX, myAnimY]
-        : [myAnimX, myAnimY, myAnimZ];
+      const finalAnimations = [];
+      if (keyFramesX.length > 1) finalAnimations.push(myAnimX);
+      if (keyFramesY.length > 1) finalAnimations.push(myAnimY);
+      if (animateZ) finalAnimations.push(myAnimZ);
 
       gameScene.scene.beginDirectAnimation(
         mesh,
-        animations,
+        finalAnimations,
         0,
-        frameRate,
+        2,
         false,
-        undefined,
+        1,
         () => {
           const lastMesh = meshes.length - 1 === i;
           if (lastMesh) resolve();
