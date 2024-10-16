@@ -92,18 +92,17 @@ function animateMeshMovement({
         });
       }
 
-      const frameRate = 1; // 1 second max to move across board
-      const ratePerSquare = 1 / 7;
-      const distancePerSquare = 3;
-      const distanceX =
-        Math.abs(targetPosition[1] - position[1]) / distancePerSquare;
+      const frameRate = 60; // 60 frames per second to move across board
+      const ratePerSquare = frameRate / 7;
+      const distancePerSquare = 3; //3 world position units per square
+      const [originY, originX] = position;
+      const [targetY, targetX] = targetPosition;
+      const squareDistanceX = Math.abs(targetX - originX) / distancePerSquare;
       const directionX = targetPosition[1] - position[1] > 0 ? 1 : -1;
-      const distanceY =
-        Math.abs(targetPosition[0] - position[0]) / distancePerSquare;
-      const directionY = targetPosition[0] - position[0] > 0 ? 1 : -1;
+      const squareDistanceY = Math.abs(targetY - originY) / distancePerSquare;
+      const directionY = targetY - originY > 0 ? 1 : -1;
 
       //Create keyframes based on distance
-
       const myAnimX = new Animation(
         "moveSquaresX",
         "position.x",
@@ -130,27 +129,21 @@ function animateMeshMovement({
         false
       );
 
-      const keyFramesX = [
-        { frame: 0, value: position[1] },
-        ...Array.from({ length: distanceX }, (_, i) => {
-          const distanceToMove = directionX * distancePerSquare * (i + 1); //3 units per square
-          return {
-            frame: ratePerSquare * (i + 1),
-            value: position[1] + distanceToMove,
-          };
-        }),
-      ];
+      const keyFramesX = Array.from({ length: squareDistanceX + 1 }, (_, i) => {
+        const distanceToMove = directionX * distancePerSquare * i;
+        return {
+          frame: ratePerSquare * i,
+          value: originX + distanceToMove,
+        };
+      });
 
-      const keyFramesY = [
-        { frame: 0, value: position[0] },
-        ...Array.from({ length: distanceY }, (_, i) => {
-          const distanceToMove = directionY * distancePerSquare * (i + 1); //3 units per square
-          return {
-            frame: ratePerSquare * (i + 1),
-            value: position[0] + distanceToMove,
-          };
-        }),
-      ];
+      const keyFramesY = Array.from({ length: squareDistanceY + 1 }, (_, i) => {
+        const distanceToMove = directionY * distancePerSquare * i;
+        return {
+          frame: ratePerSquare * i,
+          value: originY + distanceToMove,
+        };
+      });
 
       //If knight, animate z
       const keyFramesZ = [
@@ -159,8 +152,16 @@ function animateMeshMovement({
           value: 0.5,
         },
         {
+          frame: ratePerSquare / 2,
+          value: 2.5,
+        },
+        {
           frame: ratePerSquare,
           value: 5,
+        },
+        {
+          frame: ratePerSquare * 1.5,
+          value: 2.5,
         },
         {
           frame: ratePerSquare * 2,
@@ -181,7 +182,7 @@ function animateMeshMovement({
         mesh,
         finalAnimations,
         0,
-        2,
+        frameRate,
         false,
         1,
         () => {
