@@ -58,7 +58,9 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
     return team[0] as TEAM;
   }
 
-  isCurrentPlayersPiece(piece: GamePiece) {
+  isCurrentPlayersPiece(point: Point) {
+    const piece = this.getGame().lookupPiece({ point });
+    if (!piece) return false;
     return piece.team === this.getPlayerTeam();
   }
 

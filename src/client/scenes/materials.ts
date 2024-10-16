@@ -1,42 +1,47 @@
+import { Texture } from "@babylonjs/core";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Scene } from "@babylonjs/core/scene";
+import noiseUrl from "../../../assets/space/noise.png";
 
-const materials = [
-  {
-    name: "piece",
-    diffuseColor: new Color3(0, 1, 0.2),
-    specularColor: new Color3(0.15, 0.15, 0.15),
-  },
-  {
-    name: "movement",
-    diffuseColor: new Color3(1, 0.64, 0),
-    specularColor: new Color3(0.15, 0.15, 0.15),
-  },
-  {
-    name: "capture",
-    diffuseColor: new Color3(1, 0, 0),
-    specularColor: new Color3(0.15, 0.15, 0.15),
-  },
-  {
-    name: "enPassant",
-    diffuseColor: new Color3(1, 0, 1),
-    specularColor: new Color3(0.15, 0.15, 0.15),
-  },
-  {
-    name: "castle",
-    diffuseColor: new Color3(0, 0.2, 0.8),
-    specularColor: new Color3(0.15, 0.15, 0.15),
-  },
-];
+function createMovementMaterials(scene: Scene) {
+  const texture = new Texture(noiseUrl, scene);
 
-function createMovementMaterials(scene: Scene): void {
-  materials.forEach((material) => {
-    const { name, diffuseColor, specularColor } = material;
-    const mat = new StandardMaterial(name, scene);
-    mat.diffuseColor = diffuseColor;
-    mat.specularColor = specularColor;
-  });
+  const pieceMaterial = new StandardMaterial("piece", scene);
+  pieceMaterial.diffuseColor = new Color3(0, 1, 0.2);
+  pieceMaterial.specularColor = new Color3(0.15, 0.15, 0.15);
+
+  const movementMaterial = new StandardMaterial("movement", scene);
+  movementMaterial.diffuseColor = new Color3(1, 0.64, 0);
+  movementMaterial.specularColor = new Color3(0.15, 0.15, 0.15);
+  movementMaterial.diffuseTexture = texture;
+
+  const captureMaterial = new StandardMaterial("capture", scene);
+  captureMaterial.diffuseColor = new Color3(1, 0, 0);
+  captureMaterial.specularColor = new Color3(0.15, 0.15, 0.15);
+  captureMaterial.diffuseTexture = texture;
+
+  const enPassantMaterial = new StandardMaterial("enPassant", scene);
+  enPassantMaterial.diffuseColor = new Color3(1, 0, 1);
+  enPassantMaterial.specularColor = new Color3(0.15, 0.15, 0.15);
+  enPassantMaterial.diffuseTexture = texture;
+
+  const castleMaterial = new StandardMaterial("castle", scene);
+  castleMaterial.diffuseColor = new Color3(0, 0.2, 0.8);
+  castleMaterial.specularColor = new Color3(0.15, 0.15, 0.15);
+  castleMaterial.diffuseTexture = texture;
+
+  const squareMaterial = new StandardMaterial("square", scene);
+  squareMaterial.alpha = 0;
+
+  return {
+    pieceMaterial,
+    movementMaterial,
+    captureMaterial,
+    enPassantMaterial,
+    castleMaterial,
+    squareMaterial,
+  };
 }
 
 type Materials = {

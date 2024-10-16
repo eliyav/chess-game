@@ -35,34 +35,22 @@ export const createGameScene = async (
   const light = new HemisphericLight("light", new Vector3(0, 100, 0), scene);
   light.intensity = 0.2;
 
-  const pointLight = new PointLight(
-    "pointLight",
-    new Vector3(15, 20, 0),
-    scene
-  );
-  const pointLight2 = new PointLight(
-    "pointLight2",
-    new Vector3(-15, 20, 0),
-    scene
-  );
-  pointLight.intensity = 0.5;
-  pointLight2.intensity = 0.5;
+  const pointLight = new PointLight("pointLight", new Vector3(0, 20, 0), scene);
 
   const shadowGenerator = new ShadowGenerator(2048, pointLight);
-  const shadowGenerator2 = new ShadowGenerator(2048, pointLight2);
 
   createCelestialSphere(scene);
-  createMovementMaterials(scene);
-  createMeshMaterials(scene);
+  const meshMaterials = createMeshMaterials(scene);
+  const movementMaterials = createMovementMaterials(scene);
 
-  await loadGameAssets(scene);
+  await loadGameAssets({ scene, meshMaterials, movementMaterials });
 
   const gameScene: GameScene = {
     scene,
     data: {
       meshesToRender: [],
       animationsContainer: await createAnimations(scene),
-      shadowGenerator: [shadowGenerator, shadowGenerator2],
+      shadowGenerator: [shadowGenerator],
       audio: {},
     },
   };

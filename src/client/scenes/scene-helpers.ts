@@ -35,26 +35,25 @@ const highlightValidMoves = ({
   visibleMoves: boolean;
 }) => {
   const [point, type] = move;
-  const plane = MeshBuilder.CreatePlane(`plane`, {
-    width: 2.5,
-    height: 2.5,
+  const disc = MeshBuilder.CreateDisc(`disc`, {
+    radius: 1.1,
   });
-  const [z, x] = findByPoint({
-    get: "position",
+  disc.isPickable = false;
+  const [z, x] = getPositionFromPoint({
     point,
     externalMesh: false,
   });
-  plane.setPositionWithLocalVector(new Vector3(x, Y_ABOVE_FLOOR, z));
-  plane.rotation = new Vector3(Math.PI / 2, 0, 0);
+  disc.setPositionWithLocalVector(new Vector3(x, Y_ABOVE_FLOOR, z));
+  disc.rotation = new Vector3(Math.PI / 2, 0, 0);
   const material = findMaterial(type, gameScene.scene);
   if (material) {
     if (!visibleMoves) {
       material.alpha = 0;
     }
-    plane.material = material;
+    disc.material = material;
   }
 
-  gameScene.data.meshesToRender.push(plane);
+  gameScene.data.meshesToRender.push(disc);
 };
 
 const highlightPiece = ({
@@ -69,8 +68,8 @@ const highlightPiece = ({
     thickness: 0.2,
     tessellation: 16,
   });
-  const [z, x] = findByPoint({
-    get: "position",
+  torus.isPickable = false;
+  const [z, x] = getPositionFromPoint({
     point: move,
     externalMesh: false,
   });
@@ -86,29 +85,34 @@ const findMaterial = (name: string, scene: Scene) => {
   return scene.materials.find((mat: Material) => mat.id === name);
 };
 
-export const findByPoint = ({
-  get,
+export const getPointFromPosition = ({
+  position,
+  externalMesh,
+}: {
+  position: Point;
+  externalMesh: boolean;
+}): Point => {
+  const [x, y] = position;
+  const pointX = pointIndexMap.get(x)!;
+  const pointY = pointIndexMap.get(y)!;
+  //External Meshes have flipped Y coordinates on canvas from blender import
+  const finalY = externalMesh ? pointY.externalY : pointY.y;
+  const result: Point = [pointX.x, finalY];
+  return result;
+};
+
+export const getPositionFromPoint = ({
   point,
   externalMesh,
 }: {
-  get: "index" | "position";
   point: Point;
   externalMesh: boolean;
 }) => {
-  try {
-    const [x, y] = point;
-    const map = get === "index" ? pointIndexMap : pointPositionMap;
-    const positionX = map.get(x);
-    const positionY = map.get(y);
-    if (!positionX || !positionY) {
-      throw new Error("Invalid position");
-    }
-    //External Meshes have flipped Y coordinates on canvas from blender import
-    const finalY = externalMesh ? positionY.externalY : positionY.y;
-    const result: Point = [positionX.x, finalY];
-    return result;
-  } catch (error) {
-    console.error(error);
-    return point;
-  }
+  const [x, y] = point;
+  const positionX = pointPositionMap.get(x)!;
+  const positionY = pointPositionMap.get(y)!;
+  //External Meshes have flipped Y coordinates on canvas from blender import
+  const finalY = externalMesh ? positionY.externalY : positionY.y;
+  const result: Point = [positionX.x, finalY];
+  return result;
 };

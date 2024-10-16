@@ -4,17 +4,21 @@ import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
 import type { Nullable } from "@babylonjs/core/types";
 import { GAMESTATUS, Point, TurnHistory } from "../../shared/game";
 import { ControllerOptions, LOBBY_TYPE } from "../../shared/match";
+import { APP_ROUTES } from "../../shared/routes";
 import { Message } from "../components/modals/message-modal";
 import GamePiece from "../game-logic/game-piece";
 import { doPointsMatch } from "../game-logic/moves";
 import { rotateCamera } from "../scenes/animation/camera";
 import calcTurnAnimation from "../scenes/animation/turn-animation";
-import { displayPieceMoves, findByPoint } from "../scenes/scene-helpers";
+import {
+  displayPieceMoves,
+  getPointFromPosition,
+  getPositionFromPoint,
+} from "../scenes/scene-helpers";
 import { GameScene, SceneManager, Scenes } from "../scenes/scene-manager";
+import { websocket } from "../websocket-client";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
-import { APP_ROUTES } from "../../shared/routes";
-import { websocket } from "../websocket-client";
 
 export class Controller {
   sceneManager: SceneManager;
@@ -55,28 +59,37 @@ export class Controller {
   }
 
   subscribeGameInput(gameScene: GameScene) {
-    gameScene.scene.onPointerUp = async (
+    gameScene.scene.onPointerDown = async (
       e: IPointerEvent,
       pickResult: Nullable<PickingInfo>
     ) => {
       if (!this.match.isPlayersTurn()) return;
       const pickedMesh = pickResult?.pickedMesh;
       if (!pickedMesh) return;
-      const externalMesh = pickedMesh.metadata !== null;
-      const point = this.match.getMeshGamePoint(pickedMesh, externalMesh);
-      const piece = this.match.lookupGamePiece(pickedMesh, true);
-      //If no selection
+      const point = getPointFromPosition({
+        position: [pickedMesh.position.z, pickedMesh.position.x],
+        externalMesh: false,
+      });
+      //If no point selected
       if (!this.selectedPoint) {
-        return this.displayMoves(point, piece);
+        const currentPlayersPiece = this.match.isCurrentPlayersPiece(point);
+        if (!currentPlayersPiece) return;
+        this.selectedPoint = point;
+        return this.displayMoves(point);
       } else {
         //If you select the same piece as before deselect it
         if (doPointsMatch(this.selectedPoint, point)) {
-          return this.unselectCurrentPiece();
+          this.selectedPoint = undefined;
+          this.updateMeshesRender();
+          return;
         } else {
           //If you select a different piece check if its a valid move and resolve or display new moves
           const validMove = await this.move([this.selectedPoint, point]);
           if (!validMove) {
-            return this.displayMoves(point, piece);
+            const currentPlayersPiece = this.match.isCurrentPlayersPiece(point);
+            if (!currentPlayersPiece) return;
+            this.selectedPoint = point;
+            return this.displayMoves(point);
           }
         }
       }
@@ -122,16 +135,12 @@ export class Controller {
     }
   }
 
-  displayMoves(point: Point, piece: GamePiece | undefined) {
+  displayMoves(point: Point) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
-    if (!piece) return;
-    const currentPlayersPiece = this.match.isCurrentPlayersPiece(piece);
-    if (!currentPlayersPiece) return;
     if (this.options.playGameSounds) {
       gameScene.data.audio.select?.play();
     }
-    const moves = this.match.getMoves(piece, point);
-    this.selectedPoint = point;
+    const moves = this.match.getMoves(point);
     this.updateMeshesRender();
     displayPieceMoves({
       point,
@@ -139,11 +148,6 @@ export class Controller {
       gameScene,
       visibleMoves: this.options.displayAvailableMoves,
     });
-  }
-
-  unselectCurrentPiece() {
-    this.selectedPoint = undefined;
-    this.updateMeshesRender();
   }
 
   createMatchEndPrompt() {
@@ -212,9 +216,8 @@ export class Controller {
   findMeshFromPoint(point: Point) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     return gameScene.data.meshesToRender.find((mesh) => {
-      const meshPoint = findByPoint({
-        get: "index",
-        point: [mesh.position.z, mesh.position.x],
+      const meshPoint = getPointFromPosition({
+        position: [mesh.position.z, mesh.position.x],
         externalMesh: true,
       });
       return doPointsMatch(meshPoint, point);
@@ -248,12 +251,12 @@ export class Controller {
       if (!foundMesh) return;
       const clone = foundMesh.clone(type, null);
       if (!clone) return;
-      [clone.position.z, clone.position.x] = findByPoint({
-        get: "position",
+      [clone.position.z, clone.position.x] = getPositionFromPoint({
         point,
         externalMesh: true,
       });
       clone.isVisible = true;
+      clone.isPickable = false;
       if (this.options.renderShadows) {
         gameScene.data.shadowGenerator.forEach((gen) =>
           gen.addShadowCaster(clone)

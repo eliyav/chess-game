@@ -318,16 +318,15 @@ class Game {
   }
 
   public getMoves({
-    piece,
     point,
     grid = this.current.grid,
     skipResolveCheck,
   }: {
-    piece: GamePiece | undefined;
     point: Point;
     grid?: Grid;
     skipResolveCheck?: boolean;
   }): Move[] {
+    const piece = this.lookupPiece({ point });
     if (!piece) return [];
     const { type, team, moved } = piece;
     const lastTurnHistory = this.current.turnHistory.at(-1);
@@ -356,9 +355,8 @@ class Game {
     grid: Grid;
   }) {
     const piece = this.lookupPiece({ grid, point: origin });
-    if (!piece) return;
+    if (!piece || piece.team !== this.getCurrentTeam()) return;
     const availableMoves = this.getMoves({
-      piece,
       point: origin,
       grid,
     });
@@ -416,9 +414,8 @@ class Game {
       return piece?.team === this.getCurrentTeamsOpponent();
     });
     const opponentsAvailableMoves = opponentsPieces
-      .map(({ piece, point }) =>
+      .map(({ point }) =>
         this.getMoves({
-          piece,
           point,
           grid,
           skipResolveCheck: true,
@@ -439,9 +436,8 @@ class Game {
     );
     //For each piece, iterate on its available moves
     const anyAvailableMoves = currentPlayerPieces
-      .map(({ piece, point }) => {
+      .map(({ point }) => {
         return this.getMoves({
-          piece,
           point,
           grid,
         });
