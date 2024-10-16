@@ -355,7 +355,7 @@ class Game {
     grid: Grid;
   }) {
     const piece = this.lookupPiece({ grid, point: origin });
-    if (!piece) return;
+    if (!piece || piece.team !== this.getCurrentTeam()) return;
     const availableMoves = this.getMoves({
       point: origin,
       grid,

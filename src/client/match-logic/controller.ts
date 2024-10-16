@@ -70,10 +70,10 @@ export class Controller {
         position: [pickedMesh.position.z, pickedMesh.position.x],
         externalMesh: false,
       });
-      //If no selection
-      console.log("point", point);
-      console.log(this.selectedPoint);
+      //If no point selected
       if (!this.selectedPoint) {
+        const currentPlayersPiece = this.match.isCurrentPlayersPiece(point);
+        if (!currentPlayersPiece) return;
         this.selectedPoint = point;
         return this.displayMoves(point);
       } else {
@@ -86,6 +86,8 @@ export class Controller {
           //If you select a different piece check if its a valid move and resolve or display new moves
           const validMove = await this.move([this.selectedPoint, point]);
           if (!validMove) {
+            const currentPlayersPiece = this.match.isCurrentPlayersPiece(point);
+            if (!currentPlayersPiece) return;
             this.selectedPoint = point;
             return this.displayMoves(point);
           }
@@ -135,8 +137,6 @@ export class Controller {
 
   displayMoves(point: Point) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
-    const currentPlayersPiece = this.match.isCurrentPlayersPiece(point);
-    if (!currentPlayersPiece) return;
     if (this.options.playGameSounds) {
       gameScene.data.audio.select?.play();
     }
