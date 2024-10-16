@@ -36,7 +36,7 @@ const highlightValidMoves = ({
 }) => {
   const [point, type] = move;
   const disc = MeshBuilder.CreateDisc(`disc`, {
-    radius: 1,
+    radius: 1.1,
   });
   disc.isPickable = false;
   const [z, x] = getPositionFromPoint({
