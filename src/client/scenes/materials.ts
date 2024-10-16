@@ -34,6 +34,11 @@ function createMovementMaterials(scene: Scene) {
   const squareMaterial = new StandardMaterial("square", scene);
   squareMaterial.alpha = 0;
 
+  const previousTurnMaterial = new StandardMaterial("previousTurn", scene);
+  previousTurnMaterial.diffuseColor = new Color3(0.5, 0.5, 0.5);
+  previousTurnMaterial.specularColor = new Color3(0.15, 0.15, 0.15);
+  previousTurnMaterial.diffuseTexture = texture;
+
   return {
     pieceMaterial,
     movementMaterial,
@@ -41,6 +46,7 @@ function createMovementMaterials(scene: Scene) {
     enPassantMaterial,
     castleMaterial,
     squareMaterial,
+    previousTurnMaterial,
   };
 }
 

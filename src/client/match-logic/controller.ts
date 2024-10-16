@@ -6,14 +6,14 @@ import { GAMESTATUS, Point, TurnHistory } from "../../shared/game";
 import { ControllerOptions, LOBBY_TYPE } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
 import { Message } from "../components/modals/message-modal";
-import GamePiece from "../game-logic/game-piece";
 import { doPointsMatch } from "../game-logic/moves";
 import { rotateCamera } from "../scenes/animation/camera";
 import calcTurnAnimation from "../scenes/animation/turn-animation";
 import {
-  displayPieceMoves,
+  createMovementDisc,
   getPointFromPosition,
   getPositionFromPoint,
+  showMoves,
 } from "../scenes/scene-helpers";
 import { GameScene, SceneManager, Scenes } from "../scenes/scene-manager";
 import { websocket } from "../websocket-client";
@@ -59,7 +59,7 @@ export class Controller {
   }
 
   subscribeGameInput(gameScene: GameScene) {
-    gameScene.scene.onPointerDown = async (
+    gameScene.scene.onPointerUp = async (
       e: IPointerEvent,
       pickResult: Nullable<PickingInfo>
     ) => {
@@ -127,12 +127,44 @@ export class Controller {
   prepNextView() {
     this.selectedPoint = undefined;
     this.updateMeshesRender();
+    //Show previous turn
+    this.displayLastTurn();
     const isGameOver = this.match.isGameOver();
     if (isGameOver) {
       this.events.setMessage(this.createMatchEndPrompt());
     } else {
       this.rotateCamera();
     }
+  }
+
+  displayLastTurn() {
+    const gameScene = this.sceneManager.getScene(Scenes.GAME);
+    const name = "disc-previousTurn";
+    //Clear old discs
+    gameScene.scene.meshes.forEach((mesh) => {
+      if (mesh.name === name) {
+        gameScene.scene.removeMesh(mesh);
+        mesh.dispose();
+      }
+    });
+    const lastTurn = this.match.getGameHistory().at(-1);
+    if (!lastTurn) return;
+    const { origin, target } = lastTurn;
+    //Plane in both locations
+    const originDisc = createMovementDisc({
+      point: origin,
+      gameScene,
+      type: "previousTurn",
+      name,
+    });
+    const targetDisc = createMovementDisc({
+      point: target,
+      gameScene,
+      type: "previousTurn",
+      name,
+    });
+    gameScene.scene.addMesh(originDisc);
+    gameScene.scene.addMesh(targetDisc);
   }
 
   displayMoves(point: Point) {
@@ -142,7 +174,7 @@ export class Controller {
     }
     const moves = this.match.getMoves(point);
     this.updateMeshesRender();
-    displayPieceMoves({
+    showMoves({
       point,
       moves,
       gameScene,
@@ -239,6 +271,7 @@ export class Controller {
         mesh.dispose();
       }
       gameScene.data.meshesToRender = [];
+      this.displayLastTurn();
     }
 
     //For each active piece, creates a mesh clone and places on board

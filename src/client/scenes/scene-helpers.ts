@@ -8,7 +8,7 @@ import { GameScene } from "./scene-manager";
 
 const Y_ABOVE_FLOOR = 0.51;
 
-export const displayPieceMoves = ({
+export const showMoves = ({
   point,
   moves,
   gameScene,
@@ -19,44 +19,17 @@ export const displayPieceMoves = ({
   gameScene: GameScene;
   visibleMoves: boolean;
 }) => {
-  highlightPiece({ move: point, gameScene });
-  moves.forEach((move) => {
-    highlightValidMoves({ move, gameScene, visibleMoves });
-  });
-};
-
-const highlightValidMoves = ({
-  move,
-  gameScene,
-  visibleMoves,
-}: {
-  move: Move;
-  gameScene: GameScene;
-  visibleMoves: boolean;
-}) => {
-  const [point, type] = move;
-  const disc = MeshBuilder.CreateDisc(`disc`, {
-    radius: 1.1,
-  });
-  disc.isPickable = false;
-  const [z, x] = getPositionFromPoint({
-    point,
-    externalMesh: false,
-  });
-  disc.setPositionWithLocalVector(new Vector3(x, Y_ABOVE_FLOOR, z));
-  disc.rotation = new Vector3(Math.PI / 2, 0, 0);
-  const material = findMaterial(type, gameScene.scene);
-  if (material) {
-    if (!visibleMoves) {
-      material.alpha = 0;
-    }
-    disc.material = material;
+  showSelectedPiece({ move: point, gameScene });
+  if (visibleMoves) {
+    moves.forEach((move) => {
+      const [point, type] = move;
+      const disc = createMovementDisc({ point, gameScene, type });
+      gameScene.data.meshesToRender.push(disc);
+    });
   }
-
-  gameScene.data.meshesToRender.push(disc);
 };
 
-const highlightPiece = ({
+const showSelectedPiece = ({
   move,
   gameScene,
 }: {
@@ -115,4 +88,32 @@ export const getPositionFromPoint = ({
   const finalY = externalMesh ? positionY.externalY : positionY.y;
   const result: Point = [positionX.x, finalY];
   return result;
+};
+
+export const createMovementDisc = ({
+  point,
+  gameScene,
+  type,
+  name,
+}: {
+  point: Point;
+  gameScene: GameScene;
+  type: string;
+  name?: string;
+}) => {
+  const [z, x] = getPositionFromPoint({
+    point,
+    externalMesh: false,
+  });
+  const disc = MeshBuilder.CreateDisc(name || "disc", {
+    radius: 1.1,
+  });
+  disc.isPickable = false;
+  disc.setPositionWithLocalVector(new Vector3(x, Y_ABOVE_FLOOR, z));
+  disc.rotation = new Vector3(Math.PI / 2, 0, 0);
+  const material = findMaterial(type, gameScene.scene);
+  if (material) {
+    disc.material = material;
+  }
+  return disc;
 };
