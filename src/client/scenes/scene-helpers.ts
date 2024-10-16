@@ -7,6 +7,7 @@ import { pointIndexMap, pointPositionMap } from "../data/point-map-data";
 import { GameScene } from "./scene-manager";
 
 const Y_ABOVE_FLOOR = 0.51;
+const Y_ABOVE_FLOOR_EXTENDED = 0.55;
 
 export const showMoves = ({
   point,
@@ -109,7 +110,12 @@ export const createMovementDisc = ({
     radius: 1.1,
   });
   disc.isPickable = false;
-  disc.setPositionWithLocalVector(new Vector3(x, Y_ABOVE_FLOOR, z));
+  //Needed so previous turn marker wont be above display moves
+  if (type === "previousTurn") {
+    disc.setPositionWithLocalVector(new Vector3(x, Y_ABOVE_FLOOR, z));
+  } else {
+    disc.setPositionWithLocalVector(new Vector3(x, Y_ABOVE_FLOOR_EXTENDED, z));
+  }
   disc.rotation = new Vector3(Math.PI / 2, 0, 0);
   const material = findMaterial(type, gameScene.scene);
   if (material) {
