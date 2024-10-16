@@ -46,6 +46,8 @@ class Game {
   private nextTurn() {
     if (this.isCheckmate({ grid: this.current.grid })) {
       this.current.status = GAMESTATUS.CHECKMATE;
+    } else if (this.isStalemate({ grid: this.current.grid })) {
+      this.current.status = GAMESTATUS.STALEMATE;
     }
   }
 
@@ -62,7 +64,7 @@ class Game {
     target: Point;
     grid?: Grid;
   }) {
-    if (this.current.status === GAMESTATUS.CHECKMATE) return;
+    if (this.current.status !== GAMESTATUS.INPROGRESS) return;
     const move = this.findMove({ grid, origin, target });
     if (!move) return;
     const resolved = this.resolveBoard({
@@ -452,6 +454,28 @@ class Game {
       .flat();
     //If you have available moves, you are not in checkmate so return false
     return anyAvailableMoves.length ? false : true;
+  }
+
+  private isStalemate({ grid }: { grid: Grid }) {
+    //Find teams current pieces
+    const currentPlayerPieces = this.getAllPieces(grid).filter(
+      ({ piece }) => piece?.team === this.getCurrentTeam()
+    );
+    //For each piece, iterate on its available moves
+    const anyAvailableMoves = currentPlayerPieces
+      .map(({ point }) => {
+        return this.getMoves({
+          point,
+          grid,
+        });
+      })
+      .flat();
+    const playerInCheck = this.isChecked({
+      team: this.getCurrentTeam(),
+      grid,
+    });
+    //If you have no available moves, and you are not checked, you are in stalemate
+    return anyAvailableMoves.length === 0 && !playerInCheck ? true : false;
   }
 
   private checkPromotion({ piece, point }: { piece: GamePiece; point: Point }) {
