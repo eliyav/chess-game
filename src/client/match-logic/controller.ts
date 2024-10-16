@@ -59,28 +59,35 @@ export class Controller {
   }
 
   subscribeGameInput(gameScene: GameScene) {
-    gameScene.scene.onPointerUp = async (
+    gameScene.scene.onPointerDown = async (
       e: IPointerEvent,
       pickResult: Nullable<PickingInfo>
     ) => {
       if (!this.match.isPlayersTurn()) return;
       const pickedMesh = pickResult?.pickedMesh;
       if (!pickedMesh) return;
-      const externalMesh = pickedMesh.metadata !== null;
-      const point = this.match.getMeshGamePoint(pickedMesh, externalMesh);
-      const piece = this.match.lookupGamePiece(pickedMesh, true);
+      const point = getPointFromPosition({
+        position: [pickedMesh.position.z, pickedMesh.position.x],
+        externalMesh: false,
+      });
       //If no selection
+      console.log("point", point);
+      console.log(this.selectedPoint);
       if (!this.selectedPoint) {
-        return this.displayMoves(point, piece);
+        this.selectedPoint = point;
+        return this.displayMoves(point);
       } else {
         //If you select the same piece as before deselect it
         if (doPointsMatch(this.selectedPoint, point)) {
-          return this.unselectCurrentPiece();
+          this.selectedPoint = undefined;
+          this.updateMeshesRender();
+          return;
         } else {
           //If you select a different piece check if its a valid move and resolve or display new moves
           const validMove = await this.move([this.selectedPoint, point]);
           if (!validMove) {
-            return this.displayMoves(point, piece);
+            this.selectedPoint = point;
+            return this.displayMoves(point);
           }
         }
       }
@@ -126,16 +133,14 @@ export class Controller {
     }
   }
 
-  displayMoves(point: Point, piece: GamePiece | undefined) {
+  displayMoves(point: Point) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
-    if (!piece) return;
-    const currentPlayersPiece = this.match.isCurrentPlayersPiece(piece);
+    const currentPlayersPiece = this.match.isCurrentPlayersPiece(point);
     if (!currentPlayersPiece) return;
     if (this.options.playGameSounds) {
       gameScene.data.audio.select?.play();
     }
-    const moves = this.match.getMoves(piece, point);
-    this.selectedPoint = point;
+    const moves = this.match.getMoves(point);
     this.updateMeshesRender();
     displayPieceMoves({
       point,
@@ -143,11 +148,6 @@ export class Controller {
       gameScene,
       visibleMoves: this.options.displayAvailableMoves,
     });
-  }
-
-  unselectCurrentPiece() {
-    this.selectedPoint = undefined;
-    this.updateMeshesRender();
   }
 
   createMatchEndPrompt() {
@@ -256,6 +256,7 @@ export class Controller {
         externalMesh: true,
       });
       clone.isVisible = true;
+      clone.isPickable = false;
       if (this.options.renderShadows) {
         gameScene.data.shadowGenerator.forEach((gen) =>
           gen.addShadowCaster(clone)

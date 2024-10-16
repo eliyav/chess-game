@@ -38,7 +38,9 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
     return this.getGame().getCurrentTeam();
   }
 
-  isCurrentPlayersPiece(piece: GamePiece) {
+  isCurrentPlayersPiece(point: Point) {
+    const piece = this.getGame().lookupPiece({ point });
+    if (!piece) return false;
     return piece.team === this.getPlayerTeam();
   }
 }

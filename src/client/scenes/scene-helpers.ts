@@ -38,6 +38,7 @@ const highlightValidMoves = ({
   const disc = MeshBuilder.CreateDisc(`disc`, {
     radius: 1,
   });
+  disc.isPickable = false;
   const [z, x] = getPositionFromPoint({
     point,
     externalMesh: false,
@@ -67,6 +68,7 @@ const highlightPiece = ({
     thickness: 0.2,
     tessellation: 16,
   });
+  torus.isPickable = false;
   const [z, x] = getPositionFromPoint({
     point: move,
     externalMesh: false,
