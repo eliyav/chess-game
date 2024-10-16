@@ -35,25 +35,24 @@ const highlightValidMoves = ({
   visibleMoves: boolean;
 }) => {
   const [point, type] = move;
-  const plane = MeshBuilder.CreatePlane(`plane`, {
-    width: 2.5,
-    height: 2.5,
+  const disc = MeshBuilder.CreateDisc(`disc`, {
+    radius: 1,
   });
   const [z, x] = getPositionFromPoint({
     point,
     externalMesh: false,
   });
-  plane.setPositionWithLocalVector(new Vector3(x, Y_ABOVE_FLOOR, z));
-  plane.rotation = new Vector3(Math.PI / 2, 0, 0);
+  disc.setPositionWithLocalVector(new Vector3(x, Y_ABOVE_FLOOR, z));
+  disc.rotation = new Vector3(Math.PI / 2, 0, 0);
   const material = findMaterial(type, gameScene.scene);
   if (material) {
     if (!visibleMoves) {
       material.alpha = 0;
     }
-    plane.material = material;
+    disc.material = material;
   }
 
-  gameScene.data.meshesToRender.push(plane);
+  gameScene.data.meshesToRender.push(disc);
 };
 
 const highlightPiece = ({
