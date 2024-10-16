@@ -61,7 +61,7 @@ export class BaseMatch {
   }
 
   isGameOver() {
-    return this.game.getGameState().status === GAMESTATUS.CHECKMATE;
+    return this.game.getGameState().status !== GAMESTATUS.INPROGRESS;
   }
 
   getWinner() {

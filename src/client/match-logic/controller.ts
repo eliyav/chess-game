@@ -131,7 +131,8 @@ export class Controller {
     this.displayLastTurn();
     const isGameOver = this.match.isGameOver();
     if (isGameOver) {
-      this.events.setMessage(this.createMatchEndPrompt());
+      const status = this.match.getGame().getGameState().status;
+      this.events.setMessage(this.createMatchEndPrompt(status));
     } else {
       this.rotateCamera();
     }
@@ -182,10 +183,20 @@ export class Controller {
     });
   }
 
-  createMatchEndPrompt() {
-    const winningTeam = this.match.getWinner();
+  createMatchEndPrompt(status: GAMESTATUS) {
+    const text = (() => {
+      const winningTeam = this.match.getWinner();
+      switch (status) {
+        case GAMESTATUS.CHECKMATE:
+          return `Checkmate! ${winningTeam} team has won, would you like to play another game?`;
+        case GAMESTATUS.STALEMATE:
+          return "Game has ended in a stalemate, would you like to play another game?";
+        default:
+          return "Game Over! Would you like to play another game";
+      }
+    })();
     return {
-      text: `${winningTeam} team has won!, Would you like to play another game?`,
+      text,
       onConfirm: () => {
         this.requestMatchReset();
         this.events.setMessage(null);
