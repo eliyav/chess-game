@@ -1,27 +1,26 @@
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { PickingInfo } from "@babylonjs/core/Collisions/pickingInfo";
 import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Nullable } from "@babylonjs/core/types";
 import { GAMESTATUS, Point, TurnHistory } from "../../shared/game";
 import { ControllerOptions, LOBBY_TYPE } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
 import { Message } from "../components/modals/message-modal";
-import GamePiece from "../game-logic/game-piece";
 import { doPointsMatch } from "../game-logic/moves";
 import { rotateCamera } from "../scenes/animation/camera";
 import calcTurnAnimation from "../scenes/animation/turn-animation";
 import {
-  displayPieceMoves,
+  showMoves,
   getPointFromPosition,
   getPositionFromPoint,
+  createMovementDisc,
 } from "../scenes/scene-helpers";
 import { GameScene, SceneManager, Scenes } from "../scenes/scene-manager";
 import { websocket } from "../websocket-client";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { Color3, StandardMaterial } from "@babylonjs/core";
 
 export class Controller {
   sceneManager: SceneManager;
@@ -142,9 +141,10 @@ export class Controller {
 
   displayLastTurn() {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
+    const name = "disc-previousTurn";
     //Clear old discs
     gameScene.scene.meshes.forEach((mesh) => {
-      if (mesh.name === "lastTurn") {
+      if (mesh.name === name) {
         gameScene.scene.removeMesh(mesh);
         mesh.dispose();
       }
@@ -153,28 +153,18 @@ export class Controller {
     if (!lastTurn) return;
     const { origin, target } = lastTurn;
     //Plane in both locations
-    const originDisc = MeshBuilder.CreateDisc(`lastTurn`, {
-      radius: 1.1,
-    });
-    const targetDisc = MeshBuilder.CreateDisc(`lastTurn`, {
-      radius: 1.1,
-    });
-    const [originZ, originX] = getPositionFromPoint({
+    const originDisc = createMovementDisc({
       point: origin,
-      externalMesh: false,
+      gameScene,
+      type: "previousTurn",
+      name,
     });
-    const [targetZ, targetX] = getPositionFromPoint({
+    const targetDisc = createMovementDisc({
       point: target,
-      externalMesh: false,
+      gameScene,
+      type: "previousTurn",
+      name,
     });
-    originDisc.setPositionWithLocalVector(new Vector3(originX, 0.51, originZ));
-    targetDisc.setPositionWithLocalVector(new Vector3(targetX, 0.51, targetZ));
-    originDisc.rotation = new Vector3(Math.PI / 2, 0, 0);
-    targetDisc.rotation = new Vector3(Math.PI / 2, 0, 0);
-    originDisc.material =
-      gameScene.data.materials.movementMaterials.previousTurnMaterial;
-    targetDisc.material =
-      gameScene.data.materials.movementMaterials.previousTurnMaterial;
     gameScene.scene.addMesh(originDisc);
     gameScene.scene.addMesh(targetDisc);
   }
@@ -186,7 +176,7 @@ export class Controller {
     }
     const moves = this.match.getMoves(point);
     this.updateMeshesRender();
-    displayPieceMoves({
+    showMoves({
       point,
       moves,
       gameScene,

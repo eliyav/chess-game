@@ -23,21 +23,6 @@ export type GameScene = CustomScene<{
     select?: Sound;
     crumble?: Sound;
   };
-  materials: {
-    meshMaterials: {
-      white: StandardMaterial;
-      black: StandardMaterial;
-    };
-    movementMaterials: {
-      pieceMaterial: StandardMaterial;
-      movementMaterial: StandardMaterial;
-      captureMaterial: StandardMaterial;
-      enPassantMaterial: StandardMaterial;
-      castleMaterial: StandardMaterial;
-      squareMaterial: StandardMaterial;
-      previousTurnMaterial: StandardMaterial;
-    };
-  };
 }>;
 
 export const enum Scenes {
