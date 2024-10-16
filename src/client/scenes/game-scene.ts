@@ -13,12 +13,6 @@ import { createCelestialSphere } from "./celestial-shere/celestial-sphere";
 import { loadGameAssets } from "./game-assets";
 import { createMeshMaterials, createMovementMaterials } from "./materials";
 import { GameScene } from "./scene-manager";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
-import { Point } from "../../shared/game";
-import { Material } from "@babylonjs/core/Materials/material";
-import { Color3 } from "@babylonjs/core/Maths/math";
-import { StandardMaterial } from "@babylonjs/core";
-import { getPositionFromPoint } from "./scene-helpers";
 
 export const createGameScene = async (
   canvas: HTMLCanvasElement,
@@ -58,32 +52,10 @@ export const createGameScene = async (
   const shadowGenerator2 = new ShadowGenerator(2048, pointLight2);
 
   createCelestialSphere(scene);
-  createMovementMaterials(scene);
-  createMeshMaterials(scene);
+  const meshMaterials = createMeshMaterials(scene);
+  const movementMaterials = createMovementMaterials(scene);
 
-  const chessBoardPoints: Point[] = [];
-  for (let x = 0; x < 8; x++) {
-    for (let z = 0; z < 8; z++) {
-      chessBoardPoints.push([x, z]);
-    }
-  }
-
-  chessBoardPoints.forEach((point) => {
-    const plane = MeshBuilder.CreatePlane(`plane`, {
-      size: 2.8,
-    });
-    const [z, x] = getPositionFromPoint({
-      point,
-      externalMesh: false,
-    });
-    plane.setPositionWithLocalVector(new Vector3(x, 0.51, z));
-    plane.rotation = new Vector3(Math.PI / 2, 0, 0);
-    plane.material = new StandardMaterial("planeMaterial", scene);
-    plane.material.alpha = 0;
-    scene.addMesh(plane);
-  });
-
-  await loadGameAssets(scene);
+  await loadGameAssets({ scene, meshMaterials, movementMaterials });
 
   const gameScene: GameScene = {
     scene,

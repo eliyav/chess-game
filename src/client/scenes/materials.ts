@@ -4,7 +4,7 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Scene } from "@babylonjs/core/scene";
 import noiseUrl from "../../../assets/space/noise.png";
 
-function createMovementMaterials(scene: Scene): void {
+function createMovementMaterials(scene: Scene) {
   const texture = new Texture(noiseUrl, scene);
 
   const pieceMaterial = new StandardMaterial("piece", scene);
@@ -30,6 +30,18 @@ function createMovementMaterials(scene: Scene): void {
   castleMaterial.diffuseColor = new Color3(0, 0.2, 0.8);
   castleMaterial.specularColor = new Color3(0.15, 0.15, 0.15);
   castleMaterial.diffuseTexture = texture;
+
+  const squareMaterial = new StandardMaterial("square", scene);
+  squareMaterial.alpha = 0;
+
+  return {
+    pieceMaterial,
+    movementMaterial,
+    captureMaterial,
+    enPassantMaterial,
+    castleMaterial,
+    squareMaterial,
+  };
 }
 
 type Materials = {
