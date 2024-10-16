@@ -13,6 +13,7 @@ import { createCelestialSphere } from "./celestial-shere/celestial-sphere";
 import { loadGameAssets } from "./game-assets";
 import { createMeshMaterials, createMovementMaterials } from "./materials";
 import { GameScene } from "./scene-manager";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 
 export const createGameScene = async (
   canvas: HTMLCanvasElement,
@@ -36,8 +37,20 @@ export const createGameScene = async (
   light.intensity = 0.2;
 
   const pointLight = new PointLight("pointLight", new Vector3(0, 20, 0), scene);
+  const pointLight2 = new PointLight(
+    "pointLight2",
+    new Vector3(-30, 5, 0),
+    scene
+  );
+  const pointLight3 = new PointLight(
+    "pointLight3",
+    new Vector3(30, 5, 0),
+    scene
+  );
+  pointLight2.intensity = 0.25;
+  pointLight3.intensity = 0.25;
 
-  const shadowGenerator = new ShadowGenerator(2048, pointLight);
+  const shadowGenerator = new ShadowGenerator(4096, pointLight);
 
   createCelestialSphere(scene);
   const meshMaterials = createMeshMaterials(scene);
