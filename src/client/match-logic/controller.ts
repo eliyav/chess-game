@@ -223,7 +223,6 @@ export class Controller {
 
   resetView() {
     this.updateMeshesRender();
-    this.displayLastTurn();
     if (this.match.lobby.mode === LOBBY_TYPE.LOCAL) {
       this.rotateCamera();
     } else {
@@ -272,6 +271,7 @@ export class Controller {
         mesh.dispose();
       }
       gameScene.data.meshesToRender = [];
+      this.displayLastTurn();
     }
 
     //For each active piece, creates a mesh clone and places on board
