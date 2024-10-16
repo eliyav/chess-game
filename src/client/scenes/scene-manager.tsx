@@ -1,7 +1,6 @@
 import { type Sound, AudioEngine } from "@babylonjs/core/Audio";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import type { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
-import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Scene } from "@babylonjs/core/scene";
 import { APP_ROUTES } from "../../shared/routes";

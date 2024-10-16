@@ -13,7 +13,6 @@ import { createCelestialSphere } from "./celestial-shere/celestial-sphere";
 import { loadGameAssets } from "./game-assets";
 import { createMeshMaterials, createMovementMaterials } from "./materials";
 import { GameScene } from "./scene-manager";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 
 export const createGameScene = async (
   canvas: HTMLCanvasElement,
