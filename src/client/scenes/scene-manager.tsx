@@ -1,13 +1,14 @@
 import { type Sound, AudioEngine } from "@babylonjs/core/Audio";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import type { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Scene } from "@babylonjs/core/scene";
-import { AnimationContainer } from "./animation/create-animations";
-import { createHomeScene } from "./home-scene";
 import { APP_ROUTES } from "../../shared/routes";
-import { createGameScene } from "./game-scene";
+import { AnimationContainer } from "./animation/create-animations";
 import { handleAudioUnlock } from "./audio-engine";
+import { createGameScene } from "./game-scene";
+import { createHomeScene } from "./home-scene";
 
 export type CustomScene<T> = {
   scene: Scene;
@@ -21,6 +22,21 @@ export type GameScene = CustomScene<{
   audio: {
     select?: Sound;
     crumble?: Sound;
+  };
+  materials: {
+    meshMaterials: {
+      white: StandardMaterial;
+      black: StandardMaterial;
+    };
+    movementMaterials: {
+      pieceMaterial: StandardMaterial;
+      movementMaterial: StandardMaterial;
+      captureMaterial: StandardMaterial;
+      enPassantMaterial: StandardMaterial;
+      castleMaterial: StandardMaterial;
+      squareMaterial: StandardMaterial;
+      previousTurnMaterial: StandardMaterial;
+    };
   };
 }>;
 

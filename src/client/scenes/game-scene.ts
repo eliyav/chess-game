@@ -64,6 +64,10 @@ export const createGameScene = async (
       meshesToRender: [],
       animationsContainer: await createAnimations(scene),
       shadowGenerator: [shadowGenerator],
+      materials: {
+        meshMaterials,
+        movementMaterials,
+      },
       audio: {},
     },
   };

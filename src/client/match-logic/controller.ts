@@ -19,6 +19,9 @@ import { GameScene, SceneManager, Scenes } from "../scenes/scene-manager";
 import { websocket } from "../websocket-client";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Color3, StandardMaterial } from "@babylonjs/core";
 
 export class Controller {
   sceneManager: SceneManager;
@@ -127,12 +130,53 @@ export class Controller {
   prepNextView() {
     this.selectedPoint = undefined;
     this.updateMeshesRender();
+    //Show previous turn
+    this.displayLastTurn();
     const isGameOver = this.match.isGameOver();
     if (isGameOver) {
       this.events.setMessage(this.createMatchEndPrompt());
     } else {
       this.rotateCamera();
     }
+  }
+
+  displayLastTurn() {
+    const gameScene = this.sceneManager.getScene(Scenes.GAME);
+    //Clear old discs
+    gameScene.scene.meshes.forEach((mesh) => {
+      if (mesh.name === "lastTurn") {
+        gameScene.scene.removeMesh(mesh);
+        mesh.dispose();
+      }
+    });
+    const lastTurn = this.match.getGameHistory().at(-1);
+    if (!lastTurn) return;
+    const { origin, target } = lastTurn;
+    //Plane in both locations
+    const originDisc = MeshBuilder.CreateDisc(`lastTurn`, {
+      radius: 1.1,
+    });
+    const targetDisc = MeshBuilder.CreateDisc(`lastTurn`, {
+      radius: 1.1,
+    });
+    const [originZ, originX] = getPositionFromPoint({
+      point: origin,
+      externalMesh: false,
+    });
+    const [targetZ, targetX] = getPositionFromPoint({
+      point: target,
+      externalMesh: false,
+    });
+    originDisc.setPositionWithLocalVector(new Vector3(originX, 0.51, originZ));
+    targetDisc.setPositionWithLocalVector(new Vector3(targetX, 0.51, targetZ));
+    originDisc.rotation = new Vector3(Math.PI / 2, 0, 0);
+    targetDisc.rotation = new Vector3(Math.PI / 2, 0, 0);
+    originDisc.material =
+      gameScene.data.materials.movementMaterials.previousTurnMaterial;
+    targetDisc.material =
+      gameScene.data.materials.movementMaterials.previousTurnMaterial;
+    gameScene.scene.addMesh(originDisc);
+    gameScene.scene.addMesh(targetDisc);
   }
 
   displayMoves(point: Point) {
@@ -191,6 +235,7 @@ export class Controller {
 
   resetView() {
     this.updateMeshesRender();
+    this.displayLastTurn();
     if (this.match.lobby.mode === LOBBY_TYPE.LOCAL) {
       this.rotateCamera();
     } else {
