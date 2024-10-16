@@ -61,7 +61,7 @@ export class Controller {
   }
 
   subscribeGameInput(gameScene: GameScene) {
-    gameScene.scene.onPointerDown = async (
+    gameScene.scene.onPointerUp = async (
       e: IPointerEvent,
       pickResult: Nullable<PickingInfo>
     ) => {
