@@ -1,8 +1,9 @@
 import { strict as assert } from "node:assert";
 import { describe, beforeEach, it } from "node:test";
 import Game from "../client/game-logic/game";
-import { GAMESTATUS } from "../shared/game";
+import { GAMESTATUS, PIECE } from "../shared/game";
 import { TEAM } from "../shared/match";
+import { doPointsMatch } from "../client/game-logic/moves";
 
 describe("Game Class", () => {
   let game: Game;
@@ -35,5 +36,40 @@ describe("Game Class", () => {
     game.move({ origin: [3, 7], target: [7, 3] }); // Qh4#
     const gameState = game.getGameState();
     assert.equal(gameState.status, GAMESTATUS.CHECKMATE);
+  });
+
+  it("should have king side castling available", () => {
+    game.move({ origin: [6, 0], target: [5, 2] });
+    game.move({ origin: [4, 6], target: [4, 5] });
+    game.move({ origin: [4, 1], target: [4, 2] });
+    game.move({ origin: [5, 6], target: [5, 5] });
+    game.move({ origin: [5, 0], target: [4, 1] });
+    game.move({ origin: [6, 6], target: [6, 5] });
+    const pieces = game.getAllPieces();
+    const king = pieces.find(
+      ({ piece }) => piece?.type === PIECE.K && piece.team === TEAM.WHITE
+    );
+    const kingMoves = game.getMoves({ point: king!.point });
+    assert.ok(kingMoves.some((move) => move[1] === "castle"));
+    assert.ok(kingMoves.some((move) => doPointsMatch(move[0], [7, 0])));
+  });
+
+  it("should have queen side castling available", () => {
+    game.move({ origin: [1, 0], target: [0, 2] });
+    game.move({ origin: [4, 6], target: [4, 5] });
+    game.move({ origin: [1, 1], target: [1, 2] });
+    game.move({ origin: [5, 6], target: [5, 5] });
+    game.move({ origin: [2, 0], target: [1, 1] });
+    game.move({ origin: [6, 6], target: [6, 5] });
+    game.move({ origin: [2, 1], target: [2, 2] });
+    game.move({ origin: [7, 6], target: [7, 5] });
+    game.move({ origin: [3, 0], target: [2, 1] });
+    const pieces = game.getAllPieces();
+    const king = pieces.find(
+      ({ piece }) => piece?.type === PIECE.K && piece.team === TEAM.WHITE
+    );
+    const kingMoves = game.getMoves({ point: king!.point });
+    assert.ok(kingMoves.some((move) => move[1] === "castle"));
+    assert.ok(kingMoves.some((move) => doPointsMatch(move[0], [0, 0])));
   });
 });
