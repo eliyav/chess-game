@@ -72,7 +72,6 @@ describe("Game Class", () => {
       ({ piece }) => piece?.type === PIECE.K && piece.team === TEAM.WHITE
     );
     const kingMoves = game.getMoves({ point: king!.point });
-    console.log(kingMoves);
     assert.ok(!kingMoves.some((move) => move[1] === "castle"));
   });
 
