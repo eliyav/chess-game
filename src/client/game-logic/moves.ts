@@ -1,6 +1,7 @@
 import { EnPassant, Move, PIECE, Point, TurnHistory } from "../../shared/game";
 import { TEAM } from "../../shared/match";
 import { Board, type Grid } from "./board";
+import { kingInitialPoints } from "./chess-data-import";
 
 type LateralDirection = "up" | "down" | "right" | "left";
 type DiagonalDirection = "upRight" | "upLeft" | "downRight" | "downLeft";
@@ -297,6 +298,10 @@ function calcKingMoves({
     }
   });
 
+  const isKingInIntialPoint = kingInitialPoints.teams
+    .find((teamData) => teamData.name === team)
+    ?.startingPoints.some((initialPoint) => doPointsMatch(initialPoint, point));
+  if (!isKingInIntialPoint) return availableMoves;
   const hasKingMoved = turnHistory.some((turn) =>
     doPointsMatch(turn.origin, point)
   );

@@ -556,9 +556,11 @@ class Game {
     });
     if (!playersRooks.length) return;
     playersRooks.forEach(({ point: rookPoint }) => {
-      const isRookInInitalPosition = rookInitialPoints.some(
-        (rookInitialPoint) => doPointsMatch(rookInitialPoint, rookPoint)
-      );
+      const isRookInInitalPosition = rookInitialPoints.teams
+        .find((teamData) => teamData.name === team)
+        ?.startingPoints.some((initialPoint) =>
+          doPointsMatch(initialPoint, rookPoint)
+        );
       if (!isRookInInitalPosition) return;
       const hasRookMoved = turnHistory.some((turn) => {
         doPointsMatch(turn.origin, rookPoint);
@@ -589,7 +591,7 @@ class Game {
     team: TEAM;
     grid: Grid;
   }) {
-    const squaresToCheckForPiecesObstruction = [kingPoint];
+    const squaresToCheckForPiecesObstruction: Point[] = [];
     const squaresToCheckEnemyThreat = [kingPoint];
     const [kingX, kingY] = kingPoint;
     const [rookX] = rookPoint;
@@ -607,6 +609,7 @@ class Game {
       }
     }
     //Check if squares in between are used by any pieces
+    console.log(squaresToCheckForPiecesObstruction);
     const piecesInBetween = squaresToCheckForPiecesObstruction.filter(
       (point) => {
         return Board.getPiece({ grid, point }) !== undefined;
@@ -626,6 +629,8 @@ class Game {
           })
         )
         .flat();
+      console.log(squaresToCheckForPiecesObstruction);
+      console.log(squaresToCheckEnemyThreat);
       const squaresUnderEnemyThreat = [];
       for (let i = 0; i < squaresToCheckEnemyThreat.length; i++) {
         const square = squaresToCheckEnemyThreat[i];
