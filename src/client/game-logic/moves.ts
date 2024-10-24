@@ -13,7 +13,7 @@ export function getPieceMoves({
   piece: { type, team },
   turnHistory,
   checkForCastling,
-  skipCastling,
+  skipCastling = false,
 }: {
   grid: Grid;
   point: Point;
@@ -30,7 +30,7 @@ export function getPieceMoves({
     grid: Grid;
     turnHistory: TurnHistory[];
   }) => Move[];
-  skipCastling?: boolean;
+  skipCastling: boolean;
 }) {
   const lastTurnHistory = turnHistory.at(-1);
   switch (type) {
@@ -255,7 +255,7 @@ function calcKingMoves({
   turnHistory,
   team,
   checkForCastling,
-  skipCastling,
+  skipCastling = false,
 }: {
   point: Point;
   grid: Grid;
@@ -272,7 +272,7 @@ function calcKingMoves({
     grid: Grid;
     turnHistory: TurnHistory[];
   }) => Move[];
-  skipCastling?: boolean;
+  skipCastling: boolean;
 }) {
   const kingMovements: Point[] = [
     [0, 1],

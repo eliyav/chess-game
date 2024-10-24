@@ -317,7 +317,7 @@ class Game {
     point,
     grid = this.current.grid,
     skipResolveCheck,
-    skipCastling,
+    skipCastling = false,
   }: {
     point: Point;
     grid?: Grid;
