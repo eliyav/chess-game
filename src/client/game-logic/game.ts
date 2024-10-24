@@ -589,39 +589,30 @@ class Game {
     team: TEAM;
     grid: Grid;
   }) {
+    const squaresToCheckForPiecesObstruction = [kingPoint];
+    const squaresToCheckEnemyThreat = [kingPoint];
     const [kingX, kingY] = kingPoint;
     const [rookX] = rookPoint;
     const spaceBetween = kingX - rookX;
-    let distance;
-    spaceBetween < 0
-      ? (distance = spaceBetween * -1 - 1)
-      : (distance = spaceBetween - 1);
-
+    const maxKingDistance = 2;
+    const direction = spaceBetween < 0 ? 1 : -1;
+    const distance =
+      spaceBetween < 0 ? spaceBetween * -1 - 1 : spaceBetween - 1;
     //Calculate the squares in between King and Rook
-    const squaresInBetween: Point[] = [];
-
-    for (let step = 1; step <= distance; step++) {
-      let stepDirection;
-      spaceBetween < 0
-        ? (stepDirection = step * 1)
-        : (stepDirection = step * -1);
-      const point: Point = [kingX + stepDirection, kingY];
-      squaresInBetween.push(point);
+    for (let i = 1; i <= distance; i++) {
+      const distanceToMove = direction * i;
+      squaresToCheckForPiecesObstruction.push([kingX + distanceToMove, kingY]);
+      if (i <= maxKingDistance) {
+        squaresToCheckEnemyThreat.push([kingX + distanceToMove, kingY]);
+      }
     }
     //Check if squares in between are used by any pieces
-    const pieceInBetween = squaresInBetween.filter((point) => {
-      return Board.getPiece({ grid, point }) !== undefined;
-    });
-    if (!pieceInBetween.length) {
-      const [kingX, kingY] = kingPoint;
-      const [rookX] = rookPoint;
-      const spaceBetween = kingX - rookX;
-      const direction = spaceBetween < 0 ? 1 : -1;
-      const step1 = direction * 1;
-      const step2 = direction * 2;
-      const point1: Point = [kingX + step1, kingY];
-      const point2: Point = [kingX + step2, kingY];
-      const squaresInUse = [point1, point2, kingPoint];
+    const piecesInBetween = squaresToCheckForPiecesObstruction.filter(
+      (point) => {
+        return Board.getPiece({ grid, point }) !== undefined;
+      }
+    );
+    if (!piecesInBetween.length) {
       //Check if opponents pieces, threathen any of the spaces in between
       const opponentsPieces = Board.getPieces({ grid }).filter(({ piece }) => {
         return piece && piece.team !== team;
@@ -635,16 +626,18 @@ class Game {
           })
         )
         .flat();
-      const isThereOverlap = [];
-      for (let i = 0; i < squaresInUse.length; i++) {
-        const square = squaresInUse[i];
+      const squaresUnderEnemyThreat = [];
+      for (let i = 0; i < squaresToCheckEnemyThreat.length; i++) {
+        const square = squaresToCheckEnemyThreat[i];
         for (let k = 0; k < opponentsAvailableMoves.length; k++) {
           const availableMove = opponentsAvailableMoves[k];
           const doesMoveMatchSquare = doPointsMatch(availableMove[0], square);
-          doesMoveMatchSquare ? isThereOverlap.push(doesMoveMatchSquare) : null;
+          doesMoveMatchSquare
+            ? squaresUnderEnemyThreat.push(doesMoveMatchSquare)
+            : null;
         }
       }
-      if (!isThereOverlap.length) {
+      if (!squaresUnderEnemyThreat.length) {
         //If there is no overlap, return the possible castling move
         const returnResult: [boolean, Move] = [true, [rookPoint, "castle"]];
         return returnResult;
