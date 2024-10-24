@@ -561,9 +561,9 @@ class Game {
           doPointsMatch(initialPoint, rookPoint)
         );
       if (!isRookInInitalPosition) return moves;
-      const hasRookMoved = turnHistory.some((turn) => {
-        doPointsMatch(turn.origin, rookPoint);
-      });
+      const hasRookMoved = turnHistory.some((turn) =>
+        doPointsMatch(turn.origin, rookPoint)
+      );
       if (!hasRookMoved) {
         const resolve = this.isCastlingValid({
           kingPoint,

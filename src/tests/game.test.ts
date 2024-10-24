@@ -54,6 +54,28 @@ describe("Game Class", () => {
     assert.ok(kingMoves.some((move) => doPointsMatch(move[0], [7, 0])));
   });
 
+  it("should not have king side castling", () => {
+    game.move({ origin: [6, 0], target: [5, 2] });
+    game.move({ origin: [4, 6], target: [4, 5] });
+    game.move({ origin: [4, 1], target: [4, 2] });
+    game.move({ origin: [5, 6], target: [5, 5] });
+    game.move({ origin: [5, 0], target: [4, 1] });
+    game.move({ origin: [6, 6], target: [6, 5] });
+    game.move({ origin: [7, 1], target: [7, 2] });
+    game.move({ origin: [7, 6], target: [7, 5] });
+    game.move({ origin: [7, 0], target: [7, 1] });
+    game.move({ origin: [1, 6], target: [1, 5] });
+    game.move({ origin: [7, 1], target: [7, 0] });
+    game.move({ origin: [2, 6], target: [2, 5] });
+    const pieces = game.getAllPieces();
+    const king = pieces.find(
+      ({ piece }) => piece?.type === PIECE.K && piece.team === TEAM.WHITE
+    );
+    const kingMoves = game.getMoves({ point: king!.point });
+    console.log(kingMoves);
+    assert.ok(!kingMoves.some((move) => move[1] === "castle"));
+  });
+
   it("should have queen side castling available", () => {
     game.move({ origin: [1, 0], target: [0, 2] });
     game.move({ origin: [4, 6], target: [4, 5] });
