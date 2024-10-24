@@ -151,4 +151,9 @@ export const chessData: Data = {
   ],
 };
 
+export const rookInitialPoints = chessData.initialPositions
+  .find((positions) => positions.type === PIECE.R)
+  ?.teams.map((team) => team.startingPoints)
+  .flat() as Point[];
+
 export default chessData;

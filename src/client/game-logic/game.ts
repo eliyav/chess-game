@@ -3,6 +3,7 @@ import GamePiece from "./game-piece";
 import { TEAM } from "../../shared/match";
 import { Board, Grid } from "./board";
 import { doPointsMatch, getPieceMoves, isEnPassantAvailable } from "./moves";
+import { rookInitialPoints } from "./chess-data-import";
 
 class Game {
   teams: TEAM[];
@@ -82,17 +83,14 @@ class Game {
     origin,
     move,
     grid,
-    dontUpdatePiece = false,
   }: {
     origin: Point;
     move: Move;
     grid: Grid;
-    dontUpdatePiece?: boolean;
   }) {
-    const [target, moveType] = move;
+    const [_, moveType] = move;
     const originPiece = Board.getPiece({ grid, point: origin });
     if (!originPiece) return;
-    if (!dontUpdatePiece) originPiece.update();
     if (moveType === "movement") {
       return this.resolveMovement({ origin, move, grid });
     } else if (moveType === "capture") {
@@ -100,8 +98,6 @@ class Game {
     } else if (moveType === "enPassant") {
       return this.resolveEnPassant({ origin, move, grid });
     } else if (moveType === "castle") {
-      const targetPiece = Board.getPiece({ grid, point: target });
-      if (!dontUpdatePiece) targetPiece?.update();
       return this.resolveCastling({ origin, move, grid });
     }
   }
@@ -305,8 +301,6 @@ class Game {
         const { kingTarget, rookTarget } = castling;
         const kingPiece = Board.getPiece({ grid, point: kingTarget })!;
         const rookPiece = Board.getPiece({ grid, point: rookTarget })!;
-        kingPiece.resetPieceMovement();
-        rookPiece.resetPieceMovement();
         Board.addPiece({ grid, point: origin, piece: kingPiece });
         Board.addPiece({ grid, point: target, piece: rookPiece });
         Board.removePiece({ grid, point: kingTarget });
@@ -332,13 +326,12 @@ class Game {
   }): Move[] {
     const piece = this.lookupPiece({ point });
     if (!piece) return [];
-    const { type, team, moved } = piece;
-    const lastTurnHistory = this.current.turnHistory.at(-1);
+    const { type, team } = piece;
     const availableMoves = getPieceMoves({
       point,
-      piece: { type, team, moved },
+      piece: { type, team },
       grid,
-      lastTurnHistory,
+      turnHistory: this.current.turnHistory,
       skipCastling,
       calcCastling: this.calcCastling.bind(this),
     });
@@ -387,7 +380,6 @@ class Game {
       origin,
       move,
       grid: clonedGrid,
-      dontUpdatePiece: true,
     });
     //Check if resolving above switch would put player in check
     const isMoveResolvable = this.isChecked({
@@ -418,7 +410,7 @@ class Game {
     const king = pieces.find(({ piece }) => {
       return piece?.type === PIECE.K && piece?.team === team;
     })!;
-    const opponentsPieces = Board.getPieces({ grid }).filter(({ piece }) => {
+    const opponentsPieces = pieces.filter(({ piece }) => {
       return piece?.team !== team;
     });
     const opponentsAvailableMoves = opponentsPieces
@@ -550,36 +542,40 @@ class Game {
     kingPoint,
     team,
     grid,
-    lastTurnHistory,
+    turnHistory,
     movesObj,
   }: {
     kingPoint: Point;
     team: TEAM;
     grid: Grid;
-    lastTurnHistory: TurnHistory | undefined;
+    turnHistory: TurnHistory[];
     movesObj: Move[];
   }) {
     const playersRooks = Board.getPieces({ grid }).filter(({ piece }) => {
       return piece?.type === PIECE.R && piece?.team === team;
     });
-    if (playersRooks.length) {
-      playersRooks.forEach(({ piece: rook, point: rookPoint }) => {
-        if (!rook) return;
-        //Check for castling move
-        if (!rook.moved) {
-          const resolve = this.canCastlingResolve({
-            kingPoint,
-            rookPoint,
-            team,
-            grid,
-          });
-          if (resolve) {
-            //If castling resolve returns true, push the move into available moves
-            resolve[0] ? movesObj.push(resolve[1]) : null;
-          }
-        }
+    if (!playersRooks.length) return;
+    playersRooks.forEach(({ point: rookPoint }) => {
+      const isRookInInitalPosition = rookInitialPoints.some(
+        (rookInitialPoint) => doPointsMatch(rookInitialPoint, rookPoint)
+      );
+      if (!isRookInInitalPosition) return;
+      const hasRookMoved = turnHistory.some((turn) => {
+        doPointsMatch(turn.origin, rookPoint);
       });
-    }
+      if (!hasRookMoved) {
+        const resolve = this.canCastlingResolve({
+          kingPoint,
+          rookPoint,
+          team,
+          grid,
+        });
+        if (resolve) {
+          //If castling resolve returns true, push the move into available moves
+          resolve[0] ? movesObj.push(resolve[1]) : null;
+        }
+      }
+    });
   }
 
   canCastlingResolve({
@@ -617,7 +613,15 @@ class Game {
       return Board.getPiece({ grid, point }) !== undefined;
     });
     if (!pieceInBetween.length) {
-      const squaresInUse = [...squaresInBetween, kingPoint, rookPoint];
+      const [kingX, kingY] = kingPoint;
+      const [rookX] = rookPoint;
+      const spaceBetween = kingX - rookX;
+      const direction = spaceBetween < 0 ? 1 : -1;
+      const step1 = direction * 1;
+      const step2 = direction * 2;
+      const point1: Point = [kingX + step1, kingY];
+      const point2: Point = [kingX + step2, kingY];
+      const squaresInUse = [point1, point2, kingPoint];
       //Check if opponents pieces, threathen any of the spaces in between
       const opponentsPieces = Board.getPieces({ grid }).filter(({ piece }) => {
         return piece && piece.team !== team;
