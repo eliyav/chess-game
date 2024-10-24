@@ -12,26 +12,24 @@ export function getPieceMoves({
   point,
   piece: { type, team },
   turnHistory,
-  calcCastling,
+  checkForCastling,
   skipCastling,
 }: {
   grid: Grid;
   point: Point;
   piece: { type: PIECE; team: TEAM };
   turnHistory: TurnHistory[];
-  calcCastling: ({
+  checkForCastling: ({
     kingPoint,
     team,
     grid,
     turnHistory,
-    movesObj,
   }: {
     kingPoint: Point;
     team: TEAM;
     grid: Grid;
     turnHistory: TurnHistory[];
-    movesObj: Move[];
-  }) => void;
+  }) => Move[];
   skipCastling?: boolean;
 }) {
   const lastTurnHistory = turnHistory.at(-1);
@@ -57,7 +55,7 @@ export function getPieceMoves({
         grid,
         team,
         turnHistory,
-        calcCastling,
+        checkForCastling,
         skipCastling,
       });
   }
@@ -256,26 +254,24 @@ function calcKingMoves({
   grid,
   turnHistory,
   team,
-  calcCastling,
+  checkForCastling,
   skipCastling,
 }: {
   point: Point;
   grid: Grid;
   turnHistory: TurnHistory[];
   team: TEAM;
-  calcCastling: ({
+  checkForCastling: ({
     kingPoint,
     team,
     grid,
     turnHistory,
-    movesObj,
   }: {
     kingPoint: Point;
     team: TEAM;
     grid: Grid;
     turnHistory: TurnHistory[];
-    movesObj: Move[];
-  }) => void;
+  }) => Move[];
   skipCastling?: boolean;
 }) {
   const kingMovements: Point[] = [
@@ -306,13 +302,15 @@ function calcKingMoves({
     doPointsMatch(turn.origin, point)
   );
   if (!hasKingMoved && !skipCastling) {
-    calcCastling({
+    const castlingMoves = checkForCastling({
       kingPoint: point,
       team,
       grid,
       turnHistory,
-      movesObj: availableMoves,
     });
+    if (castlingMoves.length) {
+      availableMoves.push(...castlingMoves);
+    }
   }
 
   return availableMoves;
