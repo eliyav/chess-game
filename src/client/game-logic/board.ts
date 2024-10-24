@@ -25,7 +25,10 @@ export class Board {
           this.addPiece({
             grid,
             point,
-            piece: new GamePiece({ type, team: team.name }),
+            piece: new GamePiece({
+              type,
+              team: team.name,
+            }),
           });
         });
       });
@@ -45,15 +48,16 @@ export class Board {
     return grid[x][y];
   }
 
-  static getPieces({ grid }: { grid: Grid }) {
+  static getPieces({ grid }: { grid: Grid }): {
+    piece: GamePiece | undefined;
+    point: Point;
+  }[] {
     return grid
-      .flatMap((row, x) =>
-        row.map((piece, y) => ({
-          piece,
-          point: [x, y] as Point,
-        }))
+      .map((row, x) =>
+        row.map((piece, y) => ({ piece, point: [x, y] as Point }))
       )
-      .filter(({ piece }) => piece !== undefined);
+      .flat()
+      .filter(({ piece }) => piece);
   }
 
   static removePiece({ grid, point }: { grid: Grid; point: Point }) {

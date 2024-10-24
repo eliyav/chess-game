@@ -151,4 +151,12 @@ export const chessData: Data = {
   ],
 };
 
+export const rookInitialPoints = chessData.initialPositions.find(
+  (positions) => positions.type === PIECE.R
+)!;
+
+export const kingInitialPoints = chessData.initialPositions.find(
+  (positions) => positions.type === PIECE.K
+)!;
+
 export default chessData;

@@ -1,7 +1,7 @@
 import { EnPassant, Move, PIECE, Point, TurnHistory } from "../../shared/game";
-import GamePiece from "./game-piece";
 import { TEAM } from "../../shared/match";
 import { Board, type Grid } from "./board";
+import { kingInitialPoints } from "./chess-data-import";
 
 type LateralDirection = "up" | "down" | "right" | "left";
 type DiagonalDirection = "upRight" | "upLeft" | "downRight" | "downLeft";
@@ -10,30 +10,29 @@ type Movements = Partial<Record<LateralDirection | DiagonalDirection, Point[]>>;
 export function getPieceMoves({
   grid,
   point,
-  piece: { type, team, moved },
-  lastTurnHistory,
-  calcCastling,
-  skipCastling,
+  piece: { type, team },
+  turnHistory,
+  checkForCastling,
+  skipCastling = false,
 }: {
   grid: Grid;
   point: Point;
-  piece: { type: PIECE; team: TEAM; moved: boolean };
-  lastTurnHistory: TurnHistory | undefined;
-  calcCastling: ({
+  piece: { type: PIECE; team: TEAM };
+  turnHistory: TurnHistory[];
+  skipCastling: boolean;
+  checkForCastling: ({
     kingPoint,
     team,
     grid,
-    lastTurnHistory,
-    movesObj,
+    turnHistory,
   }: {
     kingPoint: Point;
     team: TEAM;
     grid: Grid;
-    lastTurnHistory: TurnHistory | undefined;
-    movesObj: Move[];
-  }) => void;
-  skipCastling?: boolean;
+    turnHistory: TurnHistory[];
+  }) => Move[];
 }) {
+  const lastTurnHistory = turnHistory.at(-1);
   switch (type) {
     case PIECE.P:
       return calcPawnMoves({
@@ -54,10 +53,9 @@ export function getPieceMoves({
       return calcKingMoves({
         point,
         grid,
-        moved,
         team,
-        lastTurnHistory,
-        calcCastling,
+        turnHistory,
+        checkForCastling,
         skipCastling,
       });
   }
@@ -254,31 +252,27 @@ function calcKnightMoves({
 function calcKingMoves({
   point,
   grid,
-  lastTurnHistory,
-  moved,
+  turnHistory,
   team,
-  calcCastling,
-  skipCastling,
+  checkForCastling,
+  skipCastling = false,
 }: {
   point: Point;
   grid: Grid;
-  lastTurnHistory: TurnHistory | undefined;
-  moved: boolean;
+  turnHistory: TurnHistory[];
   team: TEAM;
-  calcCastling: ({
+  checkForCastling: ({
     kingPoint,
     team,
     grid,
-    lastTurnHistory,
-    movesObj,
+    turnHistory,
   }: {
     kingPoint: Point;
     team: TEAM;
     grid: Grid;
-    lastTurnHistory: TurnHistory | undefined;
-    movesObj: Move[];
-  }) => void;
-  skipCastling?: boolean;
+    turnHistory: TurnHistory[];
+  }) => Move[];
+  skipCastling: boolean;
 }) {
   const kingMovements: Point[] = [
     [0, 1],
@@ -300,14 +294,23 @@ function calcKingMoves({
     }
   });
 
-  if (!moved && !skipCastling) {
-    calcCastling({
+  const isKingInIntialPoint = kingInitialPoints.teams
+    .find((teamData) => teamData.name === team)
+    ?.startingPoints.some((initialPoint) => doPointsMatch(initialPoint, point));
+  if (!isKingInIntialPoint) return availableMoves;
+  const hasKingMoved = turnHistory.some((turn) =>
+    doPointsMatch(turn.origin, point)
+  );
+  if (!hasKingMoved && !skipCastling) {
+    const castlingMoves = checkForCastling({
       kingPoint: point,
       team,
       grid,
-      lastTurnHistory,
-      movesObj: availableMoves,
+      turnHistory,
     });
+    if (castlingMoves.length) {
+      availableMoves.push(...castlingMoves);
+    }
   }
 
   return availableMoves;
