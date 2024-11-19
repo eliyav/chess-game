@@ -2,6 +2,8 @@ import { build, context } from "esbuild";
 import fs from "node:fs/promises";
 
 const isWatch = process.argv.includes("--watch") || process.argv.includes("-w");
+const isAvoidPreBuild =
+  process.argv.includes("--avoidprebuild") || process.argv.includes("-apb");
 const outPath = new URL("dist/", import.meta.url);
 const clientPath = new URL("dist/client", import.meta.url);
 const publicPath = new URL("public/", import.meta.url);
@@ -48,9 +50,11 @@ const browserEsmBundle = {
   outdir: "dist/client",
 };
 
-await fs.rm(outPath, { recursive: true, force: true });
-await fs.mkdir(outPath, { recursive: true });
-await fs.cp(publicPath, clientPath, { recursive: true });
+if (!isAvoidPreBuild) {
+  await fs.rm(outPath, { recursive: true, force: true });
+  await fs.mkdir(outPath, { recursive: true });
+  await fs.cp(publicPath, clientPath, { recursive: true });
+}
 
 const bundles = [nodeEsmBundles, browserEsmBundle];
 
