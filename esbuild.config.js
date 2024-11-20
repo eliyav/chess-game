@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 
 const isWatch = process.argv.includes("--watch") || process.argv.includes("-w");
 const isAvoidPreBuild =
-  process.argv.includes("--avoidprebuild") || process.argv.includes("-apb");
+  process.argv.includes("--skipPrebuild") || process.argv.includes("-spb");
 const outPath = new URL("dist/", import.meta.url);
 const clientPath = new URL("dist/client", import.meta.url);
 const publicPath = new URL("public/", import.meta.url);
