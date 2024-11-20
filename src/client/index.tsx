@@ -4,13 +4,12 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./app";
 import "./index.css";
 import { createSceneManager } from "./scenes/scene-manager";
+import { APP_URL } from "../config";
 
 export const isPhone = window.matchMedia("(max-width: 600px)").matches;
 
 export const ENV_BASE_URL =
-  process.env.NODE_ENV === "production"
-    ? "https://eliyav.com"
-    : "http://localhost:3000";
+  process.env.NODE_ENV === "production" ? APP_URL.PROD : APP_URL.DEV;
 
 //For hot reloading
 if (process.env.NODE_ENV === "development") {
