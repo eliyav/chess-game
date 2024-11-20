@@ -2,7 +2,7 @@ import { build, context } from "esbuild";
 import fs from "node:fs/promises";
 
 const isWatch = process.argv.includes("--watch") || process.argv.includes("-w");
-const isAvoidPreBuild =
+const isSkipPrebuild =
   process.argv.includes("--skipPrebuild") || process.argv.includes("-spb");
 const isProductionEnv =
   process.argv.includes("--production") || process.argv.includes("-p");
@@ -27,11 +27,8 @@ const commonBuildOptions = {
     ".gltf": "file",
     ".webp": "file",
   },
-  minify: !isWatch,
-  sourcemap: isWatch,
-  define: {
-    "process.env.NODE_ENV": isWatch ? '"development"' : '"production"',
-  },
+  minify: isProductionEnv,
+  sourcemap: !isProductionEnv,
 };
 
 /** @type {import('esbuild').BuildOptions} */
@@ -55,7 +52,7 @@ const browserEsmBundle = {
   },
 };
 
-if (!isAvoidPreBuild) {
+if (!isSkipPrebuild) {
   await fs.rm(outPath, { recursive: true, force: true });
   await fs.mkdir(outPath, { recursive: true });
   await fs.cp(publicPath, clientPath, { recursive: true });
@@ -70,7 +67,7 @@ if (isWatch) {
   await serverContext.watch();
   await clientContext.watch();
   await clientContext.serve({
-    port: 3001,
+    port: 8000,
     host: "localhost",
     servedir: "dist/client",
   });

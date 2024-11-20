@@ -12,7 +12,7 @@
     "build": "node esbuild.config.js",
     "watch": "npm run build -- -w",
     "watch:skipPrebuild": "npm run watch -- -spb",
-    "build:prod": "node esbuild.config.js -- --production",
+    "build:prod": "node esbuild.config.js -- -p",
     "nodemon:server": "nodemon dist/server/index.js"
   },
   "browserslist": [
