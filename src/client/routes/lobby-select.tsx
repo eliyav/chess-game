@@ -7,6 +7,7 @@ import { Message } from "../components/modals/message-modal";
 import { Divider } from "../components/svg/divider";
 import { APP_ROUTES } from "../../shared/routes";
 import { RESOURCES } from "../../shared/resources";
+import { ENV_BASE_URL } from "..";
 
 export const LobbySelect: React.FC<{
   setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
@@ -52,7 +53,7 @@ export const LobbySelect: React.FC<{
             onClick={async () => {
               try {
                 const response = await fetch(
-                  `${RESOURCES.JOIN_LOBBY}?key=${lobbyKey}`,
+                  `${ENV_BASE_URL}${RESOURCES.JOIN_LOBBY}?key=${lobbyKey}`,
                   {}
                 );
                 if (!response.ok) {
@@ -80,7 +81,9 @@ export const LobbySelect: React.FC<{
           text={`Create ${LOBBY_TYPE.ONLINE}`}
           onClick={async () => {
             try {
-              const response = await fetch(RESOURCES.CREATE_LOBBY);
+              const response = await fetch(
+                `${ENV_BASE_URL}${RESOURCES.CREATE_LOBBY}`
+              );
               const lobbyKey = await response.text();
               navigate(`${APP_ROUTES.OnlineLobby}?key=${lobbyKey}`);
             } catch (e) {

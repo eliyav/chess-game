@@ -4,10 +4,13 @@ import {
   ServerToClientEvents,
 } from "../shared/websocket";
 
+const ENV_HOST =
+  process.env.NODE_ENV === "production" ? "www.eliyav.com" : "localhost:3000";
+
 const protocol = window.location.protocol === "https:" ? "wss" : "ws";
 
 export const websocket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
-  `${protocol}://${window.location.host}`,
+  `${protocol}://${ENV_HOST}`,
   {
     transports: ["websocket"],
   }
