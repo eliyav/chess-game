@@ -54,9 +54,6 @@ self.addEventListener("fetch", (event) => {
       if (event.request.method !== "GET") {
         return;
       }
-      if (event.request.url.includes("esbuild")) {
-        return;
-      }
       const cache = await caches.open(expectedCaches.at(-1));
       // Get the resource from the cache.
       const cachedResponse = await cache.match(event.request);
