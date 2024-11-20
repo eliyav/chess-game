@@ -57,7 +57,6 @@ canvas {
   color: white;
   font-size: 2em;
   letter-spacing: 0.5em;
-  font-family: fantasy;
   animation: loadingAnimation;
   animation-duration: 0.75s;
   animation-iteration-count: infinite;
