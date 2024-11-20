@@ -4,6 +4,8 @@ import fs from "node:fs/promises";
 const isWatch = process.argv.includes("--watch") || process.argv.includes("-w");
 const isAvoidPreBuild =
   process.argv.includes("--skipPrebuild") || process.argv.includes("-spb");
+const isProductionEnv =
+  process.argv.includes("--production") || process.argv.includes("-p");
 const outPath = new URL("dist/", import.meta.url);
 const clientPath = new URL("dist/client", import.meta.url);
 const publicPath = new URL("public/", import.meta.url);
@@ -48,6 +50,9 @@ const browserEsmBundle = {
   format: "esm",
   entryPoints: ["src/client/index.tsx"],
   outdir: "dist/client",
+  define: {
+    "process.env.NODE_ENV": isProductionEnv ? '"production"' : '"development"',
+  },
 };
 
 if (!isAvoidPreBuild) {
@@ -59,10 +64,16 @@ if (!isAvoidPreBuild) {
 const bundles = [nodeEsmBundles, browserEsmBundle];
 
 if (isWatch) {
-  const buildContexts = await Promise.all(
-    bundles.map((bundle) => context(bundle))
-  );
-  await Promise.all(buildContexts.map((context) => context.watch()));
+  const serverContext = await context(nodeEsmBundles);
+  const clientContext = await context(browserEsmBundle);
+
+  await serverContext.watch();
+  await clientContext.watch();
+  await clientContext.serve({
+    port: 3001,
+    host: "localhost",
+    servedir: "dist/client",
+  });
 } else {
   await Promise.all(bundles.map((bundle) => build(bundle)));
 }
