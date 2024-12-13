@@ -35,18 +35,22 @@ export const OnlineLobby: React.FC<{
   const disableMatchStart = lobby.players.length < 2 || !playersReady;
 
   return (
-    <div className="content flex-column h-100">
-      <div className="header glass-dark">
+    <div className="grid grid-rows-5 h-dvh md:w-1/2 md:m-auto">
+      <div className="flex grid-rows-1 justify-center align-center glass dark-pane m-4">
         <BackButton
-          customClass={"bottom-left"}
+          customClass={
+            "inline-block border-r-2 border-white min-w-16 p-3 hover:bg-white hover:bg-opacity-10"
+          }
           size={30}
           onClick={() => navigate(APP_ROUTES.Lobby)}
         />
-        <h1>Online Lobby</h1>
+        <h1 className="inline-block place-self-center text-white grow text-center text-3xl font-bold italic pb-2">
+          Online Lobby
+        </h1>
       </div>
-      <div className="lobby-content">
-        <div className="lobby-code">
-          <h2 className="sub-title glass-dark">Invite Code</h2>
+      <div className="row-span-4 flex flex-col gap-2 p-2 align-center md:w-3/4 md:justify-self-center">
+        <div className="glass dark-pane p-4">
+          <h2 className="glass dark-pane">Invite Code</h2>
           <p>
             <span
               onClick={() => {
@@ -62,7 +66,7 @@ export const OnlineLobby: React.FC<{
             </span>
           </p>
         </div>
-        <h2 className="sub-title glass-dark">Players</h2>
+        <h2 className="glass dark-pane">Players</h2>
         <div className="flex">
           {player1 ? (
             <div className="flex">
@@ -90,7 +94,7 @@ export const OnlineLobby: React.FC<{
           ) : null}
           {!lessThanTwoPlayers && (
             <Switch
-              className="gold-switch"
+              className="rounded-full border-2 border-yellow-500 p-r-2"
               onClick={() => {
                 websocket.emit("switchTeams", { lobbyKey: lobby.key });
               }}
@@ -130,27 +134,26 @@ export const OnlineLobby: React.FC<{
               options: { [key]: e.target.checked },
             })}
         />
-      </div>
-      <div className="flex-align-end pb-1">
-        <div className="ready">
-          <input
-            type="checkbox"
-            id="ready-checkbox"
-            disabled={disableReadyButton}
+        <div className="grow content-end">
+          <div className="ready">
+            <input
+              type="checkbox"
+              disabled={disableReadyButton}
+              onClick={() => {
+                websocket.emit("readyPlayer", { lobbyKey: lobby.key });
+              }}
+              className="hidden"
+            />
+            <label htmlFor="ready-checkbox">Ready</label>
+          </div>
+          <SelectionButton
+            text={"Start Game"}
             onClick={() => {
-              websocket.emit("readyPlayer", { lobbyKey: lobby.key });
+              websocket.emit("requestMatchStart", { lobbyKey: lobby.key });
             }}
-            style={{ display: "none" }}
+            disabled={disableMatchStart}
           />
-          <label htmlFor="ready-checkbox">Ready</label>
         </div>
-        <SelectionButton
-          text={"Start Game"}
-          onClick={() => {
-            websocket.emit("requestMatchStart", { lobbyKey: lobby.key });
-          }}
-          disabled={disableMatchStart}
-        />
       </div>
     </div>
   );
