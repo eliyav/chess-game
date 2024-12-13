@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --primary-background: #333333;
+    --primary-color: #e9e9e9;
+    --primary-alt-color: #8b8b8b;
+    --primary-dark-opaque: rgba(0, 0, 0, 0.6);
+    --primary-light-opaque: rgba(255, 255, 255, 0.6);
+    --green-highlight: rgba(0, 255, 0, 0.5);
+    --red-highlight: rgba(255, 0, 0, 0.5);
+    --gold: #ffd700;
+  }
+
+  .glass {
+    backdrop-filter: blur(5px);
+    border-radius: 10px;
+    &.light-pane {
+      background: var(--primary-light-opaque);
+    }
+    &.dark-pane {
+      background: var(--primary-dark-opaque);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+  }
+}
