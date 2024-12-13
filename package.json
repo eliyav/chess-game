@@ -9,7 +9,7 @@
     "start": "npm run build && concurrently --names esbuild,nodemon -c auto --kill-others npm:watch:skipPrebuild npm:nodemon:server",
     "typecheck": "tsc --noEmit",
     "test": "glob -c \"node --import tsx --test\" \"src/tests/**/*.test.ts\"",
-    "prebuild": "npx tailwindcss -i ./src/client/index.css -o ./dist/index-tailwind-output.css",
+    "prebuild": "npx tailwindcss -i ./src/client/index.css -o ./dist/client/index-tailwind-output.css",
     "build": "node esbuild.config.js",
     "watch": "npm run build -- -w",
     "watch:skipPrebuild": "npm run watch -- -spb",
