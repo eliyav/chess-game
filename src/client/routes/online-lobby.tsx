@@ -133,7 +133,9 @@ export const OnlineLobby: React.FC<{
               e.currentTarget.classList.add("bg-green-500");
             }
           }}
-          className={`select-none basis-1/2 m-2 p-2 text-xl glass text-white border-2 border-white text-center tracking-widest italic font-bold bg-red-500 `}
+          className={`select-none basis-1/2 m-2 p-2 text-xl glass text-white border-2 border-white text-center tracking-widest italic font-bold bg-red-500 ${
+            disableReadyButton ? "opacity-50" : ""
+          } `}
         >
           <input
             type="checkbox"
