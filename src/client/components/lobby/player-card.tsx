@@ -7,17 +7,17 @@ const PlayerCard: React.FC<{
   team?: string;
 }> = ({ name, ready, type, team }) => {
   return (
-    <div className="player-card">
-      <p style={{ fontWeight: "bold" }}>{name}</p>
+    <div className="flex basis-full gap-1 bg-slate-200 p-4 rounded-lg border-2 border-black">
+      <p className="font-bold pr-2 border-r-2 border-black">{name}</p>
       {team !== undefined && <p>{team}</p>}
       {type !== undefined && <p>{type}</p>}
       {ready !== undefined && (
         <p>
           Ready:{" "}
           {ready ? (
-            <span className={"green-highlight"}>✔</span>
+            <span className="text-green-500 text-right">✔</span>
           ) : (
-            <span className={"red-highlight"}>✖</span>
+            <span className="text-red-500 text-right">✖</span>
           )}
         </p>
       )}
