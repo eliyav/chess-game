@@ -2,21 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --primary-dark-opaque: rgba(0, 0, 0, 0.6);
-    --primary-light-opaque: rgba(255, 255, 255, 0.6);
-  }
+:root {
+  --primary-dark-opaque: rgba(0, 0, 0, 0.6);
+  --primary-light-opaque: rgba(255, 255, 255, 0.7);
+}
 
-  .glass {
-    backdrop-filter: blur(5px);
-    border-radius: 10px;
-    &.light-pane {
-      background: var(--primary-light-opaque);
-    }
-    &.dark-pane {
-      background: var(--primary-dark-opaque);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-    }
+.glass {
+  backdrop-filter: blur(5px);
+  border-radius: 10px;
+  &.light-pane {
+    background: var(--primary-light-opaque);
+  }
+  &.dark-pane {
+    background: var(--primary-dark-opaque);
+    border: 1px solid rgba(255, 255, 255, 0.18);
   }
 }
