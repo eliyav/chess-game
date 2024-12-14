@@ -24,19 +24,6 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   }, [location]);
 
   useEffect(() => {
-    //If the user is in an online lobby and navigates away from the page without match having started, leave the lobby
-    if (
-      lobby &&
-      lobby.mode === LOBBY_TYPE.ONLINE &&
-      location.pathname !== APP_ROUTES.OnlineLobby &&
-      !lobby.matchStarted
-    ) {
-      websocket.emit("leaveLobby", { lobbyKey: lobby.key });
-      setLobby(undefined);
-    }
-  }, [location.pathname, lobby, setLobby]);
-
-  useEffect(() => {
     websocket.on("opponentDisconnected", () => {
       navigate(APP_ROUTES.Home);
       setLobby(undefined);

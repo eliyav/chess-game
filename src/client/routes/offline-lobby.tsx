@@ -43,7 +43,7 @@ export const OfflineLobby: React.FC<{
       matchStarted: false,
       controllerOptions: buildDefaultOptions(),
     });
-  }, [setLobby]);
+  }, []);
 
   if (!lobby) return null;
 

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Lobby, TEAM } from "../../shared/match";
+import { Lobby, LOBBY_TYPE, TEAM } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
 import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
@@ -21,6 +21,11 @@ export const OnlineLobby: React.FC<{
     if (lobbyKey) {
       websocket.emit("joinLobby", { lobbyKey });
     }
+    return () => {
+      if (!lobby?.matchStarted) {
+        websocket.emit("leaveLobby", { lobbyKey });
+      }
+    };
   }, [websocket, location]);
 
   if (!lobby) return null;
