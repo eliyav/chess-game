@@ -6,16 +6,15 @@
   "type": "module",
   "scripts": {
     "clean": "node -e \"fs.rmSync('dist', {recursive: true, force: true})\"",
-    "start": "npm run build && concurrently --names esbuild,nodemon,tailwind -c auto --kill-others npm:watch:skipPrebuild npm:nodemon:server npm:tailwind:watch",
+    "start": "npm run build && concurrently --names esbuild,nodemon,tailwind -c auto --kill-others npm:build:watch npm:nodemon:server npm:tailwind:watch",
     "typecheck": "tsc --noEmit",
     "test": "glob -c \"node --import tsx --test\" \"src/tests/**/*.test.ts\"",
-    "prebuild": "npx tailwindcss -i ./src/client/index.css -o ./dist/client/tailwind-output.css",
-    "tailwind:watch": "npx tailwindcss -i ./src/client/index.css -o ./dist/client/tailwind-output.css --watch",
-    "build": "node esbuild.config.js",
-    "watch": "npm run build -- -w",
-    "watch:skipPrebuild": "npm run watch -- -spb",
-    "build:prod": "npm run build -- -p",
-    "nodemon:server": "nodemon dist/server/index.js"
+    "build": "node esbuild.config.js & npm run tailwind",
+    "build:watch": "node esbuild.config.js -- -w -spb",
+    "build:prod": "node esbuild.config.js -- -p & npm run tailwind",
+    "nodemon:server": "nodemon dist/server/index.js",
+    "tailwind": "npx tailwindcss -i ./src/client/index.css -o ./dist/client/tailwind-output.css",
+    "tailwind:watch": "npx tailwindcss -i ./src/client/index.css -o ./dist/client/tailwind-output.css --watch"
   },
   "browserslist": [
     "last 1 Chrome version"
