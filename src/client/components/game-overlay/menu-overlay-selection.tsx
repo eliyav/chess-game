@@ -12,7 +12,7 @@ const OverlaySelection: React.FC<SelectionProps> = ({
 }) => {
   return (
     <div
-      className="text-black bg-slate-300 bold pointer-events-auto min-w-16 grow border-2 border-black rounded-lg p-2 border-collapse"
+      className="text-black bg-slate-300 bold pointer-events-auto min-w-16 grow border-2 border-black rounded-lg p-2 border-collapse hover:opacity-80"
       onClick={onClick}
     >
       <img

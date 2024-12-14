@@ -18,7 +18,7 @@ export const ControllerOptionsList: React.FC<ControllerOptionsProps> = ({
     <div className="flex flex-col gap-2 mt-2 items-center w-9/12 m-auto ">
       {onSwitchTeams && (
         <button
-          className={`select-none flex relative bg-slate-200 w-full p-2 rounded-lg border-2 place-content-center ${
+          className={`select-none flex relative bg-slate-200 w-full p-2 rounded-lg border-2 hover:opacity-90 place-content-center ${
             disableSwitchTeams ? "opacity-50" : ""
           }`}
           onClick={onSwitchTeams}
@@ -30,7 +30,7 @@ export const ControllerOptionsList: React.FC<ControllerOptionsProps> = ({
       {Object.entries(options).map(([key, value], i) => (
         <label
           key={i}
-          className={`select-none flex relative bg-slate-200 w-full p-2 rounded-lg border-2 ${
+          className={`select-none flex relative bg-slate-200 w-full p-2 rounded-lg border-2 hover:opacity-80 ${
             value ? "border-green-500" : "border-red-500"
           }`}
         >
