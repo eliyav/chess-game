@@ -1,13 +1,12 @@
 import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Lobby, LOBBY_TYPE, TEAM } from "../../shared/match";
+import { Lobby, TEAM } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
 import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
 import { ControllerOptionsList } from "../components/lobby/controller-options-list";
 import PlayerCard from "../components/lobby/player-card";
 import { Pawn } from "../components/svg/pawn";
-import { Switch } from "../components/svg/switch";
 import { websocket } from "../websocket-client";
 
 export const OnlineLobby: React.FC<{
@@ -64,7 +63,10 @@ export const OnlineLobby: React.FC<{
                 }
               }}
             >
-              Invite Code: {lobby.key ?? "..."}
+              Invite Code:{" "}
+              <span className="select-all cursor-pointer">
+                {lobby.key ?? "..."}
+              </span>
             </span>
           </p>
         </div>
@@ -74,62 +76,34 @@ export const OnlineLobby: React.FC<{
           Players
         </h2>
         <div className="flex flex-wrap justify-center m-2 gap-1">
-          {player1 ? (
-            <div className="flex">
-              {!lessThanTwoPlayers && (
-                <Pawn
-                  className="team-symbol-background"
-                  color={
-                    lobby.teams.White === player1.id ? "#ffffff" : "#000000"
+          {lobby.players.map((player, i) => {
+            return (
+              <React.Fragment key={i}>
+                <PlayerCard
+                  name={player.name}
+                  ready={player.ready}
+                  team={
+                    lessThanTwoPlayers
+                      ? undefined
+                      : lobby.teams.White === player.id
+                      ? TEAM.WHITE
+                      : TEAM.BLACK
                   }
-                />
-              )}
-              <PlayerCard
-                name={player1.name}
-                ready={player1.ready}
-                type={player1.type}
-                team={
-                  lessThanTwoPlayers
-                    ? undefined
-                    : lobby.teams.White === player1.id
-                    ? TEAM.WHITE
-                    : TEAM.BLACK
-                }
-              />
-            </div>
-          ) : null}
-          {!lessThanTwoPlayers && (
-            <Switch
-              className="rounded-full border-2 border-yellow-500 p-r-2"
-              onClick={() => {
-                websocket.emit("switchTeams", { lobbyKey: lobby.key });
-              }}
-            />
-          )}
-          {player2 ? (
-            <div className="flex">
-              <PlayerCard
-                name={player2.name}
-                ready={player2.ready}
-                type={player2.type}
-                team={
-                  lessThanTwoPlayers
-                    ? undefined
-                    : lobby.teams.White === player2.id
-                    ? TEAM.WHITE
-                    : TEAM.BLACK
-                }
-              />
-              {!lessThanTwoPlayers && (
-                <Pawn
-                  className="team-symbol-background"
-                  color={
-                    lobby.teams.White === player2.id ? "#ffffff" : "#000000"
-                  }
-                />
-              )}
-            </div>
-          ) : null}
+                >
+                  {!lessThanTwoPlayers ? (
+                    <Pawn
+                      size={24}
+                      className="team-symbol-background"
+                      color={
+                        lobby.teams.White === player.id ? "#ffffff" : "#000000"
+                      }
+                    />
+                  ) : null}
+                </PlayerCard>
+              </React.Fragment>
+            );
+          })}
+          {!player2 && <PlayerCard name={"Waiting for player..."} />}
         </div>
         <h2 className="glass dark-pane text-white text-lg text-center tracking-widest italic font-bold">
           Settings
@@ -141,8 +115,26 @@ export const OnlineLobby: React.FC<{
               lobbyKey: lobby.key,
               options: { [key]: e.target.checked },
             })}
+          onSwitchTeams={() => {
+            websocket.emit("switchTeams", { lobbyKey: lobby.key });
+          }}
+          disableSwitchTeams={lessThanTwoPlayers}
         />
-        <div className="ready">
+      </div>
+      <div className="row-start-5 flex justify-center items-end mb-2">
+        <label
+          onClick={(e) => {
+            const target = e.target as HTMLInputElement;
+            if (!target.checked) {
+              e.currentTarget.classList.remove("bg-green-500");
+              e.currentTarget.classList.add("bg-red-500");
+            } else {
+              e.currentTarget.classList.remove("bg-red-500");
+              e.currentTarget.classList.add("bg-green-500");
+            }
+          }}
+          className={`select-none basis-1/2 m-2 p-2 text-xl glass text-white border-2 border-white text-center tracking-widest italic font-bold bg-red-500 `}
+        >
           <input
             type="checkbox"
             disabled={disableReadyButton}
@@ -151,17 +143,19 @@ export const OnlineLobby: React.FC<{
             }}
             className="hidden"
           />
-          <label htmlFor="ready-checkbox">Ready</label>
-        </div>
+          Ready
+        </label>
+        <SelectionButton
+          customClass={`basis-1/2 m-2 p-2 font-bold text-xl border-2 border-white italic tracking-widest hover:opacity-80 md:w-1/2 md:justify-self-center ${
+            disableMatchStart ? "opacity-50" : ""
+          }`}
+          text={"Start Game"}
+          onClick={() => {
+            websocket.emit("requestMatchStart", { lobbyKey: lobby.key });
+          }}
+          disabled={disableMatchStart}
+        />
       </div>
-      <SelectionButton
-        customClass="row-start-5 m-10 font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80 md:w-1/2 md:justify-self-center"
-        text={"Start Game"}
-        onClick={() => {
-          websocket.emit("requestMatchStart", { lobbyKey: lobby.key });
-        }}
-        disabled={disableMatchStart}
-      />
     </div>
   );
 };
