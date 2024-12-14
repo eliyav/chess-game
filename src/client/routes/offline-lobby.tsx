@@ -48,26 +48,34 @@ export const OfflineLobby: React.FC<{
   if (!lobby) return null;
 
   return (
-    <div className="content flex-column space-between h-100">
-      <div className="header glass-dark">
+    <div className="grid grid-rows-5 h-dvh md:w-1/2 md:m-auto">
+      <div className="flex grid-rows-1 justify-center align-center glass dark-pane m-4">
         <BackButton
-          customClass={"bottom-left"}
+          customClass={
+            "inline-block border-r-2 border-white min-w-16 p-3 hover:bg-white hover:bg-opacity-10"
+          }
           size={30}
           onClick={() => navigate(APP_ROUTES.Lobby)}
         />
-        <h1>Offline Lobby</h1>
+        <h1 className="inline-block place-self-center text-white grow text-center text-3xl font-bold italic pb-2">
+          Offline Lobby
+        </h1>
       </div>
-      <div className="lobby-content">
+      <div className="row-span-3 flex flex-col gap-2 p-2 align-center md:w-3/4 md:justify-self-center">
         <div>
-          <h2 className="sub-title glass-dark">Players</h2>
-          <div className="flex">
+          <h2 className="glass dark-pane text-white text-lg text-center tracking-widest italic font-bold">
+            Players
+          </h2>
+          <div className="flex flex-wrap justify-center m-2 gap-1">
             {lobby?.players.map((player, i) => (
               <PlayerCard key={i} name={player.name} type={player.type} />
             ))}
           </div>
         </div>
         <div>
-          <h2 className="sub-title glass-dark">Settings</h2>
+          <h2 className="glass dark-pane text-white text-lg text-center tracking-widest italic font-bold">
+            Settings
+          </h2>
           <ControllerOptionsList
             options={lobby.controllerOptions}
             onChange={(key: string) =>
@@ -79,15 +87,14 @@ export const OfflineLobby: React.FC<{
           />
         </div>
       </div>
-      <div className={"flex-align-end pb-1"}>
-        <SelectionButton
-          disabled={lobby.mode !== LOBBY_TYPE.LOCAL}
-          text={"Start Game"}
-          onClick={() => {
-            navigate("/game");
-          }}
-        />
-      </div>
+      <SelectionButton
+        customClass="row-start-5 m-10 font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80 md:w-1/2 md:justify-self-center"
+        disabled={lobby.mode !== LOBBY_TYPE.LOCAL}
+        text={"Start Game"}
+        onClick={() => {
+          navigate("/game");
+        }}
+      />
     </div>
   );
 };
