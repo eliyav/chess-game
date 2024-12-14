@@ -6,13 +6,15 @@
   "type": "module",
   "scripts": {
     "clean": "node -e \"fs.rmSync('dist', {recursive: true, force: true})\"",
-    "start": "npm run build && concurrently --names esbuild,nodemon -c auto --kill-others npm:watch:skipPrebuild npm:nodemon:server",
+    "start": "npm run build && concurrently --names esbuild,nodemon,tailwind -c auto --kill-others npm:watch:skipPrebuild npm:nodemon:server npm:tailwind:watch",
     "typecheck": "tsc --noEmit",
     "test": "glob -c \"node --import tsx --test\" \"src/tests/**/*.test.ts\"",
+    "prebuild": "npx tailwindcss -i ./src/client/index.css -o ./dist/client/tailwind-output.css",
+    "tailwind:watch": "npx tailwindcss -i ./src/client/index.css -o ./dist/client/tailwind-output.css --watch",
     "build": "node esbuild.config.js",
     "watch": "npm run build -- -w",
     "watch:skipPrebuild": "npm run watch -- -spb",
-    "build:prod": "node esbuild.config.js -- -p",
+    "build:prod": "npm run build -- -p",
     "nodemon:server": "nodemon dist/server/index.js"
   },
   "browserslist": [
@@ -41,6 +43,7 @@
     "concurrently": "^9.0.1",
     "esbuild": "^0.24.0",
     "glob": "^11.0.0",
+    "tailwindcss": "^3.4.16",
     "tsx": "^4.19.1",
     "typescript": "^5.6.3"
   }

@@ -24,19 +24,6 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   }, [location]);
 
   useEffect(() => {
-    //If the user is in an online lobby and navigates away from the page without match having started, leave the lobby
-    if (
-      lobby &&
-      lobby.mode === LOBBY_TYPE.ONLINE &&
-      location.pathname !== APP_ROUTES.OnlineLobby &&
-      !lobby.matchStarted
-    ) {
-      websocket.emit("leaveLobby", { lobbyKey: lobby.key });
-      setLobby(undefined);
-    }
-  }, [location.pathname, lobby, setLobby]);
-
-  useEffect(() => {
     websocket.on("opponentDisconnected", () => {
       navigate(APP_ROUTES.Home);
       setLobby(undefined);
@@ -72,7 +59,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   }, [websocket, navigate, setMessage, setLobby]);
 
   return (
-    <div id="app">
+    <div>
       {message && (
         <MessageModal
           text={message.text}
@@ -80,34 +67,36 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
           onReject={message.onReject}
         />
       )}
-      <Routes>
-        <Route path={APP_ROUTES.Home} element={<Home />} />
-        <Route
-          path={APP_ROUTES.Lobby}
-          element={<LobbySelect setMessage={setMessage} />}
-        />
-        <Route
-          path={APP_ROUTES.OfflineLobby}
-          element={<OfflineLobby setLobby={setLobby} lobby={lobby} />}
-        />
-        <Route
-          path={APP_ROUTES.OnlineLobby}
-          element={<OnlineLobby lobby={lobby} />}
-        />
-        <Route
-          path={APP_ROUTES.Game}
-          element={
-            lobby !== undefined ? (
-              <Game
-                sceneManager={sceneManager}
-                lobby={lobby}
-                setMessage={setMessage}
-              />
-            ) : null
-          }
-        />
-        <Route path={"*"} element={<NotFound />} />
-      </Routes>
+      <div className="relative h-full">
+        <Routes>
+          <Route path={APP_ROUTES.Home} element={<Home />} />
+          <Route
+            path={APP_ROUTES.Lobby}
+            element={<LobbySelect setMessage={setMessage} />}
+          />
+          <Route
+            path={APP_ROUTES.OfflineLobby}
+            element={<OfflineLobby setLobby={setLobby} lobby={lobby} />}
+          />
+          <Route
+            path={APP_ROUTES.OnlineLobby}
+            element={<OnlineLobby lobby={lobby} />}
+          />
+          <Route
+            path={APP_ROUTES.Game}
+            element={
+              lobby !== undefined ? (
+                <Game
+                  sceneManager={sceneManager}
+                  lobby={lobby}
+                  setMessage={setMessage}
+                />
+              ) : null
+            }
+          />
+          <Route path={"*"} element={<NotFound />} />
+        </Routes>
+      </div>
     </div>
   );
 };
