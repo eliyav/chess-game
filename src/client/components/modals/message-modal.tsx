@@ -12,7 +12,7 @@ export const MessageModal: React.FC<Message> = ({
   text,
 }) => {
   return (
-    <div className="absolute inset-0 flex justify-center items-center m-2">
+    <div className="absolute z-50 inset-0 flex justify-center items-center m-2">
       <div className="bg-slate-200 p-4 rounded-lg border-2 border-black">
         <p className="mb-4">{text}</p>
         <div className="flex gap-2 justify-center">
