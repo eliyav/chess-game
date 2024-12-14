@@ -49,14 +49,11 @@ export const OnlineLobby: React.FC<{
           size={30}
           onClick={() => navigate(APP_ROUTES.Lobby)}
         />
-        <h1 className="inline-block place-self-center text-white grow text-center text-3xl font-bold italic pb-2">
-          Online Lobby
-        </h1>
-      </div>
-      <div className="row-span-4 flex flex-col gap-2 p-2 align-center md:w-3/4 md:justify-self-center">
-        <div className="glass dark-pane p-4">
-          <h2 className="glass dark-pane">Invite Code</h2>
-          <p>
+        <div className="inline-block grow place-content-center">
+          <h1 className="place-self-center text-white text-center text-3xl font-bold italic pb-2">
+            Online Lobby
+          </h1>
+          <p className="text-white text-center tracking-widest italic font-bold mt-2">
             <span
               onClick={() => {
                 try {
@@ -67,12 +64,16 @@ export const OnlineLobby: React.FC<{
                 }
               }}
             >
-              {lobby.key ?? "..."}
+              Invite Code: {lobby.key ?? "..."}
             </span>
           </p>
         </div>
-        <h2 className="glass dark-pane">Players</h2>
-        <div className="flex">
+      </div>
+      <div className="row-span-3 flex flex-col gap-2 p-2 align-center md:w-3/4 md:justify-self-center">
+        <h2 className="glass dark-pane text-white text-lg text-center tracking-widest italic font-bold">
+          Players
+        </h2>
+        <div className="flex flex-wrap justify-center m-2 gap-1">
           {player1 ? (
             <div className="flex">
               {!lessThanTwoPlayers && (
@@ -130,7 +131,9 @@ export const OnlineLobby: React.FC<{
             </div>
           ) : null}
         </div>
-        <h2 className="sub-title glass-dark">Settings</h2>
+        <h2 className="glass dark-pane text-white text-lg text-center tracking-widest italic font-bold">
+          Settings
+        </h2>
         <ControllerOptionsList
           options={lobby.controllerOptions}
           onChange={(key: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -139,27 +142,26 @@ export const OnlineLobby: React.FC<{
               options: { [key]: e.target.checked },
             })}
         />
-        <div className="grow content-end">
-          <div className="ready">
-            <input
-              type="checkbox"
-              disabled={disableReadyButton}
-              onClick={() => {
-                websocket.emit("readyPlayer", { lobbyKey: lobby.key });
-              }}
-              className="hidden"
-            />
-            <label htmlFor="ready-checkbox">Ready</label>
-          </div>
-          <SelectionButton
-            text={"Start Game"}
+        <div className="ready">
+          <input
+            type="checkbox"
+            disabled={disableReadyButton}
             onClick={() => {
-              websocket.emit("requestMatchStart", { lobbyKey: lobby.key });
+              websocket.emit("readyPlayer", { lobbyKey: lobby.key });
             }}
-            disabled={disableMatchStart}
+            className="hidden"
           />
+          <label htmlFor="ready-checkbox">Ready</label>
         </div>
       </div>
+      <SelectionButton
+        customClass="row-start-5 m-10 font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80 md:w-1/2 md:justify-self-center"
+        text={"Start Game"}
+        onClick={() => {
+          websocket.emit("requestMatchStart", { lobbyKey: lobby.key });
+        }}
+        disabled={disableMatchStart}
+      />
     </div>
   );
 };
