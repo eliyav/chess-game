@@ -59,7 +59,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   }, [websocket, navigate, setMessage, setLobby]);
 
   return (
-    <div className="h-dvh w-dvw">
+    <div>
       {message && (
         <MessageModal
           text={message.text}
@@ -67,7 +67,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
           onReject={message.onReject}
         />
       )}
-      <div className="relative h-full z-10">
+      <div className="relative h-full">
         <Routes>
           <Route path={APP_ROUTES.Home} element={<Home />} />
           <Route

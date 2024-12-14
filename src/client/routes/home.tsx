@@ -7,8 +7,8 @@ import { APP_ROUTES } from "../../shared/routes";
 export const Home: React.FC = () => {
   const navigate = useNavigate();
   return (
-    <div className="grid grid-rows-5 h-dvh md:w-1/2 md:m-auto">
-      <div className="relative glass dark-pane user-select-none p-6 m-6">
+    <div className="grid grid-rows-5 h-dvh md:w-1/2 md:m-auto z-10">
+      <div className="relative glass dark-pane user-select-none p-6 m-6 pt-3">
         <h1 className="text-5xl md:text-6xl text-white font-bold italic pb-2">
           3D CHESS
         </h1>

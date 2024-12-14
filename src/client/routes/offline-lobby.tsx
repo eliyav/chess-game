@@ -48,7 +48,7 @@ export const OfflineLobby: React.FC<{
   if (!lobby) return null;
 
   return (
-    <div className="grid grid-rows-5 h-dvh md:w-1/2 md:m-auto">
+    <div className="grid grid-rows-5 h-dvh md:w-1/2 md:m-auto z-10">
       <div className="flex grid-rows-1 justify-center align-center glass dark-pane m-4">
         <BackButton
           customClass={
