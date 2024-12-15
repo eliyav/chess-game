@@ -13,8 +13,8 @@
     "build:watch": "node esbuild.config.js -- -w -spb",
     "build:prod": "node esbuild.config.js -- -p & npm run tailwind",
     "nodemon:server": "nodemon dist/server/index.js",
-    "tailwind": "npx tailwindcss -i ./src/client/index.css -o ./dist/client/tailwind-output.css",
-    "tailwind:watch": "npx tailwindcss -i ./src/client/index.css -o ./dist/client/tailwind-output.css --watch"
+    "tailwind": "tailwindcss -i ./src/client/index.css -o ./dist/client/tailwind-output.css",
+    "tailwind:watch": "tailwindcss -i ./src/client/index.css -o ./dist/client/tailwind-output.css --watch"
   },
   "browserslist": [
     "last 1 Chrome version"
