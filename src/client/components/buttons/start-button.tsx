@@ -8,7 +8,7 @@ export const SelectionButton: React.FC<{
 }> = ({ text, onClick, disabled, customClass }) => {
   return (
     <button
-      className={`btn glass-light ${customClass ? customClass : ""}`}
+      className={`btn glass light-pane ${customClass ? customClass : ""}`}
       onClick={onClick}
       disabled={disabled}
     >

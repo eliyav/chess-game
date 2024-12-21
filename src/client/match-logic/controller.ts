@@ -4,17 +4,21 @@ import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
 import type { Nullable } from "@babylonjs/core/types";
 import { GAMESTATUS, Point, TurnHistory } from "../../shared/game";
 import { ControllerOptions, LOBBY_TYPE } from "../../shared/match";
+import { APP_ROUTES } from "../../shared/routes";
 import { Message } from "../components/modals/message-modal";
-import GamePiece from "../game-logic/game-piece";
 import { doPointsMatch } from "../game-logic/moves";
 import { rotateCamera } from "../scenes/animation/camera";
 import calcTurnAnimation from "../scenes/animation/turn-animation";
-import { displayPieceMoves, findByPoint } from "../scenes/scene-helpers";
+import {
+  createMovementDisc,
+  getPointFromPosition,
+  getPositionFromPoint,
+  showMoves,
+} from "../scenes/scene-helpers";
 import { GameScene, SceneManager, Scenes } from "../scenes/scene-manager";
+import { websocket } from "../websocket-client";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
-import { APP_ROUTES } from "../../shared/routes";
-import { websocket } from "../websocket-client";
 
 export class Controller {
   sceneManager: SceneManager;
@@ -62,21 +66,30 @@ export class Controller {
       if (!this.match.isPlayersTurn()) return;
       const pickedMesh = pickResult?.pickedMesh;
       if (!pickedMesh) return;
-      const externalMesh = pickedMesh.metadata !== null;
-      const point = this.match.getMeshGamePoint(pickedMesh, externalMesh);
-      const piece = this.match.lookupGamePiece(pickedMesh, true);
-      //If no selection
+      const point = getPointFromPosition({
+        position: [pickedMesh.position.z, pickedMesh.position.x],
+        externalMesh: false,
+      });
+      //If no point selected
       if (!this.selectedPoint) {
-        return this.displayMoves(point, piece);
+        const currentPlayersPiece = this.match.isCurrentPlayersPiece(point);
+        if (!currentPlayersPiece) return;
+        this.selectedPoint = point;
+        return this.displayMoves(point);
       } else {
         //If you select the same piece as before deselect it
         if (doPointsMatch(this.selectedPoint, point)) {
-          return this.unselectCurrentPiece();
+          this.selectedPoint = undefined;
+          this.updateMeshesRender();
+          return;
         } else {
           //If you select a different piece check if its a valid move and resolve or display new moves
           const validMove = await this.move([this.selectedPoint, point]);
           if (!validMove) {
-            return this.displayMoves(point, piece);
+            const currentPlayersPiece = this.match.isCurrentPlayersPiece(point);
+            if (!currentPlayersPiece) return;
+            this.selectedPoint = point;
+            return this.displayMoves(point);
           }
         }
       }
@@ -116,9 +129,12 @@ export class Controller {
   prepNextView() {
     this.selectedPoint = undefined;
     this.updateMeshesRender();
+    //Show previous turn
+    this.displayLastTurn();
     const isGameOver = this.match.isGameOver();
     if (isGameOver) {
-      this.events.setMessage(this.createMatchEndPrompt());
+      const status = this.match.getGame().getGameState().status;
+      this.events.setMessage(this.createMatchEndPrompt(status));
     } else {
       this.rotateCamera();
       if (this.match.mode === LOBBY_TYPE.LOCAL) {
@@ -129,18 +145,44 @@ export class Controller {
     }
   }
 
-  displayMoves(point: Point, piece: GamePiece | undefined) {
+  displayLastTurn() {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
-    if (!piece) return;
-    const currentPlayersPiece = this.match.isCurrentPlayersPiece(piece);
-    if (!currentPlayersPiece) return;
+    const name = "disc-previousTurn";
+    //Clear old discs
+    gameScene.scene.meshes.forEach((mesh) => {
+      if (mesh.name === name) {
+        gameScene.scene.removeMesh(mesh);
+        mesh.dispose();
+      }
+    });
+    const lastTurn = this.match.getGameHistory().at(-1);
+    if (!lastTurn) return;
+    const { origin, target } = lastTurn;
+    //Plane in both locations
+    const originDisc = createMovementDisc({
+      point: origin,
+      gameScene,
+      type: "previousTurn",
+      name,
+    });
+    const targetDisc = createMovementDisc({
+      point: target,
+      gameScene,
+      type: "previousTurn",
+      name,
+    });
+    gameScene.scene.addMesh(originDisc);
+    gameScene.scene.addMesh(targetDisc);
+  }
+
+  displayMoves(point: Point) {
+    const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (this.options.playGameSounds) {
       gameScene.data.audio.select?.play();
     }
-    const moves = this.match.getMoves(piece, point);
-    this.selectedPoint = point;
+    const moves = this.match.getMoves(point);
     this.updateMeshesRender();
-    displayPieceMoves({
+    showMoves({
       point,
       moves,
       gameScene,
@@ -148,15 +190,20 @@ export class Controller {
     });
   }
 
-  unselectCurrentPiece() {
-    this.selectedPoint = undefined;
-    this.updateMeshesRender();
-  }
-
-  createMatchEndPrompt() {
-    const winningTeam = this.match.getWinner();
+  createMatchEndPrompt(status: GAMESTATUS) {
+    const text = (() => {
+      const winningTeam = this.match.getWinner();
+      switch (status) {
+        case GAMESTATUS.CHECKMATE:
+          return `Checkmate! ${winningTeam} team has won, would you like to play another game?`;
+        case GAMESTATUS.STALEMATE:
+          return "Game has ended in a stalemate, would you like to play another game?";
+        default:
+          return "Game Over! Would you like to play another game";
+      }
+    })();
     return {
-      text: `${winningTeam} team has won!, Would you like to play another game?`,
+      text,
       onConfirm: () => {
         this.requestMatchReset();
         this.events.setMessage(null);
@@ -219,9 +266,8 @@ export class Controller {
   findMeshFromPoint(point: Point) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     return gameScene.data.meshesToRender.find((mesh) => {
-      const meshPoint = findByPoint({
-        get: "index",
-        point: [mesh.position.z, mesh.position.x],
+      const meshPoint = getPointFromPosition({
+        position: [mesh.position.z, mesh.position.x],
         externalMesh: true,
       });
       return doPointsMatch(meshPoint, point);
@@ -243,6 +289,7 @@ export class Controller {
         mesh.dispose();
       }
       gameScene.data.meshesToRender = [];
+      this.displayLastTurn();
     }
 
     //For each active piece, creates a mesh clone and places on board
@@ -255,12 +302,12 @@ export class Controller {
       if (!foundMesh) return;
       const clone = foundMesh.clone(type, null);
       if (!clone) return;
-      [clone.position.z, clone.position.x] = findByPoint({
-        get: "position",
+      [clone.position.z, clone.position.x] = getPositionFromPoint({
         point,
         externalMesh: true,
       });
       clone.isVisible = true;
+      clone.isPickable = false;
       if (this.options.renderShadows) {
         gameScene.data.shadowGenerator.forEach((gen) =>
           gen.addShadowCaster(clone)

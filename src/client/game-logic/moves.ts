@@ -1,7 +1,7 @@
 import { EnPassant, Move, PIECE, Point, TurnHistory } from "../../shared/game";
-import GamePiece from "./game-piece";
 import { TEAM } from "../../shared/match";
 import { Board, type Grid } from "./board";
+import { kingInitialPoints } from "./chess-data-import";
 
 type LateralDirection = "up" | "down" | "right" | "left";
 type DiagonalDirection = "upRight" | "upLeft" | "downRight" | "downLeft";
@@ -10,14 +10,29 @@ type Movements = Partial<Record<LateralDirection | DiagonalDirection, Point[]>>;
 export function getPieceMoves({
   grid,
   point,
-  piece: { type, team, moved },
-  lastTurnHistory,
+  piece: { type, team },
+  turnHistory,
+  checkForCastling,
+  skipCastling = false,
 }: {
   grid: Grid;
   point: Point;
-  piece: { type: PIECE; team: TEAM; moved: boolean };
-  lastTurnHistory: TurnHistory | undefined;
+  piece: { type: PIECE; team: TEAM };
+  turnHistory: TurnHistory[];
+  skipCastling: boolean;
+  checkForCastling: ({
+    kingPoint,
+    team,
+    grid,
+    turnHistory,
+  }: {
+    kingPoint: Point;
+    team: TEAM;
+    grid: Grid;
+    turnHistory: TurnHistory[];
+  }) => Move[];
 }) {
+  const lastTurnHistory = turnHistory.at(-1);
   switch (type) {
     case PIECE.P:
       return calcPawnMoves({
@@ -38,9 +53,10 @@ export function getPieceMoves({
       return calcKingMoves({
         point,
         grid,
-        moved,
         team,
-        lastTurnHistory,
+        turnHistory,
+        checkForCastling,
+        skipCastling,
       });
   }
 }
@@ -251,15 +267,27 @@ function calcKnightMoves({
 function calcKingMoves({
   point,
   grid,
-  lastTurnHistory,
-  moved,
+  turnHistory,
   team,
+  checkForCastling,
+  skipCastling = false,
 }: {
   point: Point;
   grid: Grid;
-  lastTurnHistory: TurnHistory | undefined;
-  moved: boolean;
+  turnHistory: TurnHistory[];
   team: TEAM;
+  checkForCastling: ({
+    kingPoint,
+    team,
+    grid,
+    turnHistory,
+  }: {
+    kingPoint: Point;
+    team: TEAM;
+    grid: Grid;
+    turnHistory: TurnHistory[];
+  }) => Move[];
+  skipCastling: boolean;
 }) {
   const kingMovements: Point[] = [
     [0, 1],
@@ -281,14 +309,23 @@ function calcKingMoves({
     }
   });
 
-  if (!moved) {
-    calcCastling({
+  const isKingInIntialPoint = kingInitialPoints.teams
+    .find((teamData) => teamData.name === team)
+    ?.startingPoints.some((initialPoint) => doPointsMatch(initialPoint, point));
+  if (!isKingInIntialPoint) return availableMoves;
+  const hasKingMoved = turnHistory.some((turn) =>
+    doPointsMatch(turn.origin, point)
+  );
+  if (!hasKingMoved && !skipCastling) {
+    const castlingMoves = checkForCastling({
       kingPoint: point,
       team,
       grid,
-      lastTurnHistory,
-      movesObj: availableMoves,
+      turnHistory,
     });
+    if (castlingMoves.length) {
+      availableMoves.push(...castlingMoves);
+    }
   }
 
   return availableMoves;
@@ -507,114 +544,3 @@ const calculateMovements = ({
   if (!transform) throw new Error(`Invalid direction: ${direction}`);
   return movements.map((move) => transform(x, y, move));
 };
-
-function calcCastling({
-  kingPoint,
-  team,
-  grid,
-  lastTurnHistory,
-  movesObj,
-}: {
-  kingPoint: Point;
-  team: TEAM;
-  grid: Grid;
-  lastTurnHistory: TurnHistory | undefined;
-  movesObj: Move[];
-}) {
-  const playersRooks = Board.getPieces({ grid }).filter(({ piece }) => {
-    return piece?.type === PIECE.R && piece?.team === team;
-  });
-  if (playersRooks.length) {
-    playersRooks.forEach(({ piece: rook, point: rookPoint }) => {
-      if (!rook) return;
-      //Check for castling move
-      if (!rook.moved) {
-        const resolve = canCastlingResolve({
-          kingPoint,
-          rookPoint,
-          team,
-          grid,
-          lastTurnHistory,
-        });
-        if (resolve) {
-          //If castling resolve returns true, push the move into available moves
-          resolve[0] ? movesObj.push(resolve[1]) : null;
-        }
-      }
-    });
-  }
-}
-
-function canCastlingResolve({
-  kingPoint,
-  rookPoint,
-  team,
-  grid,
-  lastTurnHistory,
-}: {
-  kingPoint: Point;
-  rookPoint: Point;
-  team: TEAM;
-  grid: Grid;
-  lastTurnHistory: TurnHistory | undefined;
-}) {
-  const [kingX, kingY] = kingPoint;
-  const [rookX] = rookPoint;
-  const spaceBetween = kingX - rookX;
-  let distance;
-  spaceBetween < 0
-    ? (distance = spaceBetween * -1 - 1)
-    : (distance = spaceBetween - 1);
-
-  //Calculate the squares in between King and Rook
-  const squaresInBetween: Point[] = [];
-
-  for (let step = 1; step <= distance; step++) {
-    let stepDirection;
-    spaceBetween < 0 ? (stepDirection = step * 1) : (stepDirection = step * -1);
-    const point: Point = [kingX + stepDirection, kingY];
-    squaresInBetween.push(point);
-  }
-  //Check if squares in between are used by any pieces
-  const pieceInBetween = squaresInBetween.filter((point) => {
-    return Board.getPiece({ grid, point }) !== undefined;
-  });
-  if (!pieceInBetween.length) {
-    const squaresInUse = [...squaresInBetween, kingPoint, rookPoint];
-    //Check if opponents pieces, threathen any of the spaces in between
-    const opponentsPieces = Board.getPieces({ grid }).filter(({ piece }) => {
-      return piece && piece.team !== team;
-    }) as { piece: GamePiece; point: Point }[];
-    const opponentsAvailableMoves = opponentsPieces
-      .map(({ piece, point }) =>
-        getPieceMoves({
-          piece,
-          point,
-          grid,
-          lastTurnHistory,
-        })
-      )
-      .flat();
-    let isThereOverlap = false;
-    for (let i = 0; i < squaresInUse.length; i++) {
-      const square = squaresInUse[i];
-      for (let k = 0; k < opponentsAvailableMoves.length; k++) {
-        const availableMove = opponentsAvailableMoves[k];
-        const doesMoveThreathenCastling = doPointsMatch(
-          availableMove.target,
-          square
-        );
-        doesMoveThreathenCastling ? (isThereOverlap = true) : null;
-        break;
-      }
-    }
-    if (!isThereOverlap) {
-      //If there is no overlap, return the possible castling move
-      const returnResult: [boolean, Move] = [
-        true,
-        { origin: kingPoint, target: rookPoint, type: "castle" },
-      ];
-      return returnResult;
-    }
-  }
-}

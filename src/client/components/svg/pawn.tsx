@@ -1,15 +1,16 @@
 import React from "react";
 
 export const Pawn: React.FC<{
+  size?: number;
   className?: string;
   color?: string;
-}> = ({ className, color }) => {
+}> = ({ className, color, size }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       version="1.1"
-      width="45"
-      height="45"
+      width={size || 50}
+      height={size || 50}
       className={className || ""}
       viewBox="0 2.5 45 47.5"
     >

@@ -15,10 +15,20 @@ import knight from "../../../assets/pieces/knightv3.gltf";
 import pawn from "../../../assets/pieces/pawnv3.gltf";
 import queen from "../../../assets/pieces/queenv3.gltf";
 import rook from "../../../assets/pieces/rookv3.gltf";
-import { createMeshMaterials } from "./materials";
+import { createMeshMaterials, createMovementMaterials } from "./materials";
+import chessData from "../game-logic/chess-data-import";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { getPositionFromPoint } from "./scene-helpers";
 
-export const loadGameAssets = async (scene: Scene) => {
-  const materials = createMeshMaterials(scene);
+export const loadGameAssets = async ({
+  scene,
+  meshMaterials,
+  movementMaterials,
+}: {
+  scene: Scene;
+  meshMaterials: ReturnType<typeof createMeshMaterials>;
+  movementMaterials: ReturnType<typeof createMovementMaterials>;
+}) => {
   const meshesToLoad = [king, queen, knight, bishop, rook, pawn];
 
   const loadedBoardMesh: ISceneLoaderAsyncResult =
@@ -52,7 +62,22 @@ export const loadGameAssets = async (scene: Scene) => {
   configureChessPieces({
     finalArray: piecesMeshes,
     meshes: loadedPieceMeshes,
-    materials: [materials.white, materials.black],
+    materials: [meshMaterials.white, meshMaterials.black],
+  });
+
+  //Create invisible mesh for each square on the board for raypicking
+  chessData.boardPoints.forEach((point, i) => {
+    const plane = MeshBuilder.CreatePlane(`plane-${i}`, {
+      size: 2.8,
+    });
+    const [z, x] = getPositionFromPoint({
+      point,
+      externalMesh: false,
+    });
+    plane.setPositionWithLocalVector(new Vector3(x, 0.51, z));
+    plane.rotation = new Vector3(Math.PI / 2, 0, 0);
+    plane.material = movementMaterials.squareMaterial;
+    scene.addMesh(plane);
   });
 
   return piecesMeshes;

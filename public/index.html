@@ -12,7 +12,7 @@
     </style>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="manifest" href="/manifest.json">
-    <link rel="stylesheet" href="/index.css">
+    <link rel="stylesheet" href="/tailwind-output.css">
     <script>
       if('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js', { scope: '/' });
@@ -20,8 +20,10 @@
     </script>
 </head>
 <body>
-  <canvas id="app-canvas" style="background-color: black;"></canvas>
-    <div id="root">
+  <canvas
+  id="app-canvas" class="fixed h-dvh w-dvw outline-none z-0 bg-black"
+></canvas>
+    <div id="root" class="h-dvh w-dvw">
       <div class="screen">
         <div class="loading screen">
           <p>Loading...</p>

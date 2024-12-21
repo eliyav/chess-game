@@ -5,20 +5,29 @@ const PlayerCard: React.FC<{
   ready?: boolean;
   type?: string;
   team?: string;
-}> = ({ name, ready, type, team }) => {
+  children?: React.ReactNode;
+}> = ({ name, ready, type, team, children }) => {
+  const isOnlyName =
+    ready === undefined && type === undefined && team === undefined;
   return (
-    <div className="player-card">
-      <p style={{ fontWeight: "bold" }}>{name}</p>
+    <div className="relative flex basis-full gap-1 p-2 bg-slate-200 rounded-lg border-2 border-black h-14 ">
+      {children}
+      <p
+        className={`font-bold pr-2 border-r-2 border-black ${
+          isOnlyName ? "w-full border-r-0" : ""
+        }`}
+      >
+        {name}
+      </p>
       {team !== undefined && <p>{team}</p>}
       {type !== undefined && <p>{type}</p>}
       {ready !== undefined && (
-        <p>
-          Ready:{" "}
-          {ready ? (
-            <span className={"green-highlight"}>✔</span>
-          ) : (
-            <span className={"red-highlight"}>✖</span>
-          )}
+        <p
+          className={`place-self-end self-center grow text-right ${
+            ready ? "text-green-500" : "text-red-500"
+          }`}
+        >
+          {ready ? "✔" : "✖"}
         </p>
       )}
     </div>

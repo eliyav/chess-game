@@ -6,6 +6,7 @@ import { LOBBY_TYPE, Lobby, buildDefaultOptions } from "../shared/match";
 import { RESOURCES } from "../shared/resources";
 import { generateKey } from "./helpers";
 import { createWebsocketServer } from "./websocket-server";
+import cors from "cors";
 
 const clientPath = fileURLToPath(new URL("../client", import.meta.url));
 
@@ -14,6 +15,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(compression());
+app.use(cors());
 
 app.use(express.static(clientPath));
 

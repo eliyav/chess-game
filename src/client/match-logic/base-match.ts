@@ -1,9 +1,6 @@
-import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { GAMESTATUS, Point, TurnHistory } from "../../shared/game";
-import GamePiece from "../game-logic/game-piece";
 import { Lobby, Player, TEAM } from "../../shared/match";
 import Game from "../game-logic/game";
-import { findByPoint } from "../scenes/scene-helpers";
 
 export interface MatchLogic {
   requestMove({
@@ -17,7 +14,7 @@ export interface MatchLogic {
   }): TurnHistory | undefined;
   isPlayersTurn(): boolean;
   getPlayerTeam(): TEAM | undefined;
-  isCurrentPlayersPiece(piece: GamePiece): boolean;
+  isCurrentPlayersPiece(point: Point): boolean;
   resetRequest(): boolean;
   undoTurnRequest(): boolean;
 }
@@ -43,8 +40,8 @@ export class BaseMatch {
     return this.getGame().move({ origin: originPoint, target: targetPoint });
   }
 
-  getMoves(piece: GamePiece, point: Point) {
-    return this.game.getMoves({ piece, point });
+  getMoves(point: Point) {
+    return this.game.getMoves({ point });
   }
 
   reset() {
@@ -64,7 +61,7 @@ export class BaseMatch {
   }
 
   isGameOver() {
-    return this.game.getGameState().status === GAMESTATUS.CHECKMATE;
+    return this.game.getGameState().status !== GAMESTATUS.INPROGRESS;
   }
 
   getWinner() {
@@ -83,21 +80,7 @@ export class BaseMatch {
     return this.game.undoTurn();
   }
 
-  getMeshGamePoint(pickedMesh: AbstractMesh, externalMesh: boolean) {
-    return findByPoint({
-      get: "index",
-      point: [pickedMesh.position.z, pickedMesh.position.x],
-      externalMesh,
-    });
-  }
-
-  lookupGamePiece(pickedMesh: AbstractMesh, externalMesh: boolean) {
-    return this.game.lookupPiece({
-      point: findByPoint({
-        get: "index",
-        point: [pickedMesh.position.z, pickedMesh.position.x],
-        externalMesh,
-      }),
-    });
+  lookupGamePiece(point: Point) {
+    return this.game.lookupPiece({ point });
   }
 }

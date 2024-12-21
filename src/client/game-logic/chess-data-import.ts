@@ -5,6 +5,7 @@ type Data = {
   boardSize: number;
   columnNames: string[];
   initialPositions: InitialPositions[];
+  boardPoints: Point[];
 };
 
 type InitialPositions = {
@@ -21,9 +22,17 @@ type InitialPositions = {
   ];
 };
 
+const boardPoints: Point[] = [];
+for (let x = 0; x < 8; x++) {
+  for (let z = 0; z < 8; z++) {
+    boardPoints.push([x, z]);
+  }
+}
+
 export const chessData: Data = {
   boardSize: 8,
   columnNames: ["a", "b", "c", "d", "e", "f", "g", "h"],
+  boardPoints,
   initialPositions: [
     {
       type: PIECE.P,
@@ -141,5 +150,13 @@ export const chessData: Data = {
     },
   ],
 };
+
+export const rookInitialPoints = chessData.initialPositions.find(
+  (positions) => positions.type === PIECE.R
+)!;
+
+export const kingInitialPoints = chessData.initialPositions.find(
+  (positions) => positions.type === PIECE.K
+)!;
 
 export default chessData;

@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LOBBY_TYPE } from "../../shared/match";
-import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
 import { Message } from "../components/modals/message-modal";
 import { Divider } from "../components/svg/divider";
 import { APP_ROUTES } from "../../shared/routes";
 import { RESOURCES } from "../../shared/resources";
+import { ENV_BASE_URL } from "..";
+import { BackButton } from "../components/svg/back-button";
 
 export const LobbySelect: React.FC<{
   setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
@@ -15,44 +16,48 @@ export const LobbySelect: React.FC<{
   const [lobbyKey, setLobbyKey] = useState("");
 
   return (
-    <div className="content flex-column space-between">
-      <div className="header glass-dark">
+    <div className="grid grid-rows-5 h-dvh select-none md:w-1/2 md:m-auto z-10">
+      <div className="flex grid-rows-1 justify-center align-center glass dark-pane m-4">
         <BackButton
-          customClass={"bottom-left"}
+          className={
+            "inline-block h-full border-r-2 border-white min-w-16 p-3 hover:bg-white hover:bg-opacity-10"
+          }
           size={30}
           onClick={() => navigate(APP_ROUTES.Home)}
         />
-        <h1>Select Lobby</h1>
+        <h1 className="inline-block place-self-center text-white grow text-center text-3xl font-bold italic pb-2">
+          Select Lobby
+        </h1>
       </div>
-      <div
-        className="flex-column gap-2 mt-3 grow-1 "
-        style={{ justifyContent: "flex-start" }}
-      >
+      <div className="row-span-4 flex flex-col gap-2 p-2 align-center md:w-3/4 md:justify-self-center">
         <SelectionButton
+          customClass="m-10 p-4 font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80"
           text={LOBBY_TYPE.LOCAL}
           onClick={() => {
             navigate(APP_ROUTES.OfflineLobby);
           }}
         />
-        <Divider />
-        <div>
+        <Divider className="w-full" />
+        <div className="text-center m-10">
           <input
-            id="join-lobby-input"
             type="text"
             placeholder="Enter Invite Code"
             maxLength={5}
             onChange={(e) => setLobbyKey(e.target.value.toUpperCase())}
             autoComplete="off"
             value={lobbyKey}
+            className="w-full p-2 rounded-t text-center border-2 border-gray-500 placeholder-opacity-50 focus:outline-none"
           ></input>
           <SelectionButton
-            customClass={"no-top-br-radius"}
+            customClass={
+              "w-full p-4 rounded-t-none font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80"
+            }
             disabled={lobbyKey.length !== 5}
             text={`Join ${LOBBY_TYPE.ONLINE}`}
             onClick={async () => {
               try {
                 const response = await fetch(
-                  `${RESOURCES.JOIN_LOBBY}?key=${lobbyKey}`,
+                  `${ENV_BASE_URL}${RESOURCES.JOIN_LOBBY}?key=${lobbyKey}`,
                   {}
                 );
                 if (!response.ok) {
@@ -75,12 +80,15 @@ export const LobbySelect: React.FC<{
             }}
           />
         </div>
-        <Divider />
+        <Divider className="w-full" />
         <SelectionButton
+          customClass="m-10 p-4 font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80"
           text={`Create ${LOBBY_TYPE.ONLINE}`}
           onClick={async () => {
             try {
-              const response = await fetch(RESOURCES.CREATE_LOBBY);
+              const response = await fetch(
+                `${ENV_BASE_URL}${RESOURCES.CREATE_LOBBY}`
+              );
               const lobbyKey = await response.text();
               navigate(`${APP_ROUTES.OnlineLobby}?key=${lobbyKey}`);
             } catch (e) {

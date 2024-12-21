@@ -25,7 +25,10 @@ export class Board {
           this.addPiece({
             grid,
             point,
-            piece: new GamePiece({ type, team: team.name }),
+            piece: new GamePiece({
+              type,
+              team: team.name,
+            }),
           });
         });
       });

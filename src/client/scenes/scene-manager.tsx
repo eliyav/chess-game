@@ -3,11 +3,11 @@ import { Engine } from "@babylonjs/core/Engines/engine";
 import type { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Scene } from "@babylonjs/core/scene";
-import { AnimationContainer } from "./animation/create-animations";
-import { createHomeScene } from "./home-scene";
 import { APP_ROUTES } from "../../shared/routes";
-import { createGameScene } from "./game-scene";
+import { AnimationContainer } from "./animation/create-animations";
 import { handleAudioUnlock } from "./audio-engine";
+import { createGameScene } from "./game-scene";
+import { createHomeScene } from "./home-scene";
 
 export type CustomScene<T> = {
   scene: Scene;
