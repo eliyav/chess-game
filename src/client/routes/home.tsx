@@ -7,7 +7,7 @@ import { APP_ROUTES } from "../../shared/routes";
 export const Home: React.FC = () => {
   const navigate = useNavigate();
   return (
-    <div className="grid grid-rows-5 h-dvh md:w-1/2 md:m-auto z-10">
+    <div className="grid grid-rows-5 h-dvh select-none md:w-1/2 md:m-auto z-10">
       <div className="relative glass dark-pane user-select-none p-6 m-6 pt-3">
         <h1 className="text-5xl md:text-6xl text-white font-bold italic pb-2">
           3D CHESS
@@ -15,7 +15,8 @@ export const Home: React.FC = () => {
         <p className="italic pb-2 text-white">Play for free!</p>
         <SvgGithub
           onClick={() => window.open("https://github.com/eliyav/chess-game")}
-          className="absolute bg-white rounded-lg right-1 bottom-1 hover:opacity-80"
+          className="absolute bg-white rounded-lg right-1 m-2 bottom-1 hover:opacity-80"
+          size={40}
         />
       </div>
       <SelectionButton
