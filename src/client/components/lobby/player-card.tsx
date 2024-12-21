@@ -23,7 +23,7 @@ const PlayerCard: React.FC<{
       {type !== undefined && <p>{type}</p>}
       {ready !== undefined && (
         <p
-          className={`absolute right-0 text-right ${
+          className={`place-self-end self-center grow text-right ${
             ready ? "text-green-500" : "text-red-500"
           }`}
         >
