@@ -11,6 +11,7 @@ import { CopyUrl } from "../components/svg/copy-url";
 import { Pawn } from "../components/svg/pawn";
 import { websocket } from "../websocket-client";
 import { ClipboardChecked } from "../components/svg/clipboard-checked";
+import { ENV_BASE_URL } from "..";
 
 export const OnlineLobby: React.FC<{
   lobby: Lobby | undefined;
@@ -43,6 +44,17 @@ export const OnlineLobby: React.FC<{
     };
   }, [websocket, location]);
 
+  useEffect(() => {
+    if (clipboardMessage) {
+      const timeout = setTimeout(() => {
+        setClipboardMessage("");
+      }, 3000);
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+  }, [clipboardMessage, setClipboardMessage]);
+
   if (!lobby) return null;
 
   const [player1, player2] = lobby.players;
@@ -74,7 +86,6 @@ export const OnlineLobby: React.FC<{
                 {clipboardMessage}
               </p>
             )}
-            <span className="pr-2 text-lg">Invite:</span>
             <span
               className="select-text cursor-pointer bold text-xl hover:opacity-80"
               onClick={() => {
@@ -91,7 +102,7 @@ export const OnlineLobby: React.FC<{
                     const text = lobby.key ?? "";
                     copyToClipboard(text, "CODE");
                   }}
-                  className="inline-block ml-2 h-full cursor-pointer bg-slate-200 rounded hover:opacity-80"
+                  className="inline-block ml-2 h-full w-fit cursor-pointer p-1 bg-slate-200 rounded hover:opacity-80"
                 />
               ) : (
                 <ClipboardAdd
@@ -99,15 +110,15 @@ export const OnlineLobby: React.FC<{
                     const text = lobby.key ?? "";
                     copyToClipboard(text, "CODE");
                   }}
-                  className="inline-block ml-2 h-full cursor-pointer bg-slate-200 rounded hover:opacity-80"
+                  className="inline-block ml-2 h-full w-fit cursor-pointer p-1 bg-slate-200 rounded hover:opacity-80"
                 />
               )}
               <CopyUrl
                 onClick={() => {
-                  const url = `${window.location.origin}${window.location.pathname}?key=${lobby.key}`;
+                  const url = `${ENV_BASE_URL}${APP_ROUTES.OnlineLobby}?key=${lobby.key}`;
                   copyToClipboard(url, "URL");
                 }}
-                className="inline-block ml-2 h-full cursor-pointer bg-slate-200 rounded hover:opacity-80"
+                className="inline-block ml-2 h-full w-fit cursor-pointer p-1 bg-slate-200 rounded hover:opacity-80"
               />
             </div>
           </div>
@@ -134,7 +145,7 @@ export const OnlineLobby: React.FC<{
                 >
                   {!lessThanTwoPlayers ? (
                     <Pawn
-                      className="team-symbol-background"
+                      className="team-symbol-background h-full"
                       color={
                         lobby.teams.White === player.id ? "#ffffff" : "#000000"
                       }
