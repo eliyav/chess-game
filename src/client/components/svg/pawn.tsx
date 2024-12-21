@@ -1,7 +1,7 @@
 import React from "react";
 
 export const Pawn: React.FC<{
-  size: number;
+  size?: number;
   className?: string;
   color?: string;
 }> = ({ className, color, size }) => {
@@ -9,8 +9,8 @@ export const Pawn: React.FC<{
     <svg
       xmlns="http://www.w3.org/2000/svg"
       version="1.1"
-      width={size}
-      height={size}
+      width={size || "auto"}
+      height={size || "auto"}
       className={className || ""}
       viewBox="0 2.5 45 47.5"
     >

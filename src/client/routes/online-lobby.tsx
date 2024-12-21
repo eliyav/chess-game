@@ -134,7 +134,6 @@ export const OnlineLobby: React.FC<{
                 >
                   {!lessThanTwoPlayers ? (
                     <Pawn
-                      size={24}
                       className="team-symbol-background"
                       color={
                         lobby.teams.White === player.id ? "#ffffff" : "#000000"
