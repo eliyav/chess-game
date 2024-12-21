@@ -1,9 +1,9 @@
 import React from "react";
 
-export const Url: React.FC<{
+export const CopyUrl: React.FC<{
   onClick?: () => void;
   className?: string;
-  size: number;
+  size?: number;
 }> = ({ className, onClick, size }) => {
   return (
     <svg
@@ -11,8 +11,8 @@ export const Url: React.FC<{
       xmlns="http://www.w3.org/2000/svg"
       className={className ? className : ""}
       onClick={onClick}
-      width={size}
-      height={size}
+      width={size ? size : "auto"}
+      height={size ? size : "auto"}
     >
       <g id="Glyph">
         <g data-name="Glyph" id="Glyph-2">

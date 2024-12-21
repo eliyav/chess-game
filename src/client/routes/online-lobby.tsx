@@ -1,19 +1,35 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Lobby, TEAM } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
 import { SelectionButton } from "../components/buttons/start-button";
 import { ControllerOptionsList } from "../components/lobby/controller-options-list";
 import PlayerCard from "../components/lobby/player-card";
+import { BackButton } from "../components/svg/back-button";
+import { ClipboardAdd } from "../components/svg/clipboard-add";
+import { CopyUrl } from "../components/svg/copy-url";
 import { Pawn } from "../components/svg/pawn";
 import { websocket } from "../websocket-client";
-import { BackButton } from "../components/svg/back-button";
+import { ClipboardChecked } from "../components/svg/clipboard-checked";
 
 export const OnlineLobby: React.FC<{
   lobby: Lobby | undefined;
 }> = ({ lobby }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [clipboardMessage, setClipboardMessage] = useState("");
+
+  const copyToClipboard = useCallback(
+    (text: string, type: "CODE" | "URL") => {
+      try {
+        navigator.clipboard.writeText(text);
+        setClipboardMessage(`Copied ${type} to clipboard!`);
+      } catch (e) {
+        setClipboardMessage(`Failed to copy to clipboard!`);
+      }
+    },
+    [setClipboardMessage]
+  );
 
   useEffect(() => {
     const lobbyKey = location.search.split("=")[1];
@@ -39,7 +55,7 @@ export const OnlineLobby: React.FC<{
   const disableMatchStart = lobby.players.length < 2 || !playersReady;
 
   return (
-    <div className="grid grid-rows-5 h-dvh md:w-1/2 md:m-auto z-10">
+    <div className="grid grid-rows-5 h-dvh md:w-1/2 md:m-auto z-10 select-none ">
       <div className="flex grid-rows-1 justify-center align-center glass dark-pane m-4">
         <BackButton
           className={
@@ -52,23 +68,49 @@ export const OnlineLobby: React.FC<{
           <h1 className="place-self-center text-white text-center text-3xl font-bold italic pb-2">
             Online Lobby
           </h1>
-          <p className="text-white text-center tracking-widest italic font-bold mt-2">
+          <div className="text-red-700 text-center tracking-widest italic font-bold flex justify-center items-center p-2 rounded-lg">
+            {clipboardMessage && (
+              <p className="absolute bottom-1 text-red-700">
+                {clipboardMessage}
+              </p>
+            )}
+            <span className="pr-2 text-lg">Invite:</span>
             <span
+              className="select-text cursor-pointer bold text-xl hover:opacity-80"
               onClick={() => {
-                try {
-                  const text = lobby.key ?? "";
-                  navigator.clipboard.writeText(text);
-                } catch (e) {
-                  console.error(e);
-                }
+                const text = lobby.key ?? "";
+                copyToClipboard(text, "CODE");
               }}
             >
-              Invite Code:{" "}
-              <span className="select-all cursor-pointer">
-                {lobby.key ?? "..."}
-              </span>
+              {lobby.key ?? "..."}
             </span>
-          </p>
+            <div className="bold h-10 m-2">
+              {clipboardMessage ? (
+                <ClipboardChecked
+                  onClick={() => {
+                    const text = lobby.key ?? "";
+                    copyToClipboard(text, "CODE");
+                  }}
+                  className="inline-block ml-2 h-full cursor-pointer bg-slate-200 rounded hover:opacity-80"
+                />
+              ) : (
+                <ClipboardAdd
+                  onClick={() => {
+                    const text = lobby.key ?? "";
+                    copyToClipboard(text, "CODE");
+                  }}
+                  className="inline-block ml-2 h-full cursor-pointer bg-slate-200 rounded hover:opacity-80"
+                />
+              )}
+              <CopyUrl
+                onClick={() => {
+                  const url = `${window.location.origin}${window.location.pathname}?key=${lobby.key}`;
+                  copyToClipboard(url, "URL");
+                }}
+                className="inline-block ml-2 h-full cursor-pointer bg-slate-200 rounded hover:opacity-80"
+              />
+            </div>
+          </div>
         </div>
       </div>
       <div className="row-span-3 flex flex-col gap-2 p-2 align-center md:w-3/4 md:justify-self-center">
