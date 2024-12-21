@@ -9,8 +9,8 @@ export const Pawn: React.FC<{
     <svg
       xmlns="http://www.w3.org/2000/svg"
       version="1.1"
-      width={size || "auto"}
-      height={size || "auto"}
+      width={size || 50}
+      height={size || 50}
       className={className || ""}
       viewBox="0 2.5 45 47.5"
     >

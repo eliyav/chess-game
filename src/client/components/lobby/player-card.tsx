@@ -10,10 +10,10 @@ const PlayerCard: React.FC<{
   const isOnlyName =
     ready === undefined && type === undefined && team === undefined;
   return (
-    <div className="relative flex basis-full gap-1 bg-slate-200 p-2 rounded-lg border-2 border-black h-14">
+    <div className="relative flex basis-full gap-1 bg-slate-200 rounded-lg border-2 border-black h-14 ">
       {children}
       <p
-        className={`font-bold pr-2 border-r-2 border-black ${
+        className={`font-bold p2 border-r-2 border-black ${
           isOnlyName ? "w-full border-r-0" : ""
         }`}
       >
@@ -23,7 +23,7 @@ const PlayerCard: React.FC<{
       {type !== undefined && <p>{type}</p>}
       {ready !== undefined && (
         <p
-          className={`absolute right-2 text-right ${
+          className={`absolute right-2  text-right ${
             ready ? "text-green-500" : "text-red-500"
           }`}
         >

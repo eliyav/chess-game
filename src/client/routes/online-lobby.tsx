@@ -74,7 +74,6 @@ export const OnlineLobby: React.FC<{
                 {clipboardMessage}
               </p>
             )}
-            <span className="pr-2 text-lg">Invite:</span>
             <span
               className="select-text cursor-pointer bold text-xl hover:opacity-80"
               onClick={() => {

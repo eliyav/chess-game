@@ -11,8 +11,8 @@ export const CopyUrl: React.FC<{
       xmlns="http://www.w3.org/2000/svg"
       className={className ? className : ""}
       onClick={onClick}
-      width={size ? size : "auto"}
-      height={size ? size : "auto"}
+      width={size ? size : "50px"}
+      height={size ? size : "50px"}
     >
       <g id="Glyph">
         <g data-name="Glyph" id="Glyph-2">
