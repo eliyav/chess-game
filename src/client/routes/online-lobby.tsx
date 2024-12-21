@@ -160,7 +160,7 @@ export const OnlineLobby: React.FC<{
           onSwitchTeams={() => {
             websocket.emit("switchTeams", { lobbyKey: lobby.key });
           }}
-          disableSwitchTeams={lessThanTwoPlayers}
+          disableSwitchTeams={lessThanTwoPlayers || playersReady}
         />
       </div>
       <div className="row-start-5 flex justify-center items-end mb-2">
