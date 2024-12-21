@@ -16,7 +16,7 @@ export const Home: React.FC = () => {
         <SvgGithub
           onClick={() => window.open("https://github.com/eliyav/chess-game")}
           className="absolute bg-white rounded-lg right-1 m-2 bottom-1 hover:opacity-80"
-          size={40}
+          size={30}
         />
       </div>
       <SelectionButton
