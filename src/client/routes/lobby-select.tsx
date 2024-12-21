@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LOBBY_TYPE } from "../../shared/match";
-import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
 import { Message } from "../components/modals/message-modal";
 import { Divider } from "../components/svg/divider";
 import { APP_ROUTES } from "../../shared/routes";
 import { RESOURCES } from "../../shared/resources";
 import { ENV_BASE_URL } from "..";
+import { BackButton } from "../components/svg/back-button";
 
 export const LobbySelect: React.FC<{
   setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
@@ -19,8 +19,8 @@ export const LobbySelect: React.FC<{
     <div className="grid grid-rows-5 h-dvh md:w-1/2 md:m-auto z-10">
       <div className="flex grid-rows-1 justify-center align-center glass dark-pane m-4">
         <BackButton
-          customClass={
-            "inline-block border-r-2 border-white min-w-16 p-3 hover:bg-white hover:bg-opacity-10"
+          className={
+            "inline-block h-full border-r-2 border-white min-w-16 p-3 hover:bg-white hover:bg-opacity-10"
           }
           size={30}
           onClick={() => navigate(APP_ROUTES.Home)}

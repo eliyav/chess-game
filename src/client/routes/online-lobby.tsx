@@ -2,12 +2,12 @@ import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Lobby, TEAM } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
-import { BackButton } from "../components/buttons/back-button";
 import { SelectionButton } from "../components/buttons/start-button";
 import { ControllerOptionsList } from "../components/lobby/controller-options-list";
 import PlayerCard from "../components/lobby/player-card";
 import { Pawn } from "../components/svg/pawn";
 import { websocket } from "../websocket-client";
+import { BackButton } from "../components/svg/back-button";
 
 export const OnlineLobby: React.FC<{
   lobby: Lobby | undefined;
@@ -42,8 +42,8 @@ export const OnlineLobby: React.FC<{
     <div className="grid grid-rows-5 h-dvh md:w-1/2 md:m-auto z-10">
       <div className="flex grid-rows-1 justify-center align-center glass dark-pane m-4">
         <BackButton
-          customClass={
-            "inline-block border-r-2 border-white min-w-16 p-3 hover:bg-white hover:bg-opacity-10"
+          className={
+            "inline-block h-full border-r-2 border-white min-w-16 p-3 hover:bg-white hover:bg-opacity-10"
           }
           size={30}
           onClick={() => navigate(APP_ROUTES.Lobby)}
