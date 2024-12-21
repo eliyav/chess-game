@@ -3,13 +3,14 @@ import React from "react";
 export const SvgGithub: React.FC<{
   onClick?: () => void;
   className?: string;
-}> = ({ className, onClick }) => {
+  size: number;
+}> = ({ className, onClick, size }) => {
   return (
     <svg
       className={className ? className : ""}
       xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
+      width={size}
+      height={size}
       viewBox="0 0 24 24"
       onClick={onClick}
     >

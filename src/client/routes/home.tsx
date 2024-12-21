@@ -15,7 +15,8 @@ export const Home: React.FC = () => {
         <p className="italic pb-2 text-white">Play for free!</p>
         <SvgGithub
           onClick={() => window.open("https://github.com/eliyav/chess-game")}
-          className="absolute bg-white rounded-lg right-1 bottom-1 hover:opacity-80"
+          className="absolute bg-white rounded-lg right-1 m-2 bottom-1 hover:opacity-80"
+          size={40}
         />
       </div>
       <SelectionButton
