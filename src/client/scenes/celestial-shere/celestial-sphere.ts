@@ -15,7 +15,8 @@ import noiseUrl from "../../../../assets/space/noise.png";
 import StarDataJSON from "../../../../assets/space/star-data.json";
 import starUrl from "../../../../assets/space/star.png";
 import tubeUrl from "../../../../assets/space/tube.png";
-import { isPhone } from "../../index";
+
+const isPhone = window.matchMedia("(max-width: 600px)").matches;
 
 export interface StarData {
   rightAscension: number[];
