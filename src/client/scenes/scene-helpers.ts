@@ -23,8 +23,8 @@ export const showMoves = ({
   showSelectedPiece({ move: point, gameScene });
   if (visibleMoves) {
     for (const move of moves) {
-      const { type } = move;
-      const disc = createMovementDisc({ point, gameScene, type });
+      const { target, type } = move;
+      const disc = createMovementDisc({ point: target, gameScene, type });
       gameScene.data.meshesToRender.push(disc);
     }
   }
