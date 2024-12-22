@@ -39,10 +39,7 @@ export const OnlineLobby: React.FC<{
       websocket.emit("joinLobby", { lobbyKey });
     }
     return () => {
-      if (!lobby?.matchStarted) {
-        websocket.emit("leaveLobby", { lobbyKey });
-        deleteLobby();
-      }
+      websocket.emit("leaveLobby", { lobbyKey });
     };
   }, [websocket, location]);
 
