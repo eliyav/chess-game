@@ -279,7 +279,6 @@ export class Controller {
           );
         }
         gameScene.scene.removeMesh(mesh);
-        mesh.dispose();
       }
       gameScene.data.meshesToRender = [];
       this.displayLastTurn();
