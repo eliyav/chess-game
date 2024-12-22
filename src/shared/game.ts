@@ -9,12 +9,19 @@ export enum GAMESTATUS {
 
 export type Point = [number, number];
 
-export type MoveType = "movement" | "capture" | "castle" | "enPassant";
+export type MoveType =
+  | "movement"
+  | "capture"
+  | "castle"
+  | "enPassant"
+  | "promotion";
 
 export type Move = {
   origin: Point;
   target: Point;
   type: MoveType;
+  movingPiece: PIECE;
+  capturedPiece?: PIECE;
 };
 
 export enum PIECE {

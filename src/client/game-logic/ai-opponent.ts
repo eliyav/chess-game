@@ -1,7 +1,5 @@
-import { Board, Grid } from "./board";
-import { PIECE } from "../../shared/game";
+import { Move, PIECE } from "../../shared/game";
 import { TEAM } from "../../shared/match";
-import Game from "./game";
 /*
  * Piece Square Tables, adapted from Sunfish.py:
  * https://github.com/thomasahle/sunfish/blob/master/sunfish.py
@@ -100,29 +98,48 @@ const positionsBlack = {
 };
 
 export function evaluateBoardPositions({
+  team,
   sum,
-  grid,
+  move,
 }: {
+  team: TEAM;
   sum: number;
-  grid: Grid;
+  move: Move;
 }) {
   let score = 0;
-  for (let i = 0; i < grid.length; i++) {
-    for (let j = 0; j < grid[i].length; j++) {
-      const piece = grid[j][i]; //Reversed because of how my chess grid is built compared to the piece square tables (x,y) are flipped
-      if (!piece) continue;
-      const pieceType = piece.type;
-      const pieceColor = piece.team;
-      const pieceWeight = weights[pieceType];
-      const piecePositionTable =
-        pieceColor === TEAM.WHITE ? positionsWhite : positionsBlack;
-      const piecePositionValue = piecePositionTable[pieceType][i][j];
-      if (pieceColor === TEAM.WHITE) {
-        score += pieceWeight + piecePositionValue;
-      } else {
-        score -= pieceWeight + piecePositionValue;
-      }
-    }
+  const piecePositionTable =
+    team === TEAM.WHITE ? positionsWhite : positionsBlack;
+  const movingPiece = move.movingPiece;
+  const [originX, originY] = move.origin;
+  const [targetX, targetY] = move.target;
+
+  if (move.type === "capture" || move.type === "enPassant") {
+    const capturedPiece = move.capturedPiece!;
+    const capturedPieceWeight = weights[capturedPiece];
+    score += capturedPieceWeight;
+    score += 100;
+  } else if (move.type === "castle") {
+    score += 50;
+  } else if (move.type === "promotion") {
+    score += 1000;
+  } else if (move.type === "movement") {
+    score += 0;
+  } else if (move.type === "enPassant") {
+    score += 50;
+  } else {
+    score += 0;
   }
+
+  const originPositionValue = piecePositionTable[movingPiece][originX][originY];
+  const targetPositionValue = piecePositionTable[movingPiece][targetX][targetY];
+  const positionDifference = targetPositionValue - originPositionValue;
+  score += positionDifference;
+
+  if (team === TEAM.WHITE) {
+    score += sum;
+  } else {
+    score -= sum;
+  }
+
   return sum + score;
 }

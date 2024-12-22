@@ -110,6 +110,7 @@ function calcRookMoves({
     grid,
     team,
     movements: lateralMovements,
+    movingPiece: PIECE.R,
   });
 }
 
@@ -133,12 +134,14 @@ function calcQueenMoves({
     grid,
     team,
     movements: lateralMovements,
+    movingPiece: PIECE.Q,
   });
   const diagonalMoves = getMovePath({
     origin: point,
     grid,
     team,
     movements: diagonalMovements,
+    movingPiece: PIECE.Q,
   });
   return [...lateralMoves, ...diagonalMoves];
 }
@@ -166,6 +169,7 @@ function calcPawnMoves({
     target: [x, newY],
     team,
     grid,
+    movingPiece: PIECE.P,
   });
   if (moveResult) {
     availableMoves.push(moveResult);
@@ -179,6 +183,7 @@ function calcPawnMoves({
         target: [x, newY],
         team,
         grid,
+        movingPiece: PIECE.P,
       });
       if (moveResult) {
         availableMoves.push(moveResult);
@@ -193,6 +198,7 @@ function calcPawnMoves({
     target: [x - direction, y + direction],
     team,
     grid,
+    movingPiece: PIECE.P,
   });
   if (captureMove) {
     availableMoves.push(captureMove);
@@ -203,6 +209,7 @@ function calcPawnMoves({
     target: [x + direction, y + direction],
     team,
     grid,
+    movingPiece: PIECE.P,
   });
   if (captureMove2) {
     availableMoves.push(captureMove2);
@@ -226,6 +233,8 @@ function calcPawnMoves({
           origin: point,
           target: enPassant.enPassantPoint,
           type: "enPassant",
+          movingPiece: PIECE.P,
+          capturedPiece: PIECE.P,
         });
       }
     }
@@ -256,7 +265,13 @@ function calcKnightMoves({
   const [x, y] = point;
   movements.forEach(([moveX, moveY]) => {
     const target: Point = [x + moveX, y + moveY];
-    const moveResult = getStandardMove({ origin: point, target, team, grid });
+    const moveResult = getStandardMove({
+      origin: point,
+      target,
+      team,
+      grid,
+      movingPiece: PIECE.N,
+    });
     if (moveResult) {
       availableMoves.push(moveResult);
     }
@@ -303,7 +318,13 @@ function calcKingMoves({
   const [x, y] = point;
   kingMovements.forEach(([moveX, moveY]) => {
     const target: Point = [x + moveX, y + moveY];
-    const moveResult = getStandardMove({ origin: point, target, team, grid });
+    const moveResult = getStandardMove({
+      origin: point,
+      target,
+      team,
+      grid,
+      movingPiece: PIECE.K,
+    });
     if (moveResult) {
       availableMoves.push(moveResult);
     }
@@ -347,6 +368,7 @@ function calcBishopMoves({
     origin: point,
     grid,
     team,
+    movingPiece: PIECE.B,
     movements: diagonalMovements,
   });
 }
@@ -357,11 +379,13 @@ const getMovePath = ({
   grid,
   team,
   movements,
+  movingPiece,
 }: {
   origin: Point;
   grid: Grid;
   team: TEAM;
   movements: Movements;
+  movingPiece: PIECE;
 }) => {
   const availableMoves: Move[] = [];
   for (const [_, points] of Object.entries(movements)) {
@@ -371,6 +395,7 @@ const getMovePath = ({
         target: points[i],
         team,
         grid,
+        movingPiece,
       });
       //If no move it means your own piece is blocking the path or out of bounds
       if (!move) break;
@@ -439,6 +464,7 @@ const calcLateralMovements = ({ point }: { point: Point }) => {
 function getStandardMove({
   origin,
   target,
+  movingPiece,
   grid,
   team,
 }: {
@@ -446,6 +472,7 @@ function getStandardMove({
   target: Point;
   grid: Grid;
   team: TEAM;
+  movingPiece: PIECE;
 }): Move | undefined {
   const [x, y] = target;
   const isInBounds = bounds(x, grid) && bounds(y, grid);
@@ -457,6 +484,8 @@ function getStandardMove({
         origin,
         target,
         type: "capture",
+        movingPiece,
+        capturedPiece: pieceOnPoint.type,
       };
     }
   } else {
@@ -464,6 +493,7 @@ function getStandardMove({
       origin,
       target,
       type: "movement",
+      movingPiece,
     };
   }
 }
@@ -474,12 +504,14 @@ function getSpecificMove({
   target,
   grid,
   team,
+  movingPiece,
 }: {
   type: "movement" | "capture";
   origin: Point;
   target: Point;
   grid: Grid;
   team: TEAM;
+  movingPiece: PIECE;
 }): Move | undefined {
   const [x, y] = target;
   const isInBounds = bounds(x, grid) && bounds(y, grid);
@@ -492,6 +524,8 @@ function getSpecificMove({
           origin,
           target,
           type: "capture",
+          movingPiece,
+          capturedPiece: pieceOnPoint.type,
         };
       }
     }
@@ -501,6 +535,7 @@ function getSpecificMove({
         origin,
         target,
         type: "movement",
+        movingPiece,
       };
     }
   }

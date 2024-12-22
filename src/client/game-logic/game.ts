@@ -590,9 +590,14 @@ class Game {
     let maxValue = Number.NEGATIVE_INFINITY;
     let minValue = Number.POSITIVE_INFINITY;
     for (let i = 0; i < availableMoves.length; i++) {
-      const { origin, target } = availableMoves[i];
+      const move = availableMoves[i];
+      const { origin, target } = move;
       this.move({ origin, target });
-      const newSum = evaluateBoardPositions({ sum, grid: this.current.grid });
+      const newSum = evaluateBoardPositions({
+        sum,
+        move,
+        team: currentTeam,
+      });
       const { value: childValue } = this.minimax({
         grid: this.current.grid,
         depth: depth - 1,
@@ -674,7 +679,12 @@ class Game {
           grid,
         });
         if (resolve) {
-          moves.push({ origin: kingPoint, target: rookPoint, type: "castle" });
+          moves.push({
+            origin: kingPoint,
+            target: rookPoint,
+            type: "castle",
+            movingPiece: PIECE.K,
+          });
         }
       }
     });
