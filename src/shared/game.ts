@@ -22,6 +22,7 @@ export type Move = {
   type: MoveType;
   movingPiece: PIECE;
   capturedPiece?: PIECE;
+  promotion?: boolean;
 };
 
 export enum PIECE {

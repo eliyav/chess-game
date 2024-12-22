@@ -163,6 +163,9 @@ function calcPawnMoves({
   //Calculate Pawn Movement based on current point
   const range = 1;
   const newY = y + range * direction;
+  const promotion = checkPromotion({
+    point: [x, newY],
+  });
   const moveResult = getSpecificMove({
     type: "movement",
     origin: point,
@@ -171,8 +174,9 @@ function calcPawnMoves({
     grid,
     movingPiece: PIECE.P,
   });
+
   if (moveResult) {
-    availableMoves.push(moveResult);
+    availableMoves.push({ ...moveResult, promotion });
     //If he has a move forward and hasnt moved, then can move 2 spaces
     if ((team === TEAM.WHITE && y === 1) || (team === TEAM.BLACK && y === 6)) {
       const extendedRange = 2;
@@ -201,7 +205,7 @@ function calcPawnMoves({
     movingPiece: PIECE.P,
   });
   if (captureMove) {
-    availableMoves.push(captureMove);
+    availableMoves.push({ ...captureMove, promotion });
   }
   const captureMove2 = getSpecificMove({
     type: "capture",
@@ -212,7 +216,7 @@ function calcPawnMoves({
     movingPiece: PIECE.P,
   });
   if (captureMove2) {
-    availableMoves.push(captureMove2);
+    availableMoves.push({ ...captureMove2, promotion });
   }
 
   if (turnHistory) {
@@ -240,6 +244,14 @@ function calcPawnMoves({
     }
   }
   return availableMoves;
+}
+
+function checkPromotion({ point }: { point: Point }) {
+  if (point[1] === 0 || point[1] === 7) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 function calcKnightMoves({

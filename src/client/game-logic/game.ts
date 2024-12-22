@@ -112,15 +112,12 @@ class Game {
     move: Move;
     grid: Grid;
   }): TurnHistory | undefined {
-    const { target } = move;
+    const { target, promotion } = move;
     const originPiece = this.lookupPiece({ grid, point: origin });
     if (!originPiece) return;
     Board.addPiece({ grid, point: target, piece: originPiece });
     Board.removePiece({ grid, point: origin });
-    const promotion = this.checkPromotion({
-      piece: originPiece,
-      point: target,
-    });
+
     if (promotion) {
       this.setPromotionPiece({
         target,
@@ -152,16 +149,12 @@ class Game {
     move: Move;
     grid: Grid;
   }): TurnHistory | undefined {
-    const { target } = move;
+    const { target, promotion } = move;
     const originPiece = this.lookupPiece({ grid, point: origin });
     const targetPiece = this.lookupPiece({ grid, point: target });
     if (!originPiece || !targetPiece) return;
     Board.addPiece({ grid, point: target, piece: originPiece });
     Board.removePiece({ grid, point: origin });
-    const promotion = this.checkPromotion({
-      piece: originPiece,
-      point: target,
-    });
     if (promotion) {
       this.setPromotionPiece({
         target,
@@ -471,13 +464,6 @@ class Game {
     });
     //If you have no available moves, and you are not checked, you are in stalemate
     return anyAvailableMoves.length === 0 && !playerInCheck ? true : false;
-  }
-
-  private checkPromotion({ piece, point }: { piece: GamePiece; point: Point }) {
-    if (piece.type === PIECE.P && (point[1] === 0 || point[1] === 7)) {
-      return true;
-    }
-    return false;
   }
 
   private setPromotionPiece({
