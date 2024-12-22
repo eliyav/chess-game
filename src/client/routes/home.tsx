@@ -20,7 +20,7 @@ export const Home: React.FC = () => {
         />
       </div>
       <SelectionButton
-        customClass="m-10 row-start-5 font-bold text-5xl border-2 border-white italic tracking-widest hover:opacity-80 md:w-1/2 md:justify-self-center"
+        customClass="m-10 font-serif row-start-5 font-bold text-5xl border-2 border-white italic tracking-widest hover:opacity-80 md:w-1/2 md:justify-self-center"
         text="Play"
         onClick={() => navigate(APP_ROUTES.Lobby)}
       />
