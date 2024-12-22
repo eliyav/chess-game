@@ -155,7 +155,7 @@ export const OnlineLobby: React.FC<{
               </React.Fragment>
             );
           })}
-          {!player2 && <PlayerCard name={"Waiting for player..."} />}
+          {!player2 && <PlayerCard name={"Waiting..."} />}
         </div>
         <h2 className="glass dark-pane text-white text-lg text-center tracking-widest italic font-bold">
           Settings
