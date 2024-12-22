@@ -28,11 +28,28 @@ export const OfflineLobby: React.FC<{
     [setLobby]
   );
 
+  const updateOpponentType = useCallback(() => {
+    const player = lobby?.players[0];
+    if (player) {
+      const opponentType = lobby?.players[1].type;
+      const newType = opponentType === "Computer" ? "Human" : "Computer";
+      const opponentName =
+        opponentType === "Computer" ? "Player 2" : "BOT - Depth 3";
+      updateLobby("players", [
+        player,
+        { name: opponentName, ready: false, id: "2", type: newType },
+      ]);
+    }
+  }, [lobby, updateLobby]);
+
   useEffect(() => {
     setLobby({
       mode: LOBBY_TYPE.LOCAL,
       key: "",
-      players: [{ name: "Player 1", ready: false, id: "1", type: "Human" }],
+      players: [
+        { name: "Player 1", ready: false, id: "1", type: "Human" },
+        { name: "BOT - Depth 3", ready: false, id: "2", type: "Computer" },
+      ],
       teams: {
         White: "1",
         Black: "2",
@@ -68,32 +85,21 @@ export const OfflineLobby: React.FC<{
               <PlayerCard key={i} name={player.name} type={player.type} />
             ))}
           </div>
-          <button
-            onClick={() => {
-              updateLobby("players", [
-                lobby.players[0],
-                { name: "AI BOT", ready: false, id: "2", type: "AI" },
-              ]);
-            }}
-          >
-            VS AI
-          </button>
-          <button
-            onClick={() => {
-              updateLobby("players", [
-                lobby.players[0],
-                { name: "Player 2", ready: false, id: "2", type: "Human" },
-              ]);
-            }}
-          >
-            VS Player
-          </button>
         </div>
         <div>
           <h2 className="glass dark-pane text-white text-lg text-center tracking-widest italic font-bold">
             Settings
           </h2>
           <ControllerOptionsList
+            uniqueOptions={[
+              {
+                text: `VS ${
+                  lobby.players[1].type === "Computer" ? "Human" : "Computer"
+                }`,
+                onChange: updateOpponentType,
+                disabled: lobby.players.length === 1,
+              },
+            ]}
             options={lobby.controllerOptions}
             onChange={(key: string) =>
               (e: React.ChangeEvent<HTMLInputElement>) =>

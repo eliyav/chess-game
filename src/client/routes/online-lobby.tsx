@@ -167,10 +167,15 @@ export const OnlineLobby: React.FC<{
               lobbyKey: lobby.key,
               options: { [key]: e.target.checked },
             })}
-          onSwitchTeams={() => {
-            websocket.emit("switchTeams", { lobbyKey: lobby.key });
-          }}
-          disableSwitchTeams={lessThanTwoPlayers || playersReady}
+          uniqueOptions={[
+            {
+              text: "Switch Teams",
+              onChange: () => {
+                websocket.emit("switchTeams", { lobbyKey: lobby.key });
+              },
+              disabled: lessThanTwoPlayers || playersReady,
+            },
+          ]}
         />
       </div>
       <div className="row-start-5 flex justify-center items-end mb-2">
