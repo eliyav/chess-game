@@ -151,8 +151,18 @@ export function evaluateBoardPositions({
 
   const originPositionValue = piecePositionTable[movingPiece][originX][originY];
   const targetPositionValue = piecePositionTable[movingPiece][targetX][targetY];
-  const positionDifference = targetPositionValue - originPositionValue;
-  score += positionDifference;
+  const absoluteValueOrigin = Math.abs(originPositionValue);
+  const absoluteValueTarget = Math.abs(targetPositionValue);
+  let difference = 0;
+
+  if (absoluteValueOrigin > absoluteValueTarget) {
+    difference = -(originPositionValue - targetPositionValue);
+  } else if (absoluteValueOrigin < absoluteValueTarget) {
+    difference = targetPositionValue - originPositionValue;
+  } else {
+    difference = 0;
+  }
+  score += difference;
 
   if (team === TEAM.WHITE) {
     sum += score;

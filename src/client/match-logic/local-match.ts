@@ -1,6 +1,5 @@
 import { Point, TurnHistory } from "../../shared/game";
 import { LOBBY_TYPE, Lobby, Player } from "../../shared/match";
-import GamePiece from "../game-logic/game-piece";
 import { BaseMatch, MatchLogic } from "./base-match";
 
 export class LocalMatch extends BaseMatch implements MatchLogic {
