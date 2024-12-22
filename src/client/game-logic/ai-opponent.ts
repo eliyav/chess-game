@@ -120,14 +120,16 @@ export function evaluateBoardPositions({
     score += 100;
   } else if (move.type === "castle") {
     score += 50;
-  } else if (move.type === "promotion") {
-    score += 1000;
   } else if (move.type === "movement") {
     score += 0;
   } else if (move.type === "enPassant") {
     score += 50;
   } else {
     score += 0;
+  }
+
+  if (move.promotion) {
+    score += 1000;
   }
 
   const originPositionValue = piecePositionTable[movingPiece][originX][originY];
