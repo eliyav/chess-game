@@ -38,6 +38,32 @@ export const LobbySelect: React.FC<{
           }}
         />
         <Divider className="w-full" />
+        <SelectionButton
+          customClass="m-10 p-4 font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80"
+          text={`Create ${LOBBY_TYPE.ONLINE}`}
+          onClick={async () => {
+            try {
+              const response = await fetch(
+                `${ENV_BASE_URL}${RESOURCES.CREATE_LOBBY}`
+              );
+              const lobbyKey = await response.text();
+              navigate(`${APP_ROUTES.OnlineLobby}?key=${lobbyKey}`);
+            } catch (e) {
+              if (e instanceof Error) {
+                setMessage({
+                  text: e.message,
+                  onConfirm: () => setMessage(null),
+                });
+              } else {
+                setMessage({
+                  text: "Failed to create lobby",
+                  onConfirm: () => setMessage(null),
+                });
+              }
+            }
+          }}
+        />
+        <Divider className="w-full" />
         <div className="text-center m-10">
           <input
             type="text"
@@ -46,11 +72,11 @@ export const LobbySelect: React.FC<{
             onChange={(e) => setLobbyKey(e.target.value.toUpperCase())}
             autoComplete="off"
             value={lobbyKey}
-            className="w-full p-2 rounded-t text-center border-2 border-gray-500 placeholder-opacity-50 focus:outline-none"
+            className="w-full p-2 rounded-t text-center border-2 h-12 border-gray-500 placeholder-opacity-50 focus:outline-none"
           ></input>
           <SelectionButton
             customClass={
-              "w-full p-4 rounded-t-none font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80"
+              "w-full p-4 !rounded-t-none font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80"
             }
             disabled={lobbyKey.length !== 5}
             text={`Join ${LOBBY_TYPE.ONLINE}`}
@@ -80,32 +106,6 @@ export const LobbySelect: React.FC<{
             }}
           />
         </div>
-        <Divider className="w-full" />
-        <SelectionButton
-          customClass="m-10 p-4 font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80"
-          text={`Create ${LOBBY_TYPE.ONLINE}`}
-          onClick={async () => {
-            try {
-              const response = await fetch(
-                `${ENV_BASE_URL}${RESOURCES.CREATE_LOBBY}`
-              );
-              const lobbyKey = await response.text();
-              navigate(`${APP_ROUTES.OnlineLobby}?key=${lobbyKey}`);
-            } catch (e) {
-              if (e instanceof Error) {
-                setMessage({
-                  text: e.message,
-                  onConfirm: () => setMessage(null),
-                });
-              } else {
-                setMessage({
-                  text: "Failed to create lobby",
-                  onConfirm: () => setMessage(null),
-                });
-              }
-            }
-          }}
-        />
       </div>
     </div>
   );

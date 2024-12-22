@@ -30,8 +30,9 @@ export const OfflineLobby: React.FC<{
 
   const updateOpponentType = useCallback(() => {
     const player = lobby?.players[0];
-    if (player) {
-      const opponentType = lobby?.players[1].type;
+    const player2 = lobby?.players[1];
+    if (player && player2) {
+      const opponentType = player2.type;
       const newType = opponentType === "Computer" ? "Human" : "Computer";
       const opponentName =
         opponentType === "Computer" ? "Player 2" : "BOT - Depth 3";
@@ -81,7 +82,7 @@ export const OfflineLobby: React.FC<{
             Players
           </h2>
           <div className="flex flex-wrap justify-center m-2 gap-1">
-            {lobby?.players.map((player, i) => (
+            {lobby.players.map((player, i) => (
               <PlayerCard key={i} name={player.name} type={player.type} />
             ))}
           </div>
@@ -94,7 +95,11 @@ export const OfflineLobby: React.FC<{
             uniqueOptions={[
               {
                 text: `VS ${
-                  lobby.players[1].type === "Computer" ? "Human" : "Computer"
+                  lobby.players[1]
+                    ? lobby.players[1].type === "Computer"
+                      ? "Human"
+                      : "Computer"
+                    : "Computer"
                 }`,
                 onChange: updateOpponentType,
                 disabled: lobby.players.length === 1,

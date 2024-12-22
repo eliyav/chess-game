@@ -15,7 +15,8 @@ import { ENV_BASE_URL } from "..";
 
 export const OnlineLobby: React.FC<{
   lobby: Lobby | undefined;
-}> = ({ lobby }) => {
+  deleteLobby: () => void;
+}> = ({ lobby, deleteLobby }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [clipboardMessage, setClipboardMessage] = useState("");
@@ -40,6 +41,7 @@ export const OnlineLobby: React.FC<{
     return () => {
       if (!lobby?.matchStarted) {
         websocket.emit("leaveLobby", { lobbyKey });
+        deleteLobby();
       }
     };
   }, [websocket, location]);
@@ -82,7 +84,7 @@ export const OnlineLobby: React.FC<{
           </h1>
           <div className="text-red-700 text-center tracking-widest italic font-bold flex justify-center items-center p-2 rounded-lg">
             {clipboardMessage && (
-              <p className="absolute bottom-1 text-red-700">
+              <p className="absolute bottom-1 text-sm text-red-700">
                 {clipboardMessage}
               </p>
             )}
@@ -95,7 +97,7 @@ export const OnlineLobby: React.FC<{
             >
               {lobby.key ?? "..."}
             </span>
-            <div className="bold h-10 m-2">
+            <div className="bold h-10 m-2 mt-0">
               {clipboardMessage ? (
                 <ClipboardChecked
                   onClick={() => {

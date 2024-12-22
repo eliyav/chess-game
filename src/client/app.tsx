@@ -80,7 +80,12 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
           />
           <Route
             path={APP_ROUTES.OnlineLobby}
-            element={<OnlineLobby lobby={lobby} />}
+            element={
+              <OnlineLobby
+                lobby={lobby}
+                deleteLobby={() => setLobby(undefined)}
+              />
+            }
           />
           <Route
             path={APP_ROUTES.Game}

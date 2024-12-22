@@ -70,12 +70,14 @@ export function createWebsocketServer({
       lobby.players = lobby.players.filter((player) => player.id !== socket.id);
       lobby.teams = { White: "", Black: "" };
       io.to(lobbyKey).emit("lobbyInfo", lobby);
+      socket.leave(lobbyKey);
     });
 
     socket.on("abandonMatch", ({ lobbyKey }) => {
       const lobby = lobbies.get(lobbyKey);
       if (!lobby) return;
       socket.to(lobbyKey).emit("opponentDisconnected");
+      socket.leave(lobbyKey);
       lobbies.delete(lobbyKey);
     });
 
