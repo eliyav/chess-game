@@ -4,6 +4,7 @@ import { Board, Grid } from "./board";
 import { rookInitialPoints } from "./chess-data-import";
 import GamePiece from "./game-piece";
 import { doPointsMatch, getPieceMoves, isEnPassantAvailable } from "./moves";
+import { evaluateBoardPositions } from "./ai-opponent";
 
 class Game {
   teams: TEAM[];
@@ -88,7 +89,7 @@ class Game {
     move: Move;
     grid: Grid;
   }) {
-    const [_, moveType] = move;
+    const { type: moveType } = move;
     const originPiece = Board.getPiece({ grid, point: origin });
     if (!originPiece) return;
     if (moveType === "movement") {
@@ -111,15 +112,12 @@ class Game {
     move: Move;
     grid: Grid;
   }): TurnHistory | undefined {
-    const [target] = move;
+    const { target, promotion } = move;
     const originPiece = this.lookupPiece({ grid, point: origin });
     if (!originPiece) return;
     Board.addPiece({ grid, point: target, piece: originPiece });
     Board.removePiece({ grid, point: origin });
-    const promotion = this.checkPromotion({
-      piece: originPiece,
-      point: target,
-    });
+
     if (promotion) {
       this.setPromotionPiece({
         target,
@@ -151,16 +149,12 @@ class Game {
     move: Move;
     grid: Grid;
   }): TurnHistory | undefined {
-    const [target] = move;
+    const { target, promotion } = move;
     const originPiece = this.lookupPiece({ grid, point: origin });
     const targetPiece = this.lookupPiece({ grid, point: target });
     if (!originPiece || !targetPiece) return;
     Board.addPiece({ grid, point: target, piece: originPiece });
     Board.removePiece({ grid, point: origin });
-    const promotion = this.checkPromotion({
-      piece: originPiece,
-      point: target,
-    });
     if (promotion) {
       this.setPromotionPiece({
         target,
@@ -191,7 +185,7 @@ class Game {
     move: Move;
     grid: Grid;
   }): TurnHistory | undefined {
-    const [target] = move;
+    const { target } = move;
     const originPiece = this.lookupPiece({ grid, point: origin });
     if (!originPiece) return;
     const lastTurnHistory = this.current.turnHistory.at(-1);
@@ -228,7 +222,7 @@ class Game {
     move: Move;
     grid: Grid;
   }): TurnHistory | undefined {
-    const [target] = move;
+    const { target } = move;
     const originPiece = this.lookupPiece({ grid, point: origin });
     const targetPiece = this.lookupPiece({ grid, point: target });
     if (!originPiece || !targetPiece) return;
@@ -335,12 +329,12 @@ class Game {
       skipCastling,
       checkForCastling: this.checkForCastling.bind(this),
     });
-    if (!skipResolveCheck) {
+    if (skipResolveCheck) {
+      return availableMoves;
+    } else {
       return availableMoves.filter((move) => {
         return this.canMoveResolve({ origin: point, move, team });
       });
-    } else {
-      return availableMoves;
     }
   }
 
@@ -359,7 +353,9 @@ class Game {
       point: origin,
       grid,
     });
-    const move = availableMoves.find((move) => doPointsMatch(move[0], target));
+    const move = availableMoves.find(({ target: moveTarget }) =>
+      doPointsMatch(moveTarget, target)
+    );
     return move;
   }
 
@@ -423,8 +419,8 @@ class Game {
         })
       )
       .flat();
-    const isKingChecked = opponentsAvailableMoves.find((move) =>
-      doPointsMatch(move[0], king.point)
+    const isKingChecked = opponentsAvailableMoves.find(({ target }) =>
+      doPointsMatch(target, king.point)
     );
     //Returns an array with the kings location if checked
     return isKingChecked;
@@ -468,13 +464,6 @@ class Game {
     });
     //If you have no available moves, and you are not checked, you are in stalemate
     return anyAvailableMoves.length === 0 && !playerInCheck ? true : false;
-  }
-
-  private checkPromotion({ piece, point }: { piece: GamePiece; point: Point }) {
-    if (piece.type === PIECE.P && (point[1] === 0 || point[1] === 7)) {
-      return true;
-    }
-    return false;
   }
 
   private setPromotionPiece({
@@ -538,6 +527,110 @@ class Game {
     this.current.turnHistory.push(history);
   }
 
+  handleAIMove({ depth }: { depth: number }) {
+    let sum = 0;
+    const result = this.minimax({
+      grid: this.current.grid,
+      depth,
+      maximizingPlayer: false,
+      alpha: Number.NEGATIVE_INFINITY,
+      beta: Number.POSITIVE_INFINITY,
+      sum,
+    });
+    if (!result.bestMove) return;
+    const { origin, target } = result.bestMove;
+    return this.move({ origin, target });
+  }
+
+  minimax({
+    grid,
+    depth,
+    maximizingPlayer,
+    alpha,
+    beta,
+    sum,
+  }: {
+    grid: Grid;
+    depth: number;
+    maximizingPlayer: boolean;
+    alpha: number;
+    beta: number;
+    sum: number;
+  }): {
+    bestMove: Move | null;
+    value: number;
+  } {
+    if (depth === 0) {
+      return { bestMove: null, value: sum };
+    }
+    const currentTeam = this.getCurrentTeam();
+    const pieces = Board.getPieces({ grid, team: currentTeam });
+    const availableMoves = pieces.flatMap(({ point }) => {
+      return this.getMoves({
+        point,
+        grid,
+      });
+    });
+
+    let bestMove: Move | null = null;
+    let maxValue = Number.NEGATIVE_INFINITY;
+    let minValue = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < availableMoves.length; i++) {
+      const move = availableMoves[i];
+      const { origin, target } = move;
+      this.move({ origin, target });
+      const newSum = evaluateBoardPositions({
+        sum,
+        move,
+        team: currentTeam,
+      });
+      const { value: childValue } = this.minimax({
+        grid: this.current.grid,
+        depth: depth - 1,
+        maximizingPlayer: !maximizingPlayer,
+        alpha,
+        beta,
+        sum: newSum,
+      });
+      this.undoTurn();
+
+      if (maximizingPlayer) {
+        if (childValue > maxValue) {
+          maxValue = childValue;
+          bestMove = availableMoves[i];
+        }
+        if (childValue > alpha) {
+          alpha = childValue;
+        }
+      } else {
+        if (childValue < minValue) {
+          minValue = childValue;
+          bestMove = availableMoves[i];
+        }
+        if (childValue < beta) {
+          beta = childValue;
+        }
+      }
+
+      // Alpha-beta pruning
+      if (alpha >= beta) {
+        break;
+      }
+    }
+
+    if (maximizingPlayer) {
+      return {
+        bestMove,
+        value: maxValue,
+      };
+    } else {
+      return {
+        bestMove,
+        value: minValue,
+      };
+    }
+  }
+
   checkForCastling({
     kingPoint,
     team,
@@ -572,7 +665,12 @@ class Game {
           grid,
         });
         if (resolve) {
-          moves.push([rookPoint, "castle"]);
+          moves.push({
+            origin: kingPoint,
+            target: rookPoint,
+            type: "castle",
+            movingPiece: PIECE.K,
+          });
         }
       }
     });
@@ -632,7 +730,7 @@ class Game {
       const square = squaresToCheckEnemyThreat[i];
       for (let k = 0; k < opponentsAvailableMoves.length; k++) {
         const availableMove = opponentsAvailableMoves[k];
-        const doesMoveMatchSquare = doPointsMatch(availableMove[0], square);
+        const doesMoveMatchSquare = doPointsMatch(availableMove.origin, square);
         doesMoveMatchSquare
           ? squaresUnderEnemyThreat.push(doesMoveMatchSquare)
           : null;

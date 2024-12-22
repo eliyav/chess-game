@@ -4,29 +4,34 @@ import { ControllerOptions, getOptionText } from "../../../shared/match";
 interface ControllerOptionsProps {
   options: ControllerOptions;
   onChange: (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onSwitchTeams?: () => void;
-  disableSwitchTeams?: boolean;
+  uniqueOptions?: [
+    {
+      text: string;
+      onChange: () => void;
+      disabled: boolean;
+    }
+  ];
 }
 
 export const ControllerOptionsList: React.FC<ControllerOptionsProps> = ({
   options,
   onChange,
-  onSwitchTeams,
-  disableSwitchTeams,
+  uniqueOptions,
 }) => {
   return (
     <div className="flex flex-col gap-2 mt-2 items-center w-9/12 m-auto ">
-      {onSwitchTeams && (
+      {uniqueOptions?.map(({ text, onChange, disabled }, i) => (
         <button
+          key={i}
           className={`select-none flex relative font-bold bg-slate-200 w-full p-2 rounded-lg border-2 border-black enabled:hover:opacity-90 place-content-center ${
-            disableSwitchTeams ? "opacity-50" : ""
+            disabled ? "opacity-50" : ""
           }`}
-          onClick={onSwitchTeams}
-          disabled={disableSwitchTeams}
+          onClick={onChange}
+          disabled={disabled}
         >
-          {"Switch Teams"}
+          {text}
         </button>
-      )}
+      ))}
       {Object.entries(options).map(([key, value], i) => (
         <label
           key={i}

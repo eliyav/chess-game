@@ -22,7 +22,7 @@ export enum TEAM {
   BLACK = "Black",
 }
 
-export type PlayerType = "Human" | "AI";
+export type PlayerType = "Human" | "Computer";
 
 export type Player = {
   id: string;

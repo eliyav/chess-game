@@ -38,6 +38,19 @@ describe("Game Class", () => {
     assert.equal(gameState.status, GAMESTATUS.CHECKMATE);
   });
 
+  it("should initialize and handle AI moves correctly", () => {
+    const gameState = game.getGameState();
+    assert.equal(gameState.status, GAMESTATUS.INPROGRESS);
+    assert.equal(gameState.turnHistory.length, 0);
+    assert.equal(gameState.annotations.length, 0);
+
+    game.move({ origin: [0, 1], target: [0, 3] });
+    game.handleAIMove({ depth: 3 });
+    assert.equal(game.getCurrentTeam(), TEAM.WHITE);
+    assert.equal(gameState.turnHistory.length, 2);
+    assert.equal(gameState.annotations.length, 2);
+  });
+
   it("should have king side castling available", () => {
     game.move({ origin: [6, 0], target: [5, 2] });
     game.move({ origin: [4, 6], target: [4, 5] });
@@ -50,8 +63,8 @@ describe("Game Class", () => {
       ({ piece }) => piece?.type === PIECE.K && piece.team === TEAM.WHITE
     );
     const kingMoves = game.getMoves({ point: king!.point });
-    assert.ok(kingMoves.some((move) => move[1] === "castle"));
-    assert.ok(kingMoves.some((move) => doPointsMatch(move[0], [7, 0])));
+    assert.ok(kingMoves.some((move) => move.type === "castle"));
+    assert.ok(kingMoves.some((move) => doPointsMatch(move.target, [7, 0])));
   });
 
   it("should not have king side castling", () => {
@@ -72,7 +85,7 @@ describe("Game Class", () => {
       ({ piece }) => piece?.type === PIECE.K && piece.team === TEAM.WHITE
     );
     const kingMoves = game.getMoves({ point: king!.point });
-    assert.ok(!kingMoves.some((move) => move[1] === "castle"));
+    assert.ok(!kingMoves.some((move) => move.type === "castle"));
   });
 
   it("should have queen side castling available", () => {
@@ -90,7 +103,7 @@ describe("Game Class", () => {
       ({ piece }) => piece?.type === PIECE.K && piece.team === TEAM.WHITE
     );
     const kingMoves = game.getMoves({ point: king!.point });
-    assert.ok(kingMoves.some((move) => move[1] === "castle"));
-    assert.ok(kingMoves.some((move) => doPointsMatch(move[0], [0, 0])));
+    assert.ok(kingMoves.some((move) => move.type === "castle"));
+    assert.ok(kingMoves.some((move) => doPointsMatch(move.target, [0, 0])));
   });
 });

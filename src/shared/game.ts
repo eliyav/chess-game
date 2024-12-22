@@ -11,7 +11,14 @@ export type Point = [number, number];
 
 export type MoveType = "movement" | "capture" | "castle" | "enPassant";
 
-export type Move = [Point, MoveType];
+export type Move = {
+  origin: Point;
+  target: Point;
+  type: MoveType;
+  movingPiece: PIECE;
+  capturedPiece?: PIECE;
+  promotion?: boolean;
+};
 
 export enum PIECE {
   P = "Pawn",

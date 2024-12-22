@@ -1,7 +1,7 @@
 import "@babylonjs/loaders/glTF";
 import React, { useEffect, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import { Lobby, LOBBY_TYPE } from "../shared/match";
+import { Lobby } from "../shared/match";
 import { APP_ROUTES } from "../shared/routes";
 import { Message, MessageModal } from "./components/modals/message-modal";
 import { Game } from "./routes/game";
@@ -80,7 +80,12 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
           />
           <Route
             path={APP_ROUTES.OnlineLobby}
-            element={<OnlineLobby lobby={lobby} />}
+            element={
+              <OnlineLobby
+                lobby={lobby}
+                deleteLobby={() => setLobby(undefined)}
+              />
+            }
           />
           <Route
             path={APP_ROUTES.Game}

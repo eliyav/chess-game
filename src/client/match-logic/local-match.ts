@@ -1,4 +1,4 @@
-import { Point } from "../../shared/game";
+import { Point, TurnHistory } from "../../shared/game";
 import { LOBBY_TYPE, Lobby, Player } from "../../shared/match";
 import GamePiece from "../game-logic/game-piece";
 import { BaseMatch, MatchLogic } from "./base-match";
@@ -21,6 +21,10 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
     return this.move({ originPoint, targetPoint });
   }
 
+  requestAiMove() {
+    return this.getGame().handleAIMove({ depth: 3 });
+  }
+
   resetRequest() {
     return true;
   }
@@ -30,8 +34,12 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
   }
 
   isPlayersTurn() {
-    //Take into account AI opponent possibility
-    return true;
+    const currentTeam = this.getGame().getCurrentTeam();
+    const playingPlayerId = this.lobby.teams[currentTeam];
+    const playerType = this.lobby.players.find(
+      (player) => player.id === playingPlayerId
+    )?.type;
+    return playerType === "Human";
   }
 
   getPlayerTeam() {
@@ -42,5 +50,18 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
     const piece = this.getGame().lookupPiece({ point });
     if (!piece) return false;
     return piece.team === this.getPlayerTeam();
+  }
+
+  postTurnEvents({
+    handleValidTurn,
+  }: {
+    handleValidTurn: ({ turnHistory }: { turnHistory: TurnHistory }) => void;
+  }) {
+    if (!this.isPlayersTurn()) {
+      const turnHistory = this.requestAiMove();
+      if (turnHistory) {
+        handleValidTurn({ turnHistory });
+      }
+    }
   }
 }

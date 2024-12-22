@@ -28,17 +28,32 @@ export const OfflineLobby: React.FC<{
     [setLobby]
   );
 
+  const updateOpponentType = useCallback(() => {
+    const player = lobby?.players[0];
+    const player2 = lobby?.players[1];
+    if (player && player2) {
+      const opponentType = player2.type;
+      const newType = opponentType === "Computer" ? "Human" : "Computer";
+      const opponentName =
+        opponentType === "Computer" ? "Player 2" : "BOT - Depth 3";
+      updateLobby("players", [
+        player,
+        { name: opponentName, ready: false, id: "2", type: newType },
+      ]);
+    }
+  }, [lobby, updateLobby]);
+
   useEffect(() => {
     setLobby({
       mode: LOBBY_TYPE.LOCAL,
       key: "",
       players: [
         { name: "Player 1", ready: false, id: "1", type: "Human" },
-        { name: "Player 2", ready: false, id: "2", type: "Human" },
+        { name: "BOT - Depth 3", ready: false, id: "2", type: "Computer" },
       ],
       teams: {
-        White: "",
-        Black: "",
+        White: "1",
+        Black: "2",
       },
       matchStarted: false,
       controllerOptions: buildDefaultOptions(),
@@ -67,7 +82,7 @@ export const OfflineLobby: React.FC<{
             Players
           </h2>
           <div className="flex flex-wrap justify-center m-2 gap-1">
-            {lobby?.players.map((player, i) => (
+            {lobby.players.map((player, i) => (
               <PlayerCard key={i} name={player.name} type={player.type} />
             ))}
           </div>
@@ -77,6 +92,19 @@ export const OfflineLobby: React.FC<{
             Settings
           </h2>
           <ControllerOptionsList
+            uniqueOptions={[
+              {
+                text: `VS ${
+                  lobby.players[1]
+                    ? lobby.players[1].type === "Computer"
+                      ? "Human"
+                      : "Computer"
+                    : "Computer"
+                }`,
+                onChange: updateOpponentType,
+                disabled: lobby.players.length === 1,
+              },
+            ]}
             options={lobby.controllerOptions}
             onChange={(key: string) =>
               (e: React.ChangeEvent<HTMLInputElement>) =>

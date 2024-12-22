@@ -12,7 +12,7 @@ export const Home: React.FC = () => {
         <h1 className="text-5xl md:text-6xl text-white font-bold italic pb-2">
           3D CHESS
         </h1>
-        <p className="italic pb-2 text-white">Play for free!</p>
+        <p className="italic pb-2 pl-2 text-white">Play for free!</p>
         <SvgGithub
           onClick={() => window.open("https://github.com/eliyav/chess-game")}
           className="absolute bg-white rounded-lg right-1 m-2 bottom-1 hover:opacity-80"
@@ -20,7 +20,7 @@ export const Home: React.FC = () => {
         />
       </div>
       <SelectionButton
-        customClass="m-10 row-start-5 font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80 md:w-1/2 md:justify-self-center"
+        customClass="m-10 font-serif row-start-5 font-bold text-5xl border-2 border-white italic tracking-widest hover:opacity-80 md:w-1/2 md:justify-self-center"
         text="Play"
         onClick={() => navigate(APP_ROUTES.Lobby)}
       />

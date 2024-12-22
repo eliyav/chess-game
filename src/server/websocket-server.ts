@@ -76,6 +76,7 @@ export function createWebsocketServer({
       const lobby = lobbies.get(lobbyKey);
       if (!lobby) return;
       socket.to(lobbyKey).emit("opponentDisconnected");
+      socket.leave(lobbyKey);
       lobbies.delete(lobbyKey);
     });
 

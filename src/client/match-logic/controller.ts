@@ -117,6 +117,8 @@ export class Controller {
         gameScene.data.audio.crumble?.play();
       }
     }
+    this.clearMeshes({ name: "plane" });
+    this.clearMeshes({ name: "torus" });
     await this.turnAnimation({
       turnHistory,
       gameScene,
@@ -135,6 +137,11 @@ export class Controller {
       this.events.setMessage(this.createMatchEndPrompt(status));
     } else {
       this.rotateCamera();
+      if (this.match.mode === LOBBY_TYPE.LOCAL) {
+        this.match.postTurnEvents({
+          handleValidTurn: this.handleValidTurn.bind(this),
+        });
+      }
     }
   }
 
@@ -310,6 +317,16 @@ export class Controller {
     });
   }
 
+  clearMeshes({ name }: { name: string }) {
+    const gameScene = this.sceneManager.getScene(Scenes.GAME);
+    gameScene.data.meshesToRender
+      .filter((mesh) => mesh.name === name)
+      .forEach((mesh) => {
+        gameScene.scene.removeMesh(mesh);
+        mesh.dispose();
+      });
+  }
+
   setMessage(message: Message | null) {
     this.events.setMessage(message);
   }
@@ -326,8 +343,13 @@ export class Controller {
 
   shouldCameraRotate() {
     if (this.match.lobby.mode === LOBBY_TYPE.LOCAL) {
-      //Check for AI opponent here
-      return true;
+      if (
+        this.match.lobby.players.find((player) => player.type === "Computer")
+      ) {
+        return false;
+      } else {
+        return true;
+      }
     } else {
       return false;
     }
