@@ -20,8 +20,8 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
     return this.move({ originPoint, targetPoint });
   }
 
-  requestAiMove() {
-    return this.getGame().handleAIMove({ depth: 3 });
+  requestBotMove() {
+    return this.getGame().handleBotMove({ depth: 3 });
   }
 
   resetRequest() {
@@ -49,18 +49,5 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
     const piece = this.getGame().lookupPiece({ point });
     if (!piece) return false;
     return piece.team === this.getPlayerTeam();
-  }
-
-  postTurnEvents({
-    handleValidTurn,
-  }: {
-    handleValidTurn: ({ turnHistory }: { turnHistory: TurnHistory }) => void;
-  }) {
-    if (!this.isPlayersTurn()) {
-      const turnHistory = this.requestAiMove();
-      if (turnHistory) {
-        handleValidTurn({ turnHistory });
-      }
-    }
   }
 }

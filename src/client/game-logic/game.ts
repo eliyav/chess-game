@@ -515,7 +515,7 @@ class Game {
     this.current.turnHistory.push(history);
   }
 
-  handleAIMove({ depth }: { depth: number }) {
+  handleBotMove({ depth }: { depth: number }) {
     let sum = 0;
     const result = this.minimax({
       grid: this.current.grid,
