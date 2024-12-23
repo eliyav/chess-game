@@ -549,7 +549,9 @@ class Game {
     value: number;
   } {
     if (depth === 0) {
-      return { bestMove: null, value: sum };
+      const returnValue = { bestMove: null, value: sum };
+      sum = 0;
+      return returnValue;
     }
     const currentTeam = this.getCurrentTeam();
     const pieces = Board.getPieces({ grid, team: currentTeam });
