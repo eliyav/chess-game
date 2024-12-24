@@ -1,5 +1,4 @@
-importScripts("./game-logic.js");
-
+import Game from "../game-logic/game";
 const game = new Game();
 
 self.onmessage = (e) => {
@@ -14,6 +13,10 @@ self.onmessage = (e) => {
       depth: e.data.depth,
       maximizingPlayer: e.data.maximizingPlayer,
     });
+    if (!bestMove) {
+      // self.postMessage({ type: "game-over" });
+      return;
+    }
     game.move(bestMove);
     self.postMessage({ type: "move", move: bestMove });
   }

@@ -60,20 +60,32 @@ const browserEsmBundle = {
   ],
 };
 
+/** @type {import('esbuild').BuildOptions} */
+const workersEsmBundle = {
+  platform: "node",
+  ...commonBuildOptions,
+  format: "esm",
+  entryPoints: ["src/client/scripts/game-worker.ts"],
+  outdir: "dist/client",
+  packages: "external",
+};
+
 if (!isSkipPrebuild) {
   await fs.rm(outPath, { recursive: true, force: true });
   await fs.mkdir(outPath, { recursive: true });
   await fs.cp(publicPath, clientPath, { recursive: true });
 }
 
-const bundles = [nodeEsmBundles, browserEsmBundle];
+const bundles = [nodeEsmBundles, browserEsmBundle, workersEsmBundle];
 
 if (isWatch) {
   const serverContext = await context(nodeEsmBundles);
   const clientContext = await context(browserEsmBundle);
+  const workersContext = await context(workersEsmBundle);
 
   await serverContext.watch();
   await clientContext.watch();
+  await workersContext.watch();
   await clientContext.serve({
     port: 8000,
     host: "localhost",
