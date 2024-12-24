@@ -1,13 +1,10 @@
 import React from "react";
 import * as ReactDOMClient from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
+import { APP_URL } from "../config";
 import App from "./app";
 import "./index.css";
 import { createSceneManager } from "./scenes/scene-manager";
-import { APP_URL } from "../config";
-import { GAME_WORKER_URL } from "./scripts/constants";
-
-export const botWorker = new Worker(new URL(GAME_WORKER_URL, import.meta.url));
 
 export const ENV_BASE_URL =
   process.env.NODE_ENV === "production" ? APP_URL.PROD : APP_URL.DEV;
