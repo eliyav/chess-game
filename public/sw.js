@@ -21,6 +21,10 @@ self.addEventListener("install", (event) => {
         "/click-2VCHPPVR.mp3",
         "/crumble-BBBHSYQE.mp3",
         "/tube-ZB5725HQ.png",
+        "/bot-worker.js",
+        "/index.html",
+        "/index.js",
+        "/tailwind-output.css",
       ]);
     })()
   );
@@ -51,6 +55,7 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   event.respondWith(
     (async () => {
+      console.log("Fetch event for ", event.request.url);
       if (event.request.method !== "GET") {
         return;
       }
