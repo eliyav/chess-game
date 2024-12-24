@@ -137,19 +137,6 @@ export class Controller {
       this.events.setMessage(this.createMatchEndPrompt(status));
     } else {
       this.rotateCamera();
-      if (this.match.mode === LOBBY_TYPE.LOCAL) {
-        if (!this.match.isPlayersTurn()) {
-          //TO DO: Add better delay for bot move, by waiting on updateMeshesRender/DisplayLastTurn
-          setTimeout(() => {
-            if (this.match.mode === LOBBY_TYPE.LOCAL) {
-              const turnHistory = this.match.requestBotMove();
-              if (turnHistory) {
-                this.handleValidTurn({ turnHistory });
-              }
-            }
-          }, 100);
-        }
-      }
     }
   }
 
@@ -233,12 +220,6 @@ export class Controller {
   requestUndoTurn() {
     if (this.match.undoTurnRequest()) {
       this.undoTurn();
-      if (
-        this.match.mode === LOBBY_TYPE.LOCAL &&
-        this.match.lobby.players.find((player) => player.type === "Computer")
-      ) {
-        this.undoTurn();
-      }
     }
   }
 
