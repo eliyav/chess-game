@@ -1,4 +1,5 @@
 import { build, context } from "esbuild";
+import { tailwindPlugin } from "esbuild-plugin-tailwindcss";
 import fs from "node:fs/promises";
 
 const isWatch = process.argv.includes("--watch") || process.argv.includes("-w");
@@ -50,6 +51,13 @@ const browserEsmBundle = {
   define: {
     "process.env.NODE_ENV": isProductionEnv ? '"production"' : '"development"',
   },
+  plugins: [
+    tailwindPlugin({
+      config: "./tailwind.config.js",
+      sourceMap: !isProductionEnv,
+      cssModulesEnabled: true,
+    }),
+  ],
 };
 
 if (!isSkipPrebuild) {
