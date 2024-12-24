@@ -1240,12 +1240,15 @@
       this.current.annotations.push(annotation);
       this.current.turnHistory.push(history);
     }
-    getBestMove({ depth }) {
+    getBestMove({
+      depth,
+      maximizingPlayer
+    }) {
       let sum = 0;
       const result = this.minimax({
         grid: this.current.grid,
         depth,
-        maximizingPlayer: false,
+        maximizingPlayer,
         alpha: Number.NEGATIVE_INFINITY,
         beta: Number.POSITIVE_INFINITY,
         sum
