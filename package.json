@@ -9,12 +9,13 @@
     "start": "npm run build && concurrently --names esbuild,nodemon,tailwind -c auto --kill-others npm:build:watch npm:nodemon:server npm:tailwind:watch",
     "typecheck": "tsc --noEmit",
     "test": "glob -c \"node --import tsx --test\" \"src/tests/**/*.test.ts\"",
-    "build": "node esbuild.config.js & npm run tailwind",
+    "build": "node esbuild.config.js && npm run tailwind && npm run worker:game",
     "build:watch": "node esbuild.config.js -- -w -spb",
-    "build:prod": "node esbuild.config.js -- -p && npm run tailwind",
+    "build:prod": "node esbuild.config.js -- -p && npm run tailwind && npm run worker:game",
     "nodemon:server": "nodemon dist/server/index.js",
     "tailwind": "tailwindcss -i ./src/client/index.css -o ./dist/client/tailwind-output.css",
-    "tailwind:watch": "tailwindcss -i ./src/client/index.css -o ./dist/client/tailwind-output.css --watch"
+    "tailwind:watch": "tailwindcss -i ./src/client/index.css -o ./dist/client/tailwind-output.css --watch",
+    "worker:game": "esbuild src/client/game-logic/game.ts --bundle --outfile=public/game-logic.js && node scripts/build-game-logic.js"
   },
   "browserslist": [
     "last 1 Chrome version"
