@@ -4,13 +4,11 @@ import { ControllerOptions, getOptionText } from "../../../shared/match";
 interface ControllerOptionsProps {
   options: ControllerOptions;
   onChange: (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => void;
-  uniqueOptions?: [
-    {
-      text: string;
-      onChange: () => void;
-      disabled: boolean;
-    }
-  ];
+  uniqueOptions?: {
+    text: string;
+    onChange: () => void;
+    disabled: boolean;
+  }[];
 }
 
 export const ControllerOptionsList: React.FC<ControllerOptionsProps> = ({

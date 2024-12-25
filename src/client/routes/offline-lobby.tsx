@@ -1,11 +1,17 @@
 import React, { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { LOBBY_TYPE, Lobby, buildDefaultOptions } from "../../shared/match";
+import {
+  LOBBY_TYPE,
+  Lobby,
+  TEAM,
+  buildDefaultOptions,
+} from "../../shared/match";
 import { SelectionButton } from "../components/buttons/start-button";
 import { ControllerOptionsList } from "../components/lobby/controller-options-list";
 import PlayerCard from "../components/lobby/player-card";
 import { APP_ROUTES } from "../../shared/routes";
 import { BackButton } from "../components/svg/back-button";
+import { Pawn } from "../components/svg/pawn";
 
 export const OfflineLobby: React.FC<{
   lobby: Lobby | undefined;
@@ -83,7 +89,21 @@ export const OfflineLobby: React.FC<{
           </h2>
           <div className="flex flex-wrap justify-center m-2 gap-1">
             {lobby.players.map((player, i) => (
-              <PlayerCard key={i} name={player.name} type={player.type} />
+              <React.Fragment key={i}>
+                <PlayerCard
+                  name={player.name}
+                  team={
+                    lobby.teams.White === player.id ? TEAM.WHITE : TEAM.BLACK
+                  }
+                >
+                  <Pawn
+                    className="team-symbol-background h-full"
+                    color={
+                      lobby.teams.White === player.id ? "#ffffff" : "#000000"
+                    }
+                  />
+                </PlayerCard>
+              </React.Fragment>
             ))}
           </div>
         </div>
@@ -103,6 +123,17 @@ export const OfflineLobby: React.FC<{
                 }`,
                 onChange: updateOpponentType,
                 disabled: lobby.players.length === 1,
+              },
+              {
+                text: "Switch Teams",
+                onChange: () => {
+                  const temp = lobby.teams.White;
+                  updateLobby("teams", {
+                    White: lobby.teams.Black,
+                    Black: temp,
+                  });
+                },
+                disabled: false,
               },
             ]}
             options={lobby.controllerOptions}

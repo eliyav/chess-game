@@ -515,19 +515,25 @@ class Game {
     this.current.turnHistory.push(history);
   }
 
-  handleBotMove({ depth }: { depth: number }) {
+  getBestMove({
+    depth,
+    maximizingPlayer,
+  }: {
+    depth: number;
+    maximizingPlayer: boolean;
+  }) {
     let sum = 0;
     const result = this.minimax({
       grid: this.current.grid,
       depth,
-      maximizingPlayer: false,
+      maximizingPlayer,
       alpha: Number.NEGATIVE_INFINITY,
       beta: Number.POSITIVE_INFINITY,
       sum,
     });
     if (!result.bestMove) return;
     const { origin, target } = result.bestMove;
-    return this.move({ origin, target });
+    return { origin, target };
   }
 
   minimax({

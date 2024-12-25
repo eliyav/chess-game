@@ -84,7 +84,9 @@ export class Controller {
           return;
         } else {
           //If you select a different piece check if its a valid move and resolve or display new moves
-          const validMove = await this.move([this.selectedPoint, point]);
+          const validMove = await this.move({
+            move: [this.selectedPoint, point],
+          });
           if (!validMove) {
             const currentPlayersPiece = this.match.isCurrentPlayersPiece(point);
             if (!currentPlayersPiece) return;
@@ -96,7 +98,7 @@ export class Controller {
     };
   }
 
-  async move(move: Point[], emit = true) {
+  async move({ move, emit = true }: { move: Point[]; emit?: boolean }) {
     const [originPoint, targetPoint] = move;
     const turnHistory = this.match.requestMove({
       originPoint,
@@ -104,7 +106,7 @@ export class Controller {
       emit,
     });
     if (turnHistory) {
-      this.handleValidTurn({ turnHistory });
+      await this.handleValidTurn({ turnHistory });
     }
     return turnHistory;
   }
@@ -137,19 +139,6 @@ export class Controller {
       this.events.setMessage(this.createMatchEndPrompt(status));
     } else {
       this.rotateCamera();
-      if (this.match.mode === LOBBY_TYPE.LOCAL) {
-        if (!this.match.isPlayersTurn()) {
-          //TO DO: Add better delay for bot move, by waiting on updateMeshesRender/DisplayLastTurn
-          setTimeout(() => {
-            if (this.match.mode === LOBBY_TYPE.LOCAL) {
-              const turnHistory = this.match.requestBotMove();
-              if (turnHistory) {
-                this.handleValidTurn({ turnHistory });
-              }
-            }
-          }, 100);
-        }
-      }
     }
   }
 
@@ -233,12 +222,6 @@ export class Controller {
   requestUndoTurn() {
     if (this.match.undoTurnRequest()) {
       this.undoTurn();
-      if (
-        this.match.mode === LOBBY_TYPE.LOCAL &&
-        this.match.lobby.players.find((player) => player.type === "Computer")
-      ) {
-        this.undoTurn();
-      }
     }
   }
 
