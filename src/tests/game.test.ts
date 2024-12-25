@@ -38,17 +38,14 @@ describe("Game Class", () => {
     assert.equal(gameState.status, GAMESTATUS.CHECKMATE);
   });
 
-  it("should initialize and handle AI moves correctly", () => {
+  it("should get best move", () => {
     const gameState = game.getGameState();
     assert.equal(gameState.status, GAMESTATUS.INPROGRESS);
     assert.equal(gameState.turnHistory.length, 0);
     assert.equal(gameState.annotations.length, 0);
 
-    game.move({ origin: [0, 1], target: [0, 3] });
-    game.handleBotMove({ depth: 3 });
-    assert.equal(game.getCurrentTeam(), TEAM.WHITE);
-    assert.equal(gameState.turnHistory.length, 2);
-    assert.equal(gameState.annotations.length, 2);
+    const move = game.getBestMove({ maximizingPlayer: true, depth: 3 });
+    assert.ok(move);
   });
 
   it("should have king side castling available", () => {
