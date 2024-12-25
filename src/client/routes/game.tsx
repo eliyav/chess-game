@@ -37,19 +37,10 @@ export const Game: React.FC<{
     })
   );
 
-  const onlineSubscribers = useMemo(() => {
-    if (match.current.mode !== LOBBY_TYPE.ONLINE) return;
-    return match.current.getOnlineSubscribers({
-      controller: controller.current,
-    });
-  }, [controller.current, match.current]);
-
   useEffect(() => {
-    onlineSubscribers?.subscribe();
-    return () => {
-      onlineSubscribers?.unsubscribe();
-    };
-  }, [onlineSubscribers]);
+    match.current?.subscribe({ controller: controller.current });
+    return () => match.current?.unsubscribe();
+  }, [match.current]);
 
   //Game Overlay
   return (

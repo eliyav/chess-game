@@ -3,32 +3,22 @@ import type { ServerToClientEvents } from "../../shared/websocket";
 import { websocket } from "../websocket-client";
 import type { Controller } from "./controller";
 
-export type OnlineEvent = {
-  name: keyof ServerToClientEvents;
-  event: (args: any) => void;
+type GameEvents<T, K = (args: any) => void> = {
+  name: T;
+  event: K;
 };
 
-export function getOnlineSubscribers(events: OnlineEvent[]) {
-  const subscribe = () => {
-    for (const { name, event } of events) {
-      websocket.on(name, event);
-    }
-  };
+export type OnlineEvents = GameEvents<keyof ServerToClientEvents>;
+export type LocalEvents = GameEvents<
+  string,
+  ((this: Worker, ev: MessageEvent) => any) | null
+>;
 
-  const unsubscribe = () => {
-    for (const { name } of events) {
-      websocket.off(name);
-    }
-  };
-
-  return { subscribe, unsubscribe };
-}
-
-export function createMatchEvents({
+export function createOnlineEvents({
   controller,
 }: {
   controller: Controller;
-}): OnlineEvent[] {
+}): OnlineEvents[] {
   return [
     {
       name: "resetMatchRequested",
@@ -73,7 +63,7 @@ export function createMatchEvents({
         originPoint: Point;
         targetPoint: Point;
       }) => {
-        controller.move([originPoint, targetPoint], false);
+        controller.move({ move: [originPoint, targetPoint], emit: false });
       },
     },
     {
@@ -106,6 +96,26 @@ export function createMatchEvents({
           controller.setMessage({
             text: "Last move has been undone successfully!",
             onConfirm: () => controller.setMessage(null),
+          });
+        }
+      },
+    },
+  ];
+}
+
+export function createLocalEvents({
+  controller,
+}: {
+  controller: Controller;
+}): LocalEvents[] {
+  return [
+    {
+      name: "onMove",
+      event: (e: MessageEvent) => {
+        if (e.data.type === "move") {
+          controller.move({
+            move: [e.data.move.origin, e.data.move.target],
+            emit: false,
           });
         }
       },

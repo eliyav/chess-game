@@ -1,14 +1,13 @@
 import { Point } from "../../shared/game";
 import { Lobby, LOBBY_TYPE, Player, TEAM } from "../../shared/match";
-import { Message } from "../components/modals/message-modal";
-import GamePiece from "../game-logic/game-piece";
 import { websocket } from "../websocket-client";
 import { BaseMatch, MatchLogic } from "./base-match";
 import { Controller } from "./controller";
-import { createMatchEvents, getOnlineSubscribers } from "./online-events";
+import { createOnlineEvents, OnlineEvents } from "./events";
 
 export class OnlineMatch extends BaseMatch implements MatchLogic {
   mode: LOBBY_TYPE.ONLINE;
+  events: OnlineEvents[] | undefined;
 
   constructor({ lobby, player }: { lobby: Lobby; player: Player }) {
     super({ lobby, player });
@@ -64,11 +63,17 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
     return piece.team === this.getPlayerTeam();
   }
 
-  getOnlineSubscribers({ controller }: { controller: Controller }) {
-    const events = createMatchEvents({
-      controller,
-    });
-    const subscribers = getOnlineSubscribers(events);
-    return subscribers;
+  subscribe({ controller }: { controller: Controller }) {
+    this.events = createOnlineEvents({ controller });
+    for (const event of this.events) {
+      websocket.on(event.name, event.event);
+    }
+  }
+
+  unsubscribe() {
+    if (!this.events) return;
+    for (const event of this.events) {
+      websocket.off(event.name, event.event);
+    }
   }
 }

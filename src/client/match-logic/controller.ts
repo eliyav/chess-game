@@ -84,7 +84,9 @@ export class Controller {
           return;
         } else {
           //If you select a different piece check if its a valid move and resolve or display new moves
-          const validMove = await this.move([this.selectedPoint, point]);
+          const validMove = await this.move({
+            move: [this.selectedPoint, point],
+          });
           if (!validMove) {
             const currentPlayersPiece = this.match.isCurrentPlayersPiece(point);
             if (!currentPlayersPiece) return;
@@ -96,7 +98,7 @@ export class Controller {
     };
   }
 
-  async move(move: Point[], emit = true) {
+  async move({ move, emit = true }: { move: Point[]; emit?: boolean }) {
     const [originPoint, targetPoint] = move;
     const turnHistory = this.match.requestMove({
       originPoint,
