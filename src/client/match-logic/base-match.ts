@@ -1,4 +1,4 @@
-import { GAMESTATUS, Point, TurnHistory } from "../../shared/game";
+import { GAMESTATUS, Point, Turn } from "../../shared/game";
 import { Lobby, Player, TEAM } from "../../shared/match";
 import Game from "../game-logic/game";
 
@@ -27,9 +27,9 @@ export class BaseMatch {
   }: {
     originPoint: Point;
     targetPoint: Point;
-  }): { turnHistory: TurnHistory | undefined; callback?: () => void } {
+  }): { turn: Turn | undefined; callback?: () => void } {
     return {
-      turnHistory: this.getGame().move({
+      turn: this.getGame().move({
         origin: originPoint,
         target: targetPoint,
       }),

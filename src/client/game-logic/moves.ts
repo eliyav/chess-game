@@ -1,4 +1,4 @@
-import { EnPassant, Move, PIECE, Point, TurnHistory } from "../../shared/game";
+import { EnPassant, Move, PIECE, Point, Turn } from "../../shared/game";
 import { TEAM } from "../../shared/match";
 import { Board, type Grid } from "./board";
 import { kingInitialPoints } from "./chess-data-import";
@@ -11,35 +11,35 @@ export function getPieceMoves({
   grid,
   point,
   piece: { type, team },
-  turnHistory,
+  turns,
   checkForCastling,
   skipCastling = false,
 }: {
   grid: Grid;
   point: Point;
   piece: { type: PIECE; team: TEAM };
-  turnHistory: TurnHistory[];
+  turns: Turn[];
   skipCastling: boolean;
   checkForCastling: ({
     kingPoint,
     team,
     grid,
-    turnHistory,
+    turns,
   }: {
     kingPoint: Point;
     team: TEAM;
     grid: Grid;
-    turnHistory: TurnHistory[];
+    turns: Turn[];
   }) => Move[];
 }) {
-  const lastTurnHistory = turnHistory.at(-1);
+  const lastTurn = turns.at(-1);
   switch (type) {
     case PIECE.P:
       return calcPawnMoves({
         point,
         team,
         grid,
-        turnHistory: lastTurnHistory,
+        turn: lastTurn,
       });
     case PIECE.R:
       return calcRookMoves({ team, point, grid });
@@ -54,7 +54,7 @@ export function getPieceMoves({
         point,
         grid,
         team,
-        turnHistory,
+        turns: turns,
         checkForCastling,
         skipCastling,
       });
@@ -62,26 +62,26 @@ export function getPieceMoves({
 }
 
 export const isEnPassantAvailable = ({
-  turnHistory,
+  turn,
   grid,
 }: {
-  turnHistory: TurnHistory;
+  turn: Turn;
   grid: Grid;
 }): EnPassant | undefined => {
-  const { target } = turnHistory;
+  const { target } = turn;
   const pieceOnLastTurnTargetSquare = Board.getPiece({ grid, point: target });
   if (
     !pieceOnLastTurnTargetSquare ||
     pieceOnLastTurnTargetSquare.type !== PIECE.P
   )
     return;
-  const targetY = turnHistory.target[1];
-  const originY = turnHistory.origin[1];
+  const targetY = turn.target[1];
+  const originY = turn.origin[1];
   const moved = Math.abs(targetY - originY);
   if (moved !== 2) return;
   const direction = pieceOnLastTurnTargetSquare.team === TEAM.WHITE ? 1 : -1;
-  const x = turnHistory.target[0];
-  const y = turnHistory.origin[1] + direction;
+  const x = turn.target[0];
+  const y = turn.origin[1] + direction;
   const enPassantPoint: Point = [x, y];
   return {
     enPassantPoint: enPassantPoint,
@@ -150,12 +150,12 @@ function calcPawnMoves({
   point,
   team,
   grid,
-  turnHistory,
+  turn,
 }: {
   point: Point;
   team: TEAM;
   grid: Grid;
-  turnHistory: TurnHistory | undefined;
+  turn: Turn | undefined;
 }) {
   const availableMoves: Move[] = [];
   const direction = Board.getDirection(team);
@@ -219,8 +219,8 @@ function calcPawnMoves({
     availableMoves.push({ ...captureMove2, promotion });
   }
 
-  if (turnHistory) {
-    const enPassant = isEnPassantAvailable({ turnHistory, grid });
+  if (turn) {
+    const enPassant = isEnPassantAvailable({ turn, grid });
     if (enPassant) {
       const [x, y] = point;
       const direction = Board.getDirection(team);
@@ -294,25 +294,25 @@ function calcKnightMoves({
 function calcKingMoves({
   point,
   grid,
-  turnHistory,
+  turns,
   team,
   checkForCastling,
   skipCastling = false,
 }: {
   point: Point;
   grid: Grid;
-  turnHistory: TurnHistory[];
+  turns: Turn[];
   team: TEAM;
   checkForCastling: ({
     kingPoint,
     team,
     grid,
-    turnHistory,
+    turns,
   }: {
     kingPoint: Point;
     team: TEAM;
     grid: Grid;
-    turnHistory: TurnHistory[];
+    turns: Turn[];
   }) => Move[];
   skipCastling: boolean;
 }) {
@@ -346,15 +346,13 @@ function calcKingMoves({
     .find((teamData) => teamData.name === team)
     ?.startingPoints.some((initialPoint) => doPointsMatch(initialPoint, point));
   if (!isKingInIntialPoint) return availableMoves;
-  const hasKingMoved = turnHistory.some((turn) =>
-    doPointsMatch(turn.origin, point)
-  );
+  const hasKingMoved = turns.some((turn) => doPointsMatch(turn.origin, point));
   if (!hasKingMoved && !skipCastling) {
     const castlingMoves = checkForCastling({
       kingPoint: point,
       team,
       grid,
-      turnHistory,
+      turns,
     });
     if (castlingMoves.length) {
       availableMoves.push(...castlingMoves);

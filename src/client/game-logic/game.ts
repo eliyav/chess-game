@@ -1,4 +1,4 @@
-import { GAMESTATUS, Move, PIECE, Point, TurnHistory } from "../../shared/game";
+import { GAMESTATUS, Move, PIECE, Point, Turn } from "../../shared/game";
 import { TEAM } from "../../shared/match";
 import { Board, Grid } from "./board";
 import { rookInitialPoints } from "./chess-data-import";
@@ -11,7 +11,7 @@ class Game {
   current: {
     grid: Grid;
     annotations: string[];
-    turnHistory: TurnHistory[];
+    turns: Turn[];
     status: GAMESTATUS;
   };
 
@@ -24,7 +24,7 @@ class Game {
     return {
       grid: Board.createGrid(),
       annotations: [],
-      turnHistory: [],
+      turns: [],
       status: GAMESTATUS.INPROGRESS,
     };
   }
@@ -54,7 +54,7 @@ class Game {
   }
 
   public getTurn() {
-    return this.current.turnHistory.length + 1;
+    return this.current.turns.length + 1;
   }
 
   public move({
@@ -123,7 +123,7 @@ class Game {
   }: {
     move: Move;
     grid: Grid;
-  }): TurnHistory | undefined {
+  }): Turn | undefined {
     const { origin, target, promotion } = move;
     const originPiece = this.lookupPiece({ grid, point: origin });
     if (!originPiece) return;
@@ -144,7 +144,7 @@ class Game {
   }: {
     move: Move;
     grid: Grid;
-  }): TurnHistory | undefined {
+  }): Turn | undefined {
     const { origin, target, promotion } = move;
     const originPiece = this.lookupPiece({ grid, point: origin });
     const targetPiece = this.lookupPiece({ grid, point: target });
@@ -167,14 +167,14 @@ class Game {
   }: {
     move: Move;
     grid: Grid;
-  }): TurnHistory | undefined {
+  }): Turn | undefined {
     const { origin, target } = move;
     const originPiece = this.lookupPiece({ grid, point: origin });
     if (!originPiece) return;
-    const lastTurnHistory = this.current.turnHistory.at(-1);
-    if (!lastTurnHistory) return;
+    const lastTurn = this.current.turns.at(-1);
+    if (!lastTurn) return;
     const enPassant = isEnPassantAvailable({
-      turnHistory: lastTurnHistory,
+      turn: lastTurn,
       grid,
     });
     if (enPassant) {
@@ -198,7 +198,7 @@ class Game {
   }: {
     move: Move;
     grid: Grid;
-  }): TurnHistory | undefined {
+  }): Turn | undefined {
     const { origin, target } = move;
     const originPiece = this.lookupPiece({ grid, point: origin });
     const targetPiece = this.lookupPiece({ grid, point: target });
@@ -228,7 +228,7 @@ class Game {
   }
 
   public undoTurn(grid = this.current.grid) {
-    const lastTurn = this.current.turnHistory.at(-1);
+    const lastTurn = this.current.turns.at(-1);
     if (lastTurn) {
       if (lastTurn.promotion) {
         const { origin, target } = lastTurn;
@@ -289,7 +289,7 @@ class Game {
         Board.removePiece({ grid, point: kingTarget });
         Board.removePiece({ grid, point: rookTarget });
       }
-      this.current.turnHistory.pop();
+      this.current.turns.pop();
       this.current.annotations.pop();
       return true;
     }
@@ -314,7 +314,7 @@ class Game {
       point,
       piece: { type, team },
       grid,
-      turnHistory: this.current.turnHistory,
+      turns: this.current.turns,
       skipCastling,
       checkForCastling: this.checkForCastling.bind(this),
     });
@@ -476,10 +476,10 @@ class Game {
   }
 
   public getHistory() {
-    return this.current.turnHistory;
+    return this.current.turns;
   }
 
-  private annotate(history: TurnHistory) {
+  private annotate(history: Turn) {
     let annotation;
     const moveType = history.type;
     const promotion = history.promotion;
@@ -510,7 +510,7 @@ class Game {
     }
     if (opponentInCheck) annotation = `${annotation}+`;
     this.current.annotations.push(annotation);
-    this.current.turnHistory.push(history);
+    this.current.turns.push(history);
   }
 
   getBestMove({
@@ -629,12 +629,12 @@ class Game {
     kingPoint,
     team,
     grid,
-    turnHistory,
+    turns,
   }: {
     kingPoint: Point;
     team: TEAM;
     grid: Grid;
-    turnHistory: TurnHistory[];
+    turns: Turn[];
   }) {
     const moves: Move[] = [];
     const playersRooks = Board.getPieces({ grid }).filter(({ piece }) => {
@@ -648,7 +648,7 @@ class Game {
           doPointsMatch(initialPoint, rookPoint)
         );
       if (!isRookInInitalPosition) return moves;
-      const hasRookMoved = turnHistory.some((turn) =>
+      const hasRookMoved = turns.some((turn) =>
         doPointsMatch(turn.origin, rookPoint)
       );
       if (!hasRookMoved) {

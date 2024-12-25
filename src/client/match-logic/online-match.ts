@@ -21,15 +21,14 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
     originPoint: Point;
     targetPoint: Point;
   }) {
-    const move = this.getGame().move({
+    const turn = this.getGame().move({
       origin: originPoint,
       target: targetPoint,
     });
     return {
-      turnHistory: move,
+      turn,
       callback: async () => {
-        if (move && this.lobby.key) {
-          const { origin: originPoint, target: targetPoint } = move;
+        if (this.lobby.key) {
           websocket.emit("resolvedMove", {
             originPoint,
             targetPoint,

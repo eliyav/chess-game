@@ -1,6 +1,6 @@
 import { Animation } from "@babylonjs/core/Animations/animation";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { PIECE, Point, TurnHistory } from "../../../shared/game";
+import { PIECE, Point, Turn } from "../../../shared/game";
 import { TEAM } from "../../../shared/match";
 import { doPointsMatch } from "../../game-logic/moves";
 import { getPointFromPosition, getPositionFromPoint } from "../scene-helpers";
@@ -9,27 +9,27 @@ import { GameScene } from "../scene-manager";
 export default async function calcTurnAnimation({
   gameScene,
   findMeshFromPoint,
-  turnHistory,
+  turn,
 }: {
   gameScene: GameScene;
   findMeshFromPoint: (point: Point) => AbstractMesh | undefined;
-  turnHistory: TurnHistory;
+  turn: Turn;
 }) {
-  const { origin, target } = turnHistory;
+  const { origin, target } = turn;
   const movingMesh = findMeshFromPoint(origin);
   if (!movingMesh) return;
 
-  if (turnHistory.type === "capture") {
+  if (turn.type === "capture") {
     animateMeshBreaking({
-      point: turnHistory.target,
-      target: turnHistory.capturedPiece,
+      point: turn.target,
+      target: turn.capturedPiece,
       gameScene,
     });
-  } else if (turnHistory.type === "enPassant") {
+  } else if (turn.type === "enPassant") {
     //Update enpassant turn history to have the enpassant point
     animateMeshBreaking({
-      point: turnHistory.enPassant.capturedPiecePoint,
-      target: turnHistory.enPassant.capturedPiece,
+      point: turn.enPassant.capturedPiecePoint,
+      target: turn.enPassant.capturedPiece,
       gameScene,
     });
   }
@@ -38,11 +38,11 @@ export default async function calcTurnAnimation({
   const animateZ = movingMesh.name === "Knight" ? true : false;
   const targetMesh = findMeshFromPoint(target)!;
   const meshes =
-    turnHistory.type === "castle" ? [movingMesh, targetMesh] : [movingMesh];
+    turn.type === "castle" ? [movingMesh, targetMesh] : [movingMesh];
   return await animateMeshMovement({
     meshes,
     animateZ,
-    turnHistory,
+    turn,
     gameScene,
   });
 }
@@ -50,35 +50,35 @@ export default async function calcTurnAnimation({
 function animateMeshMovement({
   meshes,
   animateZ,
-  turnHistory,
+  turn,
   gameScene,
 }: {
   meshes: AbstractMesh[];
   animateZ: boolean;
-  turnHistory: TurnHistory;
+  turn: Turn;
   gameScene: GameScene;
 }) {
-  const { origin, target } = turnHistory;
+  const { origin, target } = turn;
   return new Promise<void>((resolve) => {
     meshes.forEach((mesh, i) => {
       let position;
       let targetPosition;
-      if (turnHistory.type === "castle" && mesh.name === "King") {
+      if (turn.type === "castle" && mesh.name === "King") {
         position = getPositionFromPoint({
           point: origin,
           externalMesh: true,
         });
         targetPosition = getPositionFromPoint({
-          point: turnHistory.castling.kingTarget,
+          point: turn.castling.kingTarget,
           externalMesh: true,
         });
-      } else if (turnHistory.type === "castle" && mesh.name === "Rook") {
+      } else if (turn.type === "castle" && mesh.name === "Rook") {
         position = getPositionFromPoint({
           point: target,
           externalMesh: true,
         });
         targetPosition = getPositionFromPoint({
-          point: turnHistory.castling.rookTarget,
+          point: turn.castling.rookTarget,
           externalMesh: true,
         });
       } else {

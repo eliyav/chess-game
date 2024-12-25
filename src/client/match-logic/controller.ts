@@ -2,7 +2,7 @@ import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { PickingInfo } from "@babylonjs/core/Collisions/pickingInfo";
 import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
 import type { Nullable } from "@babylonjs/core/types";
-import { GAMESTATUS, Point, TurnHistory } from "../../shared/game";
+import { GAMESTATUS, Point, Turn } from "../../shared/game";
 import { ControllerOptions, LOBBY_TYPE } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
 import { Message } from "../components/modals/message-modal";
@@ -100,23 +100,23 @@ export class Controller {
 
   async move({ move, emit = true }: { move: Point[]; emit?: boolean }) {
     const [originPoint, targetPoint] = move;
-    const { turnHistory, callback } = this.match.move({
+    const { turn, callback } = this.match.move({
       originPoint,
       targetPoint,
     });
-    if (!turnHistory) return false;
-    await this.handleValidTurn({ turnHistory });
+    if (!turn) return false;
+    await this.handleValidTurn({ turn });
     if (emit) {
       callback();
     }
 
-    return turnHistory;
+    return turn;
   }
 
-  async handleValidTurn({ turnHistory }: { turnHistory: TurnHistory }) {
+  async handleValidTurn({ turn }: { turn: Turn }) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (this.options.playGameSounds) {
-      const moveType = turnHistory.type;
+      const moveType = turn.type;
       if (moveType === "capture" || moveType === "enPassant") {
         gameScene.data.audio.crumble?.play();
       }
@@ -124,7 +124,7 @@ export class Controller {
     this.clearMeshes({ name: "plane" });
     this.clearMeshes({ name: "torus" });
     await this.turnAnimation({
-      turnHistory,
+      turn,
       gameScene,
     });
     this.prepNextView();
@@ -247,18 +247,12 @@ export class Controller {
     }
   }
 
-  turnAnimation({
-    turnHistory,
-    gameScene,
-  }: {
-    turnHistory: TurnHistory;
-    gameScene: GameScene;
-  }) {
+  turnAnimation({ turn, gameScene }: { turn: Turn; gameScene: GameScene }) {
     if (!this.options.playAnimations) return;
     return calcTurnAnimation({
       gameScene,
       findMeshFromPoint: this.findMeshFromPoint.bind(this),
-      turnHistory,
+      turn,
     });
   }
 

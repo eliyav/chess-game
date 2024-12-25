@@ -15,7 +15,7 @@ describe("Game Class", () => {
   it("should initialize the game correctly", () => {
     const gameState = game.getGameState();
     assert.equal(gameState.status, GAMESTATUS.INPROGRESS);
-    assert.equal(gameState.turnHistory.length, 0);
+    assert.equal(gameState.turns.length, 0);
     assert.equal(gameState.annotations.length, 0);
   });
 
@@ -41,7 +41,7 @@ describe("Game Class", () => {
   it("should get best move", () => {
     const gameState = game.getGameState();
     assert.equal(gameState.status, GAMESTATUS.INPROGRESS);
-    assert.equal(gameState.turnHistory.length, 0);
+    assert.equal(gameState.turns.length, 0);
     assert.equal(gameState.annotations.length, 0);
 
     const move = game.getBestMove({ maximizingPlayer: true, depth: 3 });

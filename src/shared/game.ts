@@ -29,7 +29,7 @@ export enum PIECE {
   Q = "Queen",
 }
 
-type BaseTurnHistory = {
+type BaseTurn = {
   origin: Point;
   target: Point;
   isOpponentInCheck: boolean;
@@ -69,4 +69,4 @@ export type TurnTypes =
       enPassant: EnPassant;
     };
 
-export type TurnHistory = BaseTurnHistory & TurnTypes;
+export type Turn = BaseTurn & TurnTypes;
