@@ -1,4 +1,4 @@
-const expectedCaches = [`3d-chess-v1`];
+const expectedCaches = [`3d-chess-v1.3.11`];
 
 // Use the install event to pre-cache all initial resources.
 self.addEventListener("install", (event) => {
@@ -21,10 +21,10 @@ self.addEventListener("install", (event) => {
         "/click-2VCHPPVR.mp3",
         "/crumble-BBBHSYQE.mp3",
         "/tube-ZB5725HQ.png",
-        "/bot-worker.js",
         "/index.html",
         "/index.js",
-        "/tailwind-output.css",
+        "/index.css",
+        "/game-worker.js",
       ]);
     })()
   );
@@ -56,42 +56,28 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     (async () => {
       console.log("Fetch event for ", event.request.url);
-      if (event.request.method !== "GET") {
+      //If not fetching an asset, then return
+      if (event.request.method !== "GET" || !event.request.url.endsWith(".*")) {
         return;
       }
       const cache = await caches.open(expectedCaches.at(-1));
       // Get the resource from the cache.
       const cachedResponse = await cache.match(event.request);
-      //If its not a 3d model or image or audio, then check if the resource is modified since cached
-      if (
-        event.request.url.endsWith(".gltf") ||
-        event.request.url.endsWith(".png") ||
-        event.request.url.endsWith(".mp3")
-      ) {
-        if (cachedResponse) {
-          return cachedResponse;
-        } else {
-          // If the resource was not in the cache, try the network.
-          const fetchResponse = await fetch(event.request);
-          // Save the resource in the cache and return it.
-          cache.put(event.request, fetchResponse.clone());
-          return fetchResponse;
-        }
-      } else {
-        const modifiedRequest = new Request(event.request);
-        if (cachedResponse) {
-          const lastModified = cachedResponse.headers.get("Last-Modified");
-          modifiedRequest.headers.set("If-Modified-Since", lastModified);
-        }
-        const fetchResponse = await fetch(modifiedRequest);
-        //If response 304, then the resource is not modified since cached
-        if (fetchResponse.status === 304) {
-          return cachedResponse;
-        }
-        // Cache the new response
-        cache.put(event.request, fetchResponse.clone());
-        return fetchResponse;
+
+      //Create a modified request to check if resource has changed
+      const modifiedRequest = new Request(event.request);
+      if (cachedResponse) {
+        const lastModified = cachedResponse.headers.get("Last-Modified");
+        modifiedRequest.headers.set("If-Modified-Since", lastModified);
       }
+      const fetchResponse = await fetch(modifiedRequest);
+      //If response 304, then the resource is not modified, return cached response
+      if (fetchResponse.status === 304) {
+        return cachedResponse;
+      }
+      // Cache the new response
+      cache.put(event.request, fetchResponse.clone());
+      return fetchResponse;
     })()
   );
 });
