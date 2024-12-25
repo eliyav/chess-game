@@ -113,10 +113,8 @@ class Game {
         grid,
       }) !== undefined;
 
-    return {
-      ...resolvedMove,
-      isOpponentInCheck,
-    };
+    resolvedMove.isOpponentInCheck = isOpponentInCheck;
+    return resolvedMove;
   }
 
   private resolveMovement({

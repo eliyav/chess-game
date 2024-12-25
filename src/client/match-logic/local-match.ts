@@ -1,4 +1,4 @@
-import { Point } from "../../shared/game";
+import { Point, TurnHistory } from "../../shared/game";
 import { Lobby, LOBBY_TYPE, Player } from "../../shared/match";
 import { GAME_WORKER_URL } from "../scripts/constants";
 import { BaseMatch, MatchLogic } from "./base-match";
@@ -22,28 +22,33 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
       : undefined;
   }
 
-  requestMove({
+  move({
     originPoint,
     targetPoint,
-    emit,
   }: {
     originPoint: Point;
     targetPoint: Point;
-    emit: boolean;
-  }) {
-    const move = this.move({ originPoint, targetPoint });
-    if (emit && this.vsComputer && this.worker && move) {
-      this.worker.postMessage({
-        type: "move",
-        data: {
-          origin: move.origin,
-          target: move.target,
-          maximizingPlayer: this.vsComputer.maximizingPlayer,
-          depth: this.vsComputer.depth,
-        },
-      });
-    }
-    return move;
+  }): { turnHistory: TurnHistory | undefined; callback: () => void } {
+    const move = this.getGame().move({
+      origin: originPoint,
+      target: targetPoint,
+    });
+    return {
+      turnHistory: move,
+      callback: () => {
+        if (this.vsComputer && this.worker && move) {
+          this.worker.postMessage({
+            type: "move",
+            data: {
+              origin: move.origin,
+              target: move.target,
+              maximizingPlayer: this.vsComputer.maximizingPlayer,
+              depth: this.vsComputer.depth,
+            },
+          });
+        }
+      },
+    };
   }
 
   resetRequest() {

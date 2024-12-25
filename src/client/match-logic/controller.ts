@@ -100,14 +100,16 @@ export class Controller {
 
   async move({ move, emit = true }: { move: Point[]; emit?: boolean }) {
     const [originPoint, targetPoint] = move;
-    const turnHistory = this.match.requestMove({
+    const { turnHistory, callback } = this.match.move({
       originPoint,
       targetPoint,
-      emit,
     });
-    if (turnHistory) {
-      await this.handleValidTurn({ turnHistory });
+    if (!turnHistory) return false;
+    await this.handleValidTurn({ turnHistory });
+    if (emit) {
+      callback();
     }
+
     return turnHistory;
   }
 

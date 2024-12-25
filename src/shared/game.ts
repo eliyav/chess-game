@@ -45,26 +45,28 @@ export type EnPassant = {
   };
 };
 
-export type TurnHistory =
-  | ({
+export type TurnTypes =
+  | {
       type: "movement";
-    } & BaseTurnHistory)
-  | ({
+    }
+  | {
       type: "capture";
       capturedPiece: {
         type: PIECE;
         team: TEAM;
       };
-    } & BaseTurnHistory)
-  | ({
+    }
+  | {
       type: "castle";
       castling: {
         direction: number;
         kingTarget: Point;
         rookTarget: Point;
       };
-    } & BaseTurnHistory)
-  | ({
+    }
+  | {
       type: "enPassant";
       enPassant: EnPassant;
-    } & BaseTurnHistory);
+    };
+
+export type TurnHistory = BaseTurnHistory & TurnTypes;

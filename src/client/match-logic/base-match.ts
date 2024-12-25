@@ -3,15 +3,6 @@ import { Lobby, Player, TEAM } from "../../shared/match";
 import Game from "../game-logic/game";
 
 export interface MatchLogic {
-  requestMove({
-    originPoint,
-    targetPoint,
-    emit,
-  }: {
-    originPoint: Point;
-    targetPoint: Point;
-    emit: boolean;
-  }): TurnHistory | undefined;
   isPlayersTurn(): boolean;
   getPlayerTeam(): TEAM | undefined;
   isCurrentPlayersPiece(point: Point): boolean;
@@ -36,8 +27,13 @@ export class BaseMatch {
   }: {
     originPoint: Point;
     targetPoint: Point;
-  }) {
-    return this.getGame().move({ origin: originPoint, target: targetPoint });
+  }): { turnHistory: TurnHistory | undefined; callback?: () => void } {
+    return {
+      turnHistory: this.getGame().move({
+        origin: originPoint,
+        target: targetPoint,
+      }),
+    };
   }
 
   getMoves(point: Point) {
