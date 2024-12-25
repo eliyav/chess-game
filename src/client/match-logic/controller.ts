@@ -106,7 +106,7 @@ export class Controller {
       emit,
     });
     if (turnHistory) {
-      this.handleValidTurn({ turnHistory });
+      await this.handleValidTurn({ turnHistory });
     }
     return turnHistory;
   }
@@ -263,6 +263,8 @@ export class Controller {
   findMeshFromPoint(point: Point) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     return gameScene.data.meshesToRender.find((mesh) => {
+      console.log(mesh);
+      console.log(mesh.position);
       const meshPoint = getPointFromPosition({
         position: [mesh.position.z, mesh.position.x],
         externalMesh: true,
