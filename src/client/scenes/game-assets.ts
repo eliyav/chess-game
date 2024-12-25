@@ -103,6 +103,7 @@ function configureChessPieces({
       const name: string = mesh.meshes[1].id;
       const clone = mesh.meshes[1].clone(name, null);
       if (clone) {
+        clone.isPickable = false;
         finalArray.push(
           configure({
             mesh: clone,
@@ -113,6 +114,7 @@ function configureChessPieces({
       }
       const clone2 = mesh.meshes[1].clone(name, null);
       if (clone2) {
+        clone2.isPickable = false;
         finalArray.push(
           configure({
             mesh: clone2,
