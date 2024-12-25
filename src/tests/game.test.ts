@@ -24,16 +24,16 @@ describe("Game Class", () => {
   });
 
   it("should move a piece correctly", () => {
-    const move = game.move({ origin: [0, 1], target: [0, 3] });
+    const move = game.move({ from: [0, 1], to: [0, 3] });
     assert.ok(move);
     assert.equal(game.getCurrentTeam(), TEAM.BLACK);
   });
 
   it("should detect checkmate", () => {
-    game.move({ origin: [6, 1], target: [6, 3] }); // g4
-    game.move({ origin: [4, 6], target: [4, 4] }); // e5
-    game.move({ origin: [5, 1], target: [5, 2] }); // f3
-    game.move({ origin: [3, 7], target: [7, 3] }); // Qh4#
+    game.move({ from: [6, 1], to: [6, 3] }); // g4
+    game.move({ from: [4, 6], to: [4, 4] }); // e5
+    game.move({ from: [5, 1], to: [5, 2] }); // f3
+    game.move({ from: [3, 7], to: [7, 3] }); // Qh4#
     const gameState = game.getGameState();
     assert.equal(gameState.status, GAMESTATUS.CHECKMATE);
   });
@@ -49,34 +49,34 @@ describe("Game Class", () => {
   });
 
   it("should have king side castling available", () => {
-    game.move({ origin: [6, 0], target: [5, 2] });
-    game.move({ origin: [4, 6], target: [4, 5] });
-    game.move({ origin: [4, 1], target: [4, 2] });
-    game.move({ origin: [5, 6], target: [5, 5] });
-    game.move({ origin: [5, 0], target: [4, 1] });
-    game.move({ origin: [6, 6], target: [6, 5] });
+    game.move({ from: [6, 0], to: [5, 2] });
+    game.move({ from: [4, 6], to: [4, 5] });
+    game.move({ from: [4, 1], to: [4, 2] });
+    game.move({ from: [5, 6], to: [5, 5] });
+    game.move({ from: [5, 0], to: [4, 1] });
+    game.move({ from: [6, 6], to: [6, 5] });
     const pieces = game.getAllPieces();
     const king = pieces.find(
       ({ piece }) => piece?.type === PIECE.K && piece.team === TEAM.WHITE
     );
     const kingMoves = game.getMoves({ point: king!.point });
     assert.ok(kingMoves.some((move) => move.type === "castle"));
-    assert.ok(kingMoves.some((move) => doPointsMatch(move.target, [7, 0])));
+    assert.ok(kingMoves.some((move) => doPointsMatch(move.to, [7, 0])));
   });
 
   it("should not have king side castling", () => {
-    game.move({ origin: [6, 0], target: [5, 2] });
-    game.move({ origin: [4, 6], target: [4, 5] });
-    game.move({ origin: [4, 1], target: [4, 2] });
-    game.move({ origin: [5, 6], target: [5, 5] });
-    game.move({ origin: [5, 0], target: [4, 1] });
-    game.move({ origin: [6, 6], target: [6, 5] });
-    game.move({ origin: [7, 1], target: [7, 2] });
-    game.move({ origin: [7, 6], target: [7, 5] });
-    game.move({ origin: [7, 0], target: [7, 1] });
-    game.move({ origin: [1, 6], target: [1, 5] });
-    game.move({ origin: [7, 1], target: [7, 0] });
-    game.move({ origin: [2, 6], target: [2, 5] });
+    game.move({ from: [6, 0], to: [5, 2] });
+    game.move({ from: [4, 6], to: [4, 5] });
+    game.move({ from: [4, 1], to: [4, 2] });
+    game.move({ from: [5, 6], to: [5, 5] });
+    game.move({ from: [5, 0], to: [4, 1] });
+    game.move({ from: [6, 6], to: [6, 5] });
+    game.move({ from: [7, 1], to: [7, 2] });
+    game.move({ from: [7, 6], to: [7, 5] });
+    game.move({ from: [7, 0], to: [7, 1] });
+    game.move({ from: [1, 6], to: [1, 5] });
+    game.move({ from: [7, 1], to: [7, 0] });
+    game.move({ from: [2, 6], to: [2, 5] });
     const pieces = game.getAllPieces();
     const king = pieces.find(
       ({ piece }) => piece?.type === PIECE.K && piece.team === TEAM.WHITE
@@ -86,21 +86,21 @@ describe("Game Class", () => {
   });
 
   it("should have queen side castling available", () => {
-    game.move({ origin: [1, 0], target: [0, 2] });
-    game.move({ origin: [4, 6], target: [4, 5] });
-    game.move({ origin: [1, 1], target: [1, 2] });
-    game.move({ origin: [5, 6], target: [5, 5] });
-    game.move({ origin: [2, 0], target: [1, 1] });
-    game.move({ origin: [6, 6], target: [6, 5] });
-    game.move({ origin: [2, 1], target: [2, 2] });
-    game.move({ origin: [7, 6], target: [7, 5] });
-    game.move({ origin: [3, 0], target: [2, 1] });
+    game.move({ from: [1, 0], to: [0, 2] });
+    game.move({ from: [4, 6], to: [4, 5] });
+    game.move({ from: [1, 1], to: [1, 2] });
+    game.move({ from: [5, 6], to: [5, 5] });
+    game.move({ from: [2, 0], to: [1, 1] });
+    game.move({ from: [6, 6], to: [6, 5] });
+    game.move({ from: [2, 1], to: [2, 2] });
+    game.move({ from: [7, 6], to: [7, 5] });
+    game.move({ from: [3, 0], to: [2, 1] });
     const pieces = game.getAllPieces();
     const king = pieces.find(
       ({ piece }) => piece?.type === PIECE.K && piece.team === TEAM.WHITE
     );
     const kingMoves = game.getMoves({ point: king!.point });
     assert.ok(kingMoves.some((move) => move.type === "castle"));
-    assert.ok(kingMoves.some((move) => doPointsMatch(move.target, [0, 0])));
+    assert.ok(kingMoves.some((move) => doPointsMatch(move.to, [0, 0])));
   });
 });

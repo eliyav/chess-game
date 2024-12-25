@@ -15,13 +15,13 @@ export default async function calcTurnAnimation({
   findMeshFromPoint: (point: Point) => AbstractMesh | undefined;
   turn: Turn;
 }) {
-  const { origin, target } = turn;
-  const movingMesh = findMeshFromPoint(origin);
+  const { from, to } = turn;
+  const movingMesh = findMeshFromPoint(from);
   if (!movingMesh) return;
 
   if (turn.type === "capture") {
     animateMeshBreaking({
-      point: turn.target,
+      point: turn.to,
       target: turn.capturedPiece,
       gameScene,
     });
@@ -36,7 +36,7 @@ export default async function calcTurnAnimation({
 
   //Animate Piece Movement
   const animateZ = movingMesh.name === "Knight" ? true : false;
-  const targetMesh = findMeshFromPoint(target)!;
+  const targetMesh = findMeshFromPoint(to)!;
   const meshes =
     turn.type === "castle" ? [movingMesh, targetMesh] : [movingMesh];
   return await animateMeshMovement({
@@ -58,36 +58,36 @@ function animateMeshMovement({
   turn: Turn;
   gameScene: GameScene;
 }) {
-  const { origin, target } = turn;
+  const { from, to } = turn;
   return new Promise<void>((resolve) => {
     meshes.forEach((mesh, i) => {
-      let position;
-      let targetPosition;
+      let fromPosition;
+      let toPosition;
       if (turn.type === "castle" && mesh.name === "King") {
-        position = getPositionFromPoint({
-          point: origin,
+        fromPosition = getPositionFromPoint({
+          point: from,
           externalMesh: true,
         });
-        targetPosition = getPositionFromPoint({
+        toPosition = getPositionFromPoint({
           point: turn.castling.kingTarget,
           externalMesh: true,
         });
       } else if (turn.type === "castle" && mesh.name === "Rook") {
-        position = getPositionFromPoint({
-          point: target,
+        fromPosition = getPositionFromPoint({
+          point: to,
           externalMesh: true,
         });
-        targetPosition = getPositionFromPoint({
+        toPosition = getPositionFromPoint({
           point: turn.castling.rookTarget,
           externalMesh: true,
         });
       } else {
-        position = getPositionFromPoint({
-          point: origin,
+        fromPosition = getPositionFromPoint({
+          point: from,
           externalMesh: true,
         });
-        targetPosition = getPositionFromPoint({
-          point: target,
+        toPosition = getPositionFromPoint({
+          point: to,
           externalMesh: true,
         });
       }
@@ -95,12 +95,12 @@ function animateMeshMovement({
       const frameRate = 60; // 60 frames per second to move across board
       const ratePerSquare = frameRate / 7;
       const distancePerSquare = 3; //3 world position units per square
-      const [originY, originX] = position;
-      const [targetY, targetX] = targetPosition;
-      const squareDistanceX = Math.abs(targetX - originX) / distancePerSquare;
-      const directionX = targetPosition[1] - position[1] > 0 ? 1 : -1;
-      const squareDistanceY = Math.abs(targetY - originY) / distancePerSquare;
-      const directionY = targetY - originY > 0 ? 1 : -1;
+      const [fromX, fromY] = fromPosition;
+      const [toX, toY] = toPosition;
+      const squareDistanceX = Math.abs(toY - fromY) / distancePerSquare;
+      const directionX = toPosition[1] - fromPosition[1] > 0 ? 1 : -1;
+      const squareDistanceY = Math.abs(toX - fromX) / distancePerSquare;
+      const directionY = toX - fromX > 0 ? 1 : -1;
 
       //Create keyframes based on distance
       const myAnimX = new Animation(
@@ -133,7 +133,7 @@ function animateMeshMovement({
         const distanceToMove = directionX * distancePerSquare * i;
         return {
           frame: ratePerSquare * i,
-          value: originX + distanceToMove,
+          value: fromY + distanceToMove,
         };
       });
 
@@ -141,7 +141,7 @@ function animateMeshMovement({
         const distanceToMove = directionY * distancePerSquare * i;
         return {
           frame: ratePerSquare * i,
-          value: originY + distanceToMove,
+          value: fromX + distanceToMove,
         };
       });
 

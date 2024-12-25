@@ -99,10 +99,10 @@ export class Controller {
   }
 
   async move({ move, emit = true }: { move: Point[]; emit?: boolean }) {
-    const [originPoint, targetPoint] = move;
+    const [from, to] = move;
     const { turn, callback } = this.match.move({
-      originPoint,
-      targetPoint,
+      from,
+      to,
     });
     if (!turn) return false;
     await this.handleValidTurn({ turn });
@@ -156,16 +156,16 @@ export class Controller {
     });
     const lastTurn = this.match.getGameHistory().at(-1);
     if (!lastTurn) return;
-    const { origin, target } = lastTurn;
+    const { from, to } = lastTurn;
     //Plane in both locations
     const originDisc = createMovementDisc({
-      point: origin,
+      point: from,
       gameScene,
       type: "previousTurn",
       name,
     });
     const targetDisc = createMovementDisc({
-      point: target,
+      point: to,
       gameScene,
       type: "previousTurn",
       name,

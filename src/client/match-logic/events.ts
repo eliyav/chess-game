@@ -56,15 +56,9 @@ export function createOnlineEvents({
     },
     {
       name: "resolvedMove",
-      event: async ({
-        originPoint,
-        targetPoint,
-      }: {
-        originPoint: Point;
-        targetPoint: Point;
-      }) => {
+      event: async ({ from, to }: { from: Point; to: Point }) => {
         await controller.move({
-          move: [originPoint, targetPoint],
+          move: [from, to],
           emit: false,
         });
       },
@@ -117,7 +111,7 @@ export function createLocalEvents({
       event: async (e: MessageEvent) => {
         if (e.data.type === "move") {
           await controller.move({
-            move: [e.data.move.origin, e.data.move.target],
+            move: [e.data.move.from, e.data.move.to],
             emit: false,
           });
         }

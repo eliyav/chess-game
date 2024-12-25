@@ -20,9 +20,9 @@ function requestMove({
 
 self.onmessage = (e: WorkerEvents) => {
   if (e.data.type === "move") {
-    const { origin, target } = e.data.data;
-    if (!origin || !target) return;
-    game.move({ origin, target });
+    const { from, to } = e.data.data;
+    if (!from || !to) return;
+    game.move({ from, to });
     requestMove({
       maximizingPlayer: e.data.data.maximizingPlayer,
       depth: e.data.data.depth,
@@ -50,8 +50,8 @@ type WorkerEvents = {
     data: {
       depth: number;
       maximizingPlayer: boolean;
-      origin?: Point;
-      target?: Point;
+      from?: Point;
+      to?: Point;
     };
   };
 };

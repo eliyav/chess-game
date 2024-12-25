@@ -12,8 +12,8 @@ export type Point = [number, number];
 export type MoveType = "movement" | "capture" | "castle" | "enPassant";
 
 export type Move = {
-  origin: Point;
-  target: Point;
+  from: Point;
+  to: Point;
   type: MoveType;
   movingPiece: PIECE;
   capturedPiece?: PIECE;
@@ -30,8 +30,8 @@ export enum PIECE {
 }
 
 type BaseTurn = {
-  origin: Point;
-  target: Point;
+  from: Point;
+  to: Point;
   isOpponentInCheck: boolean;
   promotion?: boolean;
 };

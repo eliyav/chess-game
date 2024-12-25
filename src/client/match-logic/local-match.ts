@@ -22,16 +22,13 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
       : undefined;
   }
 
-  move({
-    originPoint,
-    targetPoint,
-  }: {
-    originPoint: Point;
-    targetPoint: Point;
-  }): { turn: Turn | undefined; callback: () => void } {
+  move({ from, to }: { from: Point; to: Point }): {
+    turn: Turn | undefined;
+    callback: () => void;
+  } {
     const turn = this.getGame().move({
-      origin: originPoint,
-      target: targetPoint,
+      from: from,
+      to: to,
     });
     return {
       turn,
@@ -40,8 +37,8 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
           this.worker.postMessage({
             type: "move",
             data: {
-              origin: originPoint,
-              target: targetPoint,
+              from: from,
+              to: to,
               maximizingPlayer: this.vsComputer.maximizingPlayer,
               depth: this.vsComputer.depth,
             },

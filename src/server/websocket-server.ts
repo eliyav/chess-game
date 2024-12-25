@@ -123,8 +123,8 @@ export function createWebsocketServer({
     });
 
     //Resolve Turn
-    socket.on("resolvedMove", ({ originPoint, targetPoint, key }) => {
-      socket.to(key).emit("resolvedMove", { originPoint, targetPoint });
+    socket.on("resolvedMove", ({ from, to, key }) => {
+      socket.to(key).emit("resolvedMove", { from, to });
     });
 
     //Reset Match

@@ -58,18 +58,18 @@ class Game {
   }
 
   public move({
-    origin,
-    target,
+    from,
+    to,
     grid = this.current.grid,
     simulate,
   }: {
-    origin: Point;
-    target: Point;
+    from: Point;
+    to: Point;
     grid?: Grid;
     simulate?: boolean;
   }) {
     if (this.current.status !== GAMESTATUS.INPROGRESS) return;
-    const move = this.findMove({ grid, origin, target });
+    const move = this.findMove({ grid, from, to });
     if (!move) return;
     const resolved = this.resolveBoard({
       move,
@@ -84,9 +84,9 @@ class Game {
   }
 
   private resolveBoard({ move, grid }: { move: Move; grid: Grid }) {
-    const { type: moveType, origin, target } = move;
-    const originPiece = Board.getPiece({ grid, point: origin });
-    if (!originPiece) return;
+    const { type: moveType, from, to } = move;
+    const movingPiece = Board.getPiece({ grid, point: from });
+    if (!movingPiece) return;
     let resolvedMove;
     if (moveType === "movement") {
       resolvedMove = this.resolveMovement({ move, grid });
@@ -101,9 +101,9 @@ class Game {
 
     if (resolvedMove.promotion) {
       this.setPromotionPiece({
-        target,
-        originPiece,
-        selection: PIECE.Q,
+        to,
+        team: movingPiece.team,
+        type: PIECE.Q,
         grid,
       });
     }
@@ -124,15 +124,15 @@ class Game {
     move: Move;
     grid: Grid;
   }): Turn | undefined {
-    const { origin, target, promotion } = move;
-    const originPiece = this.lookupPiece({ grid, point: origin });
-    if (!originPiece) return;
-    Board.addPiece({ grid, point: target, piece: originPiece });
-    Board.removePiece({ grid, point: origin });
+    const { from, to, promotion } = move;
+    const movingPiece = this.lookupPiece({ grid, point: from });
+    if (!movingPiece) return;
+    Board.addPiece({ grid, point: to, piece: movingPiece });
+    Board.removePiece({ grid, point: from });
     return {
       type: "movement",
-      origin,
-      target,
+      from,
+      to,
       promotion,
       isOpponentInCheck: false,
     };
@@ -145,16 +145,16 @@ class Game {
     move: Move;
     grid: Grid;
   }): Turn | undefined {
-    const { origin, target, promotion } = move;
-    const originPiece = this.lookupPiece({ grid, point: origin });
-    const targetPiece = this.lookupPiece({ grid, point: target });
-    if (!originPiece || !targetPiece) return;
-    Board.addPiece({ grid, point: target, piece: originPiece });
-    Board.removePiece({ grid, point: origin });
+    const { from, to, promotion } = move;
+    const movingPiece = this.lookupPiece({ grid, point: from });
+    const targetPiece = this.lookupPiece({ grid, point: to });
+    if (!movingPiece || !targetPiece) return;
+    Board.addPiece({ grid, point: to, piece: movingPiece });
+    Board.removePiece({ grid, point: from });
     return {
       type: "capture",
-      origin,
-      target,
+      from,
+      to,
       promotion,
       capturedPiece: targetPiece,
       isOpponentInCheck: false,
@@ -168,9 +168,9 @@ class Game {
     move: Move;
     grid: Grid;
   }): Turn | undefined {
-    const { origin, target } = move;
-    const originPiece = this.lookupPiece({ grid, point: origin });
-    if (!originPiece) return;
+    const { from, to } = move;
+    const movingPiece = this.lookupPiece({ grid, point: from });
+    if (!movingPiece) return;
     const lastTurn = this.current.turns.at(-1);
     if (!lastTurn) return;
     const enPassant = isEnPassantAvailable({
@@ -178,14 +178,14 @@ class Game {
       grid,
     });
     if (enPassant) {
-      Board.addPiece({ grid, point: target, piece: originPiece });
-      Board.removePiece({ grid, point: origin });
+      Board.addPiece({ grid, point: to, piece: movingPiece });
+      Board.removePiece({ grid, point: from });
       Board.removePiece({ grid, point: enPassant.capturedPiecePoint });
 
       return {
         type: "enPassant",
-        origin,
-        target,
+        from,
+        to,
         enPassant,
         isOpponentInCheck: false,
       };
@@ -199,25 +199,25 @@ class Game {
     move: Move;
     grid: Grid;
   }): Turn | undefined {
-    const { origin, target } = move;
-    const originPiece = this.lookupPiece({ grid, point: origin });
-    const targetPiece = this.lookupPiece({ grid, point: target });
-    if (!originPiece || !targetPiece) return;
-    const [originX, OriginY] = origin;
-    const [targetX] = target;
-    const c = originX - targetX;
+    const { from, to } = move;
+    const movingPiece = this.lookupPiece({ grid, point: from });
+    const targetPiece = this.lookupPiece({ grid, point: to });
+    if (!movingPiece || !targetPiece) return;
+    const [fromX, fromY] = from;
+    const [toX] = to;
+    const c = fromX - toX;
     const direction = c < 0 ? 1 : -1;
-    const newKingPoint: Point = [originX + direction * 2, OriginY];
-    const newRookPoint: Point = [originX + direction, OriginY];
-    Board.addPiece({ grid, point: newKingPoint, piece: originPiece });
+    const newKingPoint: Point = [fromX + direction * 2, fromY];
+    const newRookPoint: Point = [fromX + direction, fromY];
+    Board.addPiece({ grid, point: newKingPoint, piece: movingPiece });
     Board.addPiece({ grid, point: newRookPoint, piece: targetPiece });
-    Board.removePiece({ grid, point: origin });
-    Board.removePiece({ grid, point: target });
+    Board.removePiece({ grid, point: from });
+    Board.removePiece({ grid, point: to });
 
     return {
       type: "castle",
-      origin,
-      target,
+      from,
+      to,
       castling: {
         direction,
         kingTarget: newKingPoint,
@@ -231,47 +231,47 @@ class Game {
     const lastTurn = this.current.turns.at(-1);
     if (lastTurn) {
       if (lastTurn.promotion) {
-        const { origin, target } = lastTurn;
-        const originPiece = new GamePiece({
+        const { from, to } = lastTurn;
+        const movingPiece = new GamePiece({
           team: this.getCurrentTeamsOpponent(),
           type: PIECE.P,
         });
-        Board.removePiece({ grid, point: target });
-        Board.addPiece({ grid, point: origin, piece: originPiece });
+        Board.removePiece({ grid, point: to });
+        Board.addPiece({ grid, point: from, piece: movingPiece });
         if (lastTurn.type === "capture") {
           const { capturedPiece } = lastTurn;
           Board.addPiece({
             grid,
-            point: target,
+            point: to,
             piece: new GamePiece(capturedPiece),
           });
         }
       } else if (lastTurn.type === "movement") {
-        const { origin, target } = lastTurn;
+        const { from, to } = lastTurn;
         Board.addPiece({
           grid: this.current.grid,
-          point: origin,
-          piece: Board.getPiece({ grid, point: target })!,
+          point: from,
+          piece: Board.getPiece({ grid, point: to })!,
         });
-        Board.removePiece({ grid, point: target });
+        Board.removePiece({ grid, point: to });
       } else if (lastTurn.type === "capture") {
-        const { origin, target, capturedPiece } = lastTurn;
+        const { from, to, capturedPiece } = lastTurn;
         Board.addPiece({
           grid,
-          point: origin,
-          piece: Board.getPiece({ grid, point: target })!,
+          point: from,
+          piece: Board.getPiece({ grid, point: to })!,
         });
         Board.addPiece({
           grid,
-          point: target,
+          point: to,
           piece: new GamePiece(capturedPiece),
         });
       } else if (lastTurn.type === "enPassant") {
-        const { origin, target, enPassant } = lastTurn;
+        const { from, to, enPassant } = lastTurn;
         Board.addPiece({
           grid,
-          point: origin,
-          piece: Board.getPiece({ grid, point: target })!,
+          point: from,
+          piece: Board.getPiece({ grid, point: to })!,
         });
         Board.addPiece({
           grid,
@@ -280,12 +280,12 @@ class Game {
         });
         Board.removePiece({ grid, point: enPassant.enPassantPoint });
       } else if (lastTurn.type === "castle") {
-        const { origin, target, castling } = lastTurn;
+        const { from, to, castling } = lastTurn;
         const { kingTarget, rookTarget } = castling;
         const kingPiece = Board.getPiece({ grid, point: kingTarget })!;
         const rookPiece = Board.getPiece({ grid, point: rookTarget })!;
-        Board.addPiece({ grid, point: origin, piece: kingPiece });
-        Board.addPiece({ grid, point: target, piece: rookPiece });
+        Board.addPiece({ grid, point: from, piece: kingPiece });
+        Board.addPiece({ grid, point: to, piece: rookPiece });
         Board.removePiece({ grid, point: kingTarget });
         Board.removePiece({ grid, point: rookTarget });
       }
@@ -327,23 +327,15 @@ class Game {
     }
   }
 
-  private findMove({
-    origin,
-    target,
-    grid,
-  }: {
-    origin: Point;
-    target: Point;
-    grid: Grid;
-  }) {
-    const piece = this.lookupPiece({ grid, point: origin });
+  private findMove({ from, to, grid }: { from: Point; to: Point; grid: Grid }) {
+    const piece = this.lookupPiece({ grid, point: from });
     if (!piece || piece.team !== this.getCurrentTeam()) return;
     const availableMoves = this.getMoves({
-      point: origin,
+      point: from,
       grid,
     });
-    const move = availableMoves.find(({ target: moveTarget }) =>
-      doPointsMatch(moveTarget, target)
+    const move = availableMoves.find(({ to: moveTarget }) =>
+      doPointsMatch(moveTarget, to)
     );
     return move;
   }
@@ -405,8 +397,8 @@ class Game {
         })
       )
       .flat();
-    const isKingChecked = opponentsAvailableMoves.find(({ target }) =>
-      doPointsMatch(target, king.point)
+    const isKingChecked = opponentsAvailableMoves.find(({ to }) =>
+      doPointsMatch(to, king.point)
     );
     //Returns an array with the kings location if checked
     return isKingChecked;
@@ -453,22 +445,22 @@ class Game {
   }
 
   private setPromotionPiece({
-    target,
-    originPiece,
-    selection,
+    to,
+    team,
+    type,
     grid,
   }: {
-    target: Point;
-    originPiece: GamePiece;
-    selection: PIECE;
+    to: Point;
+    team: TEAM;
+    type: PIECE;
     grid: Grid;
   }) {
-    Board.removePiece({ grid, point: target });
+    Board.removePiece({ grid, point: to });
     const promotedPiece = new GamePiece({
-      type: selection,
-      team: originPiece.team,
+      type,
+      team,
     });
-    Board.addPiece({ grid, point: target, piece: promotedPiece });
+    Board.addPiece({ grid, point: to, piece: promotedPiece });
   }
 
   public resetGame() {
@@ -483,24 +475,24 @@ class Game {
     let annotation;
     const moveType = history.type;
     const promotion = history.promotion;
-    const originPiece = Board.getPiece({
+    const movingPiece = Board.getPiece({
       grid: this.current.grid,
-      point: history.target,
+      point: history.to,
     });
     const opponentInCheck = history.isOpponentInCheck;
     const originSquare = Board.getSquareName({
-      point: history.origin,
+      point: history.from,
     });
-    const targetSquare = Board.getSquareName({ point: history.target });
+    const targetSquare = Board.getSquareName({ point: history.to });
     const isCapturing = history.type === "capture";
-    const symbol = originPiece?.getSymbol();
+    const symbol = movingPiece?.getSymbol();
     if (moveType === "castle") {
       annotation = history.castling.direction === 1 ? "O-O" : "O-O-O";
     } else if (promotion) {
       //TO DO: Change to Q for now, will need to update to allow for selection
       annotation = `${targetSquare}${"Q"}`;
     } else if (isCapturing) {
-      if (originPiece?.type === "Pawn") {
+      if (movingPiece?.type === "Pawn") {
         annotation = `${originSquare.charAt(0)}x${targetSquare}`;
       } else {
         annotation = `${symbol}x${targetSquare}`;
@@ -530,8 +522,8 @@ class Game {
       sum,
     });
     if (!result.bestMove) return;
-    const { origin, target } = result.bestMove;
-    return { origin, target };
+    const { from, to } = result.bestMove;
+    return { from, to };
   }
 
   minimax({
@@ -571,8 +563,8 @@ class Game {
     let minValue = Number.POSITIVE_INFINITY;
     for (let i = 0; i < availableMoves.length; i++) {
       const move = availableMoves[i];
-      const { origin, target } = move;
-      this.move({ origin, target, simulate: true });
+      const { from, to } = move;
+      this.move({ from, to, simulate: true });
       const newSum = evaluateBoardPositions({
         sum,
         move,
@@ -649,7 +641,7 @@ class Game {
         );
       if (!isRookInInitalPosition) return moves;
       const hasRookMoved = turns.some((turn) =>
-        doPointsMatch(turn.origin, rookPoint)
+        doPointsMatch(turn.from, rookPoint)
       );
       if (!hasRookMoved) {
         const resolve = this.isCastlingValid({
@@ -660,8 +652,8 @@ class Game {
         });
         if (resolve) {
           moves.push({
-            origin: kingPoint,
-            target: rookPoint,
+            from: kingPoint,
+            to: rookPoint,
             type: "castle",
             movingPiece: PIECE.K,
           });
@@ -724,7 +716,7 @@ class Game {
       const square = squaresToCheckEnemyThreat[i];
       for (let k = 0; k < opponentsAvailableMoves.length; k++) {
         const availableMove = opponentsAvailableMoves[k];
-        const doesMoveMatchSquare = doPointsMatch(availableMove.origin, square);
+        const doesMoveMatchSquare = doPointsMatch(availableMove.from, square);
         doesMoveMatchSquare
           ? squaresUnderEnemyThreat.push(doesMoveMatchSquare)
           : null;

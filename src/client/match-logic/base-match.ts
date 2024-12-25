@@ -21,17 +21,14 @@ export class BaseMatch {
     this.player = player;
   }
 
-  move({
-    originPoint,
-    targetPoint,
-  }: {
-    originPoint: Point;
-    targetPoint: Point;
-  }): { turn: Turn | undefined; callback?: () => void } {
+  move({ from, to }: { from: Point; to: Point }): {
+    turn: Turn | undefined;
+    callback?: () => void;
+  } {
     return {
       turn: this.getGame().move({
-        origin: originPoint,
-        target: targetPoint,
+        from: from,
+        to: to,
       }),
     };
   }

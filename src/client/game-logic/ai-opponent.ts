@@ -127,8 +127,8 @@ export function evaluateBoardPositions({
   const piecePositionTable =
     team === TEAM.WHITE ? positionsWhite : positionsBlack;
   const movingPiece = move.movingPiece;
-  const [originX, originY] = move.origin;
-  const [targetX, targetY] = move.target;
+  const [fromX, fromY] = move.from;
+  const [toX, toY] = move.to;
 
   if (move.type === "capture" || move.type === "enPassant") {
     const capturedPiece = move.capturedPiece!;
@@ -149,8 +149,8 @@ export function evaluateBoardPositions({
     score += 1000;
   }
 
-  const originPositionValue = piecePositionTable[movingPiece][originX][originY];
-  const targetPositionValue = piecePositionTable[movingPiece][targetX][targetY];
+  const originPositionValue = piecePositionTable[movingPiece][fromX][fromY];
+  const targetPositionValue = piecePositionTable[movingPiece][toX][toY];
   const absoluteValueOrigin = Math.abs(originPositionValue);
   const absoluteValueTarget = Math.abs(targetPositionValue);
   let difference = 0;

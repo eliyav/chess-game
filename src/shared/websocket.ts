@@ -6,7 +6,7 @@ export interface ServerToClientEvents {
   lobbyInfo: (lobby: Lobby) => void;
   message: (message: string) => void;
   redirect: (data: { path: APP_ROUTES; message: string | undefined }) => void;
-  resolvedMove: (data: { originPoint: Point; targetPoint: Point }) => void;
+  resolvedMove: (data: { from: Point; to: Point }) => void;
   resetMatchRequested: () => void;
   resetMatchResolve: (data: { answer: boolean }) => void;
   undoTurnRequested: () => void;
@@ -21,11 +21,7 @@ export interface ClientToServerEvents {
   requestMatchStart: (data: { lobbyKey: string }) => void;
   readyPlayer: (data: { lobbyKey: string }) => void;
   switchTeams: (data: { lobbyKey: string }) => void;
-  resolvedMove: (data: {
-    originPoint: Point;
-    targetPoint: Point;
-    key: string;
-  }) => void;
+  resolvedMove: (data: { from: Point; to: Point; key: string }) => void;
   resetMatchRequest: (data: { lobbyKey: string }) => void;
   resetMatchResponse: (data: { answer: boolean; lobbyKey: string }) => void;
   undoTurnRequest: (data: { lobbyKey: string }) => void;
