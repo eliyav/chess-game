@@ -6,6 +6,10 @@ self.addEventListener("install", (event) => {
     (async () => {
       const cache = await caches.open(expectedCaches.at(-1));
       cache.addAll([
+        "/",
+        "/index.js",
+        "/index.css",
+        "/game-worker.js",
         "/board-WBQHAPHW.gltf",
         "/pawnv3-WMTUALHL.gltf",
         "/bishopv3-4YRUFXLK.gltf",
@@ -21,10 +25,6 @@ self.addEventListener("install", (event) => {
         "/click-2VCHPPVR.mp3",
         "/crumble-BBBHSYQE.mp3",
         "/tube-ZB5725HQ.png",
-        "/index.html",
-        "/index.js",
-        "/index.css",
-        "/game-worker.js",
       ]);
     })()
   );
@@ -55,29 +55,30 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   event.respondWith(
     (async () => {
-      console.log("Fetch event for ", event.request.url);
-      //If not fetching an asset, then return
-      if (event.request.method !== "GET" || !event.request.url.endsWith(".*")) {
-        return;
+      const isGetRequest = event.request.method === "GET";
+      const isRootRequest = event.request.url === self.location.origin + "/";
+      if (isGetRequest && (event.request.url.includes(".") || isRootRequest)) {
+        const cache = await caches.open(expectedCaches.at(-1));
+        // Get the resource from the cache.
+        const cachedResponse = await cache.match(event.request);
+        //Create a modified request to check if resource has changed
+        const modifiedRequest = new Request(event.request);
+        if (cachedResponse) {
+          const lastModified = cachedResponse.headers.get("Last-Modified");
+          modifiedRequest.headers.set("If-Modified-Since", lastModified);
+        }
+        const fetchResponse = await fetch(modifiedRequest);
+        //If response 304, then the resource is not modified, return cached response
+        if (fetchResponse.status === 304) {
+          return cachedResponse;
+        }
+        // Cache the new response
+        cache.put(event.request, fetchResponse.clone());
+        return fetchResponse;
+      } else {
+        //If not fetching an asset, then return the original request
+        return await fetch(event.request);
       }
-      const cache = await caches.open(expectedCaches.at(-1));
-      // Get the resource from the cache.
-      const cachedResponse = await cache.match(event.request);
-
-      //Create a modified request to check if resource has changed
-      const modifiedRequest = new Request(event.request);
-      if (cachedResponse) {
-        const lastModified = cachedResponse.headers.get("Last-Modified");
-        modifiedRequest.headers.set("If-Modified-Since", lastModified);
-      }
-      const fetchResponse = await fetch(modifiedRequest);
-      //If response 304, then the resource is not modified, return cached response
-      if (fetchResponse.status === 304) {
-        return cachedResponse;
-      }
-      // Cache the new response
-      cache.put(event.request, fetchResponse.clone());
-      return fetchResponse;
     })()
   );
 });
