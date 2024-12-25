@@ -47,8 +47,8 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
   }
 
   resetRequest() {
-    if (this.vsComputer) {
-      this.worker?.postMessage({ type: "reset" });
+    if (this.vsComputer && this.worker) {
+      this.worker.postMessage({ type: "reset", data: this.vsComputer });
     }
     return true;
   }
@@ -63,8 +63,14 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
     if (this.vsComputer) {
       if (!this.worker) return false;
       for (let i = 0; i < 2; i++) {
-        this.worker.postMessage({ type: "undo" });
         this.getGame().undoTurn();
+        this.worker.postMessage({ type: "undo", data: this.vsComputer });
+      }
+      if (this.vsComputer.maximizingPlayer && !this.isPlayersTurn()) {
+        this.worker.postMessage({
+          type: "request-move",
+          data: this.vsComputer,
+        });
       }
     } else {
       this.getGame().undoTurn();
@@ -100,13 +106,8 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
       }
       worker.postMessage({
         type: "start",
+        data: this.vsComputer,
       });
-      if (this.vsComputer.maximizingPlayer) {
-        worker.postMessage({
-          type: "request-move",
-          data: this.vsComputer,
-        });
-      }
       this.worker = worker;
     }
   }
