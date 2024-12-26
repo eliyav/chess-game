@@ -17,26 +17,19 @@ export const Game: React.FC<{
   const location = useLocation();
 
   useEffect(() => {
-    const key = new URLSearchParams(location.search).get("key");
     const type = new URLSearchParams(location.search).get("type");
     const vs = new URLSearchParams(location.search).get(
       "vs"
     ) as PlayerType | null;
     const depth = new URLSearchParams(location.search).get("depth");
-    console.log(lobby);
     if (!lobby) {
       if (type === LOBBY_TYPE.ONLINE) {
-        if (key) {
-          websocket.emit("rejoinMatch", { lobbyKey: key });
-        } else {
-          navigate(APP_ROUTES.Home);
-        }
+        navigate(APP_ROUTES.Home);
+        return;
       } else {
         const newLobby = createLobby({ type: LOBBY_TYPE.LOCAL, vs, depth });
         setLobby(newLobby);
       }
-    } else {
-      console.log("lobby already exists");
     }
   }, [location]);
 
