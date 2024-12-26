@@ -3,10 +3,10 @@ import cors from "cors";
 import express from "express";
 import { fileURLToPath } from "node:url";
 import path from "path";
-import { Lobby } from "../shared/match";
+import { createLobby, Lobby, LOBBY_TYPE } from "../shared/match";
 import { RESOURCES } from "../shared/resources";
-import { createLobby } from "./helpers";
 import { createWebsocketServer } from "./websocket-server";
+import { generateKey } from "./helpers";
 
 const clientPath = fileURLToPath(new URL("../client", import.meta.url));
 
@@ -23,7 +23,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.text());
 
 app.get(RESOURCES.CREATE_LOBBY, (req, res) => {
-  const lobby = createLobby();
+  const lobby = createLobby({
+    type: LOBBY_TYPE.ONLINE,
+    vs: "Human",
+    key: generateKey(),
+  });
   lobbies.set(lobby.key, lobby);
   res.send(lobby.key);
 });

@@ -4,7 +4,8 @@ import {
   ControllerOptions,
   LOBBY_TYPE,
   Lobby,
-  createOfflineLobby,
+  PlayerType,
+  createLobby,
 } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
 import { SelectionButton } from "../components/buttons/start-button";
@@ -57,8 +58,15 @@ export const OfflineLobby: React.FC<{
   }, [lobby, updateLobby]);
 
   useEffect(() => {
-    setLobby(createOfflineLobby());
-  }, []);
+    const vs = new URLSearchParams(location.search).get(
+      "vs"
+    ) as PlayerType | null;
+    const depth = new URLSearchParams(location.search).get("depth");
+    if (!lobby) {
+      const newLobby = createLobby({ type: LOBBY_TYPE.LOCAL, vs });
+      setLobby(newLobby);
+    }
+  }, [location, lobby]);
 
   if (!lobby) return null;
 
@@ -150,7 +158,15 @@ export const OfflineLobby: React.FC<{
         customClass="row-start-5 m-10 font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80 md:w-1/2 md:justify-self-center"
         text={"Start Game"}
         onClick={() => {
-          navigate(`${APP_ROUTES.Game}?type=${LOBBY_TYPE.LOCAL}`);
+          if (lobby.players[1].type === "Computer") {
+            navigate(
+              `${APP_ROUTES.Game}?type=${LOBBY_TYPE.LOCAL}&vs=${lobby.players[1].type}&depth=${lobby.players[1].depth}`
+            );
+          } else {
+            navigate(
+              `${APP_ROUTES.Game}?type=${LOBBY_TYPE.LOCAL}&vs=${lobby.players[1].type}`
+            );
+          }
         }}
       />
     </div>

@@ -1,9 +1,8 @@
 import { Point } from "../../shared/game";
-import { Lobby, LOBBY_TYPE, Player, TEAM } from "../../shared/match";
+import { Lobby, LOBBY_TYPE, Player } from "../../shared/match";
 import { websocket } from "../websocket-client";
 import { BaseMatch, MatchLogic } from "./base-match";
-import { Controller } from "./controller";
-import { createOnlineEvents, OnlineEvents } from "./events";
+import { OnlineEvents } from "./events";
 
 export class OnlineMatch extends BaseMatch implements MatchLogic {
   mode: LOBBY_TYPE.ONLINE;

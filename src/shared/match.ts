@@ -20,6 +20,8 @@ export enum TEAM {
   BLACK = "Black",
 }
 
+export type PlayerType = "Human" | "Computer";
+
 export type Player =
   | {
       id: string;
@@ -66,27 +68,64 @@ export function getOptionText(option: keyof ControllerOptions) {
   }
 }
 
-export function createOfflineLobby(): Lobby {
-  return {
-    mode: LOBBY_TYPE.LOCAL,
-    key: "",
-    players: [
-      {
-        name: "Player 1",
-        ready: false,
-        id: "1",
-        type: "Human",
-        team: TEAM.WHITE,
-      },
-      {
-        name: "BOT",
-        ready: false,
-        id: "2",
-        type: "Computer",
-        depth: 3,
-        team: TEAM.BLACK,
-      },
-    ],
-    matchStarted: false,
-  };
+export function createLobby(preset: {
+  type: LOBBY_TYPE;
+  vs?: PlayerType | null;
+  depth?: string | null;
+  key?: string | null;
+}): Lobby {
+  if (preset.type === LOBBY_TYPE.LOCAL) {
+    return {
+      mode: preset.type,
+      key: preset.key ?? "",
+      players: [
+        {
+          name: "Player 1",
+          ready: false,
+          id: "1",
+          type: "Human",
+          team: TEAM.WHITE,
+        },
+        preset?.vs === "Human"
+          ? {
+              name: "Player 2",
+              ready: false,
+              id: "2",
+              type: "Human",
+              team: TEAM.BLACK,
+            }
+          : {
+              name: "BOT",
+              ready: false,
+              id: "2",
+              type: "Computer",
+              team: TEAM.BLACK,
+              depth: preset.depth ? Number(preset.depth) : 3,
+            },
+      ],
+      matchStarted: false,
+    };
+  } else {
+    return {
+      mode: preset.type,
+      key: preset.key ?? "",
+      players: [
+        {
+          id: "",
+          type: "Human",
+          name: "Player 1",
+          ready: false,
+          team: TEAM.WHITE,
+        },
+        {
+          id: "",
+          type: "Human",
+          name: "Player 2",
+          ready: false,
+          team: TEAM.BLACK,
+        },
+      ],
+      matchStarted: false,
+    };
+  }
 }

@@ -14,27 +14,3 @@ export function generateKey() {
   }
   return key.join("");
 }
-
-export function createLobby(): Lobby {
-  return {
-    mode: LOBBY_TYPE.ONLINE,
-    key: generateKey(),
-    players: [
-      {
-        id: "",
-        type: "Human",
-        name: "Player 1",
-        ready: false,
-        team: TEAM.WHITE,
-      },
-      {
-        id: "",
-        type: "Human",
-        name: "Player 2",
-        ready: false,
-        team: TEAM.BLACK,
-      },
-    ],
-    matchStarted: false,
-  };
-}

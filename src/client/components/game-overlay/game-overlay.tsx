@@ -1,8 +1,8 @@
 import React from "react";
+import { Lobby } from "../../../shared/match";
 import { IconsIndex } from "../../routes/game";
 import OverlaySelection from "./overlay-selection";
 import { PlayersOverlay } from "./players-overlay";
-import { Lobby } from "../../../shared/match";
 
 export const GameOverlay: React.FC<{
   items: Array<{ text: keyof IconsIndex; onClick: () => void }>;

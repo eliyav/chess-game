@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { LOBBY_TYPE, Lobby, createOfflineLobby } from "../../shared/match";
+import { useLocation } from "react-router-dom";
+import { LOBBY_TYPE, Lobby, PlayerType, createLobby } from "../../shared/match";
 import { GameOverlay } from "../components/game-overlay/game-overlay";
 import * as icons from "../components/game-overlay/overlay-icons";
 import { Controller } from "../match-logic/controller";
@@ -15,8 +15,12 @@ export const Game: React.FC<{
 
   useEffect(() => {
     const lobbyType = new URLSearchParams(location.search).get("type");
+    const vs = new URLSearchParams(location.search).get(
+      "vs"
+    ) as PlayerType | null;
+    const depth = new URLSearchParams(location.search).get("depth");
     if (!lobby && lobbyType === LOBBY_TYPE.LOCAL) {
-      const newLobby = createOfflineLobby();
+      const newLobby = createLobby({ type: LOBBY_TYPE.LOCAL, vs, depth });
       setLobby(newLobby);
     }
   }, [location]);

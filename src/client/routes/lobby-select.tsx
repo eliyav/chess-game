@@ -34,7 +34,7 @@ export const LobbySelect: React.FC<{
           customClass="m-10 p-4 font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80"
           text={LOBBY_TYPE.LOCAL}
           onClick={() => {
-            navigate(APP_ROUTES.OfflineLobby);
+            navigate(`${APP_ROUTES.OfflineLobby}?vs=Computer&depth=3`);
           }}
         />
         <Divider className="w-full z-10" />
