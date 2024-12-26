@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { SvgGithub } from "../components/svg/svg-github";
-import { SelectionButton } from "../components/buttons/start-button";
+import { SelectionButton } from "../components/buttons/selection-button";
 import { APP_ROUTES } from "../../shared/routes";
 
 export const Home: React.FC = () => {

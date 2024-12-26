@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ENV_BASE_URL } from "..";
 import { ControllerOptions, Lobby } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
-import { SelectionButton } from "../components/buttons/start-button";
+import { SelectionButton } from "../components/buttons/selection-button";
 import { ControllerOptionsList } from "../components/lobby/controller-options-list";
 import PlayerCard from "../components/lobby/player-card";
 import { BackButton } from "../components/svg/back-button";

@@ -20,6 +20,7 @@ import { OfflineLobby } from "./routes/offline-lobby";
 import { OnlineLobby } from "./routes/online-lobby";
 import { type SceneManager } from "./scenes/scene-manager";
 import { websocket } from "./websocket-client";
+import LoadingScreen from "./components/loading-screen";
 
 const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   const [lobby, setLobby] = useState<Lobby>();
   const [message, setMessage] = useState<Message | null>(null);
   const [options, setOptions] = useState(buildDefaultOptions());
+  const [loading, setLoading] = useState(false);
 
   const updateOptions = useCallback(
     <KEY extends keyof ControllerOptions>(
@@ -122,6 +124,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
 
   return (
     <>
+      {loading && <LoadingScreen />}
       {message && (
         <MessageModal
           text={message.text}
@@ -133,7 +136,9 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
         <Route path={APP_ROUTES.Home} element={<Home />} />
         <Route
           path={APP_ROUTES.Lobby}
-          element={<LobbySelect setMessage={setMessage} />}
+          element={
+            <LobbySelect setMessage={setMessage} setLoading={setLoading} />
+          }
         />
         <Route
           path={APP_ROUTES.OfflineLobby}
