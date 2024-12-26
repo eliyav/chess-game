@@ -8,6 +8,7 @@ interface ControllerOptionsProps {
     text: string;
     onChange: () => void;
     disabled: boolean;
+    className?: string;
   }[];
 }
 
@@ -19,8 +20,8 @@ export const ControllerOptionsList: React.FC<ControllerOptionsProps> = ({
   return (
     <div className="flex flex-col gap-2 mt-2 items-center w-10/12 m-auto md:w-3/4 ">
       <div className="w-full">
-        {uniqueOptions?.map(({ text, onChange, disabled }, i) => (
-          <div className="inline-block p-1 w-1/2" key={i}>
+        {uniqueOptions?.map(({ text, onChange, disabled, className }, i) => (
+          <div className={className ?? ""} key={i}>
             <button
               className={`select-none relative h-16 align-top w-full font-bold bg-slate-200 p-2 rounded-lg border-2 border-black enabled:hover:opacity-90 ${
                 disabled ? "opacity-50" : ""

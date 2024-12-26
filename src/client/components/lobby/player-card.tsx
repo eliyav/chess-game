@@ -31,7 +31,7 @@ const PlayerCard: React.FC<{
             className={`w-9/12 inline-block whitespace-nowrap overflow-hidden text-ellipsis text-slate-200 font-bold text-md p-2 pb-0 
             `}
           >
-            {player.id ? player.name : "Waiting..."}
+            {player.id ? player.name : "Invite Code"}
           </p>
           <p className={`float-right inline-block text-lg mt-0.5`}>
             {player?.ready ? (

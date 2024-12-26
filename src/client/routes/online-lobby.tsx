@@ -1,22 +1,20 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Lobby, TEAM } from "../../shared/match";
+import { ENV_BASE_URL } from "..";
+import { Lobby } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
 import { SelectionButton } from "../components/buttons/start-button";
 import { ControllerOptionsList } from "../components/lobby/controller-options-list";
 import PlayerCard from "../components/lobby/player-card";
 import { BackButton } from "../components/svg/back-button";
 import { ClipboardAdd } from "../components/svg/clipboard-add";
-import { CopyUrl } from "../components/svg/copy-url";
-import { Pawn } from "../components/svg/pawn";
-import { websocket } from "../websocket-client";
 import { ClipboardChecked } from "../components/svg/clipboard-checked";
-import { ENV_BASE_URL } from "..";
+import { CopyUrl } from "../components/svg/copy-url";
+import { websocket } from "../websocket-client";
 
 export const OnlineLobby: React.FC<{
   lobby: Lobby | undefined;
-  deleteLobby: () => void;
-}> = ({ lobby, deleteLobby }) => {
+}> = ({ lobby }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [clipboardMessage, setClipboardMessage] = useState("");
@@ -56,14 +54,8 @@ export const OnlineLobby: React.FC<{
 
   if (!lobby) return null;
 
-  const [player1, player2] = lobby.players;
-  const lessThanTwoPlayers = lobby.players.length < 2;
-  const playersReady = lobby.players.every((player) => player.ready);
-  const disableReadyButton =
-    lobby.teams.White === "" ||
-    lobby.teams.Black === "" ||
-    lobby.players.length !== 2;
-  const disableMatchStart = lobby.players.length < 2 || !playersReady;
+  const somePlayersReady = lobby.players.some((player) => player.ready);
+  const disableMatchStart = !lobby.players.every((player) => player.ready);
 
   return (
     <div className="grid grid-rows-5 h-dvh md:w-3/4 md:max-w-4xl md:m-auto z-10 select-none ">
@@ -75,90 +67,68 @@ export const OnlineLobby: React.FC<{
           size={30}
           onClick={() => navigate(APP_ROUTES.Lobby)}
         />
-        <div className="inline-block grow place-content-center">
+        <div className="relative inline-block grow place-content-center">
           <h1 className="place-self-center text-white text-center text-4xl font-bold italic pb-2">
             Online Lobby
           </h1>
-          <div className="text-red-700 text-center tracking-widest italic font-bold flex justify-center items-center p-2 rounded-lg">
-            {clipboardMessage && (
-              <p className="absolute bottom-1 text-sm text-red-700">
-                {clipboardMessage}
-              </p>
-            )}
-            <span
-              className="select-text cursor-pointer bold text-xl hover:opacity-80"
-              onClick={() => {
-                const text = lobby.key ?? "";
-                copyToClipboard(text, "CODE");
-              }}
-            >
-              {lobby.key ?? "..."}
-            </span>
-            <div className="bold h-10 m-2 mt-0">
-              {clipboardMessage ? (
-                <ClipboardChecked
-                  onClick={() => {
-                    const text = lobby.key ?? "";
-                    copyToClipboard(text, "CODE");
-                  }}
-                  className="inline-block ml-2 h-full w-fit cursor-pointer p-1 bg-slate-200 rounded hover:opacity-80"
-                />
-              ) : (
-                <ClipboardAdd
-                  onClick={() => {
-                    const text = lobby.key ?? "";
-                    copyToClipboard(text, "CODE");
-                  }}
-                  className="inline-block ml-2 h-full w-fit cursor-pointer p-1 bg-slate-200 rounded hover:opacity-80"
-                />
-              )}
-              <CopyUrl
-                onClick={() => {
-                  const url = `${ENV_BASE_URL}${APP_ROUTES.OnlineLobby}?key=${lobby.key}`;
-                  copyToClipboard(url, "URL");
-                }}
-                className="inline-block ml-2 h-full w-fit cursor-pointer p-1 bg-slate-200 rounded hover:opacity-80"
-              />
-            </div>
-          </div>
+          {clipboardMessage && (
+            <p className="font-bold text-rose-600 text-center w-full absolute bottom-1 left-1/2 transform -translate-x-1/2 text-sm">
+              {clipboardMessage}
+            </p>
+          )}
         </div>
       </div>
       <div className="row-span-3 flex flex-col gap-2 p-2 align-center md:w-3/4 md:justify-self-center">
-        <h2 className="glass dark-pane text-white text-lg text-center tracking-widest italic font-bold">
-          Players
-        </h2>
-        <div className="flex flex-wrap justify-center m-2 gap-1">
+        <div className="h-40 ml-auto mr-auto w-11/12 row-span-1 flex flex-col flex-wrap gap-0.5 justify-center md:w-3/4">
           {lobby.players.map((player, i) => {
             return (
               <React.Fragment key={i}>
-                <PlayerCard
-                  name={player.name}
-                  ready={player.ready}
-                  team={
-                    lessThanTwoPlayers
-                      ? undefined
-                      : lobby.teams.White === player.id
-                      ? TEAM.WHITE
-                      : TEAM.BLACK
-                  }
-                >
-                  {!lessThanTwoPlayers ? (
-                    <Pawn
-                      className="team-symbol-background h-full"
-                      color={
-                        lobby.teams.White === player.id ? "#ffffff" : "#000000"
-                      }
-                    />
+                <PlayerCard player={player}>
+                  {!player.id ? (
+                    <div className="text-rose-600 max-w-40 mt-3 tracking-widest italic font-bold flex items-center justify-around gap-1 m-auto">
+                      <span
+                        className="animate-pulse select-text text-lg cursor-pointer bold hover:opacity-80"
+                        onClick={() => {
+                          const text = lobby.key ?? "";
+                          copyToClipboard(text, "CODE");
+                        }}
+                      >
+                        {lobby.key ?? "..."}
+                      </span>
+                      {clipboardMessage ? (
+                        <ClipboardChecked
+                          onClick={() => {
+                            const text = lobby.key ?? "";
+                            copyToClipboard(text, "CODE");
+                          }}
+                          size={35}
+                          className="inline-block cursor-pointer rounded hover:opacity-70"
+                        />
+                      ) : (
+                        <ClipboardAdd
+                          onClick={() => {
+                            const text = lobby.key ?? "";
+                            copyToClipboard(text, "CODE");
+                          }}
+                          size={35}
+                          className="inline-block cursor-pointer rounded hover:opacity-70"
+                        />
+                      )}
+                      <CopyUrl
+                        onClick={() => {
+                          const url = `${ENV_BASE_URL}${APP_ROUTES.OnlineLobby}?key=${lobby.key}`;
+                          copyToClipboard(url, "URL");
+                        }}
+                        size={35}
+                        className="inline-block cursor-pointer rounded hover:opacity-70"
+                      />
+                    </div>
                   ) : null}
                 </PlayerCard>
               </React.Fragment>
             );
           })}
-          {!player2 && <PlayerCard name={"Waiting..."} />}
         </div>
-        <h2 className="glass dark-pane text-white text-lg text-center tracking-widest italic font-bold">
-          Settings
-        </h2>
         <ControllerOptionsList
           options={lobby.controllerOptions}
           onChange={(key: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -169,10 +139,10 @@ export const OnlineLobby: React.FC<{
           uniqueOptions={[
             {
               text: "Switch Teams",
+              disabled: somePlayersReady,
               onChange: () => {
                 websocket.emit("switchTeams", { lobbyKey: lobby.key });
               },
-              disabled: lessThanTwoPlayers || playersReady,
             },
           ]}
         />
@@ -189,13 +159,10 @@ export const OnlineLobby: React.FC<{
               e.currentTarget.classList.add("bg-green-500");
             }
           }}
-          className={`select-none basis-1/2 m-2 p-2 text-xl glass text-white border-2 border-white text-center tracking-widest italic font-bold bg-red-500 ${
-            disableReadyButton ? "opacity-50" : ""
-          } `}
+          className={`select-none basis-1/2 m-2 p-2 text-xl glass text-white border-2 border-white text-center tracking-widest italic font-bold bg-red-500`}
         >
           <input
             type="checkbox"
-            disabled={disableReadyButton}
             onClick={() => {
               websocket.emit("readyPlayer", { lobbyKey: lobby.key });
             }}

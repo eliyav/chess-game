@@ -1,6 +1,11 @@
 import React, { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { LOBBY_TYPE, Lobby, buildDefaultOptions } from "../../shared/match";
+import {
+  LOBBY_TYPE,
+  Lobby,
+  TEAM,
+  buildDefaultOptions,
+} from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
 import { SelectionButton } from "../components/buttons/start-button";
 import { ControllerOptionsList } from "../components/lobby/controller-options-list";
@@ -20,7 +25,6 @@ export const OfflineLobby: React.FC<{
         mode: prev?.mode ?? LOBBY_TYPE.LOCAL,
         key: prev?.key ?? "",
         players: prev?.players ?? [],
-        teams: prev?.teams ?? { White: "", Black: "" },
         matchStarted: prev?.matchStarted ?? false,
         controllerOptions: prev?.controllerOptions ?? buildDefaultOptions(),
         [key]: value,
@@ -42,6 +46,7 @@ export const OfflineLobby: React.FC<{
           id: "2",
           type: isVsComputer ? "Human" : "Computer",
           depth: isVsComputer ? 0 : 3,
+          team: player2.team,
         },
       ]);
     }
@@ -52,19 +57,22 @@ export const OfflineLobby: React.FC<{
       mode: LOBBY_TYPE.LOCAL,
       key: "",
       players: [
-        { name: "Player 1", ready: false, id: "1", type: "Human" },
+        {
+          name: "Player 1",
+          ready: false,
+          id: "1",
+          type: "Human",
+          team: TEAM.WHITE,
+        },
         {
           name: "BOT",
           ready: false,
           id: "2",
           type: "Computer",
           depth: 3,
+          team: TEAM.BLACK,
         },
       ],
-      teams: {
-        White: "1",
-        Black: "2",
-      },
       matchStarted: false,
       controllerOptions: buildDefaultOptions(),
     });
@@ -73,7 +81,7 @@ export const OfflineLobby: React.FC<{
   if (!lobby) return null;
 
   return (
-    <div className="grid grid-rows-5 h-dvh select-none md:w-3/4 md:max-w-4xl md:m-auto z-10">
+    <div className="grid grid-rows-5 h-dvh select-none md:w-3/4 md:max-w-4xl md:m-auto z-10 overflow-hidden">
       <div className="flex grid-rows-1 justify-center align-center glass dark-pane m-4">
         <BackButton
           className={
@@ -88,17 +96,16 @@ export const OfflineLobby: React.FC<{
       </div>
       <div className="h-42 ml-auto mr-auto w-11/12 row-span-1 flex flex-col flex-wrap gap-0.5 justify-center md:w-3/4">
         {lobby.players.map((player, i) => {
-          const team = lobby.teams.White === player.id ? "White" : "Black";
           return (
             <React.Fragment key={i}>
-              <PlayerCard player={player} team={team}>
+              <PlayerCard player={player}>
                 {player.type === "Computer" ? (
                   <div className="overflow-x-scroll whitespace-nowrap mt-1 p-1 rounded bg-slate-700 text-slate-200">
                     <span className="text-sm">Depth</span>
                     {POSSIBLE_DEPTHS.map((depth) => (
                       <button
                         key={depth}
-                        className={`p-1.5 mx-1 rounded ${
+                        className={`py-1.5 px-2 mx-1 rounded ${
                           player.depth === depth
                             ? "bg-slate-500 border-2 border-white"
                             : "bg-slate-600 border-2 border-transparent hover:bg-slate-500"
@@ -125,9 +132,6 @@ export const OfflineLobby: React.FC<{
       </div>
       <div className="row-span-2 flex flex-col gap-2 p-2 align-center">
         <div>
-          <h2 className="glass dark-pane text-white text-lg text-center tracking-widest italic font-bold">
-            Settings
-          </h2>
           <ControllerOptionsList
             uniqueOptions={[
               {
@@ -139,16 +143,19 @@ export const OfflineLobby: React.FC<{
                     : "Computer"
                 }`,
                 onChange: updateOpponentType,
+                className: "inline-block p-1 w-1/2",
                 disabled: lobby.players.length === 1,
               },
               {
                 text: "Switch Teams",
+                className: "inline-block p-1 w-1/2",
                 onChange: () => {
-                  const temp = lobby.teams.White;
-                  updateLobby("teams", {
-                    White: lobby.teams.Black,
-                    Black: temp,
-                  });
+                  const players = [...lobby.players];
+                  const temp = players[0].team;
+                  players[0].team = players[1].team;
+                  players[1].team = temp;
+                  console.log(players);
+                  updateLobby("players", players);
                 },
                 disabled: false,
               },
