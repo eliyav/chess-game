@@ -4,7 +4,7 @@ import { Board, Grid } from "./board";
 import { rookInitialPoints } from "./chess-data-import";
 import GamePiece from "./game-piece";
 import { doPointsMatch, getPieceMoves, isEnPassantAvailable } from "./moves";
-import { evaluateBoardPositions } from "./ai-opponent";
+import { evaluateBoardPositions } from "./bot-opponent";
 
 class Game {
   teams: TEAM[];

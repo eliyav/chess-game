@@ -31,10 +31,12 @@ export function createWebsocketServer({
             socket.to(key).emit("opponentDisconnected");
             lobbies.delete(key);
           } else {
-            lobby.players = lobby.players.filter(
-              (player) => player.id !== socket.id
+            const findPlayer = lobby.players.find(
+              (player) => player.id === socket.id
             );
-            lobby.teams = { White: "", Black: "" };
+            if (findPlayer) {
+              findPlayer.id = "";
+            }
             socket.to(key).emit("lobbyInfo", lobby);
           }
         }
@@ -46,30 +48,33 @@ export function createWebsocketServer({
       if (!lobby) {
         return socket.emit("message", "Lobby does not exist");
       }
-      if (lobby.players.find((player) => player.id === socket.id)) return;
-      if (lobby.players.length === 2) {
-        return socket.emit("message", "Lobby is full");
+      const alreadyInLobby = lobby.players.find(
+        (player) => player.id === socket.id
+      );
+      if (!alreadyInLobby) {
+        const placeHolderPlayer = lobby.players.find(
+          (player) => !Boolean(player.id)
+        );
+        if (!placeHolderPlayer) {
+          return socket.emit("message", "Lobby is full");
+        }
+        placeHolderPlayer.id = socket.id;
       }
-      socket.join(lobbyKey);
-      lobby.players.push({
-        id: socket.id,
-        type: "Human",
-        name: `Player ${lobby.players.length + 1}`,
-        ready: false,
-      });
-      if (lobby.players.length === 2) {
-        lobby.teams.White = lobby.players[0].id;
-        lobby.teams.Black = lobby.players[1].id;
-      }
+
       io.to(lobbyKey).emit("lobbyInfo", lobby);
+      socket.join(lobbyKey);
     });
 
     socket.on("leaveLobby", ({ lobbyKey }) => {
       const lobby = lobbies.get(lobbyKey);
       if (!lobby) return;
-      lobby.players = lobby.players.filter((player) => player.id !== socket.id);
-      lobby.teams = { White: "", Black: "" };
-      io.to(lobbyKey).emit("lobbyInfo", lobby);
+      const findPlayer = lobby.players.find(
+        (player) => player.id === socket.id
+      );
+      if (findPlayer) {
+        findPlayer.id = "";
+      }
+      socket.to(lobbyKey).emit("lobbyInfo", lobby);
     });
 
     socket.on("abandonMatch", ({ lobbyKey }) => {
@@ -115,10 +120,9 @@ export function createWebsocketServer({
     socket.on("switchTeams", ({ lobbyKey }) => {
       const lobby = lobbies.get(lobbyKey);
       if (!lobby) return;
-      if (lobby.players.length !== 2) return;
-      const temp = lobby.teams.White;
-      lobby.teams.White = lobby.teams.Black;
-      lobby.teams.Black = temp;
+      const temp = lobby.players[0].team;
+      lobby.players[0].team = lobby.players[1].team;
+      lobby.players[1].team = temp;
       io.to(lobbyKey).emit("lobbyInfo", lobby);
     });
 

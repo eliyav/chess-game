@@ -1,5 +1,5 @@
 import { Point, Turn } from "../../shared/game";
-import { Lobby, LOBBY_TYPE, Player } from "../../shared/match";
+import { Lobby, LOBBY_TYPE, Player, TEAM } from "../../shared/match";
 import { GAME_WORKER_URL } from "../scripts/constants";
 import { BaseMatch, MatchLogic } from "./base-match";
 import { Controller } from "./controller";
@@ -18,7 +18,10 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
       (player) => player.type === "Computer"
     );
     this.vsComputer = !!isComputer
-      ? { maximizingPlayer: lobby.teams.White === isComputer.id, depth: 3 }
+      ? {
+          maximizingPlayer: isComputer.team === TEAM.WHITE ? true : false,
+          depth: isComputer.depth || 3,
+        }
       : undefined;
   }
 
@@ -78,25 +81,6 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
       this.getGame().undoTurn();
     }
     return true;
-  }
-
-  isPlayersTurn() {
-    const currentTeam = this.getGame().getCurrentTeam();
-    const playingPlayerId = this.lobby.teams[currentTeam];
-    const playerType = this.lobby.players.find(
-      (player) => player.id === playingPlayerId
-    )?.type;
-    return playerType === "Human";
-  }
-
-  getPlayerTeam() {
-    return this.getGame().getCurrentTeam();
-  }
-
-  isCurrentPlayersPiece(point: Point) {
-    const piece = this.getGame().lookupPiece({ point });
-    if (!piece) return false;
-    return piece.team === this.getPlayerTeam();
   }
 
   subscribe({ controller }: { controller: Controller }) {

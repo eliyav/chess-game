@@ -16,7 +16,7 @@ export const LobbySelect: React.FC<{
   const [lobbyKey, setLobbyKey] = useState("");
 
   return (
-    <div className="grid grid-rows-5 h-dvh select-none md:w-1/2 md:m-auto z-10">
+    <div className="grid grid-rows-5 h-dvh select-none md:w-3/4 md:max-w-4xl md:m-auto z-10">
       <div className="flex grid-rows-1 justify-center align-center glass dark-pane m-4">
         <BackButton
           className={
@@ -25,7 +25,7 @@ export const LobbySelect: React.FC<{
           size={30}
           onClick={() => navigate(APP_ROUTES.Home)}
         />
-        <h1 className="inline-block place-self-center text-white grow text-center text-3xl font-bold italic pb-2">
+        <h1 className="inline-block place-self-center text-white grow text-center text-4xl font-bold italic pb-2">
           Select Lobby
         </h1>
       </div>

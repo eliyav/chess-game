@@ -3,7 +3,7 @@ import { PickingInfo } from "@babylonjs/core/Collisions/pickingInfo";
 import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
 import type { Nullable } from "@babylonjs/core/types";
 import { GAMESTATUS, Point, Turn } from "../../shared/game";
-import { ControllerOptions, LOBBY_TYPE } from "../../shared/match";
+import { ControllerOptions, LOBBY_TYPE, TEAM } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
 import { Message } from "../components/modals/message-modal";
 import { doPointsMatch } from "../game-logic/moves";
@@ -351,7 +351,7 @@ export class Controller {
     if (!this.shouldCameraRotate()) return;
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     const camera = gameScene.scene.cameras[0] as ArcRotateCamera;
-    const currentPlayer = this.match.getPlayerTeam();
+    const currentPlayer = this.match.getCurrentTeam();
     if (!currentPlayer) return;
     rotateCamera({
       camera,
@@ -362,8 +362,16 @@ export class Controller {
   resetCamera() {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     const camera = gameScene.scene.cameras[0] as ArcRotateCamera;
-    const isWhitePlayer = this.match.getPlayerTeam() === "White";
-    camera.alpha = isWhitePlayer ? Math.PI : 0;
+    const playersTurn = this.match.isPlayersTurn();
+    const currentTeam = this.match.getCurrentTeam();
+    const teamToReset = playersTurn
+      ? currentTeam
+      : currentTeam === TEAM.WHITE
+      ? TEAM.BLACK
+      : TEAM.WHITE;
+    console.log(playersTurn, currentTeam);
+    camera.alpha = teamToReset === TEAM.WHITE ? Math.PI : 0;
     camera.beta = Math.PI / 4;
   }
 }
+//debugger reset camera for bot on white

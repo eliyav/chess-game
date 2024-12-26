@@ -7,7 +7,6 @@ export interface Lobby {
   mode: LOBBY_TYPE;
   key: string;
   players: Player[];
-  teams: { [key in TEAM]: Player["id"] };
   matchStarted: boolean;
   controllerOptions: ControllerOptions;
 }
@@ -22,14 +21,22 @@ export enum TEAM {
   BLACK = "Black",
 }
 
-export type PlayerType = "Human" | "Computer";
-
-export type Player = {
-  id: string;
-  type: PlayerType;
-  name: string;
-  ready: boolean;
-};
+export type Player =
+  | {
+      id: string;
+      type: "Human";
+      name: string;
+      ready: boolean;
+      team: TEAM;
+    }
+  | {
+      id: string;
+      type: "Computer";
+      name: string;
+      ready: boolean;
+      depth: number;
+      team: TEAM;
+    };
 
 export type ControllerOptions = {
   playAnimations: boolean;
