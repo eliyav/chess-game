@@ -1,17 +1,12 @@
 import React, { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  LOBBY_TYPE,
-  Lobby,
-  TEAM,
-  buildDefaultOptions,
-} from "../../shared/match";
+import { LOBBY_TYPE, Lobby, buildDefaultOptions } from "../../shared/match";
+import { APP_ROUTES } from "../../shared/routes";
 import { SelectionButton } from "../components/buttons/start-button";
 import { ControllerOptionsList } from "../components/lobby/controller-options-list";
 import PlayerCard from "../components/lobby/player-card";
-import { APP_ROUTES } from "../../shared/routes";
 import { BackButton } from "../components/svg/back-button";
-import { Pawn } from "../components/svg/pawn";
+import { POSSIBLE_DEPTHS } from "../game-logic/bot-opponent";
 
 export const OfflineLobby: React.FC<{
   lobby: Lobby | undefined;
@@ -35,16 +30,19 @@ export const OfflineLobby: React.FC<{
   );
 
   const updateOpponentType = useCallback(() => {
-    const player = lobby?.players[0];
-    const player2 = lobby?.players[1];
-    if (player && player2) {
-      const opponentType = player2.type;
-      const newType = opponentType === "Computer" ? "Human" : "Computer";
-      const opponentName =
-        opponentType === "Computer" ? "Player 2" : "BOT - Depth 3";
+    const players = lobby?.players;
+    if (players) {
+      const [player, player2] = players;
+      const isVsComputer = player2.type === "Computer";
       updateLobby("players", [
         player,
-        { name: opponentName, ready: false, id: "2", type: newType },
+        {
+          name: isVsComputer ? "Player 2" : "BOT",
+          ready: false,
+          id: "2",
+          type: isVsComputer ? "Human" : "Computer",
+          depth: isVsComputer ? 0 : 3,
+        },
       ]);
     }
   }, [lobby, updateLobby]);
@@ -55,7 +53,13 @@ export const OfflineLobby: React.FC<{
       key: "",
       players: [
         { name: "Player 1", ready: false, id: "1", type: "Human" },
-        { name: "BOT - Depth 3", ready: false, id: "2", type: "Computer" },
+        {
+          name: "BOT",
+          ready: false,
+          id: "2",
+          type: "Computer",
+          depth: 3,
+        },
       ],
       teams: {
         White: "1",
@@ -69,7 +73,7 @@ export const OfflineLobby: React.FC<{
   if (!lobby) return null;
 
   return (
-    <div className="grid grid-rows-5 h-dvh select-none md:w-1/2 md:m-auto z-10">
+    <div className="grid grid-rows-5 h-dvh select-none md:w-3/4 md:max-w-4xl md:m-auto z-10">
       <div className="flex grid-rows-1 justify-center align-center glass dark-pane m-4">
         <BackButton
           className={
@@ -82,31 +86,44 @@ export const OfflineLobby: React.FC<{
           Offline Lobby
         </h1>
       </div>
-      <div className="row-span-3 flex flex-col gap-2 p-2 align-center md:w-3/4 md:justify-self-center">
-        <div>
-          <h2 className="glass dark-pane text-white text-lg text-center tracking-widest italic font-bold">
-            Players
-          </h2>
-          <div className="flex flex-wrap justify-center m-2 gap-1">
-            {lobby.players.map((player, i) => (
-              <React.Fragment key={i}>
-                <PlayerCard
-                  name={player.name}
-                  team={
-                    lobby.teams.White === player.id ? TEAM.WHITE : TEAM.BLACK
-                  }
-                >
-                  <Pawn
-                    className="team-symbol-background h-full"
-                    color={
-                      lobby.teams.White === player.id ? "#ffffff" : "#000000"
-                    }
-                  />
-                </PlayerCard>
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
+      <div className="h-42 ml-auto mr-auto w-11/12 row-span-1 flex flex-col flex-wrap gap-0.5 justify-center md:w-3/4">
+        {lobby.players.map((player, i) => {
+          const team = lobby.teams.White === player.id ? "White" : "Black";
+          return (
+            <React.Fragment key={i}>
+              <PlayerCard player={player} team={team}>
+                {player.type === "Computer" ? (
+                  <div className="mt-1 p-1 rounded bg-slate-700 text-slate-200">
+                    <span className="text-sm">Depth</span>
+                    {POSSIBLE_DEPTHS.map((depth) => (
+                      <button
+                        key={depth}
+                        className={`px-1.5 py-1 mx-1 rounded ${
+                          player.depth === depth
+                            ? "bg-slate-500 border-2 border-white"
+                            : "bg-slate-600 border-2 border-transparent hover:bg-slate-500"
+                        }`}
+                        onClick={() => {
+                          updateLobby("players", [
+                            lobby.players[0],
+                            {
+                              ...player,
+                              depth,
+                            },
+                          ]);
+                        }}
+                      >
+                        {depth}
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
+              </PlayerCard>
+            </React.Fragment>
+          );
+        })}
+      </div>
+      <div className="row-span-2 flex flex-col gap-2 p-2 align-center">
         <div>
           <h2 className="glass dark-pane text-white text-lg text-center tracking-widest italic font-bold">
             Settings

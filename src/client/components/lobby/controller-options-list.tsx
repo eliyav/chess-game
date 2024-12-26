@@ -18,18 +18,21 @@ export const ControllerOptionsList: React.FC<ControllerOptionsProps> = ({
 }) => {
   return (
     <div className="flex flex-col gap-2 mt-2 items-center w-9/12 m-auto ">
-      {uniqueOptions?.map(({ text, onChange, disabled }, i) => (
-        <button
-          key={i}
-          className={`select-none flex relative font-bold bg-slate-200 w-full p-2 rounded-lg border-2 border-black enabled:hover:opacity-90 place-content-center ${
-            disabled ? "opacity-50" : ""
-          }`}
-          onClick={onChange}
-          disabled={disabled}
-        >
-          {text}
-        </button>
-      ))}
+      <div className="w-full">
+        {uniqueOptions?.map(({ text, onChange, disabled }, i) => (
+          <div className="inline-block p-1 w-1/2" key={i}>
+            <button
+              className={`select-none relative h-16 align-top w-full font-bold bg-slate-200 p-2 rounded-lg border-2 border-black enabled:hover:opacity-90 ${
+                disabled ? "opacity-50" : ""
+              }`}
+              onClick={onChange}
+              disabled={disabled}
+            >
+              {text}
+            </button>
+          </div>
+        ))}
+      </div>
       {Object.entries(options).map(([key, value], i) => (
         <label
           key={i}

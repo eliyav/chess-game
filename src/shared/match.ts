@@ -22,14 +22,20 @@ export enum TEAM {
   BLACK = "Black",
 }
 
-export type PlayerType = "Human" | "Computer";
-
-export type Player = {
-  id: string;
-  type: PlayerType;
-  name: string;
-  ready: boolean;
-};
+export type Player =
+  | {
+      id: string;
+      type: "Human";
+      name: string;
+      ready: boolean;
+    }
+  | {
+      id: string;
+      type: "Computer";
+      name: string;
+      ready: boolean;
+      depth: number;
+    };
 
 export type ControllerOptions = {
   playAnimations: boolean;
