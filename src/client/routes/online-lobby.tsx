@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ENV_BASE_URL } from "..";
-import { Lobby } from "../../shared/match";
+import { ControllerOptions, Lobby } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
 import { SelectionButton } from "../components/buttons/start-button";
 import { ControllerOptionsList } from "../components/lobby/controller-options-list";
@@ -14,7 +14,12 @@ import { websocket } from "../websocket-client";
 
 export const OnlineLobby: React.FC<{
   lobby: Lobby | undefined;
-}> = ({ lobby }) => {
+  options: ControllerOptions;
+  updateOptions: <KEY extends keyof ControllerOptions>(
+    key: KEY,
+    value: ControllerOptions[KEY]
+  ) => void;
+}> = ({ lobby, options, updateOptions }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [clipboardMessage, setClipboardMessage] = useState("");
@@ -130,12 +135,9 @@ export const OnlineLobby: React.FC<{
           })}
         </div>
         <ControllerOptionsList
-          options={lobby.controllerOptions}
-          onChange={(key: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
-            websocket.emit("updateControllerOptions", {
-              lobbyKey: lobby.key,
-              options: { [key]: e.target.checked },
-            })}
+          options={options}
+          onChange={(key) => (e: React.ChangeEvent<HTMLInputElement>) =>
+            updateOptions(key, e.target.checked)}
           uniqueOptions={[
             {
               text: "Switch Teams",

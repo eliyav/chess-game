@@ -43,8 +43,8 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
     return false;
   }
 
-  subscribe({ controller }: { controller: Controller }) {
-    this.events = createOnlineEvents({ controller });
+  subscribe(events: OnlineEvents[]) {
+    this.events = events;
     for (const event of this.events) {
       websocket.on(event.name, event.event);
     }

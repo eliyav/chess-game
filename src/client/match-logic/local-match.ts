@@ -2,8 +2,7 @@ import { Point, Turn } from "../../shared/game";
 import { Lobby, LOBBY_TYPE, Player, TEAM } from "../../shared/match";
 import { GAME_WORKER_URL } from "../scripts/constants";
 import { BaseMatch, MatchLogic } from "./base-match";
-import { Controller } from "./controller";
-import { createLocalEvents, LocalEvents } from "./events";
+import { LocalEvents } from "./events";
 
 export class LocalMatch extends BaseMatch implements MatchLogic {
   mode: LOBBY_TYPE.LOCAL;
@@ -83,8 +82,8 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
     return true;
   }
 
-  subscribe({ controller }: { controller: Controller }) {
-    this.events = createLocalEvents({ controller });
+  subscribe(events: LocalEvents[]) {
+    this.events = events;
     if (this.vsComputer) {
       const worker = new Worker(new URL(GAME_WORKER_URL, import.meta.url));
       for (const event of this.events) {

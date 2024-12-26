@@ -26,10 +26,6 @@ export interface ClientToServerEvents {
   resetMatchResponse: (data: { answer: boolean; lobbyKey: string }) => void;
   undoTurnRequest: (data: { lobbyKey: string }) => void;
   undoTurnResponse: (data: { answer: boolean; lobbyKey: string }) => void;
-  updateControllerOptions: (data: {
-    lobbyKey: string;
-    options: { [key: string]: boolean };
-  }) => void;
   abandonMatch: (data: { lobbyKey: string }) => void;
 }
 

@@ -8,7 +8,6 @@ export interface Lobby {
   key: string;
   players: Player[];
   matchStarted: boolean;
-  controllerOptions: ControllerOptions;
 }
 
 export interface RoomDetails {
@@ -65,4 +64,29 @@ export function getOptionText(option: keyof ControllerOptions) {
     case "displayAvailableMoves":
       return "Display Available Moves";
   }
+}
+
+export function createOfflineLobby(): Lobby {
+  return {
+    mode: LOBBY_TYPE.LOCAL,
+    key: "",
+    players: [
+      {
+        name: "Player 1",
+        ready: false,
+        id: "1",
+        type: "Human",
+        team: TEAM.WHITE,
+      },
+      {
+        name: "BOT",
+        ready: false,
+        id: "2",
+        type: "Computer",
+        depth: 3,
+        team: TEAM.BLACK,
+      },
+    ],
+    matchStarted: false,
+  };
 }

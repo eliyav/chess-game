@@ -1,4 +1,4 @@
-import { buildDefaultOptions, Lobby, LOBBY_TYPE, TEAM } from "../shared/match";
+import { Lobby, LOBBY_TYPE, TEAM } from "../shared/match";
 
 export function generateKey() {
   const chars = [
@@ -36,6 +36,5 @@ export function createLobby(): Lobby {
       },
     ],
     matchStarted: false,
-    controllerOptions: buildDefaultOptions(),
   };
 }

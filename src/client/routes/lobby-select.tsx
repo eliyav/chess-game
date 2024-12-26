@@ -37,7 +37,7 @@ export const LobbySelect: React.FC<{
             navigate(APP_ROUTES.OfflineLobby);
           }}
         />
-        <Divider className="w-full" />
+        <Divider className="w-full z-10" />
         <SelectionButton
           customClass="m-10 p-4 font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80"
           text={`Create ${LOBBY_TYPE.ONLINE}`}
@@ -63,7 +63,7 @@ export const LobbySelect: React.FC<{
             }
           }}
         />
-        <Divider className="w-full" />
+        <Divider className="w-full z-10" />
         <div className="text-center m-10">
           <input
             type="text"

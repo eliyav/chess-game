@@ -109,13 +109,6 @@ export function createWebsocketServer({
       io.to(lobbyKey).emit("lobbyInfo", lobby);
     });
 
-    socket.on("updateControllerOptions", ({ lobbyKey, options }) => {
-      const lobby = lobbies.get(lobbyKey);
-      if (!lobby) return;
-      lobby.controllerOptions = { ...lobby.controllerOptions, ...options };
-      io.to(lobbyKey).emit("lobbyInfo", lobby);
-    });
-
     socket.on("switchTeams", ({ lobbyKey }) => {
       const lobby = lobbies.get(lobbyKey);
       if (!lobby) return;
