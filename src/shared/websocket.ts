@@ -5,7 +5,11 @@ import { APP_ROUTES } from "./routes";
 export interface ServerToClientEvents {
   lobbyInfo: (lobby: Lobby) => void;
   message: (message: string) => void;
-  redirect: (data: { path: APP_ROUTES; message: string | undefined }) => void;
+  redirect: (data: {
+    path: APP_ROUTES;
+    message: string | undefined;
+    search?: { [id: string]: string };
+  }) => void;
   resolvedMove: (data: { from: Point; to: Point }) => void;
   resetMatchRequested: () => void;
   resetMatchResolve: (data: { answer: boolean }) => void;
@@ -26,11 +30,8 @@ export interface ClientToServerEvents {
   resetMatchResponse: (data: { answer: boolean; lobbyKey: string }) => void;
   undoTurnRequest: (data: { lobbyKey: string }) => void;
   undoTurnResponse: (data: { answer: boolean; lobbyKey: string }) => void;
-  updateControllerOptions: (data: {
-    lobbyKey: string;
-    options: { [key: string]: boolean };
-  }) => void;
   abandonMatch: (data: { lobbyKey: string }) => void;
+  rejoinMatch: (data: { lobbyKey: string }) => void;
 }
 
 export interface InterServerEvents {

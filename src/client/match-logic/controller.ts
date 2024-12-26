@@ -369,7 +369,6 @@ export class Controller {
       : currentTeam === TEAM.WHITE
       ? TEAM.BLACK
       : TEAM.WHITE;
-    console.log(playersTurn, currentTeam);
     camera.alpha = teamToReset === TEAM.WHITE ? Math.PI : 0;
     camera.beta = Math.PI / 4;
   }

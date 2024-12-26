@@ -1,13 +1,14 @@
 import React, { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  ControllerOptions,
   LOBBY_TYPE,
   Lobby,
-  TEAM,
-  buildDefaultOptions,
+  PlayerType,
+  createLobby,
 } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
-import { SelectionButton } from "../components/buttons/start-button";
+import { SelectionButton } from "../components/buttons/selection-button";
 import { ControllerOptionsList } from "../components/lobby/controller-options-list";
 import PlayerCard from "../components/lobby/player-card";
 import { BackButton } from "../components/svg/back-button";
@@ -16,7 +17,12 @@ import { POSSIBLE_DEPTHS } from "../game-logic/bot-opponent";
 export const OfflineLobby: React.FC<{
   lobby: Lobby | undefined;
   setLobby: React.Dispatch<React.SetStateAction<Lobby | undefined>>;
-}> = ({ setLobby, lobby }) => {
+  options: ControllerOptions;
+  updateOptions: <KEY extends keyof ControllerOptions>(
+    key: KEY,
+    value: ControllerOptions[KEY]
+  ) => void;
+}> = ({ setLobby, lobby, updateOptions, options }) => {
   const navigate = useNavigate();
 
   const updateLobby = useCallback(
@@ -26,7 +32,6 @@ export const OfflineLobby: React.FC<{
         key: prev?.key ?? "",
         players: prev?.players ?? [],
         matchStarted: prev?.matchStarted ?? false,
-        controllerOptions: prev?.controllerOptions ?? buildDefaultOptions(),
         [key]: value,
       }));
     },
@@ -53,30 +58,21 @@ export const OfflineLobby: React.FC<{
   }, [lobby, updateLobby]);
 
   useEffect(() => {
-    setLobby({
-      mode: LOBBY_TYPE.LOCAL,
-      key: "",
-      players: [
-        {
-          name: "Player 1",
-          ready: false,
-          id: "1",
-          type: "Human",
-          team: TEAM.WHITE,
-        },
-        {
-          name: "BOT",
-          ready: false,
-          id: "2",
-          type: "Computer",
-          depth: 3,
-          team: TEAM.BLACK,
-        },
-      ],
-      matchStarted: false,
-      controllerOptions: buildDefaultOptions(),
-    });
-  }, []);
+    const vs = new URLSearchParams(location.search).get(
+      "vs"
+    ) as PlayerType | null;
+    const depth = new URLSearchParams(location.search).get("depth");
+    const newLobby = createLobby({ type: LOBBY_TYPE.LOCAL, vs, depth });
+    if (newLobby) {
+      if (newLobby.players[1].type === "Computer") {
+        const searchParams = new URLSearchParams(location.search);
+        searchParams.set("vs", vs || newLobby.players[1].type);
+        searchParams.set("depth", String(newLobby.players[1].depth));
+        navigate(`${location.pathname}?${searchParams.toString()}`);
+      }
+      setLobby(newLobby);
+    }
+  }, [location]);
 
   if (!lobby) return null;
 
@@ -144,7 +140,6 @@ export const OfflineLobby: React.FC<{
                 }`,
                 onChange: updateOpponentType,
                 className: "inline-block p-1 w-1/2",
-                disabled: lobby.players.length === 1,
               },
               {
                 text: "Switch Teams",
@@ -159,22 +154,25 @@ export const OfflineLobby: React.FC<{
                 disabled: false,
               },
             ]}
-            options={lobby.controllerOptions}
-            onChange={(key: string) =>
-              (e: React.ChangeEvent<HTMLInputElement>) =>
-                updateLobby("controllerOptions", {
-                  ...lobby.controllerOptions,
-                  [key]: e.target.checked,
-                })}
+            options={options}
+            onChange={(key) => (e: React.ChangeEvent<HTMLInputElement>) =>
+              updateOptions(key, e.target.checked)}
           />
         </div>
       </div>
       <SelectionButton
         customClass="row-start-5 m-10 font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80 md:w-1/2 md:justify-self-center"
-        disabled={lobby.mode !== LOBBY_TYPE.LOCAL}
         text={"Start Game"}
         onClick={() => {
-          navigate("/game");
+          if (lobby.players[1].type === "Computer") {
+            navigate(
+              `${APP_ROUTES.Game}?type=${LOBBY_TYPE.LOCAL}&vs=${lobby.players[1].type}&depth=${lobby.players[1].depth}`
+            );
+          } else {
+            navigate(
+              `${APP_ROUTES.Game}?type=${LOBBY_TYPE.LOCAL}&vs=${lobby.players[1].type}`
+            );
+          }
         }}
       />
     </div>

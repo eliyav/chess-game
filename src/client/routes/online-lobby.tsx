@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ENV_BASE_URL } from "..";
-import { Lobby } from "../../shared/match";
+import { ControllerOptions, Lobby } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
-import { SelectionButton } from "../components/buttons/start-button";
+import { SelectionButton } from "../components/buttons/selection-button";
 import { ControllerOptionsList } from "../components/lobby/controller-options-list";
 import PlayerCard from "../components/lobby/player-card";
 import { BackButton } from "../components/svg/back-button";
@@ -11,10 +11,18 @@ import { ClipboardAdd } from "../components/svg/clipboard-add";
 import { ClipboardChecked } from "../components/svg/clipboard-checked";
 import { CopyUrl } from "../components/svg/copy-url";
 import { websocket } from "../websocket-client";
+import LoadingScreen from "../components/loading-screen";
+import { Message } from "../components/modals/message-modal";
 
 export const OnlineLobby: React.FC<{
   lobby: Lobby | undefined;
-}> = ({ lobby }) => {
+  options: ControllerOptions;
+  setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
+  updateOptions: <KEY extends keyof ControllerOptions>(
+    key: KEY,
+    value: ControllerOptions[KEY]
+  ) => void;
+}> = ({ lobby, options, updateOptions, setMessage }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [clipboardMessage, setClipboardMessage] = useState("");
@@ -35,10 +43,13 @@ export const OnlineLobby: React.FC<{
     const lobbyKey = location.search.split("=")[1];
     if (lobbyKey) {
       websocket.emit("joinLobby", { lobbyKey });
+    } else {
+      navigate(APP_ROUTES.Lobby);
+      setMessage({
+        text: "Lobby does not exist",
+        onConfirm: () => setMessage(null),
+      });
     }
-    return () => {
-      websocket.emit("leaveLobby", { lobbyKey });
-    };
   }, [websocket, location]);
 
   useEffect(() => {
@@ -52,7 +63,7 @@ export const OnlineLobby: React.FC<{
     }
   }, [clipboardMessage, setClipboardMessage]);
 
-  if (!lobby) return null;
+  if (!lobby) return <LoadingScreen />;
 
   const somePlayersReady = lobby.players.some((player) => player.ready);
   const disableMatchStart = !lobby.players.every((player) => player.ready);
@@ -130,12 +141,9 @@ export const OnlineLobby: React.FC<{
           })}
         </div>
         <ControllerOptionsList
-          options={lobby.controllerOptions}
-          onChange={(key: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
-            websocket.emit("updateControllerOptions", {
-              lobbyKey: lobby.key,
-              options: { [key]: e.target.checked },
-            })}
+          options={options}
+          onChange={(key) => (e: React.ChangeEvent<HTMLInputElement>) =>
+            updateOptions(key, e.target.checked)}
           uniqueOptions={[
             {
               text: "Switch Teams",

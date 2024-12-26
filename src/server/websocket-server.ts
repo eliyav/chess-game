@@ -1,6 +1,6 @@
 import { Server as Webserver } from "node:http";
 import { Server } from "socket.io";
-import { Lobby } from "../shared/match";
+import { Lobby, LOBBY_TYPE } from "../shared/match";
 import { APP_ROUTES } from "../shared/routes";
 import {
   ClientToServerEvents,
@@ -46,7 +46,10 @@ export function createWebsocketServer({
     socket.on("joinLobby", ({ lobbyKey }) => {
       const lobby = lobbies.get(lobbyKey);
       if (!lobby) {
-        return socket.emit("message", "Lobby does not exist");
+        return socket.emit("redirect", {
+          path: APP_ROUTES.Home,
+          message: "Lobby does not exist",
+        });
       }
       const alreadyInLobby = lobby.players.find(
         (player) => player.id === socket.id
@@ -56,7 +59,10 @@ export function createWebsocketServer({
           (player) => !Boolean(player.id)
         );
         if (!placeHolderPlayer) {
-          return socket.emit("message", "Lobby is full");
+          return socket.emit("redirect", {
+            path: APP_ROUTES.Home,
+            message: "Lobby is full",
+          });
         }
         placeHolderPlayer.id = socket.id;
       }
@@ -76,6 +82,33 @@ export function createWebsocketServer({
       socket.to(lobbyKey).emit("lobbyInfo", lobby);
     });
 
+    socket.on("rejoinMatch", ({ lobbyKey }) => {
+      const lobby = lobbies.get(lobbyKey);
+      if (!lobby) {
+        return socket.emit("redirect", {
+          path: APP_ROUTES.Home,
+          message: "Lobby does not exist",
+        });
+      }
+      const alreadyInLobby = lobby.players.find(
+        (player) => player.id === socket.id
+      );
+      if (!alreadyInLobby) {
+        const placeHolderPlayer = lobby.players.find(
+          (player) => !Boolean(player.id)
+        );
+        if (!placeHolderPlayer) {
+          return socket.emit("redirect", {
+            path: APP_ROUTES.Home,
+            message: "Lobby is full",
+          });
+        }
+        placeHolderPlayer.id = socket.id;
+      }
+      socket.join(lobbyKey);
+      io.to(lobbyKey).emit("lobbyInfo", lobby);
+    });
+
     socket.on("abandonMatch", ({ lobbyKey }) => {
       const lobby = lobbies.get(lobbyKey);
       if (!lobby) return;
@@ -87,16 +120,9 @@ export function createWebsocketServer({
     socket.on("requestMatchStart", ({ lobbyKey }) => {
       const lobby = lobbies.get(lobbyKey);
       if (!lobby) return;
-      if (
-        lobby.players.length === 2 &&
-        lobby.players.every((player) => player.ready)
-      ) {
+      if (lobby.players.every((player) => player.ready)) {
         lobby.matchStarted = true;
         io.to(lobbyKey).emit("lobbyInfo", lobby);
-        io.to(lobbyKey).emit("redirect", {
-          path: APP_ROUTES.Game,
-          message: "Match started!",
-        });
       }
     });
 
@@ -106,13 +132,6 @@ export function createWebsocketServer({
       const player = lobby.players.find((player) => player.id === socket.id);
       if (!player) return;
       player.ready = !player.ready;
-      io.to(lobbyKey).emit("lobbyInfo", lobby);
-    });
-
-    socket.on("updateControllerOptions", ({ lobbyKey, options }) => {
-      const lobby = lobbies.get(lobbyKey);
-      if (!lobby) return;
-      lobby.controllerOptions = { ...lobby.controllerOptions, ...options };
       io.to(lobbyKey).emit("lobbyInfo", lobby);
     });
 

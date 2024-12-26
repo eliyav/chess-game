@@ -1,9 +1,17 @@
 import "@babylonjs/loaders/glTF";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import { Lobby } from "../shared/match";
+import {
+  buildDefaultOptions,
+  ControllerOptions,
+  Lobby,
+  LOBBY_TYPE,
+} from "../shared/match";
 import { APP_ROUTES } from "../shared/routes";
 import { Message, MessageModal } from "./components/modals/message-modal";
+import { Controller } from "./match-logic/controller";
+import { LocalMatch } from "./match-logic/local-match";
+import { OnlineMatch } from "./match-logic/online-match";
 import { Game } from "./routes/game";
 import { Home } from "./routes/home";
 import { LobbySelect } from "./routes/lobby-select";
@@ -12,12 +20,51 @@ import { OfflineLobby } from "./routes/offline-lobby";
 import { OnlineLobby } from "./routes/online-lobby";
 import { type SceneManager } from "./scenes/scene-manager";
 import { websocket } from "./websocket-client";
+import LoadingScreen from "./components/loading-screen";
 
 const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [lobby, setLobby] = useState<Lobby>();
   const [message, setMessage] = useState<Message | null>(null);
+  const [options, setOptions] = useState(buildDefaultOptions());
+  const [loading, setLoading] = useState(false);
+
+  const updateOptions = useCallback(
+    <KEY extends keyof ControllerOptions>(
+      key: KEY,
+      value: ControllerOptions[KEY]
+    ) => {
+      setOptions((prev) => ({
+        ...prev,
+        [key]: value,
+      }));
+    },
+    [setOptions]
+  );
+
+  const match = useMemo(() => {
+    if (!lobby) return undefined;
+    return lobby.mode === LOBBY_TYPE.LOCAL
+      ? new LocalMatch({ lobby, player: lobby.players[0] })
+      : new OnlineMatch({
+          lobby,
+          player: lobby.players.find((player) => player.id === websocket.id)!,
+        });
+  }, [lobby]);
+
+  const controller = useMemo(() => {
+    if (!match || !lobby) return undefined;
+    return new Controller({
+      sceneManager,
+      match,
+      events: {
+        setMessage: (message: Message | null) => setMessage(message),
+        navigate: (route: APP_ROUTES) => navigate(route),
+      },
+      options,
+    });
+  }, [match, sceneManager, navigate]);
 
   useEffect(() => {
     sceneManager.switchScene(location.pathname as APP_ROUTES);
@@ -37,10 +84,27 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
 
     websocket.on("lobbyInfo", (lobby: Lobby) => {
       setLobby(lobby);
+      if (lobby.matchStarted) {
+        navigate(`${APP_ROUTES.Game}?key=${lobby.key}&type=${lobby.mode}`);
+        setMessage({
+          text: "Match has started!",
+          onConfirm: () => {
+            setMessage(null);
+          },
+        });
+      }
     });
 
-    websocket.on("redirect", ({ path, message }) => {
-      navigate(path);
+    websocket.on("redirect", ({ path, message, search }) => {
+      if (search) {
+        const searchParams = new URLSearchParams();
+        Object.entries(search).forEach(([key, value]) => {
+          searchParams.append(key, value);
+        });
+        navigate(`${path}?${searchParams.toString()}`);
+      } else {
+        navigate(path);
+      }
       if (message) {
         setMessage({
           text: message,
@@ -59,7 +123,8 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   }, [websocket, navigate, setMessage, setLobby]);
 
   return (
-    <div>
+    <>
+      {loading && <LoadingScreen />}
       {message && (
         <MessageModal
           text={message.text}
@@ -67,37 +132,50 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
           onReject={message.onReject}
         />
       )}
-      <div className="relative h-full">
-        <Routes>
-          <Route path={APP_ROUTES.Home} element={<Home />} />
-          <Route
-            path={APP_ROUTES.Lobby}
-            element={<LobbySelect setMessage={setMessage} />}
-          />
-          <Route
-            path={APP_ROUTES.OfflineLobby}
-            element={<OfflineLobby setLobby={setLobby} lobby={lobby} />}
-          />
-          <Route
-            path={APP_ROUTES.OnlineLobby}
-            element={<OnlineLobby lobby={lobby} />}
-          />
-          <Route
-            path={APP_ROUTES.Game}
-            element={
-              lobby !== undefined ? (
-                <Game
-                  sceneManager={sceneManager}
-                  lobby={lobby}
-                  setMessage={setMessage}
-                />
-              ) : null
-            }
-          />
-          <Route path={"*"} element={<NotFound />} />
-        </Routes>
-      </div>
-    </div>
+      <Routes>
+        <Route path={APP_ROUTES.Home} element={<Home />} />
+        <Route
+          path={APP_ROUTES.Lobby}
+          element={
+            <LobbySelect setMessage={setMessage} setLoading={setLoading} />
+          }
+        />
+        <Route
+          path={APP_ROUTES.OfflineLobby}
+          element={
+            <OfflineLobby
+              setLobby={setLobby}
+              lobby={lobby}
+              options={options}
+              updateOptions={updateOptions}
+            />
+          }
+        />
+        <Route
+          path={APP_ROUTES.OnlineLobby}
+          element={
+            <OnlineLobby
+              lobby={lobby}
+              options={options}
+              updateOptions={updateOptions}
+              setMessage={setMessage}
+            />
+          }
+        />
+        <Route
+          path={APP_ROUTES.Game}
+          element={
+            <Game
+              lobby={lobby}
+              setLobby={setLobby}
+              controller={controller}
+              setMessage={setMessage}
+            />
+          }
+        />
+        <Route path={"*"} element={<NotFound />} />
+      </Routes>
+    </>
   );
 };
 

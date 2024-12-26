@@ -1,3 +1,5 @@
+import { POSSIBLE_DEPTHS } from "../client/game-logic/bot-opponent";
+
 export enum LOBBY_TYPE {
   LOCAL = "Local",
   ONLINE = "Online",
@@ -8,7 +10,6 @@ export interface Lobby {
   key: string;
   players: Player[];
   matchStarted: boolean;
-  controllerOptions: ControllerOptions;
 }
 
 export interface RoomDetails {
@@ -20,6 +21,8 @@ export enum TEAM {
   WHITE = "White",
   BLACK = "Black",
 }
+
+export type PlayerType = "Human" | "Computer";
 
 export type Player =
   | {
@@ -64,5 +67,71 @@ export function getOptionText(option: keyof ControllerOptions) {
       return "Game Sounds";
     case "displayAvailableMoves":
       return "Display Available Moves";
+  }
+}
+
+export function createLobby(preset: {
+  type: LOBBY_TYPE;
+  vs?: PlayerType | null;
+  depth?: string | null;
+  key?: string | null;
+}): Lobby {
+  if (preset.type === LOBBY_TYPE.LOCAL) {
+    return {
+      mode: preset.type,
+      key: preset.key ?? "",
+      players: [
+        {
+          name: "Player 1",
+          ready: false,
+          id: "1",
+          type: "Human",
+          team: TEAM.WHITE,
+        },
+        preset?.vs === "Human"
+          ? {
+              name: "Player 2",
+              ready: false,
+              id: "2",
+              type: "Human",
+              team: TEAM.BLACK,
+            }
+          : {
+              name: "BOT",
+              ready: false,
+              id: "2",
+              type: "Computer",
+              team: TEAM.BLACK,
+              depth: POSSIBLE_DEPTHS.some((num) =>
+                num === Number(preset.depth) ? true : false
+              )
+                ? Number(preset.depth)
+                : 3,
+            },
+      ],
+      matchStarted: false,
+    };
+  } else {
+    return {
+      mode: preset.type,
+      key: preset.key ?? "",
+      players: [
+        {
+          id: "",
+          type: "Human",
+          name: "Player 1",
+          ready: false,
+          team: TEAM.WHITE,
+        },
+        {
+          id: "",
+          type: "Human",
+          name: "Player 2",
+          ready: false,
+          team: TEAM.BLACK,
+        },
+      ],
+      matchStarted: false,
+    };
   }
 }

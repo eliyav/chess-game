@@ -3,11 +3,13 @@ import { ControllerOptions, getOptionText } from "../../../shared/match";
 
 interface ControllerOptionsProps {
   options: ControllerOptions;
-  onChange: (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (
+    key: keyof ControllerOptions
+  ) => (e: React.ChangeEvent<HTMLInputElement>) => void;
   uniqueOptions?: {
     text: string;
     onChange: () => void;
-    disabled: boolean;
+    disabled?: boolean;
     className?: string;
   }[];
 }
@@ -45,7 +47,7 @@ export const ControllerOptionsList: React.FC<ControllerOptionsProps> = ({
             type="checkbox"
             className="hidden"
             checked={value}
-            onChange={onChange(key)}
+            onChange={onChange(key as keyof ControllerOptions)}
           />
           {getOptionText(key as keyof ControllerOptions)}
           <span

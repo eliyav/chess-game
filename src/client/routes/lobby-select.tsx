@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LOBBY_TYPE } from "../../shared/match";
-import { SelectionButton } from "../components/buttons/start-button";
+import { SelectionButton } from "../components/buttons/selection-button";
 import { Message } from "../components/modals/message-modal";
 import { Divider } from "../components/svg/divider";
 import { APP_ROUTES } from "../../shared/routes";
@@ -11,7 +11,8 @@ import { BackButton } from "../components/svg/back-button";
 
 export const LobbySelect: React.FC<{
   setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
-}> = ({ setMessage }) => {
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+}> = ({ setMessage, setLoading }) => {
   const navigate = useNavigate();
   const [lobbyKey, setLobbyKey] = useState("");
 
@@ -34,15 +35,16 @@ export const LobbySelect: React.FC<{
           customClass="m-10 p-4 font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80"
           text={LOBBY_TYPE.LOCAL}
           onClick={() => {
-            navigate(APP_ROUTES.OfflineLobby);
+            navigate(`${APP_ROUTES.OfflineLobby}?vs=Computer&depth=3`);
           }}
         />
-        <Divider className="w-full" />
+        <Divider className="w-full z-10" />
         <SelectionButton
-          customClass="m-10 p-4 font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80"
+          customClass="m-10 p-4 font-bold text-2xl border-2 h-16 border-white italic tracking-widest hover:opacity-80"
           text={`Create ${LOBBY_TYPE.ONLINE}`}
           onClick={async () => {
             try {
+              setLoading(true);
               const response = await fetch(
                 `${ENV_BASE_URL}${RESOURCES.CREATE_LOBBY}`
               );
@@ -60,10 +62,12 @@ export const LobbySelect: React.FC<{
                   onConfirm: () => setMessage(null),
                 });
               }
+            } finally {
+              setLoading(false);
             }
           }}
         />
-        <Divider className="w-full" />
+        <Divider className="w-full z-10" />
         <div className="text-center m-10">
           <input
             type="text"
@@ -72,16 +76,17 @@ export const LobbySelect: React.FC<{
             onChange={(e) => setLobbyKey(e.target.value.toUpperCase())}
             autoComplete="off"
             value={lobbyKey}
-            className="w-full p-2 rounded-t text-center border-2 h-12 border-gray-500 placeholder-opacity-50 focus:outline-none"
+            className="relative w-full p-2 rounded-xl mb-4 text-center border-2 h-16 border-gray-700 shadow-sm shadow-white placeholder-opacity-50 focus:outline-none focus:shadow-md focus:shadow-white"
           ></input>
           <SelectionButton
             customClass={
-              "w-full p-4 !rounded-t-none font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80"
+              "w-full p-4 font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80"
             }
             disabled={lobbyKey.length !== 5}
             text={`Join ${LOBBY_TYPE.ONLINE}`}
             onClick={async () => {
               try {
+                setLoading(true);
                 const response = await fetch(
                   `${ENV_BASE_URL}${RESOURCES.JOIN_LOBBY}?key=${lobbyKey}`,
                   {}
@@ -102,6 +107,8 @@ export const LobbySelect: React.FC<{
                     onConfirm: () => setMessage(null),
                   });
                 }
+              } finally {
+                setLoading(false);
               }
             }}
           />
