@@ -1,13 +1,12 @@
 import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LOBBY_TYPE, Lobby, PlayerType, createLobby } from "../../shared/match";
+import { APP_ROUTES } from "../../shared/routes";
 import { GameOverlay } from "../components/game-overlay/game-overlay";
 import * as icons from "../components/game-overlay/overlay-icons";
+import { Message } from "../components/modals/message-modal";
 import { Controller } from "../match-logic/controller";
 import { createLocalEvents, createOnlineEvents } from "../match-logic/events";
-import { websocket } from "../websocket-client";
-import { APP_ROUTES } from "../../shared/routes";
-import { Message } from "../components/modals/message-modal";
 
 export const Game: React.FC<{
   lobby: Lobby | undefined;
@@ -25,12 +24,14 @@ export const Game: React.FC<{
     ) as PlayerType | null;
     const depth = new URLSearchParams(location.search).get("depth");
     if (type === LOBBY_TYPE.ONLINE) {
-      setMessage({
-        text: "Rejoining not supported (soon)",
-        onConfirm: () => setMessage(null),
-      });
-      navigate(APP_ROUTES.Home);
-      return;
+      if (!lobby) {
+        setMessage({
+          text: "Rejoining not supported (soon)",
+          onConfirm: () => setMessage(null),
+        });
+        navigate(APP_ROUTES.Home);
+        return;
+      }
     } else {
       if (!lobby) {
         const newLobby = createLobby({ type: LOBBY_TYPE.LOCAL, vs, depth });
