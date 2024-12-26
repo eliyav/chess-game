@@ -1,10 +1,10 @@
 import { GAMESTATUS, Point, Turn } from "../../shared/game";
-import { Lobby, Player, TEAM } from "../../shared/match";
+import { Lobby, LOBBY_TYPE, Player, TEAM } from "../../shared/match";
 import Game from "../game-logic/game";
 
 export interface MatchLogic {
   isPlayersTurn(): boolean;
-  getPlayerTeam(): TEAM | undefined;
+  getCurrentTeam(): TEAM | undefined;
   isCurrentPlayersPiece(point: Point): boolean;
   resetRequest(): boolean;
   undoTurnRequest(): boolean;
@@ -35,6 +35,30 @@ export class BaseMatch {
 
   getMoves(point: Point) {
     return this.game.getMoves({ point });
+  }
+
+  getCurrentTeam() {
+    return this.game.getCurrentTeam();
+  }
+
+  isPlayersTurn() {
+    const currentTeam = this.getCurrentTeam();
+    if (!currentTeam) return false;
+    const currentPlayer = this.lobby.players.find(
+      (player) => player.team === currentTeam
+    );
+    if (currentPlayer?.type === "Computer") return false;
+    if (this.lobby.mode === LOBBY_TYPE.ONLINE) {
+      return currentPlayer?.team === this.player.team;
+    } else {
+      return true;
+    }
+  }
+
+  isCurrentPlayersPiece(point: Point) {
+    const piece = this.game.lookupPiece({ point });
+    if (!piece) return false;
+    return piece.team === this.getCurrentTeam();
   }
 
   reset() {

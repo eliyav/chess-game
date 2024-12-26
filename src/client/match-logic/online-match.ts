@@ -43,28 +43,6 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
     return false;
   }
 
-  isPlayersTurn() {
-    const currentTeam = this.getGame().getCurrentTeam();
-    const playingPlayerId = this.lobby.players.find(
-      (player) => player.team === currentTeam
-    )?.id;
-    return playingPlayerId === this.player.id;
-  }
-
-  getPlayerTeam() {
-    const player = this.lobby.players.find(
-      (player) => player.id === this.player.id
-    );
-    if (!player) return;
-    return player.team;
-  }
-
-  isCurrentPlayersPiece(point: Point) {
-    const piece = this.getGame().lookupPiece({ point });
-    if (!piece) return false;
-    return piece.team === this.getPlayerTeam();
-  }
-
   subscribe({ controller }: { controller: Controller }) {
     this.events = createOnlineEvents({ controller });
     for (const event of this.events) {

@@ -83,23 +83,6 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
     return true;
   }
 
-  isPlayersTurn() {
-    const playingPlayer = this.lobby.players.find(
-      (player) => player.id === this.player.id
-    );
-    return playingPlayer?.type === "Human";
-  }
-
-  getPlayerTeam() {
-    return this.getGame().getCurrentTeam();
-  }
-
-  isCurrentPlayersPiece(point: Point) {
-    const piece = this.getGame().lookupPiece({ point });
-    if (!piece) return false;
-    return piece.team === this.getPlayerTeam();
-  }
-
   subscribe({ controller }: { controller: Controller }) {
     this.events = createLocalEvents({ controller });
     if (this.vsComputer) {

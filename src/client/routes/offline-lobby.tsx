@@ -154,7 +154,6 @@ export const OfflineLobby: React.FC<{
                   const temp = players[0].team;
                   players[0].team = players[1].team;
                   players[1].team = temp;
-                  console.log(players);
                   updateLobby("players", players);
                 },
                 disabled: false,
