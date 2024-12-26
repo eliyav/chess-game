@@ -1,75 +1,75 @@
-import React, { useEffect, useMemo, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { LOBBY_TYPE, Lobby } from "../../shared/match";
-import { APP_ROUTES } from "../../shared/routes";
-import { MenuOverlay } from "../components/game-overlay/menu-overlay";
+import React, { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { LOBBY_TYPE, Lobby, createOfflineLobby } from "../../shared/match";
+import { GameOverlay } from "../components/game-overlay/game-overlay";
 import * as icons from "../components/game-overlay/overlay-icons";
-import { Message } from "../components/modals/message-modal";
 import { Controller } from "../match-logic/controller";
-import { LocalMatch } from "../match-logic/local-match";
-import { OnlineMatch } from "../match-logic/online-match";
-import { SceneManager } from "../scenes/scene-manager";
-import { websocket } from "../websocket-client";
+import { createLocalEvents, createOnlineEvents } from "../match-logic/events";
 
 export const Game: React.FC<{
-  sceneManager: SceneManager;
-  lobby: Lobby;
-  setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
-}> = ({ sceneManager, setMessage, lobby }) => {
-  const navigate = useNavigate();
-  const match = useRef(
-    lobby.mode === LOBBY_TYPE.LOCAL
-      ? new LocalMatch({ lobby, player: lobby.players[0] })
-      : new OnlineMatch({
-          lobby,
-          player: lobby.players.find((player) => player.id === websocket.id)!,
-        })
-  );
-  const controller = useRef(
-    new Controller({
-      sceneManager,
-      match: match.current,
-      events: {
-        setMessage: (message: Message | null) => setMessage(message),
-        navigate: (route: APP_ROUTES) => navigate(route),
-      },
-      options: lobby.controllerOptions,
-    })
-  );
+  lobby: Lobby | undefined;
+  setLobby: React.Dispatch<React.SetStateAction<Lobby | undefined>>;
+  controller: Controller | undefined;
+}> = ({ controller, lobby, setLobby }) => {
+  const location = useLocation();
 
   useEffect(() => {
-    match.current?.subscribe({ controller: controller.current });
-    return () => match.current?.unsubscribe();
-  }, [match.current]);
+    const lobbyType = new URLSearchParams(location.search).get("type");
+    if (!lobby && lobbyType === LOBBY_TYPE.LOCAL) {
+      const newLobby = createOfflineLobby();
+      setLobby(newLobby);
+    }
+  }, [location]);
 
-  //Game Overlay
+  useEffect(() => {
+    if (controller) {
+      if (controller.match.mode === LOBBY_TYPE.LOCAL) {
+        const events = createLocalEvents({ controller });
+        controller.match.subscribe(events);
+      } else {
+        const onlineEvents = createOnlineEvents({ controller });
+        controller.match.subscribe(onlineEvents);
+      }
+      return () => {
+        controller.match.unsubscribe();
+      };
+    }
+  }, [controller]);
+
   return (
     <>
-      <MenuOverlay
-        items={[
-          {
-            text: "home",
-            onClick: () => controller.current.leaveMatch({ key: lobby.key }),
-          },
-          {
-            text: "restart",
-            onClick: () => controller.current.requestMatchReset(),
-          },
-          {
-            text: "undo",
-            onClick: () => controller.current.requestUndoTurn(),
-          },
-          {
-            text: "camera",
-            onClick: () => controller.current.resetCamera(),
-          },
-          // {
-          //   text: "pause",
-          //   onClick: () => match.timer.toggleTimer(),
-          // },
-        ]}
-        icons={icons}
-      />
+      {controller && lobby ? (
+        <GameOverlay
+          items={[
+            {
+              text: "home",
+              onClick: () => controller.leaveMatch({ key: lobby.key }),
+            },
+            {
+              text: "restart",
+              onClick: () => controller.requestMatchReset(),
+            },
+            {
+              text: "undo",
+              onClick: () => controller.requestUndoTurn(),
+            },
+            {
+              text: "camera",
+              onClick: () => controller.resetCamera(),
+            },
+            // {
+            //   text: "pause",
+            //   onClick: () => match.timer.toggleTimer(),
+            // },
+          ]}
+          icons={icons}
+          lobby={lobby}
+        />
+      ) : (
+        <div className="flex justify-center items-center h-full">
+          <div className="animate-spin h-10 w-10 border-4 border-gray-300 border-t-transparent rounded-full"></div>
+        </div>
+      )}
     </>
   );
 };
