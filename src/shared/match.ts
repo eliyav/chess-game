@@ -7,7 +7,6 @@ export interface Lobby {
   mode: LOBBY_TYPE;
   key: string;
   players: Player[];
-  teams: { [key in TEAM]: Player["id"] };
   matchStarted: boolean;
   controllerOptions: ControllerOptions;
 }
@@ -28,6 +27,7 @@ export type Player =
       type: "Human";
       name: string;
       ready: boolean;
+      team: TEAM;
     }
   | {
       id: string;
@@ -35,6 +35,7 @@ export type Player =
       name: string;
       ready: boolean;
       depth: number;
+      team: TEAM;
     };
 
 export type ControllerOptions = {

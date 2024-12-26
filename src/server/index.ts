@@ -1,12 +1,12 @@
 import compression from "compression";
+import cors from "cors";
 import express from "express";
 import { fileURLToPath } from "node:url";
 import path from "path";
-import { LOBBY_TYPE, Lobby, buildDefaultOptions } from "../shared/match";
+import { Lobby } from "../shared/match";
 import { RESOURCES } from "../shared/resources";
-import { generateKey } from "./helpers";
+import { createLobby } from "./helpers";
 import { createWebsocketServer } from "./websocket-server";
-import cors from "cors";
 
 const clientPath = fileURLToPath(new URL("../client", import.meta.url));
 
@@ -23,17 +23,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.text());
 
 app.get(RESOURCES.CREATE_LOBBY, (req, res) => {
-  const key = generateKey();
-  const lobby = {
-    mode: LOBBY_TYPE.ONLINE,
-    key,
-    players: [],
-    teams: { White: "", Black: "" },
-    matchStarted: false,
-    controllerOptions: buildDefaultOptions(),
-  };
-  lobbies.set(key, lobby);
-  res.send(key);
+  const lobby = createLobby();
+  lobbies.set(lobby.key, lobby);
+  res.send(lobby.key);
 });
 
 app.get(RESOURCES.JOIN_LOBBY, (req, res) => {
