@@ -7,12 +7,14 @@ import { Controller } from "../match-logic/controller";
 import { createLocalEvents, createOnlineEvents } from "../match-logic/events";
 import { websocket } from "../websocket-client";
 import { APP_ROUTES } from "../../shared/routes";
+import { Message } from "../components/modals/message-modal";
 
 export const Game: React.FC<{
   lobby: Lobby | undefined;
   setLobby: React.Dispatch<React.SetStateAction<Lobby | undefined>>;
   controller: Controller | undefined;
-}> = ({ controller, lobby, setLobby }) => {
+  setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
+}> = ({ controller, lobby, setLobby, setMessage }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -22,13 +24,24 @@ export const Game: React.FC<{
       "vs"
     ) as PlayerType | null;
     const depth = new URLSearchParams(location.search).get("depth");
-    if (!lobby) {
-      if (type === LOBBY_TYPE.ONLINE) {
-        navigate(APP_ROUTES.Home);
-        return;
-      } else {
+    if (type === LOBBY_TYPE.ONLINE) {
+      setMessage({
+        text: "Rejoining not supported (soon)",
+        onConfirm: () => setMessage(null),
+      });
+      navigate(APP_ROUTES.Home);
+      return;
+    } else {
+      if (!lobby) {
         const newLobby = createLobby({ type: LOBBY_TYPE.LOCAL, vs, depth });
         setLobby(newLobby);
+        const searchParams = new URLSearchParams(location.search);
+        if (newLobby.players[1].type === "Computer") {
+          searchParams.set("vs", vs || newLobby.players[1].type);
+          searchParams.set("type", newLobby.mode);
+          searchParams.set("depth", String(newLobby.players[1].depth));
+        }
+        navigate(`${location.pathname}?${searchParams.toString()}`);
       }
     }
   }, [location]);

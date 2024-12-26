@@ -165,7 +165,12 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
         <Route
           path={APP_ROUTES.Game}
           element={
-            <Game lobby={lobby} setLobby={setLobby} controller={controller} />
+            <Game
+              lobby={lobby}
+              setLobby={setLobby}
+              controller={controller}
+              setMessage={setMessage}
+            />
           }
         />
         <Route path={"*"} element={<NotFound />} />
