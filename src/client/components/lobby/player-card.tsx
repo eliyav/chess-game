@@ -1,45 +1,46 @@
 import React from "react";
 import { Player, TEAM } from "../../../shared/match";
 import { Pawn } from "../svg/pawn";
+import { Checkmark } from "../svg/checkmark";
+import { XIcon } from "../svg/x-icon";
 
 const PlayerCard: React.FC<{
   player: Player | undefined;
-  team: string;
   children?: React.ReactNode;
-}> = ({ player, team, children }) => {
+}> = ({ player, children }) => {
   return (
-    <div className="h-full w-1/2 grow p-1 bg-slate-600 rounded-lg border-2 border-black">
-      <div className="h-14 bg-slate-400 rounded p-1 text-nowrap">
+    <div className="h-full relative w-1/2 grow p-1 bg-slate-600 rounded-lg border-2 border-black">
+      <div className="h-12 bg-slate-400 rounded p-1 text-nowrap">
         <Pawn
           className={`inline-block team-symbol-background h-full border-r-2  ${
-            team === TEAM.WHITE ? "border-white" : "border-black"
+            player?.team === TEAM.WHITE ? "border-white" : "border-black"
           }`}
-          color={team === TEAM.WHITE ? "#ffffff" : "#000000"}
+          color={player?.team === TEAM.WHITE ? "#ffffff" : "#000000"}
         />
         <p
-          className={`inline-block text-center pl-2 tracking-wide font-bold text-2xl font-mono ${
-            team === TEAM.WHITE ? "text-white" : "text-black"
+          className={`inline-block text-center pl-1 tracking-wide font-bold text-2xl font-mono ${
+            player?.team === TEAM.WHITE ? "text-white" : "text-black"
           }`}
         >
-          {team}
+          {player?.team}
         </p>
-        {player?.ready && (
-          <p
-            className={`inline-block place-self-end self-center grow text-right ${
-              player.ready ? "text-green-500" : "text-red-500"
-            }`}
-          >
-            {player.ready ? "✔" : "✖"}
-          </p>
-        )}
       </div>
       {player ? (
-        <p
-          className={`whitespace-nowrap overflow-hidden text-ellipsis text-slate-200 font-bold text-md p-2 border-b-2 border-black
-          `}
-        >
-          {player.name}
-        </p>
+        <div className="border-b-2 border-black">
+          <p
+            className={`w-9/12 inline-block whitespace-nowrap overflow-hidden text-ellipsis text-slate-200 font-bold text-md p-2 pb-0 
+            `}
+          >
+            {player.id ? player.name : "Waiting..."}
+          </p>
+          <p className={`float-right inline-block text-lg mt-0.5`}>
+            {player?.ready ? (
+              <Checkmark size={25} className="p-0.5" />
+            ) : (
+              <XIcon size={25} />
+            )}
+          </p>
+        </div>
       ) : (
         <>
           <p>Waiting...</p>
