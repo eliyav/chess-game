@@ -60,9 +60,8 @@ export function createWebsocketServer({
         }
         placeHolderPlayer.id = socket.id;
       }
-
-      io.to(lobbyKey).emit("lobbyInfo", lobby);
       socket.join(lobbyKey);
+      io.to(lobbyKey).emit("lobbyInfo", lobby);
     });
 
     socket.on("leaveLobby", ({ lobbyKey }) => {
