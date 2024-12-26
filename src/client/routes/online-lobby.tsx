@@ -66,7 +66,7 @@ export const OnlineLobby: React.FC<{
   const disableMatchStart = lobby.players.length < 2 || !playersReady;
 
   return (
-    <div className="grid grid-rows-5 h-dvh md:w-1/2 md:m-auto z-10 select-none ">
+    <div className="grid grid-rows-5 h-dvh md:w-3/4 md:max-w-4xl md:m-auto z-10 select-none ">
       <div className="flex grid-rows-1 justify-center align-center glass dark-pane m-4">
         <BackButton
           className={
@@ -76,7 +76,7 @@ export const OnlineLobby: React.FC<{
           onClick={() => navigate(APP_ROUTES.Lobby)}
         />
         <div className="inline-block grow place-content-center">
-          <h1 className="place-self-center text-white text-center text-3xl font-bold italic pb-2">
+          <h1 className="place-self-center text-white text-center text-4xl font-bold italic pb-2">
             Online Lobby
           </h1>
           <div className="text-red-700 text-center tracking-widest italic font-bold flex justify-center items-center p-2 rounded-lg">

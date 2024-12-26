@@ -82,7 +82,7 @@ export const OfflineLobby: React.FC<{
           size={30}
           onClick={() => navigate(APP_ROUTES.Lobby)}
         />
-        <h1 className="inline-block place-self-center text-white grow text-center text-3xl font-bold italic pb-2">
+        <h1 className="inline-block place-self-center text-white grow text-center text-4xl font-bold italic pb-2">
           Offline Lobby
         </h1>
       </div>
@@ -93,12 +93,12 @@ export const OfflineLobby: React.FC<{
             <React.Fragment key={i}>
               <PlayerCard player={player} team={team}>
                 {player.type === "Computer" ? (
-                  <div className="mt-1 p-1 rounded bg-slate-700 text-slate-200">
+                  <div className="overflow-x-scroll whitespace-nowrap mt-1 p-1 rounded bg-slate-700 text-slate-200">
                     <span className="text-sm">Depth</span>
                     {POSSIBLE_DEPTHS.map((depth) => (
                       <button
                         key={depth}
-                        className={`px-1.5 py-1 mx-1 rounded ${
+                        className={`p-1.5 mx-1 rounded ${
                           player.depth === depth
                             ? "bg-slate-500 border-2 border-white"
                             : "bg-slate-600 border-2 border-transparent hover:bg-slate-500"

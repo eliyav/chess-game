@@ -17,7 +17,7 @@ export const ControllerOptionsList: React.FC<ControllerOptionsProps> = ({
   uniqueOptions,
 }) => {
   return (
-    <div className="flex flex-col gap-2 mt-2 items-center w-9/12 m-auto ">
+    <div className="flex flex-col gap-2 mt-2 items-center w-10/12 m-auto md:w-3/4 ">
       <div className="w-full">
         {uniqueOptions?.map(({ text, onChange, disabled }, i) => (
           <div className="inline-block p-1 w-1/2" key={i}>
