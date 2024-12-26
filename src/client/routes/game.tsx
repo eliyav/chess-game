@@ -1,27 +1,42 @@
 import React, { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { LOBBY_TYPE, Lobby, PlayerType, createLobby } from "../../shared/match";
 import { GameOverlay } from "../components/game-overlay/game-overlay";
 import * as icons from "../components/game-overlay/overlay-icons";
 import { Controller } from "../match-logic/controller";
 import { createLocalEvents, createOnlineEvents } from "../match-logic/events";
+import { websocket } from "../websocket-client";
+import { APP_ROUTES } from "../../shared/routes";
 
 export const Game: React.FC<{
   lobby: Lobby | undefined;
   setLobby: React.Dispatch<React.SetStateAction<Lobby | undefined>>;
   controller: Controller | undefined;
 }> = ({ controller, lobby, setLobby }) => {
+  const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    const lobbyType = new URLSearchParams(location.search).get("type");
+    const key = new URLSearchParams(location.search).get("key");
+    const type = new URLSearchParams(location.search).get("type");
     const vs = new URLSearchParams(location.search).get(
       "vs"
     ) as PlayerType | null;
     const depth = new URLSearchParams(location.search).get("depth");
-    if (!lobby && lobbyType === LOBBY_TYPE.LOCAL) {
-      const newLobby = createLobby({ type: LOBBY_TYPE.LOCAL, vs, depth });
-      setLobby(newLobby);
+    console.log(lobby);
+    if (!lobby) {
+      if (type === LOBBY_TYPE.ONLINE) {
+        if (key) {
+          websocket.emit("rejoinMatch", { lobbyKey: key });
+        } else {
+          navigate(APP_ROUTES.Home);
+        }
+      } else {
+        const newLobby = createLobby({ type: LOBBY_TYPE.LOCAL, vs, depth });
+        setLobby(newLobby);
+      }
+    } else {
+      console.log("lobby already exists");
     }
   }, [location]);
 

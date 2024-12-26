@@ -82,10 +82,27 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
 
     websocket.on("lobbyInfo", (lobby: Lobby) => {
       setLobby(lobby);
+      if (lobby.matchStarted) {
+        navigate(`${APP_ROUTES.Game}?key=${lobby.key}&type=${lobby.mode}`);
+        setMessage({
+          text: "Match has started!",
+          onConfirm: () => {
+            setMessage(null);
+          },
+        });
+      }
     });
 
-    websocket.on("redirect", ({ path, message }) => {
-      navigate(path);
+    websocket.on("redirect", ({ path, message, search }) => {
+      if (search) {
+        const searchParams = new URLSearchParams();
+        Object.entries(search).forEach(([key, value]) => {
+          searchParams.append(key, value);
+        });
+        navigate(`${path}?${searchParams.toString()}`);
+      } else {
+        navigate(path);
+      }
       if (message) {
         setMessage({
           text: message,
