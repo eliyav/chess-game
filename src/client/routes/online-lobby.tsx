@@ -11,6 +11,7 @@ import { ClipboardAdd } from "../components/svg/clipboard-add";
 import { ClipboardChecked } from "../components/svg/clipboard-checked";
 import { CopyUrl } from "../components/svg/copy-url";
 import { websocket } from "../websocket-client";
+import LoadingScreen from "../components/loading-screen";
 
 export const OnlineLobby: React.FC<{
   lobby: Lobby | undefined;
@@ -54,7 +55,7 @@ export const OnlineLobby: React.FC<{
     }
   }, [clipboardMessage, setClipboardMessage]);
 
-  if (!lobby) return null;
+  if (!lobby) return <LoadingScreen />;
 
   const somePlayersReady = lobby.players.some((player) => player.ready);
   const disableMatchStart = !lobby.players.every((player) => player.ready);
