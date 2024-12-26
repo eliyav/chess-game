@@ -158,6 +158,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
               lobby={lobby}
               options={options}
               updateOptions={updateOptions}
+              setMessage={setMessage}
             />
           }
         />

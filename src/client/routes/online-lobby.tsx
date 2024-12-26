@@ -12,15 +12,17 @@ import { ClipboardChecked } from "../components/svg/clipboard-checked";
 import { CopyUrl } from "../components/svg/copy-url";
 import { websocket } from "../websocket-client";
 import LoadingScreen from "../components/loading-screen";
+import { Message } from "../components/modals/message-modal";
 
 export const OnlineLobby: React.FC<{
   lobby: Lobby | undefined;
   options: ControllerOptions;
+  setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
   updateOptions: <KEY extends keyof ControllerOptions>(
     key: KEY,
     value: ControllerOptions[KEY]
   ) => void;
-}> = ({ lobby, options, updateOptions }) => {
+}> = ({ lobby, options, updateOptions, setMessage }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [clipboardMessage, setClipboardMessage] = useState("");
@@ -41,6 +43,12 @@ export const OnlineLobby: React.FC<{
     const lobbyKey = location.search.split("=")[1];
     if (lobbyKey) {
       websocket.emit("joinLobby", { lobbyKey });
+    } else {
+      navigate(APP_ROUTES.Lobby);
+      setMessage({
+        text: "Lobby does not exist",
+        onConfirm: () => setMessage(null),
+      });
     }
   }, [websocket, location]);
 
