@@ -62,11 +62,17 @@ export const OfflineLobby: React.FC<{
       "vs"
     ) as PlayerType | null;
     const depth = new URLSearchParams(location.search).get("depth");
-    if (!lobby) {
-      const newLobby = createLobby({ type: LOBBY_TYPE.LOCAL, vs });
+    const newLobby = createLobby({ type: LOBBY_TYPE.LOCAL, vs, depth });
+    if (newLobby) {
+      if (newLobby.players[1].type === "Computer") {
+        const searchParams = new URLSearchParams(location.search);
+        searchParams.set("vs", vs || newLobby.players[1].type);
+        searchParams.set("depth", String(newLobby.players[1].depth));
+        navigate(`${location.pathname}?${searchParams.toString()}`);
+      }
       setLobby(newLobby);
     }
-  }, [location, lobby]);
+  }, [location]);
 
   if (!lobby) return null;
 

@@ -1,3 +1,5 @@
+import { POSSIBLE_DEPTHS } from "../client/game-logic/bot-opponent";
+
 export enum LOBBY_TYPE {
   LOCAL = "Local",
   ONLINE = "Online",
@@ -100,7 +102,11 @@ export function createLobby(preset: {
               id: "2",
               type: "Computer",
               team: TEAM.BLACK,
-              depth: preset.depth ? Number(preset.depth) : 3,
+              depth: POSSIBLE_DEPTHS.some((num) =>
+                num === Number(preset.depth) ? true : false
+              )
+                ? Number(preset.depth)
+                : 3,
             },
       ],
       matchStarted: false,
