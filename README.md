@@ -2,18 +2,18 @@
 
 ## About The Project
 
-3D Chess PWA app built to easily play chess!
+3D chess web app built to easily play chess!
 
 ### Built With
 
+- [TypeScript](https://www.typescriptlang.org)
 - [Babylon.js](https://www.babylonjs.com)
 - [React.js](https://reactjs.org/)
 - [Node.js](https://nodejs.org/en)
-- [TypeScript](https://www.typescriptlang.org)
-- [Esbuild](https://esbuild.github.io)
 - [Express.js](https://expressjs.com)
 - [Socket.io](https://socket.io)
-- [React Router](https://reactrouter.com/)
+- [Esbuild](https://esbuild.github.io)
+- [PWA](https://web.dev/progressive-web-apps/)
 
 <!-- GETTING STARTED -->
 
@@ -53,8 +53,11 @@ This project is meant to be played. If you are having fun playing chess it is be
 
 ## TO DO
 
-- [In Progress] Add AI opponent
-- [] More will be added.
+- [-] Improve overall match experience
+- [-] Refactor old code
+- [] Performance improvements for bot evaluation (would enable better depth)
+- [] Add Users
+- [] Update meshes
 
 ## License
 
