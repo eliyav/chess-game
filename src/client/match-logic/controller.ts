@@ -19,6 +19,7 @@ import { GameScene, SceneManager, Scenes } from "../scenes/scene-manager";
 import { websocket } from "../websocket-client";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
+import { info } from "console";
 
 export class Controller {
   sceneManager: SceneManager;
@@ -372,5 +373,10 @@ export class Controller {
     camera.alpha = teamToReset === TEAM.WHITE ? Math.PI : 0;
     camera.beta = Math.PI / 4;
   }
+
+  info() {
+    return {
+      currentTeam: this.match.getCurrentTeam(),
+    };
+  }
 }
-//debugger reset camera for bot on white

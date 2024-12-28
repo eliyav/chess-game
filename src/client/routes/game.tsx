@@ -16,6 +16,9 @@ export const Game: React.FC<{
 }> = ({ controller, lobby, setLobby, setMessage }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [info, setInfo] = React.useState<ReturnType<Controller["info"]> | null>(
+    null
+  );
 
   useEffect(() => {
     const type = new URLSearchParams(location.search).get("type");
@@ -56,8 +59,13 @@ export const Game: React.FC<{
         const onlineEvents = createOnlineEvents({ controller });
         controller.match.subscribe(onlineEvents);
       }
+      const interval = setInterval(() => {
+        setInfo(controller.info());
+      }, 1000);
+
       return () => {
         controller.match.unsubscribe();
+        clearInterval(interval);
       };
     }
   }, [controller]);
@@ -66,30 +74,34 @@ export const Game: React.FC<{
     <>
       {controller && lobby ? (
         <GameOverlay
-          items={[
+          headerItems={[
             {
               text: "home",
               onClick: () => controller.leaveMatch({ key: lobby.key }),
+              iconPath: icons.home,
             },
             {
               text: "restart",
               onClick: () => controller.requestMatchReset(),
+              iconPath: icons.restart,
             },
             {
               text: "undo",
               onClick: () => controller.requestUndoTurn(),
+              iconPath: icons.undo,
             },
             {
               text: "camera",
               onClick: () => controller.resetCamera(),
+              iconPath: icons.camera,
             },
             // {
             //   text: "pause",
             //   onClick: () => match.timer.toggleTimer(),
             // },
           ]}
-          icons={icons}
           lobby={lobby}
+          info={info}
         />
       ) : (
         <div className="flex justify-center items-center h-full">
@@ -99,5 +111,3 @@ export const Game: React.FC<{
     </>
   );
 };
-
-export type IconsIndex = typeof icons;
