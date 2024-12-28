@@ -13,13 +13,15 @@ export const FooterGameOverlay: React.FC<{
         <div className="inline-block w-1/2" key={index}>
           <div className="flex flex-col items-center bg-slate-700 rounded-lg p-2 m-2 relative min-w-1/3 overflow-hidden whitespace-nowrap transition-all duration-500 ease-in-out transform hover:scale-105">
             <div
-              className={`absolute top-2 ${
-                index % 2 === 0 ? "left-2" : "right-2"
+              className={`absolute top-1 transition-all duration-500 ease-in-out ${
+                index % 2 === 0 ? "left-1" : "right-1"
               } ${
-                player.team === TEAM.WHITE ? "bg-white" : "bg-black"
-              } rounded-full w-4 h-4 ${
-                info?.currentTeam === player.team ? "animate-pulse" : ""
-              }`}
+                info?.currentTeam === player.team
+                  ? "animate-pulse bg-red-500"
+                  : player.team === TEAM.WHITE
+                  ? "bg-white"
+                  : "bg-black"
+              } rounded-full w-4 h-4`}
             ></div>
             <p className="font-bold text-lg whitespace-nowrap overflow-hidden text-ellipsis w-3/4 max-w-3/4">
               {player.name}
