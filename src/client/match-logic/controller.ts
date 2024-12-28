@@ -19,7 +19,6 @@ import { GameScene, SceneManager, Scenes } from "../scenes/scene-manager";
 import { websocket } from "../websocket-client";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
-import { info } from "console";
 
 export class Controller {
   sceneManager: SceneManager;
