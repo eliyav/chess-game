@@ -22,7 +22,7 @@
   "license": "MIT",
   "dependencies": {
     "@babylonjs/core": "^7.42.0",
-    "@babylonjs/loaders": "^7.40.2",
+    "@babylonjs/loaders": "^7.42.0",
     "compression": "^1.7.5",
     "cors": "^2.8.5",
     "express": "^4.21.2",
