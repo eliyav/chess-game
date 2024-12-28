@@ -15,7 +15,7 @@ export const GameOverlay: React.FC<{
 }> = ({ headerItems, lobby, info }) => {
   return (
     <div>
-      <div className="z-10 absolute select-none top-0 w-full bg-transparent text-center">
+      <div className="z-10 absolute top-0 w-full bg-transparent text-center">
         <div className="max-w-[600px] text-center t m-auto">
           {headerItems.map((item, idx) => (
             <HeaderGameOverlay item={item} key={idx} />
