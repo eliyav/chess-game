@@ -11,12 +11,12 @@ export const FooterGameOverlay: React.FC<{
     <div className="h-full p-2 text-white rounded-t-lg max-w-[600px] m-auto gap-x-4">
       {players.map((player, index) => (
         <div className="inline-block w-1/2" key={index}>
-          <div className="flex flex-col items-center bg-slate-700 rounded-lg p-2 m-2 relative md:w-1/3 transition-all duration-500 ease-in-out transform hover:scale-105">
+          <div className="flex flex-col items-center bg-slate-700 rounded-lg p-2 m-2 relative min-w-1/3 overflow-hidden whitespace-nowrap transition-all duration-500 ease-in-out transform hover:scale-105">
             <div
               className={`absolute top-2 ${
-                player.team === TEAM.WHITE
-                  ? "left-2 bg-white"
-                  : "right-2 bg-black"
+                index % 2 === 0 ? "left-2" : "right-2"
+              } ${
+                player.team === TEAM.WHITE ? "bg-white" : "bg-black"
               } rounded-full w-4 h-4 ${
                 info?.currentTeam === player.team ? "animate-pulse" : ""
               }`}

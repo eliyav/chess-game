@@ -377,7 +377,7 @@ export class Controller {
   info() {
     return {
       currentTeam: this.match.getCurrentTeam(),
-      time: "00:00",
+      time: "",
     };
   }
 }

@@ -3,10 +3,15 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { LOBBY_TYPE, Lobby, PlayerType, createLobby } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
 import { GameOverlay } from "../components/game-overlay/game-overlay";
-import * as icons from "../components/game-overlay/overlay-icons";
 import { Message } from "../components/modals/message-modal";
 import { Controller } from "../match-logic/controller";
 import { createLocalEvents, createOnlineEvents } from "../match-logic/events";
+import {
+  CameraIcon,
+  HomeIcon,
+  RestartIcon,
+  UndoIcon,
+} from "../components/svg/game-overlay-icons";
 
 export const Game: React.FC<{
   lobby: Lobby | undefined;
@@ -78,27 +83,27 @@ export const Game: React.FC<{
             {
               text: "home",
               onClick: () => controller.leaveMatch({ key: lobby.key }),
-              iconPath: icons.home,
+              children: <HomeIcon className="w-6 h-6 bg-transparent m-auto" />,
             },
             {
               text: "restart",
               onClick: () => controller.requestMatchReset(),
-              iconPath: icons.restart,
+              children: (
+                <RestartIcon className="w-6 h-6 bg-transparent m-auto" />
+              ),
             },
             {
               text: "undo",
               onClick: () => controller.requestUndoTurn(),
-              iconPath: icons.undo,
+              children: <UndoIcon className="w-6 h-6 bg-transparent m-auto" />,
             },
             {
               text: "camera",
               onClick: () => controller.resetCamera(),
-              iconPath: icons.camera,
+              children: (
+                <CameraIcon className="w-6 h-6 bg-transparent m-auto" />
+              ),
             },
-            // {
-            //   text: "pause",
-            //   onClick: () => match.timer.toggleTimer(),
-            // },
           ]}
           lobby={lobby}
           info={info}

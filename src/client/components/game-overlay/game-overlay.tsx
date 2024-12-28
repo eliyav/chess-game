@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { Lobby } from "../../../shared/match";
 import HeaderGameOverlay from "./header-game-overlay";
 import { FooterGameOverlay } from "./footer-game-overlay.tsx";
@@ -7,7 +7,11 @@ import { Controller } from "../../match-logic/controller";
 export const GameOverlay: React.FC<{
   lobby: Lobby;
   info: ReturnType<Controller["info"]> | null;
-  headerItems: Array<{ text: string; onClick: () => void; iconPath: string }>;
+  headerItems: Array<{
+    text: string;
+    onClick: () => void;
+    children: ReactNode;
+  }>;
 }> = ({ headerItems, lobby, info }) => {
   return (
     <div>
