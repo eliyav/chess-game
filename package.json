@@ -33,7 +33,7 @@
     "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
-    "@babylonjs/inspector": "^7.40.2",
+    "@babylonjs/inspector": "^7.42.0",
     "@types/compression": "^1.7.5",
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.1",
