@@ -3,7 +3,7 @@ import { Player, TEAM } from "../../../shared/match";
 import { Controller } from "../../match-logic/controller";
 import { ClockIcon } from "../svg/clock-icon";
 
-export const PlayersOverlay: React.FC<{
+export const FooterGameOverlay: React.FC<{
   players: Player[];
   info: ReturnType<Controller["info"]> | null;
 }> = ({ players, info }) => {
