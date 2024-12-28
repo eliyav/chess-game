@@ -7,7 +7,8 @@ import { XIcon } from "../svg/x-icon";
 const PlayerCard: React.FC<{
   player: Player | undefined;
   children?: React.ReactNode;
-}> = ({ player, children }) => {
+  hideReady?: boolean;
+}> = ({ player, hideReady = false, children }) => {
   return (
     <div className="h-full relative w-1/2 grow p-1 bg-slate-600 rounded-lg border-2 border-black">
       <div className="h-12 bg-slate-400 rounded p-1 text-nowrap">
@@ -33,13 +34,15 @@ const PlayerCard: React.FC<{
           >
             {player.id ? player.name : "Invite Code"}
           </p>
-          <p className={`float-right inline-block text-lg mt-0.5`}>
-            {player?.ready ? (
-              <Checkmark size={25} className="p-0.5" />
-            ) : (
-              <XIcon size={25} />
-            )}
-          </p>
+          {!hideReady && (
+            <p className={`float-right inline-block text-lg mt-0.5`}>
+              {player?.ready ? (
+                <Checkmark size={25} className="p-0.5" />
+              ) : (
+                <XIcon size={25} />
+              )}
+            </p>
+          )}
         </div>
       ) : (
         <>

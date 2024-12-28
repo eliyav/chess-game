@@ -94,7 +94,7 @@ export const OfflineLobby: React.FC<{
         {lobby.players.map((player, i) => {
           return (
             <React.Fragment key={i}>
-              <PlayerCard player={player}>
+              <PlayerCard player={player} hideReady={true}>
                 {player.type === "Computer" ? (
                   <div className="overflow-x-scroll whitespace-nowrap mt-1 p-1 rounded bg-slate-700 text-slate-200">
                     <span className="text-sm">Depth</span>
