@@ -372,5 +372,11 @@ export class Controller {
     camera.alpha = teamToReset === TEAM.WHITE ? Math.PI : 0;
     camera.beta = Math.PI / 4;
   }
+
+  info() {
+    return {
+      currentTeam: this.match.getCurrentTeam(),
+      time: "",
+    };
+  }
 }
-//debugger reset camera for bot on white

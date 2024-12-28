@@ -3,10 +3,15 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { LOBBY_TYPE, Lobby, PlayerType, createLobby } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
 import { GameOverlay } from "../components/game-overlay/game-overlay";
-import * as icons from "../components/game-overlay/overlay-icons";
 import { Message } from "../components/modals/message-modal";
 import { Controller } from "../match-logic/controller";
 import { createLocalEvents, createOnlineEvents } from "../match-logic/events";
+import {
+  CameraIcon,
+  HomeIcon,
+  RestartIcon,
+  UndoIcon,
+} from "../components/svg/game-overlay-icons";
 
 export const Game: React.FC<{
   lobby: Lobby | undefined;
@@ -16,6 +21,9 @@ export const Game: React.FC<{
 }> = ({ controller, lobby, setLobby, setMessage }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [info, setInfo] = React.useState<ReturnType<Controller["info"]> | null>(
+    null
+  );
 
   useEffect(() => {
     const type = new URLSearchParams(location.search).get("type");
@@ -56,8 +64,13 @@ export const Game: React.FC<{
         const onlineEvents = createOnlineEvents({ controller });
         controller.match.subscribe(onlineEvents);
       }
+      const interval = setInterval(() => {
+        setInfo(controller.info());
+      }, 1000);
+
       return () => {
         controller.match.unsubscribe();
+        clearInterval(interval);
       };
     }
   }, [controller]);
@@ -66,30 +79,34 @@ export const Game: React.FC<{
     <>
       {controller && lobby ? (
         <GameOverlay
-          items={[
+          headerItems={[
             {
               text: "home",
               onClick: () => controller.leaveMatch({ key: lobby.key }),
+              children: <HomeIcon className="w-6 h-6 bg-transparent m-auto" />,
             },
             {
               text: "restart",
               onClick: () => controller.requestMatchReset(),
+              children: (
+                <RestartIcon className="w-6 h-6 bg-transparent m-auto" />
+              ),
             },
             {
               text: "undo",
               onClick: () => controller.requestUndoTurn(),
+              children: <UndoIcon className="w-6 h-6 bg-transparent m-auto" />,
             },
             {
               text: "camera",
               onClick: () => controller.resetCamera(),
+              children: (
+                <CameraIcon className="w-6 h-6 bg-transparent m-auto" />
+              ),
             },
-            // {
-            //   text: "pause",
-            //   onClick: () => match.timer.toggleTimer(),
-            // },
           ]}
-          icons={icons}
           lobby={lobby}
+          info={info}
         />
       ) : (
         <div className="flex justify-center items-center h-full">
@@ -99,5 +116,3 @@ export const Game: React.FC<{
     </>
   );
 };
-
-export type IconsIndex = typeof icons;
