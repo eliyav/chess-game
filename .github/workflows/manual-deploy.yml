@@ -1,8 +1,7 @@
-name: Release Deploy
+name: Manual Deploy
 
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
 
 jobs:
   build:
