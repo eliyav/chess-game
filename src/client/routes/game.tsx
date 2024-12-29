@@ -54,22 +54,6 @@ export const Game: React.FC<{
     }
   }, [location]);
 
-  useEffect(() => {
-    if (controller) {
-      if (controller.match.mode === LOBBY_TYPE.LOCAL) {
-        const events = createLocalEvents({ controller });
-        controller.match.subscribe(events);
-      } else {
-        const onlineEvents = createOnlineEvents({ controller });
-        controller.match.subscribe(onlineEvents);
-      }
-
-      return () => {
-        controller.match.unsubscribe();
-      };
-    }
-  }, [controller]);
-
   return (
     <>
       {controller && lobby ? (

@@ -53,7 +53,6 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
   }
 
   subscribe(events: OnlineEvents[]) {
-    this.timer?.start();
     this.events = events;
     for (const event of this.events) {
       websocket.on(event.name, event.event);
@@ -61,7 +60,6 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
   }
 
   unsubscribe() {
-    this.timer?.stop();
     if (!this.events) return;
     for (const event of this.events) {
       websocket.off(event.name, event.event);

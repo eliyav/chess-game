@@ -93,7 +93,6 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
   }
 
   subscribe(events: LocalEvents[]) {
-    this.timer?.start();
     this.events = events;
     if (this.vsComputer) {
       const worker = new Worker(new URL(GAME_WORKER_URL, import.meta.url));
@@ -109,7 +108,6 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
   }
 
   unsubscribe() {
-    this.timer?.stop();
     if (!this.worker) return;
     this.worker.terminate();
   }

@@ -20,6 +20,7 @@ import { websocket } from "../websocket-client";
 import { BaseMatch } from "./base-match";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
+import { createLocalEvents, createOnlineEvents } from "./events";
 
 export class Controller {
   sceneManager: SceneManager;
@@ -56,13 +57,18 @@ export class Controller {
 
   init() {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
-    this.subscribeGameInput(gameScene);
-    this.updateMeshesRender();
+    this.enableGameInput(gameScene);
+    this.render();
     this.resetCamera();
     this.events.updateState(this.match.state());
+    this.subscribe();
   }
 
-  subscribeGameInput(gameScene: GameScene) {
+  start() {
+    this.match.start();
+  }
+
+  enableGameInput(gameScene: GameScene) {
     gameScene.scene.onPointerUp = async (
       e: IPointerEvent,
       pickResult: Nullable<PickingInfo>
@@ -86,7 +92,7 @@ export class Controller {
         //If you select the same piece as before deselect it
         if (doPointsMatch(this.selectedPoint, point)) {
           this.selectedPoint = undefined;
-          this.updateMeshesRender();
+          this.render();
           return;
         } else {
           //If you select a different piece check if its a valid move and resolve or display new moves
@@ -138,7 +144,7 @@ export class Controller {
 
   prepNextView() {
     this.selectedPoint = undefined;
-    this.updateMeshesRender();
+    this.render();
     //Show previous turn
     this.displayLastTurn();
     const isGameOver = this.match.isGameOver();
@@ -186,7 +192,7 @@ export class Controller {
       gameScene.data.audio.select?.play();
     }
     const moves = this.match.getMoves(point);
-    this.updateMeshesRender();
+    this.render();
     showMoves({
       point,
       moves,
@@ -247,7 +253,7 @@ export class Controller {
   }
 
   resetView() {
-    this.updateMeshesRender();
+    this.render();
     if (this.match.lobby.mode === LOBBY_TYPE.LOCAL) {
       this.rotateCamera();
     } else {
@@ -275,7 +281,7 @@ export class Controller {
     });
   }
 
-  updateMeshesRender() {
+  render() {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     //Clears old meshes/memory usage
     if (gameScene.data.meshesToRender.length) {
@@ -379,5 +385,15 @@ export class Controller {
       : TEAM.WHITE;
     camera.alpha = teamToReset === TEAM.WHITE ? Math.PI : 0;
     camera.beta = Math.PI / 4;
+  }
+
+  subscribe() {
+    if (this.match.mode === LOBBY_TYPE.LOCAL) {
+      const events = createLocalEvents({ controller: this });
+      this.match.subscribe(events);
+    } else {
+      const onlineEvents = createOnlineEvents({ controller: this });
+      this.match.subscribe(onlineEvents);
+    }
   }
 }
