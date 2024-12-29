@@ -10,6 +10,7 @@ describe("Game Class", () => {
 
   beforeEach(() => {
     game = new Game();
+    game.getState().status = GAMESTATUS.INPROGRESS;
   });
 
   it("should initialize the game correctly", () => {
