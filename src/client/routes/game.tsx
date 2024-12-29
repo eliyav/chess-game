@@ -55,11 +55,9 @@ export const Game: React.FC<{
   }, [location]);
 
   useEffect(() => {
-    if (lobby?.mode === LOBBY_TYPE.LOCAL) {
-      controller?.start();
-    }
+    controller?.start();
     return () => controller?.cleanup();
-  }, [lobby, controller]);
+  }, [controller]);
 
   return (
     <>
