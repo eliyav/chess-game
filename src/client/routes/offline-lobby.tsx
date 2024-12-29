@@ -32,6 +32,7 @@ export const OfflineLobby: React.FC<{
         key: prev?.key ?? "",
         players: prev?.players ?? [],
         matchStarted: prev?.matchStarted ?? false,
+        time: prev?.time ?? 10,
         [key]: value,
       }));
     },
@@ -42,14 +43,14 @@ export const OfflineLobby: React.FC<{
     const players = lobby?.players;
     if (players) {
       const [player, player2] = players;
-      const isVsComputer = player2.type === "Computer";
+      const isVsComputer = player2.type === "computer";
       updateLobby("players", [
         player,
         {
           name: isVsComputer ? "Player 2" : "BOT",
           ready: false,
           id: "2",
-          type: isVsComputer ? "Human" : "Computer",
+          type: isVsComputer ? "human" : "computer",
           depth: isVsComputer ? 0 : 3,
           team: player2.team,
         },
@@ -62,12 +63,14 @@ export const OfflineLobby: React.FC<{
       "vs"
     ) as PlayerType | null;
     const depth = new URLSearchParams(location.search).get("depth");
-    const newLobby = createLobby({ type: LOBBY_TYPE.LOCAL, vs, depth });
+    const time = new URLSearchParams(location.search).get("time");
+    const newLobby = createLobby({ type: LOBBY_TYPE.LOCAL, vs, depth, time });
     if (newLobby) {
-      if (newLobby.players[1].type === "Computer") {
+      if (newLobby.players[1].type === "computer") {
         const searchParams = new URLSearchParams(location.search);
         searchParams.set("vs", vs || newLobby.players[1].type);
         searchParams.set("depth", String(newLobby.players[1].depth));
+        searchParams.set("time", time ?? String(newLobby.time));
         navigate(`${location.pathname}?${searchParams.toString()}`);
       }
       setLobby(newLobby);
@@ -95,13 +98,13 @@ export const OfflineLobby: React.FC<{
           return (
             <React.Fragment key={i}>
               <PlayerCard player={player} hideReady={true}>
-                {player.type === "Computer" ? (
+                {player.type === "computer" ? (
                   <div className="overflow-x-scroll whitespace-nowrap mt-1 p-1 rounded bg-slate-700 text-slate-200">
-                    <span className="text-sm">Depth</span>
+                    <span className="text-sm pr-2">Depth</span>
                     {POSSIBLE_DEPTHS.map((depth) => (
                       <button
                         key={depth}
-                        className={`py-1.5 px-2 mx-1 rounded ${
+                        className={`py-1.5 px-2.5 mx-1 rounded ${
                           player.depth === depth
                             ? "bg-slate-500 border-2 border-white"
                             : "bg-slate-600 border-2 border-transparent hover:bg-slate-500"
@@ -131,12 +134,43 @@ export const OfflineLobby: React.FC<{
           <ControllerOptionsList
             uniqueOptions={[
               {
+                text: `Time: ${lobby.time === 0 ? "∞" : lobby.time} min`,
+                className: "inline-block p-1 w-full",
+                onChange: (e) => {
+                  const target = e.target as HTMLInputElement;
+                  const time = parseInt(target.value, 10);
+                  updateLobby("time", time);
+                },
+                render: () => (
+                  <div className="relative flex items-center gap-x-2 w-full bg-slate-700 p-2 rounded-lg border-2 border-slate-200 text-center text-white text-lg min-w-16 font-bold">
+                    <div className="w-1/3">
+                      <span className="text-4xl truncate">
+                        {lobby.time === 0 ? "∞" : lobby.time}
+                      </span>
+                    </div>
+                    <span>min</span>
+                    <input
+                      type="range"
+                      min="0"
+                      max="60"
+                      step="5"
+                      value={lobby.time}
+                      onChange={(e) => {
+                        const time = parseInt(e.target.value, 10);
+                        updateLobby("time", time);
+                      }}
+                      className="slider inline-block bg-slate-200"
+                    />
+                  </div>
+                ),
+              },
+              {
                 text: `VS ${
                   lobby.players[1]
-                    ? lobby.players[1].type === "Computer"
-                      ? "Human"
-                      : "Computer"
-                    : "Computer"
+                    ? lobby.players[1].type === "computer"
+                      ? "human"
+                      : "computer"
+                    : "computer"
                 }`,
                 onChange: updateOpponentType,
                 className: "inline-block p-1 w-1/2",
@@ -164,7 +198,7 @@ export const OfflineLobby: React.FC<{
         customClass="row-start-5 m-10 font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80 md:w-1/2 md:justify-self-center"
         text={"Start Game"}
         onClick={() => {
-          if (lobby.players[1].type === "Computer") {
+          if (lobby.players[1].type === "computer") {
             navigate(
               `${APP_ROUTES.Game}?type=${LOBBY_TYPE.LOCAL}&vs=${lobby.players[1].type}&depth=${lobby.players[1].depth}`
             );

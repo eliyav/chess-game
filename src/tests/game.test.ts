@@ -10,10 +10,11 @@ describe("Game Class", () => {
 
   beforeEach(() => {
     game = new Game();
+    game.getState().status = GAMESTATUS.INPROGRESS;
   });
 
   it("should initialize the game correctly", () => {
-    const gameState = game.getGameState();
+    const gameState = game.getState();
     assert.equal(gameState.status, GAMESTATUS.INPROGRESS);
     assert.equal(gameState.turns.length, 0);
     assert.equal(gameState.annotations.length, 0);
@@ -34,12 +35,12 @@ describe("Game Class", () => {
     game.move({ from: [4, 6], to: [4, 4] }); // e5
     game.move({ from: [5, 1], to: [5, 2] }); // f3
     game.move({ from: [3, 7], to: [7, 3] }); // Qh4#
-    const gameState = game.getGameState();
+    const gameState = game.getState();
     assert.equal(gameState.status, GAMESTATUS.CHECKMATE);
   });
 
   it("should get best move", () => {
-    const gameState = game.getGameState();
+    const gameState = game.getState();
     assert.equal(gameState.status, GAMESTATUS.INPROGRESS);
     assert.equal(gameState.turns.length, 0);
     assert.equal(gameState.annotations.length, 0);

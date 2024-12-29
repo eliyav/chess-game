@@ -46,7 +46,8 @@ export function createOnlineEvents({
       name: "resetMatchResolve",
       event: ({ answer }: { answer: boolean }) => {
         if (answer) {
-          controller.resetMatchAndView();
+          controller.match.reset();
+          controller.resetView();
           controller.setMessage({
             text: "Match reset successfully!",
             onConfirm: () => controller.setMessage(null),

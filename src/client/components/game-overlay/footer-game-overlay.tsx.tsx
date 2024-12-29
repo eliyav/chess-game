@@ -1,12 +1,12 @@
 import React from "react";
 import { Player, TEAM } from "../../../shared/match";
-import { Controller } from "../../match-logic/controller";
+import { BaseMatch } from "../../match-logic/base-match";
 import { ClockIcon } from "../svg/clock-icon";
 
 export const FooterGameOverlay: React.FC<{
   players: Player[];
-  info: ReturnType<Controller["info"]> | null;
-}> = ({ players, info }) => {
+  controllerState: ReturnType<BaseMatch["state"]> | null;
+}> = ({ players, controllerState }) => {
   return (
     <div className="h-full p-2 text-white rounded-t-lg max-w-[600px] m-auto gap-x-4">
       {players.map((player, index) => (
@@ -16,7 +16,7 @@ export const FooterGameOverlay: React.FC<{
               className={`absolute top-1 transition-all duration-500 ease-in-out ${
                 index % 2 === 0 ? "left-1" : "right-1"
               } ${
-                info?.currentTeam === player.team
+                controllerState?.currentTeam === player.team
                   ? "animate-pulse bg-red-500"
                   : player.team === TEAM.WHITE
                   ? "bg-white"
@@ -28,18 +28,22 @@ export const FooterGameOverlay: React.FC<{
             </p>
             <div
               className={`flex items-center justify-center mt-2 transition-all duration-1000 ease-in-out ${
-                info?.time ? "h-10" : "h-0 opacity-0"
+                controllerState?.timers?.[player.team].formatted
+                  ? "h-10"
+                  : "h-0 opacity-0"
               }`}
             >
               <ClockIcon
                 className={`w-8 h-8 mr-1 ${
-                  info?.currentTeam === player.team
+                  controllerState?.currentTeam === player.team
                     ? "animate-pulse text-red-500"
                     : ""
                 }`}
               />
               <div className="flex items-center space-x-1 text-lg">
-                <span className="font-mono">{info?.time}</span>
+                <span className="font-mono">
+                  {controllerState?.timers?.[player.team].formatted}
+                </span>
               </div>
             </div>
           </div>

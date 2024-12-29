@@ -1,10 +1,12 @@
 import { TEAM } from "./match";
 
 export enum GAMESTATUS {
+  LOBBY = "Lobby",
   INPROGRESS = "In Progress",
   CHECKMATE = "Checkmate",
   STALEMATE = "Stalemate",
   DRAW = "Draw",
+  TIMER = "TimeEnd",
 }
 
 export type Point = [number, number];

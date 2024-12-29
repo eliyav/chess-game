@@ -13,7 +13,7 @@ const PlayerCard: React.FC<{
     <div className="h-full relative w-1/2 grow p-1 bg-slate-600 rounded-lg border-2 border-black">
       <div className="h-12 bg-slate-400 rounded p-1 text-nowrap">
         <Pawn
-          className={`inline-block team-symbol-background h-full border-r-2  ${
+          className={`inline-block team-symbol-background h-full border-r-2 mr-1  ${
             player?.team === TEAM.WHITE ? "border-white" : "border-black"
           }`}
           color={player?.team === TEAM.WHITE ? "#ffffff" : "#000000"}
@@ -27,9 +27,9 @@ const PlayerCard: React.FC<{
         </p>
       </div>
       {player ? (
-        <div className="border-b-2 border-black">
+        <div className="">
           <p
-            className={`w-9/12 inline-block whitespace-nowrap overflow-hidden text-ellipsis text-slate-200 font-bold text-md p-2 pb-0 
+            className={`w-9/12 inline-block whitespace-nowrap overflow-hidden text-ellipsis text-slate-200 text-lg font-bold text-md p-2 pb-0 
             `}
           >
             {player.id ? player.name : "Invite Code"}

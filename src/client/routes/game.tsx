@@ -4,26 +4,24 @@ import { LOBBY_TYPE, Lobby, PlayerType, createLobby } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
 import { GameOverlay } from "../components/game-overlay/game-overlay";
 import { Message } from "../components/modals/message-modal";
-import { Controller } from "../match-logic/controller";
-import { createLocalEvents, createOnlineEvents } from "../match-logic/events";
 import {
   CameraIcon,
   HomeIcon,
   RestartIcon,
   UndoIcon,
 } from "../components/svg/game-overlay-icons";
+import { BaseMatch } from "../match-logic/base-match";
+import { Controller } from "../match-logic/controller";
 
 export const Game: React.FC<{
   lobby: Lobby | undefined;
   setLobby: React.Dispatch<React.SetStateAction<Lobby | undefined>>;
   controller: Controller | undefined;
   setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
-}> = ({ controller, lobby, setLobby, setMessage }) => {
+  controllerState: ReturnType<BaseMatch["state"]> | null;
+}> = ({ controller, controllerState, lobby, setLobby, setMessage }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [info, setInfo] = React.useState<ReturnType<Controller["info"]> | null>(
-    null
-  );
 
   useEffect(() => {
     const type = new URLSearchParams(location.search).get("type");
@@ -31,6 +29,7 @@ export const Game: React.FC<{
       "vs"
     ) as PlayerType | null;
     const depth = new URLSearchParams(location.search).get("depth");
+    const time = new URLSearchParams(location.search).get("time");
     if (type === LOBBY_TYPE.ONLINE) {
       if (!lobby) {
         setMessage({
@@ -42,13 +41,19 @@ export const Game: React.FC<{
       }
     } else {
       if (!lobby) {
-        const newLobby = createLobby({ type: LOBBY_TYPE.LOCAL, vs, depth });
+        const newLobby = createLobby({
+          type: LOBBY_TYPE.LOCAL,
+          vs,
+          depth,
+          time,
+        });
         setLobby(newLobby);
         const searchParams = new URLSearchParams(location.search);
-        if (newLobby.players[1].type === "Computer") {
+        if (newLobby.players[1].type === "computer") {
           searchParams.set("vs", vs || newLobby.players[1].type);
           searchParams.set("type", newLobby.mode);
           searchParams.set("depth", String(newLobby.players[1].depth));
+          searchParams.set("time", String(newLobby.time));
         }
         navigate(`${location.pathname}?${searchParams.toString()}`);
       }
@@ -56,23 +61,8 @@ export const Game: React.FC<{
   }, [location]);
 
   useEffect(() => {
-    if (controller) {
-      if (controller.match.mode === LOBBY_TYPE.LOCAL) {
-        const events = createLocalEvents({ controller });
-        controller.match.subscribe(events);
-      } else {
-        const onlineEvents = createOnlineEvents({ controller });
-        controller.match.subscribe(onlineEvents);
-      }
-      const interval = setInterval(() => {
-        setInfo(controller.info());
-      }, 1000);
-
-      return () => {
-        controller.match.unsubscribe();
-        clearInterval(interval);
-      };
-    }
+    controller?.start();
+    return () => controller?.cleanup();
   }, [controller]);
 
   return (
@@ -106,7 +96,7 @@ export const Game: React.FC<{
             },
           ]}
           lobby={lobby}
-          info={info}
+          controllerState={controllerState}
         />
       ) : (
         <div className="flex justify-center items-center h-full">

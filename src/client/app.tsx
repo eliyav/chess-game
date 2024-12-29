@@ -6,9 +6,12 @@ import {
   ControllerOptions,
   Lobby,
   LOBBY_TYPE,
+  TEAM,
 } from "../shared/match";
 import { APP_ROUTES } from "../shared/routes";
+import LoadingScreen from "./components/loading-screen";
 import { Message, MessageModal } from "./components/modals/message-modal";
+import { BaseMatch } from "./match-logic/base-match";
 import { Controller } from "./match-logic/controller";
 import { LocalMatch } from "./match-logic/local-match";
 import { OnlineMatch } from "./match-logic/online-match";
@@ -20,7 +23,6 @@ import { OfflineLobby } from "./routes/offline-lobby";
 import { OnlineLobby } from "./routes/online-lobby";
 import { type SceneManager } from "./scenes/scene-manager";
 import { websocket } from "./websocket-client";
-import LoadingScreen from "./components/loading-screen";
 
 const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   const navigate = useNavigate();
@@ -29,6 +31,9 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   const [message, setMessage] = useState<Message | null>(null);
   const [options, setOptions] = useState(buildDefaultOptions());
   const [loading, setLoading] = useState(false);
+  const [controllerState, setControllerState] = useState<ReturnType<
+    BaseMatch["state"]
+  > | null>(null);
 
   const updateOptions = useCallback(
     <KEY extends keyof ControllerOptions>(
@@ -46,10 +51,17 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   const match = useMemo(() => {
     if (!lobby) return undefined;
     return lobby.mode === LOBBY_TYPE.LOCAL
-      ? new LocalMatch({ lobby, player: lobby.players[0] })
+      ? new LocalMatch({
+          lobby,
+          player: lobby.players[0],
+          onTimeUpdate,
+          onTimeEnd,
+        })
       : new OnlineMatch({
           lobby,
           player: lobby.players.find((player) => player.id === websocket.id)!,
+          onTimeUpdate,
+          onTimeEnd,
         });
   }, [lobby]);
 
@@ -61,10 +73,28 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
       events: {
         setMessage: (message: Message | null) => setMessage(message),
         navigate: (route: APP_ROUTES) => navigate(route),
+        updateState: (state) => setControllerState(state),
       },
       options,
     });
   }, [match, sceneManager, navigate]);
+
+  function onTimeUpdate() {
+    const state = match?.state();
+    if (!state) return;
+    setControllerState(state);
+  }
+
+  function onTimeEnd() {
+    match?.endMatch("time");
+    const player = match?.getCurrentTeam();
+    setMessage({
+      text: `${player} ran out of time!`,
+      onConfirm: () => {
+        setMessage(null);
+      },
+    });
+  }
 
   useEffect(() => {
     sceneManager.switchScene(location.pathname as APP_ROUTES);
@@ -170,6 +200,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
               setLobby={setLobby}
               controller={controller}
               setMessage={setMessage}
+              controllerState={controllerState}
             />
           }
         />

@@ -10,11 +10,21 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
   worker: Worker | undefined;
   events: LocalEvents[] | undefined;
 
-  constructor({ lobby, player }: { lobby: Lobby; player: Player }) {
-    super({ lobby, player });
+  constructor({
+    lobby,
+    player,
+    onTimeEnd,
+    onTimeUpdate,
+  }: {
+    lobby: Lobby;
+    player: Player;
+    onTimeUpdate: (timers: { [key in TEAM]: number }) => void;
+    onTimeEnd: (player: TEAM) => void;
+  }) {
+    super({ lobby, player, onTimeUpdate, onTimeEnd });
     this.mode = LOBBY_TYPE.LOCAL;
     const isComputer = lobby.players.find(
-      (player) => player.type === "Computer"
+      (player) => player.type === "computer"
     );
     this.vsComputer = !!isComputer
       ? {
@@ -32,6 +42,7 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
       from: from,
       to: to,
     });
+    this.timer?.switchPlayer();
     return {
       turn,
       callback: () => {

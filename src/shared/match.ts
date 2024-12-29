@@ -1,8 +1,8 @@
 import { POSSIBLE_DEPTHS } from "../client/game-logic/bot-opponent";
 
 export enum LOBBY_TYPE {
-  LOCAL = "Local",
-  ONLINE = "Online",
+  LOCAL = "local",
+  ONLINE = "online",
 }
 
 export interface Lobby {
@@ -10,6 +10,7 @@ export interface Lobby {
   key: string;
   players: Player[];
   matchStarted: boolean;
+  time: number;
 }
 
 export interface RoomDetails {
@@ -22,19 +23,19 @@ export enum TEAM {
   BLACK = "Black",
 }
 
-export type PlayerType = "Human" | "Computer";
+export type PlayerType = "human" | "computer";
 
 export type Player =
   | {
       id: string;
-      type: "Human";
+      type: "human";
       name: string;
       ready: boolean;
       team: TEAM;
     }
   | {
       id: string;
-      type: "Computer";
+      type: "computer";
       name: string;
       ready: boolean;
       depth: number;
@@ -75,32 +76,34 @@ export function createLobby(preset: {
   vs?: PlayerType | null;
   depth?: string | null;
   key?: string | null;
+  time?: string | null;
 }): Lobby {
   if (preset.type === LOBBY_TYPE.LOCAL) {
     return {
       mode: preset.type,
       key: preset.key ?? "",
+      time: preset.time ? Number(preset.time) : 10,
       players: [
         {
           name: "Player 1",
           ready: false,
           id: "1",
-          type: "Human",
+          type: "human",
           team: TEAM.WHITE,
         },
-        preset?.vs === "Human"
+        preset?.vs === "human"
           ? {
               name: "Player 2",
               ready: false,
               id: "2",
-              type: "Human",
+              type: "human",
               team: TEAM.BLACK,
             }
           : {
               name: "BOT",
               ready: false,
               id: "2",
-              type: "Computer",
+              type: "computer",
               team: TEAM.BLACK,
               depth: POSSIBLE_DEPTHS.some((num) =>
                 num === Number(preset.depth) ? true : false
@@ -115,17 +118,18 @@ export function createLobby(preset: {
     return {
       mode: preset.type,
       key: preset.key ?? "",
+      time: preset.time ? Number(preset.time) : 10,
       players: [
         {
           id: "",
-          type: "Human",
+          type: "human",
           name: "Player 1",
           ready: false,
           team: TEAM.WHITE,
         },
         {
           id: "",
-          type: "Human",
+          type: "human",
           name: "Player 2",
           ready: false,
           team: TEAM.BLACK,

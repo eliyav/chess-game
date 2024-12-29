@@ -25,7 +25,7 @@ app.use(express.text());
 app.get(RESOURCES.CREATE_LOBBY, (req, res) => {
   const lobby = createLobby({
     type: LOBBY_TYPE.ONLINE,
-    vs: "Human",
+    vs: "human",
     key: generateKey(),
   });
   lobbies.set(lobby.key, lobby);

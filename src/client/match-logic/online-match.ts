@@ -1,5 +1,5 @@
 import { Point } from "../../shared/game";
-import { Lobby, LOBBY_TYPE, Player } from "../../shared/match";
+import { Lobby, LOBBY_TYPE, Player, TEAM } from "../../shared/match";
 import { websocket } from "../websocket-client";
 import { BaseMatch, MatchLogic } from "./base-match";
 import { OnlineEvents } from "./events";
@@ -8,8 +8,18 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
   mode: LOBBY_TYPE.ONLINE;
   events: OnlineEvents[] | undefined;
 
-  constructor({ lobby, player }: { lobby: Lobby; player: Player }) {
-    super({ lobby, player });
+  constructor({
+    lobby,
+    player,
+    onTimeEnd,
+    onTimeUpdate,
+  }: {
+    lobby: Lobby;
+    player: Player;
+    onTimeUpdate: (timers: { [key in TEAM]: number }) => void;
+    onTimeEnd: (player: TEAM) => void;
+  }) {
+    super({ lobby, player, onTimeEnd, onTimeUpdate });
     this.mode = LOBBY_TYPE.ONLINE;
   }
 

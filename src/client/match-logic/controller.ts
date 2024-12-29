@@ -17,8 +17,10 @@ import {
 } from "../scenes/scene-helpers";
 import { GameScene, SceneManager, Scenes } from "../scenes/scene-manager";
 import { websocket } from "../websocket-client";
+import { BaseMatch } from "./base-match";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
+import { createLocalEvents, createOnlineEvents } from "./events";
 
 export class Controller {
   sceneManager: SceneManager;
@@ -26,6 +28,7 @@ export class Controller {
   events: {
     setMessage: (message: Message | null) => void;
     navigate: (route: APP_ROUTES) => void;
+    updateState: (state: ReturnType<BaseMatch["state"]>) => void;
   };
   selectedPoint?: Point;
   options: ControllerOptions;
@@ -41,6 +44,7 @@ export class Controller {
     events: {
       setMessage: (message: Message | null) => void;
       navigate: (route: APP_ROUTES) => void;
+      updateState: (state: ReturnType<BaseMatch["state"]>) => void;
     };
     options: ControllerOptions;
   }) {
@@ -48,22 +52,30 @@ export class Controller {
     this.match = match;
     this.events = events;
     this.options = options;
-    this.init();
-  }
-
-  init() {
-    const gameScene = this.sceneManager.getScene(Scenes.GAME);
-    this.subscribeGameInput(gameScene);
-    this.updateMeshesRender();
+    this.enableGameInput(this.sceneManager.getScene(Scenes.GAME));
+    this.render();
     this.resetCamera();
+    this.events.updateState(this.match.state());
   }
 
-  subscribeGameInput(gameScene: GameScene) {
+  start() {
+    this.subscribe();
+    this.match.start();
+  }
+
+  cleanup() {
+    this.match.cleanup();
+    this.match.unsubscribe();
+  }
+
+  enableGameInput(gameScene: GameScene) {
     gameScene.scene.onPointerUp = async (
       e: IPointerEvent,
       pickResult: Nullable<PickingInfo>
     ) => {
-      if (!this.match.isPlayersTurn()) return;
+      const gameInProgress =
+        this.match.getGame().getState().status === GAMESTATUS.INPROGRESS;
+      if (!this.match.isPlayersTurn() || !gameInProgress) return;
       const pickedMesh = pickResult?.pickedMesh;
       if (!pickedMesh) return;
       const point = getPointFromPosition({
@@ -80,7 +92,7 @@ export class Controller {
         //If you select the same piece as before deselect it
         if (doPointsMatch(this.selectedPoint, point)) {
           this.selectedPoint = undefined;
-          this.updateMeshesRender();
+          this.render();
           return;
         } else {
           //If you select a different piece check if its a valid move and resolve or display new moves
@@ -109,7 +121,7 @@ export class Controller {
     if (emit) {
       callback();
     }
-
+    this.events.updateState(this.match.state());
     return turn;
   }
 
@@ -132,12 +144,12 @@ export class Controller {
 
   prepNextView() {
     this.selectedPoint = undefined;
-    this.updateMeshesRender();
+    this.render();
     //Show previous turn
     this.displayLastTurn();
     const isGameOver = this.match.isGameOver();
     if (isGameOver) {
-      const status = this.match.getGame().getGameState().status;
+      const status = this.match.getGame().getState().status;
       this.events.setMessage(this.createMatchEndPrompt(status));
     } else {
       this.rotateCamera();
@@ -180,7 +192,7 @@ export class Controller {
       gameScene.data.audio.select?.play();
     }
     const moves = this.match.getMoves(point);
-    this.updateMeshesRender();
+    this.render();
     showMoves({
       point,
       moves,
@@ -197,6 +209,8 @@ export class Controller {
           return `Checkmate! ${winningTeam} team has won, would you like to play another game?`;
         case GAMESTATUS.STALEMATE:
           return "Game has ended in a stalemate, would you like to play another game?";
+        case GAMESTATUS.TIMER:
+          return `Time has run out! ${winningTeam} team has won, would you like to play another game?`;
         default:
           return "Game Over! Would you like to play another game";
       }
@@ -229,17 +243,13 @@ export class Controller {
 
   requestMatchReset() {
     if (this.match.resetRequest()) {
-      this.resetMatchAndView();
+      this.match.reset();
+      this.resetView();
     }
   }
 
-  resetMatchAndView() {
-    this.match.reset();
-    this.resetView();
-  }
-
   resetView() {
-    this.updateMeshesRender();
+    this.render();
     if (this.match.lobby.mode === LOBBY_TYPE.LOCAL) {
       this.rotateCamera();
     } else {
@@ -267,7 +277,7 @@ export class Controller {
     });
   }
 
-  updateMeshesRender() {
+  render() {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     //Clears old meshes/memory usage
     if (gameScene.data.meshesToRender.length) {
@@ -327,7 +337,7 @@ export class Controller {
     this.events.navigate(APP_ROUTES.Home);
     if (
       this.match.mode === LOBBY_TYPE.ONLINE &&
-      this.match.getGame().getGameState().status === GAMESTATUS.INPROGRESS
+      this.match.getGame().getState().status === GAMESTATUS.INPROGRESS
     ) {
       websocket.emit("abandonMatch", { lobbyKey: key });
     }
@@ -336,7 +346,7 @@ export class Controller {
   shouldCameraRotate() {
     if (this.match.lobby.mode === LOBBY_TYPE.LOCAL) {
       if (
-        this.match.lobby.players.find((player) => player.type === "Computer")
+        this.match.lobby.players.find((player) => player.type === "computer")
       ) {
         return false;
       } else {
@@ -373,10 +383,13 @@ export class Controller {
     camera.beta = Math.PI / 4;
   }
 
-  info() {
-    return {
-      currentTeam: this.match.getCurrentTeam(),
-      time: "",
-    };
+  subscribe() {
+    if (this.match.mode === LOBBY_TYPE.LOCAL) {
+      const events = createLocalEvents({ controller: this });
+      this.match.subscribe(events);
+    } else {
+      const onlineEvents = createOnlineEvents({ controller: this });
+      this.match.subscribe(onlineEvents);
+    }
   }
 }
