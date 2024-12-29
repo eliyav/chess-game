@@ -195,7 +195,7 @@ export const OfflineLobby: React.FC<{
         </div>
       </div>
       <SelectionButton
-        customClass="row-start-5 m-10 font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80 md:w-1/2 md:justify-self-center"
+        customClass="row-start-5 m-10 font-bold text-4xl border-2 border-white italic tracking-widest hover:opacity-80 md:w-1/2 md:justify-self-center"
         text={"Start Game"}
         onClick={() => {
           if (lobby.players[1].type === "computer") {
