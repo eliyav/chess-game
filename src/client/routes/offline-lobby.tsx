@@ -134,6 +134,28 @@ export const OfflineLobby: React.FC<{
           <ControllerOptionsList
             uniqueOptions={[
               {
+                text: `Time: ${lobby.time} min`,
+                className: "inline-block p-1 w-full",
+                onChange: (e) => {
+                  const target = e.target as HTMLInputElement;
+                  const time = parseInt(target.value, 10);
+                  updateLobby("time", time);
+                },
+                render: () => (
+                  <input
+                    type="range"
+                    min="1"
+                    max="60"
+                    value={lobby.time}
+                    onChange={(e) => {
+                      const time = parseInt(e.target.value, 10);
+                      updateLobby("time", time);
+                    }}
+                    className="w-full relative"
+                  />
+                ),
+              },
+              {
                 text: `VS ${
                   lobby.players[1]
                     ? lobby.players[1].type === "computer"
