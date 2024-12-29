@@ -100,11 +100,11 @@ export const OfflineLobby: React.FC<{
               <PlayerCard player={player} hideReady={true}>
                 {player.type === "computer" ? (
                   <div className="overflow-x-scroll whitespace-nowrap mt-1 p-1 rounded bg-slate-700 text-slate-200">
-                    <span className="text-sm">Depth</span>
+                    <span className="text-sm pr-2">Depth</span>
                     {POSSIBLE_DEPTHS.map((depth) => (
                       <button
                         key={depth}
-                        className={`py-1.5 px-2 mx-1 rounded ${
+                        className={`py-1.5 px-2.5 mx-1 rounded ${
                           player.depth === depth
                             ? "bg-slate-500 border-2 border-white"
                             : "bg-slate-600 border-2 border-transparent hover:bg-slate-500"
@@ -142,7 +142,7 @@ export const OfflineLobby: React.FC<{
                   updateLobby("time", time);
                 },
                 render: () => (
-                  <div className="relative flex items-center gap-x-2 w-full bg-slate-700 p-2 rounded-lg border-2 border-slate-200 text-center text-white text-lg min-w-16 ml-2 font-bold">
+                  <div className="relative flex items-center gap-x-2 w-full bg-slate-700 p-2 rounded-lg border-2 border-slate-200 text-center text-white text-lg min-w-16 font-bold">
                     <div className="w-1/3">
                       <span className="text-4xl truncate">
                         {lobby.time === 0 ? "∞" : lobby.time}

@@ -30,7 +30,7 @@ export const ControllerOptionsList: React.FC<ControllerOptionsProps> = ({
                 render()
               ) : (
                 <button
-                  className={`select-none relative h-16 align-top w-full font-bold bg-slate-200 p-2 rounded-lg border-2 border-black enabled:hover:opacity-90 ${
+                  className={`select-none relative h-16 align-top w-full font-bold bg-slate-700 border-slate-200 text-white p-2 rounded-lg border-2 enabled:hover:opacity-90 ${
                     disabled ? "opacity-50" : ""
                   }`}
                   onClick={onChange}
