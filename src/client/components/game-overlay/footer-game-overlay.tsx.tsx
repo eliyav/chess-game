@@ -27,10 +27,8 @@ export const FooterGameOverlay: React.FC<{
               {player.name}
             </p>
             <div
-              className={`flex items-center justify-center mt-2 transition-all duration-1000 ease-in-out ${
-                controllerState?.timers?.[player.team].formatted
-                  ? "h-10"
-                  : "h-0 opacity-0"
+              className={`flex items-center overflow-hidden justify-center mt-2 h-0 transition-all duration-1000 ease-in-out ${
+                controllerState ? "h-10" : ""
               }`}
             >
               <ClockIcon
