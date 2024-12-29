@@ -4,8 +4,6 @@ import { LOBBY_TYPE, Lobby, PlayerType, createLobby } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
 import { GameOverlay } from "../components/game-overlay/game-overlay";
 import { Message } from "../components/modals/message-modal";
-import { Controller } from "../match-logic/controller";
-import { createLocalEvents, createOnlineEvents } from "../match-logic/events";
 import {
   CameraIcon,
   HomeIcon,
@@ -13,6 +11,7 @@ import {
   UndoIcon,
 } from "../components/svg/game-overlay-icons";
 import { BaseMatch } from "../match-logic/base-match";
+import { Controller } from "../match-logic/controller";
 
 export const Game: React.FC<{
   lobby: Lobby | undefined;
@@ -30,6 +29,7 @@ export const Game: React.FC<{
       "vs"
     ) as PlayerType | null;
     const depth = new URLSearchParams(location.search).get("depth");
+    const time = new URLSearchParams(location.search).get("time");
     if (type === LOBBY_TYPE.ONLINE) {
       if (!lobby) {
         setMessage({
@@ -41,13 +41,19 @@ export const Game: React.FC<{
       }
     } else {
       if (!lobby) {
-        const newLobby = createLobby({ type: LOBBY_TYPE.LOCAL, vs, depth });
+        const newLobby = createLobby({
+          type: LOBBY_TYPE.LOCAL,
+          vs,
+          depth,
+          time,
+        });
         setLobby(newLobby);
         const searchParams = new URLSearchParams(location.search);
-        if (newLobby.players[1].type === "Computer") {
+        if (newLobby.players[1].type === "computer") {
           searchParams.set("vs", vs || newLobby.players[1].type);
           searchParams.set("type", newLobby.mode);
           searchParams.set("depth", String(newLobby.players[1].depth));
+          searchParams.set("time", String(newLobby.time));
         }
         navigate(`${location.pathname}?${searchParams.toString()}`);
       }

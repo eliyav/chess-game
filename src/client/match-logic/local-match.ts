@@ -24,7 +24,7 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
     super({ lobby, player, onTimeUpdate, onTimeEnd });
     this.mode = LOBBY_TYPE.LOCAL;
     const isComputer = lobby.players.find(
-      (player) => player.type === "Computer"
+      (player) => player.type === "computer"
     );
     this.vsComputer = !!isComputer
       ? {

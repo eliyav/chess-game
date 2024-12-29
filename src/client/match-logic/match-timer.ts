@@ -20,7 +20,7 @@ export class MatchTimer {
     onTimeUpdate: (timers: { [key in TEAM]: number }) => void;
     onTimeEnd: (player: TEAM) => void;
   }) {
-    this.time = time;
+    this.time = time * 60;
     this.timers = { White: this.time, Black: this.time };
     this.currentPlayer = initialPlayer;
     this.onTimeUpdate = onTimeUpdate;

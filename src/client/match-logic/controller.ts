@@ -346,7 +346,7 @@ export class Controller {
   shouldCameraRotate() {
     if (this.match.lobby.mode === LOBBY_TYPE.LOCAL) {
       if (
-        this.match.lobby.players.find((player) => player.type === "Computer")
+        this.match.lobby.players.find((player) => player.type === "computer")
       ) {
         return false;
       } else {

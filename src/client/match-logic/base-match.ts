@@ -12,7 +12,6 @@ export interface MatchLogic {
   undoTurnRequest(): boolean;
 }
 
-const TIMEPLACEHOLDER = 5;
 export class BaseMatch {
   private game: Game;
   lobby: Lobby;
@@ -34,7 +33,7 @@ export class BaseMatch {
     this.lobby = lobby;
     this.player = player;
     this.timer = new MatchTimer({
-      time: TIMEPLACEHOLDER,
+      time: lobby.time,
       initialPlayer: TEAM.WHITE,
       onTimeUpdate,
       onTimeEnd,
@@ -72,7 +71,7 @@ export class BaseMatch {
     const currentPlayer = this.lobby.players.find(
       (player) => player.team === currentTeam
     );
-    if (currentPlayer?.type === "Computer") return false;
+    if (currentPlayer?.type === "computer") return false;
     if (this.lobby.mode === LOBBY_TYPE.ONLINE) {
       return currentPlayer?.team === this.player.team;
     } else {
