@@ -10,8 +10,18 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
   worker: Worker | undefined;
   events: LocalEvents[] | undefined;
 
-  constructor({ lobby, player }: { lobby: Lobby; player: Player }) {
-    super({ lobby, player });
+  constructor({
+    lobby,
+    player,
+    onTimeEnd,
+    onTimeUpdate,
+  }: {
+    lobby: Lobby;
+    player: Player;
+    onTimeUpdate: (timers: { [key in TEAM]: number }) => void;
+    onTimeEnd: (player: TEAM) => void;
+  }) {
+    super({ lobby, player, onTimeUpdate, onTimeEnd });
     this.mode = LOBBY_TYPE.LOCAL;
     const isComputer = lobby.players.find(
       (player) => player.type === "Computer"
@@ -83,6 +93,7 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
   }
 
   subscribe(events: LocalEvents[]) {
+    this.timer?.start();
     this.events = events;
     if (this.vsComputer) {
       const worker = new Worker(new URL(GAME_WORKER_URL, import.meta.url));
@@ -98,6 +109,7 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
   }
 
   unsubscribe() {
+    this.timer?.stop();
     if (!this.worker) return;
     this.worker.terminate();
   }

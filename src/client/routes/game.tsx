@@ -12,13 +12,14 @@ import {
   RestartIcon,
   UndoIcon,
 } from "../components/svg/game-overlay-icons";
+import { BaseMatch } from "../match-logic/base-match";
 
 export const Game: React.FC<{
   lobby: Lobby | undefined;
   setLobby: React.Dispatch<React.SetStateAction<Lobby | undefined>>;
   controller: Controller | undefined;
   setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
-  controllerState: ReturnType<Controller["state"]> | null;
+  controllerState: ReturnType<BaseMatch["state"]> | null;
 }> = ({ controller, controllerState, lobby, setLobby, setMessage }) => {
   const navigate = useNavigate();
   const location = useLocation();

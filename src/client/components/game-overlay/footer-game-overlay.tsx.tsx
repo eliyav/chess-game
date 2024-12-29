@@ -1,11 +1,11 @@
 import React from "react";
 import { Player, TEAM } from "../../../shared/match";
-import { Controller } from "../../match-logic/controller";
+import { BaseMatch } from "../../match-logic/base-match";
 import { ClockIcon } from "../svg/clock-icon";
 
 export const FooterGameOverlay: React.FC<{
   players: Player[];
-  controllerState: ReturnType<Controller["state"]> | null;
+  controllerState: ReturnType<BaseMatch["state"]> | null;
 }> = ({ players, controllerState }) => {
   return (
     <div className="h-full p-2 text-white rounded-t-lg max-w-[600px] m-auto gap-x-4">
@@ -28,7 +28,9 @@ export const FooterGameOverlay: React.FC<{
             </p>
             <div
               className={`flex items-center justify-center mt-2 transition-all duration-1000 ease-in-out ${
-                controllerState?.time ? "h-10" : "h-0 opacity-0"
+                controllerState?.timers?.[player.team].formatted
+                  ? "h-10"
+                  : "h-0 opacity-0"
               }`}
             >
               <ClockIcon
@@ -39,7 +41,9 @@ export const FooterGameOverlay: React.FC<{
                 }`}
               />
               <div className="flex items-center space-x-1 text-lg">
-                <span className="font-mono">{controllerState?.time}</span>
+                <span className="font-mono">
+                  {controllerState?.timers?.[player.team].formatted}
+                </span>
               </div>
             </div>
           </div>

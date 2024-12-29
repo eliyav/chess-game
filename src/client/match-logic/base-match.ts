@@ -1,6 +1,8 @@
+import { on } from "node:events";
 import { GAMESTATUS, Point, Turn } from "../../shared/game";
 import { Lobby, LOBBY_TYPE, Player, TEAM } from "../../shared/match";
 import Game from "../game-logic/game";
+import { MatchTimer } from "./match-timer";
 
 export interface MatchLogic {
   isPlayersTurn(): boolean;
@@ -10,15 +12,38 @@ export interface MatchLogic {
   undoTurnRequest(): boolean;
 }
 
+const TIMEPLACEHOLDER = 5;
 export class BaseMatch {
   private game: Game;
   lobby: Lobby;
   player: Player;
+  timer: MatchTimer | undefined;
 
-  constructor({ lobby, player }: { lobby: Lobby; player: Player }) {
+  constructor({
+    lobby,
+    player,
+    onTimeUpdate,
+    onTimeEnd,
+  }: {
+    lobby: Lobby;
+    player: Player;
+    onTimeUpdate: (timers: { [key in TEAM]: number }) => void;
+    onTimeEnd: (player: TEAM) => void;
+  }) {
     this.game = new Game();
     this.lobby = lobby;
     this.player = player;
+    this.timer = new MatchTimer({
+      time: TIMEPLACEHOLDER,
+      initialPlayer: TEAM.WHITE,
+      onTimeUpdate,
+      onTimeEnd,
+    });
+  }
+
+  start() {
+    this.game.current.status = GAMESTATUS.INPROGRESS;
+    this.timer?.start();
   }
 
   move({ from, to }: { from: Point; to: Point }): {
@@ -63,6 +88,7 @@ export class BaseMatch {
 
   reset() {
     this.game.resetGame();
+    if (this.timer) this.timer.reset();
   }
 
   saveGame() {
@@ -78,7 +104,7 @@ export class BaseMatch {
   }
 
   isGameOver() {
-    return this.game.getGameState().status !== GAMESTATUS.INPROGRESS;
+    return this.game.getState().status !== GAMESTATUS.INPROGRESS;
   }
 
   getWinner() {
@@ -99,5 +125,23 @@ export class BaseMatch {
 
   lookupGamePiece(point: Point) {
     return this.game.lookupPiece({ point });
+  }
+
+  endMatch(reason: "time" | "checkmate" | "resign") {
+    if (this.timer) this.timer.stop();
+    if (reason === "time") {
+      this.game.current.status = GAMESTATUS.TIMER;
+    } else if (reason === "checkmate") {
+      this.game.current.status = GAMESTATUS.CHECKMATE;
+    } else if (reason === "resign") {
+      this.game.current.status = GAMESTATUS.CHECKMATE;
+    }
+  }
+
+  state() {
+    return {
+      currentTeam: this.getCurrentTeam(),
+      timers: this.timer?.getTimers(),
+    };
   }
 }

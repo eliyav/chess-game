@@ -1,12 +1,12 @@
 import React, { ReactNode } from "react";
 import { Lobby } from "../../../shared/match";
-import HeaderGameOverlay from "./header-game-overlay";
+import { BaseMatch } from "../../match-logic/base-match";
 import { FooterGameOverlay } from "./footer-game-overlay.tsx";
-import { Controller } from "../../match-logic/controller";
+import HeaderGameOverlay from "./header-game-overlay";
 
 export const GameOverlay: React.FC<{
   lobby: Lobby;
-  controllerState: ReturnType<Controller["state"]> | null;
+  controllerState: ReturnType<BaseMatch["state"]> | null;
   headerItems: Array<{
     text: string;
     onClick: () => void;

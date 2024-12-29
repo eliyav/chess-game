@@ -25,7 +25,7 @@ class Game {
       grid: Board.createGrid(),
       annotations: [],
       turns: [],
-      status: GAMESTATUS.INPROGRESS,
+      status: GAMESTATUS.LOBBY,
     };
   }
 
@@ -41,7 +41,7 @@ class Game {
     return this.teams[index];
   }
 
-  public getGameState() {
+  public getState() {
     return this.current;
   }
 
