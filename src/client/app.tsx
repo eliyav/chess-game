@@ -29,6 +29,9 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   const [message, setMessage] = useState<Message | null>(null);
   const [options, setOptions] = useState(buildDefaultOptions());
   const [loading, setLoading] = useState(false);
+  const [controllerState, setControllerState] = useState<ReturnType<
+    Controller["state"]
+  > | null>(null);
 
   const updateOptions = useCallback(
     <KEY extends keyof ControllerOptions>(
@@ -61,6 +64,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
       events: {
         setMessage: (message: Message | null) => setMessage(message),
         navigate: (route: APP_ROUTES) => navigate(route),
+        updateState: (state) => setControllerState(state),
       },
       options,
     });
@@ -170,6 +174,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
               setLobby={setLobby}
               controller={controller}
               setMessage={setMessage}
+              controllerState={controllerState}
             />
           }
         />

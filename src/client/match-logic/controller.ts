@@ -26,6 +26,7 @@ export class Controller {
   events: {
     setMessage: (message: Message | null) => void;
     navigate: (route: APP_ROUTES) => void;
+    updateState: (state: ReturnType<Controller["state"]>) => void;
   };
   selectedPoint?: Point;
   options: ControllerOptions;
@@ -41,6 +42,7 @@ export class Controller {
     events: {
       setMessage: (message: Message | null) => void;
       navigate: (route: APP_ROUTES) => void;
+      updateState: (state: ReturnType<Controller["state"]>) => void;
     };
     options: ControllerOptions;
   }) {
@@ -56,6 +58,7 @@ export class Controller {
     this.subscribeGameInput(gameScene);
     this.updateMeshesRender();
     this.resetCamera();
+    this.events.updateState(this.state());
   }
 
   subscribeGameInput(gameScene: GameScene) {
@@ -109,7 +112,7 @@ export class Controller {
     if (emit) {
       callback();
     }
-
+    this.events.updateState(this.state());
     return turn;
   }
 
@@ -373,7 +376,7 @@ export class Controller {
     camera.beta = Math.PI / 4;
   }
 
-  info() {
+  state() {
     return {
       currentTeam: this.match.getCurrentTeam(),
       time: "",

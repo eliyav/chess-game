@@ -18,12 +18,10 @@ export const Game: React.FC<{
   setLobby: React.Dispatch<React.SetStateAction<Lobby | undefined>>;
   controller: Controller | undefined;
   setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
-}> = ({ controller, lobby, setLobby, setMessage }) => {
+  controllerState: ReturnType<Controller["state"]> | null;
+}> = ({ controller, controllerState, lobby, setLobby, setMessage }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [info, setInfo] = React.useState<ReturnType<Controller["info"]> | null>(
-    null
-  );
 
   useEffect(() => {
     const type = new URLSearchParams(location.search).get("type");
@@ -64,13 +62,9 @@ export const Game: React.FC<{
         const onlineEvents = createOnlineEvents({ controller });
         controller.match.subscribe(onlineEvents);
       }
-      const interval = setInterval(() => {
-        setInfo(controller.info());
-      }, 1000);
 
       return () => {
         controller.match.unsubscribe();
-        clearInterval(interval);
       };
     }
   }, [controller]);
@@ -106,7 +100,7 @@ export const Game: React.FC<{
             },
           ]}
           lobby={lobby}
-          info={info}
+          controllerState={controllerState}
         />
       ) : (
         <div className="flex justify-center items-center h-full">

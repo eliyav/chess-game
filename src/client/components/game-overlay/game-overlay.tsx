@@ -6,13 +6,13 @@ import { Controller } from "../../match-logic/controller";
 
 export const GameOverlay: React.FC<{
   lobby: Lobby;
-  info: ReturnType<Controller["info"]> | null;
+  controllerState: ReturnType<Controller["state"]> | null;
   headerItems: Array<{
     text: string;
     onClick: () => void;
     children: ReactNode;
   }>;
-}> = ({ headerItems, lobby, info }) => {
+}> = ({ headerItems, lobby, controllerState }) => {
   return (
     <div>
       <div className="z-10 absolute select-none top-0 w-full bg-transparent text-center">
@@ -23,7 +23,10 @@ export const GameOverlay: React.FC<{
         </div>
       </div>
       <div className="z-10 absolute bottom-0 w-full bg-transparent text-center ">
-        <FooterGameOverlay players={lobby.players} info={info} />
+        <FooterGameOverlay
+          players={lobby.players}
+          controllerState={controllerState}
+        />
       </div>
     </div>
   );
