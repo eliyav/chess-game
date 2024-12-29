@@ -32,12 +32,14 @@ export class BaseMatch {
     this.game = new Game();
     this.lobby = lobby;
     this.player = player;
-    this.timer = new MatchTimer({
-      time: lobby.time,
-      initialPlayer: TEAM.WHITE,
-      onTimeUpdate,
-      onTimeEnd,
-    });
+    if (lobby.time) {
+      this.timer = new MatchTimer({
+        time: lobby.time,
+        initialPlayer: TEAM.WHITE,
+        onTimeUpdate,
+        onTimeEnd,
+      });
+    }
   }
 
   start() {

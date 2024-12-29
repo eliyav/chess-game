@@ -134,7 +134,7 @@ export const OfflineLobby: React.FC<{
           <ControllerOptionsList
             uniqueOptions={[
               {
-                text: `Time: ${lobby.time} min`,
+                text: `Time: ${lobby.time === 0 ? "∞" : lobby.time} min`,
                 className: "inline-block p-1 w-full",
                 onChange: (e) => {
                   const target = e.target as HTMLInputElement;
@@ -142,17 +142,26 @@ export const OfflineLobby: React.FC<{
                   updateLobby("time", time);
                 },
                 render: () => (
-                  <input
-                    type="range"
-                    min="1"
-                    max="60"
-                    value={lobby.time}
-                    onChange={(e) => {
-                      const time = parseInt(e.target.value, 10);
-                      updateLobby("time", time);
-                    }}
-                    className="w-full relative"
-                  />
+                  <div className="relative flex items-center gap-x-2 w-full bg-slate-700 p-2 rounded-lg border-2 border-slate-200 text-center text-white text-lg min-w-16 ml-2 font-bold">
+                    <div className="w-1/3">
+                      <span className="text-4xl truncate">
+                        {lobby.time === 0 ? "∞" : lobby.time}
+                      </span>
+                    </div>
+                    <span>min</span>
+                    <input
+                      type="range"
+                      min="0"
+                      max="60"
+                      step="5"
+                      value={lobby.time}
+                      onChange={(e) => {
+                        const time = parseInt(e.target.value, 10);
+                        updateLobby("time", time);
+                      }}
+                      className="slider inline-block bg-slate-200"
+                    />
+                  </div>
                 ),
               },
               {
