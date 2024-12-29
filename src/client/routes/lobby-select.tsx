@@ -33,7 +33,7 @@ export const LobbySelect: React.FC<{
       <div className="row-span-4 flex flex-col gap-2 p-2 align-center md:w-3/4 md:justify-self-center">
         <SelectionButton
           customClass="m-10 p-4 font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80"
-          text={LOBBY_TYPE.LOCAL}
+          text={"Local"}
           onClick={() => {
             navigate(`${APP_ROUTES.OfflineLobby}?vs=computer&depth=3&time=10`);
           }}
@@ -41,7 +41,7 @@ export const LobbySelect: React.FC<{
         <Divider className="w-full z-10" />
         <SelectionButton
           customClass="m-10 p-4 font-bold text-2xl border-2 h-16 border-white italic tracking-widest hover:opacity-80"
-          text={`Create ${LOBBY_TYPE.ONLINE}`}
+          text={"Create Online"}
           onClick={async () => {
             try {
               setLoading(true);
@@ -83,7 +83,7 @@ export const LobbySelect: React.FC<{
               "w-full p-4 font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80"
             }
             disabled={lobbyKey.length !== 5}
-            text={`Join ${LOBBY_TYPE.ONLINE}`}
+            text={"Join Online"}
             onClick={async () => {
               try {
                 setLoading(true);
