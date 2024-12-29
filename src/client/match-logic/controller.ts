@@ -52,20 +52,20 @@ export class Controller {
     this.match = match;
     this.events = events;
     this.options = options;
-    this.init();
-  }
-
-  init() {
-    const gameScene = this.sceneManager.getScene(Scenes.GAME);
-    this.enableGameInput(gameScene);
+    this.enableGameInput(this.sceneManager.getScene(Scenes.GAME));
     this.render();
     this.resetCamera();
     this.events.updateState(this.match.state());
-    this.subscribe();
   }
 
   start() {
+    this.subscribe();
     this.match.start();
+  }
+
+  cleanup() {
+    this.match.cleanup();
+    this.match.unsubscribe();
   }
 
   enableGameInput(gameScene: GameScene) {
@@ -243,13 +243,9 @@ export class Controller {
 
   requestMatchReset() {
     if (this.match.resetRequest()) {
-      this.resetMatchAndView();
+      this.match.reset();
+      this.resetView();
     }
-  }
-
-  resetMatchAndView() {
-    this.match.reset();
-    this.resetView();
   }
 
   resetView() {

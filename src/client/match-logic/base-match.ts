@@ -91,6 +91,10 @@ export class BaseMatch {
     if (this.timer) this.timer.reset();
   }
 
+  cleanup() {
+    if (this.timer) this.timer.stop();
+  }
+
   saveGame() {
     //Save game state to database
   }

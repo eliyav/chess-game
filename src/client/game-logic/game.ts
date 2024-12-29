@@ -20,12 +20,12 @@ class Game {
     this.current = this.createGame();
   }
 
-  private createGame() {
+  private createGame(status: GAMESTATUS = GAMESTATUS.LOBBY) {
     return {
       grid: Board.createGrid(),
       annotations: [],
       turns: [],
-      status: GAMESTATUS.LOBBY,
+      status,
     };
   }
 
@@ -464,7 +464,7 @@ class Game {
   }
 
   public resetGame() {
-    this.current = this.createGame();
+    this.current = this.createGame(GAMESTATUS.INPROGRESS);
   }
 
   public getHistory() {

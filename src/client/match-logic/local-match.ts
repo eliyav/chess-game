@@ -42,6 +42,7 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
       from: from,
       to: to,
     });
+    this.timer?.switchPlayer();
     return {
       turn,
       callback: () => {
