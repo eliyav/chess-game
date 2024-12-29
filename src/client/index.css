@@ -60,6 +60,7 @@
   transition: opacity 0.2s;
   color: black;
   border: none;
+  border-radius: 10px;
 }
 
 .slider:hover {
@@ -69,21 +70,21 @@
 .slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 40px;
-  height: 40px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   background: url("~../../../../assets/icons/clock.svg") no-repeat center;
   background-size: cover;
   cursor: pointer;
-  background-color: red;
+  border: none;
 }
 
 .slider::-moz-range-thumb {
-  width: 40px;
-  height: 40px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   background: url("~../../../../assets/icons/clock.svg") no-repeat center;
   background-size: cover;
-  background-color: rgba(185, 14, 31, 0.6);
   cursor: pointer;
+  border: none;
 }

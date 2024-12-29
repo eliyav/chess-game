@@ -28,7 +28,7 @@ export class Controller {
   events: {
     setMessage: (message: Message | null) => void;
     navigate: (route: APP_ROUTES) => void;
-    updateState: (state: ReturnType<BaseMatch["state"]>) => void;
+    updateState: (state: ReturnType<BaseMatch["state"]> | null) => void;
   };
   selectedPoint?: Point;
   options: ControllerOptions;
@@ -44,7 +44,7 @@ export class Controller {
     events: {
       setMessage: (message: Message | null) => void;
       navigate: (route: APP_ROUTES) => void;
-      updateState: (state: ReturnType<BaseMatch["state"]>) => void;
+      updateState: (state: ReturnType<BaseMatch["state"]> | null) => void;
     };
     options: ControllerOptions;
   }) {
@@ -55,17 +55,18 @@ export class Controller {
     this.enableGameInput(this.sceneManager.getScene(Scenes.GAME));
     this.render();
     this.resetCamera();
-    this.events.updateState(this.match.state());
   }
 
   start() {
     this.subscribe();
+    this.events.updateState(this.match.state());
     this.match.start();
   }
 
   cleanup() {
     this.match.cleanup();
     this.match.unsubscribe();
+    this.events.updateState(null);
   }
 
   enableGameInput(gameScene: GameScene) {

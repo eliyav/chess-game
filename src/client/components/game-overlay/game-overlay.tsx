@@ -22,7 +22,7 @@ export const GameOverlay: React.FC<{
           ))}
         </div>
       </div>
-      <div className="z-10 absolute bottom-0 w-full bg-transparent text-center ">
+      <div className="z-10 absolute select-none bottom-0 w-full bg-transparent text-center ">
         <FooterGameOverlay
           players={lobby.players}
           controllerState={controllerState}
