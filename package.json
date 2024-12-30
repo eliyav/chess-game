@@ -38,7 +38,7 @@
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
-    "concurrently": "^9.1.0",
+    "concurrently": "^9.1.1",
     "esbuild": "^0.24.2",
     "esbuild-plugin-tailwindcss": "^1.2.1",
     "glob": "^11.0.0",
