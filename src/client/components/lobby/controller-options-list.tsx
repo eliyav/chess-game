@@ -1,10 +1,10 @@
 import React, { JSX } from "react";
-import { ControllerOptions, getOptionText } from "../../../shared/match";
+import { getOptionText, Settings } from "../../../shared/settings";
 
 interface ControllerOptionsProps {
-  options: ControllerOptions;
+  options: Settings;
   onChange: (
-    key: keyof ControllerOptions
+    key: keyof Settings
   ) => (e: React.ChangeEvent<HTMLInputElement>) => void;
   uniqueOptions?: {
     text: string;
@@ -54,9 +54,9 @@ export const ControllerOptionsList: React.FC<ControllerOptionsProps> = ({
             type="checkbox"
             className="hidden"
             checked={value}
-            onChange={onChange(key as keyof ControllerOptions)}
+            onChange={onChange(key as keyof Settings)}
           />
-          {getOptionText(key as keyof ControllerOptions)}
+          {getOptionText(key as keyof Settings)}
           <span
             className={`absolute right-2 font-bold ${
               value ? "text-green-500" : "text-red-500"

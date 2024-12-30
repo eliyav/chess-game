@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ENV_BASE_URL } from "..";
-import { ControllerOptions, Lobby } from "../../shared/match";
+import { Lobby } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
 import { SelectionButton } from "../components/buttons/selection-button";
 import { ControllerOptionsList } from "../components/lobby/controller-options-list";
@@ -13,14 +13,15 @@ import { CopyUrl } from "../components/svg/copy-url";
 import { websocket } from "../websocket-client";
 import LoadingScreen from "../components/loading-screen";
 import { Message } from "../components/modals/message-modal";
+import { Settings } from "../../shared/settings";
 
 export const OnlineLobby: React.FC<{
   lobby: Lobby | undefined;
-  options: ControllerOptions;
+  options: Settings;
   setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
-  updateOptions: <KEY extends keyof ControllerOptions>(
+  updateOptions: <KEY extends keyof Settings>(
     key: KEY,
-    value: ControllerOptions[KEY]
+    value: Settings[KEY]
   ) => void;
 }> = ({ lobby, options, updateOptions, setMessage }) => {
   const navigate = useNavigate();

@@ -1,26 +1,21 @@
 import React, { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  ControllerOptions,
-  LOBBY_TYPE,
-  Lobby,
-  PlayerType,
-  createLobby,
-} from "../../shared/match";
+import { LOBBY_TYPE, Lobby, PlayerType, createLobby } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
 import { SelectionButton } from "../components/buttons/selection-button";
 import { ControllerOptionsList } from "../components/lobby/controller-options-list";
 import PlayerCard from "../components/lobby/player-card";
 import { BackButton } from "../components/svg/back-button";
 import { POSSIBLE_DEPTHS } from "../game-logic/bot-opponent";
+import { Settings } from "../../shared/settings";
 
 export const OfflineLobby: React.FC<{
   lobby: Lobby | undefined;
   setLobby: React.Dispatch<React.SetStateAction<Lobby | undefined>>;
-  options: ControllerOptions;
-  updateOptions: <KEY extends keyof ControllerOptions>(
+  options: Settings;
+  updateOptions: <KEY extends keyof Settings>(
     key: KEY,
-    value: ControllerOptions[KEY]
+    value: Settings[KEY]
   ) => void;
 }> = ({ setLobby, lobby, updateOptions, options }) => {
   const navigate = useNavigate();
@@ -190,7 +185,7 @@ export const OfflineLobby: React.FC<{
             ]}
             options={options}
             onChange={(key) => (e: React.ChangeEvent<HTMLInputElement>) =>
-              updateOptions(key, e.target.checked)}
+              updateOptions(key as keyof Settings, e.target.checked)}
           />
         </div>
       </div>

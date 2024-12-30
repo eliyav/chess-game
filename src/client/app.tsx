@@ -1,14 +1,9 @@
 import "@babylonjs/loaders/glTF";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import {
-  buildDefaultOptions,
-  ControllerOptions,
-  Lobby,
-  LOBBY_TYPE,
-  TEAM,
-} from "../shared/match";
+import { Lobby, LOBBY_TYPE } from "../shared/match";
 import { APP_ROUTES } from "../shared/routes";
+import { getSettings } from "../shared/settings";
 import LoadingScreen from "./components/loading-screen";
 import { Message, MessageModal } from "./components/modals/message-modal";
 import { BaseMatch } from "./match-logic/base-match";
@@ -29,23 +24,23 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   const location = useLocation();
   const [lobby, setLobby] = useState<Lobby>();
   const [message, setMessage] = useState<Message | null>(null);
-  const [options, setOptions] = useState(buildDefaultOptions());
+  const [settings, setSettings] = useState(getSettings());
   const [loading, setLoading] = useState(false);
   const [controllerState, setControllerState] = useState<ReturnType<
     BaseMatch["state"]
   > | null>(null);
 
   const updateOptions = useCallback(
-    <KEY extends keyof ControllerOptions>(
+    <KEY extends keyof typeof settings>(
       key: KEY,
-      value: ControllerOptions[KEY]
+      value: (typeof settings)[KEY]
     ) => {
-      setOptions((prev) => ({
+      setSettings((prev) => ({
         ...prev,
         [key]: value,
       }));
     },
-    [setOptions]
+    [setSettings]
   );
 
   const match = useMemo(() => {
@@ -75,7 +70,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
         navigate: (route: APP_ROUTES) => navigate(route),
         updateState: (state) => setControllerState(state),
       },
-      options,
+      settings,
     });
   }, [match, sceneManager, navigate]);
 
@@ -176,7 +171,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
             <OfflineLobby
               setLobby={setLobby}
               lobby={lobby}
-              options={options}
+              options={settings}
               updateOptions={updateOptions}
             />
           }
@@ -186,7 +181,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
           element={
             <OnlineLobby
               lobby={lobby}
-              options={options}
+              options={settings}
               updateOptions={updateOptions}
               setMessage={setMessage}
             />

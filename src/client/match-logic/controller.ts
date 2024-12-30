@@ -3,7 +3,7 @@ import { PickingInfo } from "@babylonjs/core/Collisions/pickingInfo";
 import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
 import type { Nullable } from "@babylonjs/core/types";
 import { GAMESTATUS, Point, Turn } from "../../shared/game";
-import { ControllerOptions, LOBBY_TYPE, TEAM } from "../../shared/match";
+import { LOBBY_TYPE, TEAM } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
 import { Message } from "../components/modals/message-modal";
 import { doPointsMatch } from "../game-logic/moves";
@@ -21,6 +21,7 @@ import { BaseMatch } from "./base-match";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
 import { createLocalEvents, createOnlineEvents } from "./events";
+import { Settings } from "../../shared/settings";
 
 export class Controller {
   sceneManager: SceneManager;
@@ -31,13 +32,13 @@ export class Controller {
     updateState: (state: ReturnType<BaseMatch["state"]> | null) => void;
   };
   selectedPoint?: Point;
-  options: ControllerOptions;
+  settings: Settings;
 
   constructor({
     sceneManager,
     match,
     events,
-    options,
+    settings,
   }: {
     sceneManager: SceneManager;
     match: LocalMatch | OnlineMatch;
@@ -46,12 +47,12 @@ export class Controller {
       navigate: (route: APP_ROUTES) => void;
       updateState: (state: ReturnType<BaseMatch["state"]> | null) => void;
     };
-    options: ControllerOptions;
+    settings: Settings;
   }) {
     this.sceneManager = sceneManager;
     this.match = match;
     this.events = events;
-    this.options = options;
+    this.settings = settings;
     this.enableGameInput(this.sceneManager.getScene(Scenes.GAME));
     this.render();
     this.resetCamera();
@@ -128,7 +129,7 @@ export class Controller {
 
   async handleValidTurn({ turn }: { turn: Turn }) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
-    if (this.options.playGameSounds) {
+    if (this.settings.playGameSounds) {
       const moveType = turn.type;
       if (moveType === "capture" || moveType === "enPassant") {
         gameScene.data.audio.crumble?.play();
@@ -189,7 +190,7 @@ export class Controller {
 
   displayMoves(point: Point) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
-    if (this.options.playGameSounds) {
+    if (this.settings.playGameSounds) {
       gameScene.data.audio.select?.play();
     }
     const moves = this.match.getMoves(point);
@@ -198,7 +199,7 @@ export class Controller {
       point,
       moves,
       gameScene,
-      visibleMoves: this.options.displayAvailableMoves,
+      visibleMoves: this.settings.displayAvailableMoves,
     });
   }
 
@@ -259,7 +260,7 @@ export class Controller {
   }
 
   turnAnimation({ turn, gameScene }: { turn: Turn; gameScene: GameScene }) {
-    if (!this.options.playAnimations) return;
+    if (!this.settings.playAnimations) return;
     return calcTurnAnimation({
       gameScene,
       findMeshFromPoint: this.findMeshFromPoint.bind(this),
@@ -284,7 +285,7 @@ export class Controller {
     if (gameScene.data.meshesToRender.length) {
       for (let i = 0; i < gameScene.data.meshesToRender.length; i++) {
         const mesh = gameScene.data.meshesToRender[i];
-        if (this.options.renderShadows) {
+        if (this.settings.renderShadows) {
           gameScene.data.shadowGenerator.forEach((gen) =>
             gen.removeShadowCaster(mesh)
           );
@@ -311,7 +312,7 @@ export class Controller {
       });
       clone.isVisible = true;
       clone.isPickable = false;
-      if (this.options.renderShadows) {
+      if (this.settings.renderShadows) {
         gameScene.data.shadowGenerator.forEach((gen) =>
           gen.addShadowCaster(clone)
         );
