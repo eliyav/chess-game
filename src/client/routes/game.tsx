@@ -2,7 +2,8 @@ import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LOBBY_TYPE, Lobby, PlayerType, createLobby } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
-import { GameOverlay } from "../components/game-overlay/game-overlay";
+import { FooterOverlay } from "../components/game-overlay/footer-overlay";
+import HeaderOverlay from "../components/game-overlay/header-overlay";
 import { Message } from "../components/modals/message-modal";
 import {
   CameraIcon,
@@ -14,12 +15,11 @@ import { BaseMatch } from "../match-logic/base-match";
 import { Controller } from "../match-logic/controller";
 
 export const Game: React.FC<{
-  lobby: Lobby | undefined;
   setLobby: React.Dispatch<React.SetStateAction<Lobby | undefined>>;
   controller: Controller | undefined;
   setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
   controllerState: ReturnType<BaseMatch["state"]> | null;
-}> = ({ controller, controllerState, lobby, setLobby, setMessage }) => {
+}> = ({ controller, controllerState, setLobby, setMessage }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -31,7 +31,7 @@ export const Game: React.FC<{
     const depth = new URLSearchParams(location.search).get("depth");
     const time = new URLSearchParams(location.search).get("time");
     if (type === LOBBY_TYPE.ONLINE) {
-      if (!lobby) {
+      if (!controller?.match?.lobby) {
         setMessage({
           text: "Rejoining not supported (soon)",
           onConfirm: () => setMessage(null),
@@ -40,7 +40,7 @@ export const Game: React.FC<{
         return;
       }
     } else {
-      if (!lobby) {
+      if (!controller?.match?.lobby) {
         const newLobby = createLobby({
           type: LOBBY_TYPE.LOCAL,
           vs,
@@ -65,14 +65,14 @@ export const Game: React.FC<{
     return () => controller?.cleanup();
   }, [controller]);
 
-  return (
-    <>
-      {controller && lobby ? (
-        <GameOverlay
-          headerItems={[
+  if (controller) {
+    return (
+      <div>
+        <HeaderOverlay
+          items={[
             {
               text: "home",
-              onClick: () => controller.leaveMatch({ key: lobby.key }),
+              onClick: () => controller.leaveMatch(),
               children: <HomeIcon className="w-6 h-6 bg-transparent m-auto" />,
             },
             {
@@ -95,14 +95,24 @@ export const Game: React.FC<{
               ),
             },
           ]}
-          lobby={lobby}
-          controllerState={controllerState}
+          className={
+            "z-10 absolute select-none top-0 w-full bg-transparent text-center"
+          }
         />
-      ) : (
-        <div className="flex justify-center items-center h-full">
-          <div className="animate-spin h-10 w-10 border-4 border-gray-300 border-t-transparent rounded-full"></div>
-        </div>
-      )}
-    </>
+        <FooterOverlay
+          players={controller.match.lobby.players}
+          controllerState={controllerState}
+          className={
+            "z-10 absolute select-none bottom-0 w-full bg-transparent text-center"
+          }
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex justify-center items-center h-full">
+      <div className="animate-spin h-10 w-10 border-4 border-gray-300 border-t-transparent rounded-full"></div>
+    </div>
   );
 };

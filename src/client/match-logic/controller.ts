@@ -334,13 +334,13 @@ export class Controller {
     this.events.setMessage(message);
   }
 
-  leaveMatch({ key }: { key: string }) {
+  leaveMatch() {
     this.events.navigate(APP_ROUTES.Home);
     if (
       this.match.mode === LOBBY_TYPE.ONLINE &&
       this.match.getGame().getState().status === GAMESTATUS.INPROGRESS
     ) {
-      websocket.emit("abandonMatch", { lobbyKey: key });
+      websocket.emit("abandonMatch", { lobbyKey: this.match.lobby.key });
     }
   }
 
