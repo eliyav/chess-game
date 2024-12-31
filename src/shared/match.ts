@@ -1,4 +1,5 @@
 import { POSSIBLE_DEPTHS } from "../client/game-logic/bot-opponent";
+import { generateKey } from "./helpers";
 
 export enum LOBBY_TYPE {
   LOCAL = "local",
@@ -11,6 +12,9 @@ export interface Lobby {
   players: Player[];
   matchStarted: boolean;
   time: number;
+  depth: number;
+  timers?: { [key in TEAM]: { formatted: string; raw: number } };
+  currentTeam?: TEAM;
 }
 
 export interface RoomDetails {
@@ -38,7 +42,6 @@ export type Player =
       type: "computer";
       name: string;
       ready: boolean;
-      depth: number;
       team: TEAM;
     };
 
@@ -49,11 +52,40 @@ export function createLobby(preset: {
   key?: string | null;
   time?: string | null;
 }): Lobby {
-  if (preset.type === LOBBY_TYPE.LOCAL) {
+  if (preset.type === LOBBY_TYPE.ONLINE) {
     return {
       mode: preset.type,
       key: preset.key ?? "",
       time: preset.time ? Number(preset.time) : 10,
+      depth: 0,
+      players: [
+        {
+          id: "",
+          type: "human",
+          name: "Player 1",
+          ready: false,
+          team: TEAM.WHITE,
+        },
+        {
+          id: "",
+          type: "human",
+          name: "Player 2",
+          ready: false,
+          team: TEAM.BLACK,
+        },
+      ],
+      matchStarted: false,
+    };
+  } else {
+    return {
+      mode: LOBBY_TYPE.LOCAL,
+      key: preset.key ?? generateKey(),
+      time: preset.time ? Number(preset.time) : 10,
+      depth: POSSIBLE_DEPTHS.some((num) =>
+        num === Number(preset.depth) ? true : false
+      )
+        ? Number(preset.depth)
+        : 3,
       players: [
         {
           name: "Player 1",
@@ -76,35 +108,7 @@ export function createLobby(preset: {
               id: "2",
               type: "computer",
               team: TEAM.BLACK,
-              depth: POSSIBLE_DEPTHS.some((num) =>
-                num === Number(preset.depth) ? true : false
-              )
-                ? Number(preset.depth)
-                : 3,
             },
-      ],
-      matchStarted: false,
-    };
-  } else {
-    return {
-      mode: preset.type,
-      key: preset.key ?? "",
-      time: preset.time ? Number(preset.time) : 10,
-      players: [
-        {
-          id: "",
-          type: "human",
-          name: "Player 1",
-          ready: false,
-          team: TEAM.WHITE,
-        },
-        {
-          id: "",
-          type: "human",
-          name: "Player 2",
-          ready: false,
-          team: TEAM.BLACK,
-        },
       ],
       matchStarted: false,
     };
