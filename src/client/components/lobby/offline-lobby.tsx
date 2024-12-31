@@ -1,59 +1,25 @@
-import React, { useCallback } from "react";
+import React from "react";
+import { SelectionButton } from "../buttons/selection-button";
 import { useNavigate } from "react-router-dom";
-import { LOBBY_TYPE, Lobby } from "../../shared/match";
-import { APP_ROUTES } from "../../shared/routes";
-import { Settings } from "../../shared/settings";
-import { SelectionButton } from "../components/buttons/selection-button";
-import { ControllerOptionsList } from "../components/lobby/controller-options-list";
-import PlayerCard from "../components/lobby/player-card";
-import { BackButton } from "../components/svg/back-button";
-import { POSSIBLE_DEPTHS } from "../game-logic/bot-opponent";
+import { APP_ROUTES } from "../../../shared/routes";
+import { BackButton } from "../svg/back-button";
+import { Lobby, LOBBY_TYPE } from "../../../shared/match";
+import PlayerCard from "./player-card";
+import { POSSIBLE_DEPTHS } from "../../game-logic/bot-opponent";
+import { ControllerOptionsList } from "./controller-options-list";
+import { Settings } from "../../../shared/settings";
 
 export const OfflineLobby: React.FC<{
-  lobby: Lobby | undefined;
-  setLobby: React.Dispatch<React.SetStateAction<Lobby | undefined>>;
+  lobby: Lobby;
   settings: Settings;
-  updateOptions: <KEY extends keyof Settings>(
+  updateLobby: <KEY extends keyof Lobby>(key: KEY, value: Lobby[KEY]) => void;
+  updateSettings: <KEY extends keyof Settings>(
     key: KEY,
     value: Settings[KEY]
   ) => void;
-}> = ({ setLobby, lobby, updateOptions, settings }) => {
+  updateOpponentType: () => void;
+}> = ({ lobby, settings, updateSettings, updateLobby, updateOpponentType }) => {
   const navigate = useNavigate();
-
-  const updateLobby = useCallback(
-    <KEY extends keyof Lobby>(key: KEY, value: Lobby[KEY]) => {
-      setLobby((prev) => ({
-        mode: prev?.mode ?? LOBBY_TYPE.LOCAL,
-        key: prev?.key ?? "",
-        players: prev?.players ?? [],
-        matchStarted: prev?.matchStarted ?? false,
-        time: prev?.time ?? 10,
-        depth: prev?.depth ?? 0,
-        [key]: value,
-      }));
-    },
-    [setLobby]
-  );
-
-  const updateOpponentType = useCallback(() => {
-    const players = lobby?.players;
-    if (players) {
-      const [player, player2] = players;
-      const isVsComputer = player2.type === "computer";
-      updateLobby("players", [
-        player,
-        {
-          name: isVsComputer ? "Player 2" : "BOT",
-          ready: false,
-          id: "2",
-          type: isVsComputer ? "human" : "computer",
-          team: player2.team,
-        },
-      ]);
-    }
-  }, [lobby, updateLobby]);
-
-  if (!lobby) return null;
 
   const player2 = lobby.players[1];
 
@@ -162,7 +128,7 @@ export const OfflineLobby: React.FC<{
             ]}
             settings={settings}
             onChange={(key) => (e: React.ChangeEvent<HTMLInputElement>) =>
-              updateOptions(key, e.target.checked)}
+              updateSettings(key, e.target.checked)}
           />
         </div>
       </div>

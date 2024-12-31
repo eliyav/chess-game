@@ -12,8 +12,7 @@ import { BackButton } from "../components/svg/back-button";
 export const LobbySelect: React.FC<{
   setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  setLobby: React.Dispatch<React.SetStateAction<Lobby | undefined>>;
-}> = ({ setMessage, setLoading, setLobby }) => {
+}> = ({ setMessage, setLoading }) => {
   const navigate = useNavigate();
   const [lobbyKey, setLobbyKey] = useState("");
 
@@ -36,7 +35,6 @@ export const LobbySelect: React.FC<{
           customClass="m-10 p-4 font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80"
           text={"Local"}
           onClick={() => {
-            setLobby(undefined);
             navigate(
               `${APP_ROUTES.LOBBY}?type=local&vs=computer&depth=3&time=10`
             );
@@ -53,7 +51,7 @@ export const LobbySelect: React.FC<{
                 `${ENV_BASE_URL}${RESOURCES.CREATE_LOBBY}`
               );
               const lobbyKey = await response.text();
-              setLobby(undefined);
+              console.log("lobbyKey", lobbyKey);
               navigate(
                 `${APP_ROUTES.LOBBY}?type=${LOBBY_TYPE.ONLINE}&key=${lobbyKey}`
               );
@@ -101,7 +99,6 @@ export const LobbySelect: React.FC<{
                 if (!response.ok) {
                   throw new Error("Failed to join lobby");
                 }
-                setLobby(undefined);
                 navigate(
                   `${APP_ROUTES.LOBBY}?type=${LOBBY_TYPE.ONLINE}&key=${lobbyKey}`
                 );

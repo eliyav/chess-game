@@ -1,31 +1,28 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { ENV_BASE_URL } from "..";
-import { Lobby } from "../../shared/match";
-import { APP_ROUTES } from "../../shared/routes";
-import { SelectionButton } from "../components/buttons/selection-button";
-import { ControllerOptionsList } from "../components/lobby/controller-options-list";
-import PlayerCard from "../components/lobby/player-card";
-import { BackButton } from "../components/svg/back-button";
-import { ClipboardAdd } from "../components/svg/clipboard-add";
-import { ClipboardChecked } from "../components/svg/clipboard-checked";
-import { CopyUrl } from "../components/svg/copy-url";
-import { websocket } from "../websocket-client";
-import LoadingScreen from "../components/loading-screen";
-import { Message } from "../components/modals/message-modal";
-import { Settings } from "../../shared/settings";
+import { useNavigate } from "react-router-dom";
+import { ENV_BASE_URL } from "../..";
+import { Lobby, LOBBY_TYPE } from "../../../shared/match";
+import { APP_ROUTES } from "../../../shared/routes";
+import { Settings } from "../../../shared/settings";
+import { websocket } from "../../websocket-client";
+import { SelectionButton } from "../buttons/selection-button";
+import LoadingScreen from "../loading-screen";
+import { BackButton } from "../svg/back-button";
+import { ClipboardAdd } from "../svg/clipboard-add";
+import { ClipboardChecked } from "../svg/clipboard-checked";
+import { CopyUrl } from "../svg/copy-url";
+import { ControllerOptionsList } from "./controller-options-list";
+import PlayerCard from "./player-card";
 
 export const OnlineLobby: React.FC<{
   lobby: Lobby | undefined;
-  options: Settings;
-  setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
-  updateOptions: <KEY extends keyof Settings>(
+  settings: Settings;
+  updateSettings: <KEY extends keyof Settings>(
     key: KEY,
     value: Settings[KEY]
   ) => void;
-}> = ({ lobby, options, updateOptions, setMessage }) => {
+}> = ({ lobby, settings, updateSettings }) => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [clipboardMessage, setClipboardMessage] = useState("");
 
   const copyToClipboard = useCallback(
@@ -39,19 +36,6 @@ export const OnlineLobby: React.FC<{
     },
     [setClipboardMessage]
   );
-
-  useEffect(() => {
-    const lobbyKey = location.search.split("=")[1];
-    if (lobbyKey) {
-      websocket.emit("joinLobby", { lobbyKey });
-    } else {
-      navigate(APP_ROUTES.LOBBY_SELECT);
-      setMessage({
-        text: "Lobby does not exist",
-        onConfirm: () => setMessage(null),
-      });
-    }
-  }, [websocket, location]);
 
   useEffect(() => {
     if (clipboardMessage) {
@@ -128,7 +112,7 @@ export const OnlineLobby: React.FC<{
                       )}
                       <CopyUrl
                         onClick={() => {
-                          const url = `${ENV_BASE_URL}${APP_ROUTES.OnlineLobby}?key=${lobby.key}`;
+                          const url = `${ENV_BASE_URL}${APP_ROUTES.LOBBY}?type=${LOBBY_TYPE.ONLINE}&key=${lobby.key}`;
                           copyToClipboard(url, "URL");
                         }}
                         size={35}
@@ -142,9 +126,9 @@ export const OnlineLobby: React.FC<{
           })}
         </div>
         <ControllerOptionsList
-          settings={options}
+          settings={settings}
           onChange={(key) => (e: React.ChangeEvent<HTMLInputElement>) =>
-            updateOptions(key, e.target.checked)}
+            updateSettings(key, e.target.checked)}
           uniqueOptions={[
             {
               text: "Switch Teams",

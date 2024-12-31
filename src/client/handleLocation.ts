@@ -2,10 +2,11 @@ import { Location } from "react-router-dom";
 import { createLobby, Lobby, LOBBY_TYPE, PlayerType } from "../shared/match";
 import { APP_ROUTES } from "../shared/routes";
 import { Controller } from "./match-logic/controller";
+import { websocket } from "./websocket-client";
 
 export function handleLocation(
   lobby: Lobby | undefined,
-  setLobby: (lobby: Lobby) => void,
+  setLobby: (lobby: Lobby | undefined) => void,
   location: Location,
   controller: Controller,
   navigate: (to: string) => void
@@ -19,15 +20,21 @@ export function handleLocation(
 
   if (
     location.pathname === APP_ROUTES.GAME ||
-    location.pathname === APP_ROUTES.LOBBY_SELECT
+    location.pathname === APP_ROUTES.LOBBY
   ) {
     if (type === LOBBY_TYPE.ONLINE) {
-      controller?.events.setMessage({
-        text: "Rejoining not supported (soon)",
-        onConfirm: () => controller.events.setMessage(null),
-      });
-      controller.cleanup();
-      navigate(APP_ROUTES.HOME);
+      if (!lobby) {
+        const key = new URLSearchParams(location.search).get("key");
+        if (key) {
+          websocket.emit("joinLobby", { lobbyKey: key });
+        } else {
+          controller?.events.setMessage({
+            text: "Lobby does not exist",
+            onConfirm: () => controller.events.setMessage(null),
+          });
+          navigate(APP_ROUTES.LOBBY_SELECT);
+        }
+      }
       return;
     } else {
       if (!lobby) {
@@ -45,7 +52,10 @@ export function handleLocation(
         if (lobby.players[1].type === "computer") {
           searchParams.set("depth", String(lobby.depth));
         }
+        navigate(`${location.pathname}?${searchParams.toString()}`);
       }
     }
+  } else if (location.pathname === APP_ROUTES.LOBBY_SELECT) {
+    setLobby(undefined);
   }
 }

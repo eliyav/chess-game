@@ -14,10 +14,9 @@ import { Game } from "./routes/game";
 import { Home } from "./routes/home";
 import { LobbySelect } from "./routes/lobby-select";
 import NotFound from "./routes/not-found";
-import { OfflineLobby } from "./routes/offline-lobby";
-import { OnlineLobby } from "./routes/online-lobby";
 import { type SceneManager } from "./scenes/scene-manager";
 import { websocket } from "./websocket-client";
+import { LobbyView } from "./routes/lobby-view";
 
 const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   const navigate = useNavigate();
@@ -35,7 +34,6 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
       if (!state) return;
       setMatchInfo(state);
     }
-
     function onTimeEnd() {
       controller.match?.endMatch("time");
       const player = controller.match?.getCurrentTeam();
@@ -72,9 +70,9 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
 
   useEffect(() => {
     handleLocation(lobby, setLobby, location, controller, navigate);
-  }, [location, lobby, controller, navigate, setLobby]);
+  }, [location]);
 
-  const updateOptions = useCallback(
+  const updateSettings = useCallback(
     <KEY extends keyof typeof settings>(
       key: KEY,
       value: (typeof settings)[KEY]
@@ -158,21 +156,17 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
         <Route
           path={APP_ROUTES.LOBBY_SELECT}
           element={
-            <LobbySelect
-              setMessage={setMessage}
-              setLoading={setLoading}
-              setLobby={setLobby}
-            />
+            <LobbySelect setMessage={setMessage} setLoading={setLoading} />
           }
         />
         <Route
           path={APP_ROUTES.LOBBY}
           element={
-            <OfflineLobby
+            <LobbyView
               setLobby={setLobby}
               lobby={lobby}
               settings={settings}
-              updateOptions={updateOptions}
+              updateSettings={updateSettings}
             />
           }
         />
