@@ -18,8 +18,8 @@ export function handleLocation(
   const time = new URLSearchParams(location.search).get("time");
 
   if (
-    location.pathname === APP_ROUTES.Game ||
-    location.pathname === APP_ROUTES.Lobby
+    location.pathname === APP_ROUTES.GAME ||
+    location.pathname === APP_ROUTES.LOBBY_SELECT
   ) {
     if (type === LOBBY_TYPE.ONLINE) {
       controller?.events.setMessage({
@@ -27,7 +27,7 @@ export function handleLocation(
         onConfirm: () => controller.events.setMessage(null),
       });
       controller.cleanup();
-      navigate(APP_ROUTES.Home);
+      navigate(APP_ROUTES.HOME);
       return;
     } else {
       if (!lobby) {

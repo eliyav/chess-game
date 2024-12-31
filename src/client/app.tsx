@@ -93,7 +93,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
 
   useEffect(() => {
     websocket.on("opponentDisconnected", () => {
-      navigate(APP_ROUTES.Home);
+      navigate(APP_ROUTES.HOME);
       setLobby(undefined);
       setMessage({
         text: "Opponent has left the match",
@@ -106,7 +106,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
     websocket.on("lobbyInfo", (lobby: Lobby) => {
       setLobby(lobby);
       if (lobby.matchStarted) {
-        navigate(`${APP_ROUTES.Game}?key=${lobby.key}&type=${lobby.mode}`);
+        navigate(`${APP_ROUTES.GAME}?key=${lobby.key}&type=${lobby.mode}`);
         setMessage({
           text: "Match has started!",
           onConfirm: () => {
@@ -154,9 +154,9 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
         />
       )}
       <Routes>
-        <Route path={APP_ROUTES.Home} element={<Home />} />
+        <Route path={APP_ROUTES.HOME} element={<Home />} />
         <Route
-          path={APP_ROUTES.Lobby}
+          path={APP_ROUTES.LOBBY_SELECT}
           element={
             <LobbySelect
               setMessage={setMessage}
@@ -166,7 +166,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
           }
         />
         <Route
-          path={APP_ROUTES.OfflineLobby}
+          path={APP_ROUTES.LOBBY}
           element={
             <OfflineLobby
               setLobby={setLobby}
@@ -177,18 +177,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
           }
         />
         <Route
-          path={APP_ROUTES.OnlineLobby}
-          element={
-            <OnlineLobby
-              lobby={lobby}
-              options={settings}
-              updateOptions={updateOptions}
-              setMessage={setMessage}
-            />
-          }
-        />
-        <Route
-          path={APP_ROUTES.Game}
+          path={APP_ROUTES.GAME}
           element={<Game matchInfo={matchInfo} controller={controller} />}
         />
         <Route path={"*"} element={<NotFound />} />

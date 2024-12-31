@@ -45,7 +45,7 @@ export const OnlineLobby: React.FC<{
     if (lobbyKey) {
       websocket.emit("joinLobby", { lobbyKey });
     } else {
-      navigate(APP_ROUTES.Lobby);
+      navigate(APP_ROUTES.LOBBY_SELECT);
       setMessage({
         text: "Lobby does not exist",
         onConfirm: () => setMessage(null),
@@ -77,7 +77,7 @@ export const OnlineLobby: React.FC<{
             "inline-block h-full border-r-2 border-white min-w-16 p-3 hover:bg-white hover:bg-opacity-10"
           }
           size={30}
-          onClick={() => navigate(APP_ROUTES.Lobby)}
+          onClick={() => navigate(APP_ROUTES.LOBBY_SELECT)}
         />
         <div className="relative inline-block grow place-content-center">
           <h1 className="place-self-center text-white text-center text-4xl font-bold italic pb-2">
@@ -142,7 +142,7 @@ export const OnlineLobby: React.FC<{
           })}
         </div>
         <ControllerOptionsList
-          options={options}
+          settings={options}
           onChange={(key) => (e: React.ChangeEvent<HTMLInputElement>) =>
             updateOptions(key, e.target.checked)}
           uniqueOptions={[

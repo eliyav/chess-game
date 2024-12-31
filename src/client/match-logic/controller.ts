@@ -338,7 +338,7 @@ export class Controller {
   }
 
   leaveMatch() {
-    this.events.navigate(APP_ROUTES.Home);
+    this.events.navigate(APP_ROUTES.HOME);
     if (
       this.match?.mode === LOBBY_TYPE.ONLINE &&
       this.match?.getGame().getState().status === GAMESTATUS.INPROGRESS

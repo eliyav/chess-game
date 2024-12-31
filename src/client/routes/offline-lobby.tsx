@@ -65,7 +65,7 @@ export const OfflineLobby: React.FC<{
             "inline-block h-full border-r-2 border-white min-w-16 p-3 hover:bg-white hover:bg-opacity-10"
           }
           size={30}
-          onClick={() => navigate(APP_ROUTES.Lobby)}
+          onClick={() => navigate(APP_ROUTES.LOBBY_SELECT)}
         />
         <h1 className="inline-block place-self-center text-white grow text-center text-4xl font-bold italic pb-2">
           Offline Lobby
@@ -172,11 +172,11 @@ export const OfflineLobby: React.FC<{
         onClick={() => {
           if (player2.type === "computer") {
             navigate(
-              `${APP_ROUTES.Game}?type=${LOBBY_TYPE.LOCAL}&vs=${player2.type}&depth=${lobby.depth}&time=${lobby.time}`
+              `${APP_ROUTES.GAME}?type=${LOBBY_TYPE.LOCAL}&vs=${player2.type}&depth=${lobby.depth}&time=${lobby.time}`
             );
           } else {
             navigate(
-              `${APP_ROUTES.Game}?type=${LOBBY_TYPE.LOCAL}&vs=${player2.type}&time=${lobby.time}`
+              `${APP_ROUTES.GAME}?type=${LOBBY_TYPE.LOCAL}&vs=${player2.type}&time=${lobby.time}`
             );
           }
         }}

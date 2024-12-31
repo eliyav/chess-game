@@ -25,7 +25,7 @@ export const LobbySelect: React.FC<{
             "inline-block h-full border-r-2 border-white min-w-16 p-3 hover:bg-white hover:bg-opacity-10"
           }
           size={30}
-          onClick={() => navigate(APP_ROUTES.Home)}
+          onClick={() => navigate(APP_ROUTES.HOME)}
         />
         <h1 className="inline-block place-self-center text-white grow text-center text-4xl font-bold italic pb-2">
           Select Lobby
@@ -38,7 +38,7 @@ export const LobbySelect: React.FC<{
           onClick={() => {
             setLobby(undefined);
             navigate(
-              `${APP_ROUTES.OfflineLobby}?type=local&vs=computer&depth=3&time=10`
+              `${APP_ROUTES.LOBBY}?type=local&vs=computer&depth=3&time=10`
             );
           }}
         />
@@ -54,7 +54,9 @@ export const LobbySelect: React.FC<{
               );
               const lobbyKey = await response.text();
               setLobby(undefined);
-              navigate(`${APP_ROUTES.OnlineLobby}?key=${lobbyKey}`);
+              navigate(
+                `${APP_ROUTES.LOBBY}?type=${LOBBY_TYPE.ONLINE}&key=${lobbyKey}`
+              );
             } catch (e) {
               if (e instanceof Error) {
                 setMessage({
@@ -100,7 +102,9 @@ export const LobbySelect: React.FC<{
                   throw new Error("Failed to join lobby");
                 }
                 setLobby(undefined);
-                navigate(`${APP_ROUTES.OnlineLobby}?key=${lobbyKey}`);
+                navigate(
+                  `${APP_ROUTES.LOBBY}?type=${LOBBY_TYPE.ONLINE}&key=${lobbyKey}`
+                );
               } catch (e) {
                 if (e instanceof Error) {
                   setMessage({
