@@ -1,23 +1,23 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { LOBBY_TYPE, Lobby, PlayerType, createLobby } from "../../shared/match";
+import { LOBBY_TYPE, Lobby } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
+import { Settings } from "../../shared/settings";
 import { SelectionButton } from "../components/buttons/selection-button";
 import { ControllerOptionsList } from "../components/lobby/controller-options-list";
 import PlayerCard from "../components/lobby/player-card";
 import { BackButton } from "../components/svg/back-button";
 import { POSSIBLE_DEPTHS } from "../game-logic/bot-opponent";
-import { Settings } from "../../shared/settings";
 
 export const OfflineLobby: React.FC<{
   lobby: Lobby | undefined;
   setLobby: React.Dispatch<React.SetStateAction<Lobby | undefined>>;
-  options: Settings;
+  settings: Settings;
   updateOptions: <KEY extends keyof Settings>(
     key: KEY,
     value: Settings[KEY]
   ) => void;
-}> = ({ setLobby, lobby, updateOptions, options }) => {
+}> = ({ setLobby, lobby, updateOptions, settings }) => {
   const navigate = useNavigate();
 
   const updateLobby = useCallback(
@@ -28,6 +28,7 @@ export const OfflineLobby: React.FC<{
         players: prev?.players ?? [],
         matchStarted: prev?.matchStarted ?? false,
         time: prev?.time ?? 10,
+        depth: prev?.depth ?? 0,
         [key]: value,
       }));
     },
@@ -46,33 +47,15 @@ export const OfflineLobby: React.FC<{
           ready: false,
           id: "2",
           type: isVsComputer ? "human" : "computer",
-          depth: isVsComputer ? 0 : 3,
           team: player2.team,
         },
       ]);
     }
   }, [lobby, updateLobby]);
 
-  useEffect(() => {
-    const vs = new URLSearchParams(location.search).get(
-      "vs"
-    ) as PlayerType | null;
-    const depth = new URLSearchParams(location.search).get("depth");
-    const time = new URLSearchParams(location.search).get("time");
-    const newLobby = createLobby({ type: LOBBY_TYPE.LOCAL, vs, depth, time });
-    if (newLobby) {
-      if (newLobby.players[1].type === "computer") {
-        const searchParams = new URLSearchParams(location.search);
-        searchParams.set("vs", vs || newLobby.players[1].type);
-        searchParams.set("depth", String(newLobby.players[1].depth));
-        searchParams.set("time", time ?? String(newLobby.time));
-        navigate(`${location.pathname}?${searchParams.toString()}`);
-      }
-      setLobby(newLobby);
-    }
-  }, [location]);
-
   if (!lobby) return null;
+
+  const player2 = lobby.players[1];
 
   return (
     <div className="grid grid-rows-5 h-dvh select-none md:w-3/4 md:max-w-4xl md:m-auto z-10 overflow-hidden">
@@ -100,18 +83,12 @@ export const OfflineLobby: React.FC<{
                       <button
                         key={depth}
                         className={`py-1.5 px-2.5 mx-1 rounded ${
-                          player.depth === depth
+                          lobby.depth === depth
                             ? "bg-slate-500 border-2 border-white"
                             : "bg-slate-600 border-2 border-transparent hover:bg-slate-500"
                         }`}
                         onClick={() => {
-                          updateLobby("players", [
-                            lobby.players[0],
-                            {
-                              ...player,
-                              depth,
-                            },
-                          ]);
+                          updateLobby("players", [lobby.players[0], player]);
                         }}
                       >
                         {depth}
@@ -161,8 +138,8 @@ export const OfflineLobby: React.FC<{
               },
               {
                 text: `VS ${
-                  lobby.players[1]
-                    ? lobby.players[1].type === "computer"
+                  player2
+                    ? player2.type === "computer"
                       ? "human"
                       : "computer"
                     : "computer"
@@ -183,9 +160,9 @@ export const OfflineLobby: React.FC<{
                 disabled: false,
               },
             ]}
-            options={options}
+            settings={settings}
             onChange={(key) => (e: React.ChangeEvent<HTMLInputElement>) =>
-              updateOptions(key as keyof Settings, e.target.checked)}
+              updateOptions(key, e.target.checked)}
           />
         </div>
       </div>
@@ -193,13 +170,13 @@ export const OfflineLobby: React.FC<{
         customClass="row-start-5 m-10 font-bold text-4xl border-2 border-white italic tracking-widest hover:opacity-80 md:w-1/2 md:justify-self-center"
         text={"Start Game"}
         onClick={() => {
-          if (lobby.players[1].type === "computer") {
+          if (player2.type === "computer") {
             navigate(
-              `${APP_ROUTES.Game}?type=${LOBBY_TYPE.LOCAL}&vs=${lobby.players[1].type}&depth=${lobby.players[1].depth}`
+              `${APP_ROUTES.Game}?type=${LOBBY_TYPE.LOCAL}&vs=${player2.type}&depth=${lobby.depth}&time=${lobby.time}`
             );
           } else {
             navigate(
-              `${APP_ROUTES.Game}?type=${LOBBY_TYPE.LOCAL}&vs=${lobby.players[1].type}`
+              `${APP_ROUTES.Game}?type=${LOBBY_TYPE.LOCAL}&vs=${player2.type}&time=${lobby.time}`
             );
           }
         }}

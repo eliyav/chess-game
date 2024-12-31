@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { LOBBY_TYPE } from "../../shared/match";
+import { Lobby, LOBBY_TYPE } from "../../shared/match";
 import { SelectionButton } from "../components/buttons/selection-button";
 import { Message } from "../components/modals/message-modal";
 import { Divider } from "../components/svg/divider";
@@ -12,7 +12,8 @@ import { BackButton } from "../components/svg/back-button";
 export const LobbySelect: React.FC<{
   setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ setMessage, setLoading }) => {
+  setLobby: React.Dispatch<React.SetStateAction<Lobby | undefined>>;
+}> = ({ setMessage, setLoading, setLobby }) => {
   const navigate = useNavigate();
   const [lobbyKey, setLobbyKey] = useState("");
 
@@ -35,7 +36,10 @@ export const LobbySelect: React.FC<{
           customClass="m-10 p-4 font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80"
           text={"Local"}
           onClick={() => {
-            navigate(`${APP_ROUTES.OfflineLobby}?vs=computer&depth=3&time=10`);
+            setLobby(undefined);
+            navigate(
+              `${APP_ROUTES.OfflineLobby}?type=local&vs=computer&depth=3&time=10`
+            );
           }}
         />
         <Divider className="w-full z-10" />
@@ -49,6 +53,7 @@ export const LobbySelect: React.FC<{
                 `${ENV_BASE_URL}${RESOURCES.CREATE_LOBBY}`
               );
               const lobbyKey = await response.text();
+              setLobby(undefined);
               navigate(`${APP_ROUTES.OnlineLobby}?key=${lobbyKey}`);
             } catch (e) {
               if (e instanceof Error) {
@@ -94,6 +99,7 @@ export const LobbySelect: React.FC<{
                 if (!response.ok) {
                   throw new Error("Failed to join lobby");
                 }
+                setLobby(undefined);
                 navigate(`${APP_ROUTES.OnlineLobby}?key=${lobbyKey}`);
               } catch (e) {
                 if (e instanceof Error) {
