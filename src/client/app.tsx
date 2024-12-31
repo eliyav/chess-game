@@ -1,15 +1,15 @@
 import "@babylonjs/loaders/glTF";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import { Lobby, LOBBY_TYPE } from "../shared/match";
+import { Lobby } from "../shared/match";
 import { APP_ROUTES } from "../shared/routes";
 import { getSettings } from "../shared/settings";
 import LoadingScreen from "./components/loading-screen";
 import { Message, MessageModal } from "./components/modals/message-modal";
+import { handleLocation } from "./handleLocation";
 import { BaseMatch } from "./match-logic/base-match";
 import { Controller } from "./match-logic/controller";
-import { LocalMatch } from "./match-logic/local-match";
-import { OnlineMatch } from "./match-logic/online-match";
+import { createMatchContext } from "./match-logic/create-match-context";
 import { Game } from "./routes/game";
 import { Home } from "./routes/home";
 import { LobbySelect } from "./routes/lobby-select";
@@ -26,9 +26,53 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   const [message, setMessage] = useState<Message | null>(null);
   const [settings, setSettings] = useState(getSettings());
   const [loading, setLoading] = useState(false);
-  const [controllerState, setControllerState] = useState<ReturnType<
-    BaseMatch["state"]
-  > | null>(null);
+  const [matchInfo, setMatchInfo] = useState<ReturnType<BaseMatch["state"]>>();
+
+  const match = useMemo(() => {
+    if (!lobby) return undefined;
+    function onTimeUpdate() {
+      const state = controller.match?.state();
+      if (!state) return;
+      setMatchInfo(state);
+    }
+
+    function onTimeEnd() {
+      controller.match?.endMatch("time");
+      const player = controller.match?.getCurrentTeam();
+      controller.events.setMessage({
+        text: `${player} ran out of time!`,
+        onConfirm: () => {
+          controller.setMessage(null);
+        },
+      });
+    }
+    const player =
+      lobby.players.find((player) => player.id === websocket.id)! ||
+      lobby.players[0];
+    return createMatchContext({
+      lobby,
+      player,
+      onTimeUpdate,
+      onTimeEnd,
+    });
+  }, [lobby]);
+
+  const controller = useMemo(() => {
+    return new Controller({
+      sceneManager,
+      match,
+      events: {
+        setMessage: (message: Message | null) => setMessage(message),
+        navigate: (route: APP_ROUTES) => navigate(route),
+        setMatchInfo: (state) => setMatchInfo(state),
+      },
+      settings,
+    });
+  }, [match, sceneManager, navigate, setMatchInfo, setMessage, settings]);
+
+  useEffect(() => {
+    handleLocation(lobby, setLobby, location, controller, navigate);
+  }, [location, lobby, controller, navigate, setLobby]);
 
   const updateOptions = useCallback(
     <KEY extends keyof typeof settings>(
@@ -42,54 +86,6 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
     },
     [setSettings]
   );
-
-  const match = useMemo(() => {
-    if (!lobby) return undefined;
-    return lobby.mode === LOBBY_TYPE.LOCAL
-      ? new LocalMatch({
-          lobby,
-          player: lobby.players[0],
-          onTimeUpdate,
-          onTimeEnd,
-        })
-      : new OnlineMatch({
-          lobby,
-          player: lobby.players.find((player) => player.id === websocket.id)!,
-          onTimeUpdate,
-          onTimeEnd,
-        });
-  }, [lobby]);
-
-  const controller = useMemo(() => {
-    if (!match || !lobby) return undefined;
-    return new Controller({
-      sceneManager,
-      match,
-      events: {
-        setMessage: (message: Message | null) => setMessage(message),
-        navigate: (route: APP_ROUTES) => navigate(route),
-        updateState: (state) => setControllerState(state),
-      },
-      settings,
-    });
-  }, [match, sceneManager, navigate]);
-
-  function onTimeUpdate() {
-    const state = match?.state();
-    if (!state) return;
-    setControllerState(state);
-  }
-
-  function onTimeEnd() {
-    match?.endMatch("time");
-    const player = match?.getCurrentTeam();
-    setMessage({
-      text: `${player} ran out of time!`,
-      onConfirm: () => {
-        setMessage(null);
-      },
-    });
-  }
 
   useEffect(() => {
     sceneManager.switchScene(location.pathname as APP_ROUTES);
@@ -162,7 +158,11 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
         <Route
           path={APP_ROUTES.Lobby}
           element={
-            <LobbySelect setMessage={setMessage} setLoading={setLoading} />
+            <LobbySelect
+              setMessage={setMessage}
+              setLoading={setLoading}
+              setLobby={setLobby}
+            />
           }
         />
         <Route
@@ -171,7 +171,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
             <OfflineLobby
               setLobby={setLobby}
               lobby={lobby}
-              options={settings}
+              settings={settings}
               updateOptions={updateOptions}
             />
           }
@@ -189,14 +189,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
         />
         <Route
           path={APP_ROUTES.Game}
-          element={
-            <Game
-              setLobby={setLobby}
-              controller={controller}
-              setMessage={setMessage}
-              controllerState={controllerState}
-            />
-          }
+          element={<Game matchInfo={matchInfo} controller={controller} />}
         />
         <Route path={"*"} element={<NotFound />} />
       </Routes>

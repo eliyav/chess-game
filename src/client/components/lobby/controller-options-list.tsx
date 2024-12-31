@@ -2,7 +2,7 @@ import React, { JSX } from "react";
 import { getOptionText, Settings } from "../../../shared/settings";
 
 interface ControllerOptionsProps {
-  options: Settings;
+  settings: Settings;
   onChange: (
     key: keyof Settings
   ) => (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -16,7 +16,7 @@ interface ControllerOptionsProps {
 }
 
 export const ControllerOptionsList: React.FC<ControllerOptionsProps> = ({
-  options,
+  settings,
   onChange,
   uniqueOptions,
 }) => {
@@ -43,7 +43,7 @@ export const ControllerOptionsList: React.FC<ControllerOptionsProps> = ({
           )
         )}
       </div>
-      {Object.entries(options).map(([key, value], i) => (
+      {Object.entries(settings).map(([key, value], i) => (
         <label
           key={i}
           className={`select-none flex relative bg-slate-200 w-full p-2 rounded-lg border-2 hover:opacity-80 ${

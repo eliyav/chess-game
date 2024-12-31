@@ -1,14 +1,6 @@
-import React, { useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import {
-  LOBBY_TYPE,
-  Lobby,
-  PlayerType,
-  TEAM,
-  createLobby,
-} from "../../shared/match";
-import { APP_ROUTES } from "../../shared/routes";
-import { Message } from "../components/modals/message-modal";
+import React, { useEffect, useState } from "react";
+import { Lobby, TEAM } from "../../shared/match";
+import { Overlay } from "../components/game-overlay/overlay";
 import { ClockIcon } from "../components/svg/clock-icon";
 import {
   CameraIcon,
@@ -16,62 +8,27 @@ import {
   RestartIcon,
   UndoIcon,
 } from "../components/svg/game-overlay-icons";
-import { BaseMatch } from "../match-logic/base-match";
 import { Controller } from "../match-logic/controller";
-import { Overlay } from "../components/game-overlay/overlay";
 
 export const Game: React.FC<{
-  setLobby: React.Dispatch<React.SetStateAction<Lobby | undefined>>;
-  controller: Controller | undefined;
-  setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
-  controllerState: ReturnType<BaseMatch["state"]> | null;
-}> = ({ controller, controllerState, setLobby, setMessage }) => {
-  const navigate = useNavigate();
-  const location = useLocation();
-
+  matchInfo: Lobby | undefined;
+  controller: Controller;
+}> = ({ matchInfo, controller }) => {
+  const [showAnimation, setShowAnimation] = useState(false);
   useEffect(() => {
-    const type = new URLSearchParams(location.search).get("type");
-    const vs = new URLSearchParams(location.search).get(
-      "vs"
-    ) as PlayerType | null;
-    const depth = new URLSearchParams(location.search).get("depth");
-    const time = new URLSearchParams(location.search).get("time");
-    if (type === LOBBY_TYPE.ONLINE) {
-      if (!controller?.match?.lobby) {
-        setMessage({
-          text: "Rejoining not supported (soon)",
-          onConfirm: () => setMessage(null),
-        });
-        navigate(APP_ROUTES.Home);
-        return;
-      }
-    } else {
-      if (!controller?.match?.lobby) {
-        const newLobby = createLobby({
-          type: LOBBY_TYPE.LOCAL,
-          vs,
-          depth,
-          time,
-        });
-        setLobby(newLobby);
-        const searchParams = new URLSearchParams(location.search);
-        if (newLobby.players[1].type === "computer") {
-          searchParams.set("vs", vs || newLobby.players[1].type);
-          searchParams.set("type", newLobby.mode);
-          searchParams.set("depth", String(newLobby.players[1].depth));
-          searchParams.set("time", String(newLobby.time));
-        }
-        navigate(`${location.pathname}?${searchParams.toString()}`);
-      }
-    }
-  }, [location]);
-
-  useEffect(() => {
-    controller?.start();
+    controller.start();
     return () => controller?.cleanup();
-  }, [controller]);
+  }, [controller.match]);
 
-  if (controller) {
+  useEffect(() => {
+    if (!showAnimation) {
+      setTimeout(() => {
+        setShowAnimation(true);
+      }, 500);
+    }
+  }, []);
+
+  if (matchInfo) {
     return (
       <div>
         <Overlay
@@ -131,14 +88,14 @@ export const Game: React.FC<{
           }
         >
           <div className="h-full p-2 text-white rounded-t-lg max-w-[600px] m-auto gap-x-4">
-            {controller.match.lobby.players.map((player, index) => (
+            {matchInfo?.players.map((player, index) => (
               <div className="inline-block w-1/2" key={index}>
                 <div className="flex flex-col items-center bg-slate-700 rounded-lg p-2 m-2 relative min-w-1/3 overflow-hidden whitespace-nowrap transition-all duration-500 ease-in-out transform hover:scale-105">
                   <div
                     className={`absolute top-1 transition-all duration-500 ease-in-out ${
                       index % 2 === 0 ? "left-1" : "right-1"
                     } ${
-                      controllerState?.currentTeam === player.team
+                      matchInfo?.currentTeam === player.team
                         ? "animate-pulse bg-red-500"
                         : player.team === TEAM.WHITE
                         ? "bg-white"
@@ -150,19 +107,19 @@ export const Game: React.FC<{
                   </p>
                   <div
                     className={`flex items-center overflow-hidden justify-center mt-2 h-0 transition-all duration-1000 ease-in-out ${
-                      controllerState ? "h-10" : ""
+                      showAnimation && matchInfo.timers ? "h-10" : ""
                     }`}
                   >
                     <ClockIcon
                       className={`w-8 h-8 mr-1 ${
-                        controllerState?.currentTeam === player.team
+                        matchInfo?.currentTeam === player.team
                           ? "animate-pulse text-red-500"
                           : ""
                       }`}
                     />
                     <div className="flex items-center space-x-1 text-lg">
                       <span className="font-mono">
-                        {controllerState?.timers?.[player.team].formatted}
+                        {matchInfo?.timers?.[player.team].formatted}
                       </span>
                     </div>
                   </div>
