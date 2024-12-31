@@ -2,7 +2,8 @@ import { Point } from "../../shared/game";
 import { Lobby, LOBBY_TYPE, Player, TEAM } from "../../shared/match";
 import { websocket } from "../websocket-client";
 import { BaseMatch, MatchLogic } from "./base-match";
-import { OnlineEvents } from "./events";
+import { Controller } from "./controller";
+import { createOnlineEvents, OnlineEvents } from "./events";
 
 export class OnlineMatch extends BaseMatch implements MatchLogic {
   mode: LOBBY_TYPE.ONLINE;
@@ -16,8 +17,8 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
   }: {
     lobby: Lobby;
     player: Player;
-    onTimeUpdate: (timers: { [key in TEAM]: number }) => void;
-    onTimeEnd: (player: TEAM) => void;
+    onTimeUpdate: () => void;
+    onTimeEnd: () => void;
   }) {
     super({ lobby, player, onTimeEnd, onTimeUpdate });
     this.mode = LOBBY_TYPE.ONLINE;
@@ -52,7 +53,8 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
     return false;
   }
 
-  subscribe(events: OnlineEvents[]) {
+  subscribe({ controller }: { controller: Controller }) {
+    const events = createOnlineEvents({ controller });
     this.events = events;
     for (const event of this.events) {
       websocket.on(event.name, event.event);

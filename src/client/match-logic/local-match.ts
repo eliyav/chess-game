@@ -1,8 +1,9 @@
 import { Point, Turn } from "../../shared/game";
 import { Lobby, LOBBY_TYPE, Player, TEAM } from "../../shared/match";
-import { GAME_WORKER_URL } from "../scripts/constants";
+import { GAME_WORKER_URL } from "../constants";
 import { BaseMatch, MatchLogic } from "./base-match";
-import { LocalEvents } from "./events";
+import { Controller } from "./controller";
+import { createLocalEvents, LocalEvents } from "./events";
 
 export class LocalMatch extends BaseMatch implements MatchLogic {
   mode: LOBBY_TYPE.LOCAL;
@@ -18,8 +19,8 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
   }: {
     lobby: Lobby;
     player: Player;
-    onTimeUpdate: (timers: { [key in TEAM]: number }) => void;
-    onTimeEnd: (player: TEAM) => void;
+    onTimeUpdate: () => void;
+    onTimeEnd: () => void;
   }) {
     super({ lobby, player, onTimeUpdate, onTimeEnd });
     this.mode = LOBBY_TYPE.LOCAL;
@@ -29,7 +30,7 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
     this.vsComputer = !!isComputer
       ? {
           maximizingPlayer: isComputer.team === TEAM.WHITE ? true : false,
-          depth: isComputer.depth || 3,
+          depth: lobby.depth || 3,
         }
       : undefined;
   }
@@ -93,7 +94,8 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
     return true;
   }
 
-  subscribe(events: LocalEvents[]) {
+  subscribe({ controller }: { controller: Controller }) {
+    const events = createLocalEvents({ controller });
     this.events = events;
     if (this.vsComputer) {
       const worker = new Worker(new URL(GAME_WORKER_URL, import.meta.url));
