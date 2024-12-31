@@ -19,6 +19,8 @@ export function createOnlineEvents({
 }: {
   controller: Controller;
 }): OnlineEvents[] {
+  const match = controller.match;
+  if (!match) return [];
   return [
     {
       name: "resetMatchRequested",
@@ -28,14 +30,14 @@ export function createOnlineEvents({
           onConfirm: () => {
             websocket.emit("resetMatchResponse", {
               answer: true,
-              lobbyKey: controller.match.lobby.key,
+              lobbyKey: match.lobby.key,
             });
             controller.setMessage(null);
           },
           onReject: () => {
             websocket.emit("resetMatchResponse", {
               answer: false,
-              lobbyKey: controller.match.lobby.key,
+              lobbyKey: match.lobby.key,
             });
             controller.setMessage(null);
           },
@@ -46,7 +48,7 @@ export function createOnlineEvents({
       name: "resetMatchResolve",
       event: ({ answer }: { answer: boolean }) => {
         if (answer) {
-          controller.match.reset();
+          match.reset();
           controller.resetView();
           controller.setMessage({
             text: "Match reset successfully!",
@@ -72,14 +74,14 @@ export function createOnlineEvents({
           onConfirm: () => {
             websocket.emit("undoTurnResponse", {
               answer: true,
-              lobbyKey: controller.match.lobby.key,
+              lobbyKey: match.lobby.key,
             });
             controller.setMessage(null);
           },
           onReject: () => {
             websocket.emit("undoTurnResponse", {
               answer: false,
-              lobbyKey: controller.match.lobby.key,
+              lobbyKey: match.lobby.key,
             });
             controller.setMessage(null);
           },

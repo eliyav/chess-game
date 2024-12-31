@@ -37,20 +37,17 @@ export type ScenesDict = {
 };
 
 const sceneRouting: Record<APP_ROUTES, { [state: string]: Scenes }> = {
-  [APP_ROUTES.Game]: {
+  [APP_ROUTES.GAME]: {
     ["/"]: Scenes.GAME,
     ["promote"]: Scenes.PROMOTION,
   },
-  [APP_ROUTES.Home]: {
+  [APP_ROUTES.HOME]: {
     ["/"]: Scenes.HOME,
   },
-  [APP_ROUTES.Lobby]: {
+  [APP_ROUTES.LOBBY_SELECT]: {
     ["/"]: Scenes.HOME,
   },
-  [APP_ROUTES.OnlineLobby]: {
-    ["/"]: Scenes.HOME,
-  },
-  [APP_ROUTES.OfflineLobby]: {
+  [APP_ROUTES.LOBBY]: {
     ["/"]: Scenes.HOME,
   },
 };

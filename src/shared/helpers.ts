@@ -1,5 +1,3 @@
-import { Lobby, LOBBY_TYPE, TEAM } from "../shared/match";
-
 export function generateKey() {
   const chars = [
     ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],

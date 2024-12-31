@@ -6,7 +6,7 @@ import path from "path";
 import { createLobby, Lobby, LOBBY_TYPE } from "../shared/match";
 import { RESOURCES } from "../shared/resources";
 import { createWebsocketServer } from "./websocket-server";
-import { generateKey } from "./helpers";
+import { generateKey } from "../shared/helpers";
 
 const clientPath = fileURLToPath(new URL("../client", import.meta.url));
 

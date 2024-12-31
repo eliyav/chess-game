@@ -1,7 +1,7 @@
 import { GAMESTATUS, Point, Turn } from "../../shared/game";
 import { Lobby, LOBBY_TYPE, Player, TEAM } from "../../shared/match";
 import Game from "../game-logic/game";
-import { LocalEvents, OnlineEvents } from "./events";
+import { Controller } from "./controller";
 import { MatchTimer } from "./match-timer";
 
 export interface MatchLogic {
@@ -10,6 +10,7 @@ export interface MatchLogic {
   isCurrentPlayersPiece(point: Point): boolean;
   resetRequest(): boolean;
   undoTurnRequest(): boolean;
+  subscribe({ controller }: { controller: Controller }): void;
 }
 
 export class BaseMatch {
@@ -143,8 +144,10 @@ export class BaseMatch {
     }
   }
 
-  state() {
+  state(): Lobby {
+    const lobby = this.lobby;
     return {
+      ...lobby,
       currentTeam: this.getCurrentTeam(),
       timers: this.timer?.getTimers(),
     };

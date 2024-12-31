@@ -1,83 +1,27 @@
-import React, { useCallback, useEffect } from "react";
+import React from "react";
+import { SelectionButton } from "../buttons/selection-button";
 import { useNavigate } from "react-router-dom";
-import {
-  ControllerOptions,
-  LOBBY_TYPE,
-  Lobby,
-  PlayerType,
-  createLobby,
-} from "../../shared/match";
-import { APP_ROUTES } from "../../shared/routes";
-import { SelectionButton } from "../components/buttons/selection-button";
-import { ControllerOptionsList } from "../components/lobby/controller-options-list";
-import PlayerCard from "../components/lobby/player-card";
-import { BackButton } from "../components/svg/back-button";
-import { POSSIBLE_DEPTHS } from "../game-logic/bot-opponent";
+import { APP_ROUTES } from "../../../shared/routes";
+import { BackButton } from "../svg/back-button";
+import { Lobby, LOBBY_TYPE } from "../../../shared/match";
+import PlayerCard from "./player-card";
+import { POSSIBLE_DEPTHS } from "../../game-logic/bot-opponent";
+import { ControllerOptionsList } from "./controller-options-list";
+import { Settings } from "../../../shared/settings";
 
 export const OfflineLobby: React.FC<{
-  lobby: Lobby | undefined;
-  setLobby: React.Dispatch<React.SetStateAction<Lobby | undefined>>;
-  options: ControllerOptions;
-  updateOptions: <KEY extends keyof ControllerOptions>(
+  lobby: Lobby;
+  settings: Settings;
+  updateLobby: <KEY extends keyof Lobby>(key: KEY, value: Lobby[KEY]) => void;
+  updateSettings: <KEY extends keyof Settings>(
     key: KEY,
-    value: ControllerOptions[KEY]
+    value: Settings[KEY]
   ) => void;
-}> = ({ setLobby, lobby, updateOptions, options }) => {
+  updateOpponentType: () => void;
+}> = ({ lobby, settings, updateSettings, updateLobby, updateOpponentType }) => {
   const navigate = useNavigate();
 
-  const updateLobby = useCallback(
-    <KEY extends keyof Lobby>(key: KEY, value: Lobby[KEY]) => {
-      setLobby((prev) => ({
-        mode: prev?.mode ?? LOBBY_TYPE.LOCAL,
-        key: prev?.key ?? "",
-        players: prev?.players ?? [],
-        matchStarted: prev?.matchStarted ?? false,
-        time: prev?.time ?? 10,
-        [key]: value,
-      }));
-    },
-    [setLobby]
-  );
-
-  const updateOpponentType = useCallback(() => {
-    const players = lobby?.players;
-    if (players) {
-      const [player, player2] = players;
-      const isVsComputer = player2.type === "computer";
-      updateLobby("players", [
-        player,
-        {
-          name: isVsComputer ? "Player 2" : "BOT",
-          ready: false,
-          id: "2",
-          type: isVsComputer ? "human" : "computer",
-          depth: isVsComputer ? 0 : 3,
-          team: player2.team,
-        },
-      ]);
-    }
-  }, [lobby, updateLobby]);
-
-  useEffect(() => {
-    const vs = new URLSearchParams(location.search).get(
-      "vs"
-    ) as PlayerType | null;
-    const depth = new URLSearchParams(location.search).get("depth");
-    const time = new URLSearchParams(location.search).get("time");
-    const newLobby = createLobby({ type: LOBBY_TYPE.LOCAL, vs, depth, time });
-    if (newLobby) {
-      if (newLobby.players[1].type === "computer") {
-        const searchParams = new URLSearchParams(location.search);
-        searchParams.set("vs", vs || newLobby.players[1].type);
-        searchParams.set("depth", String(newLobby.players[1].depth));
-        searchParams.set("time", time ?? String(newLobby.time));
-        navigate(`${location.pathname}?${searchParams.toString()}`);
-      }
-      setLobby(newLobby);
-    }
-  }, [location]);
-
-  if (!lobby) return null;
+  const player2 = lobby.players[1];
 
   return (
     <div className="grid grid-rows-5 h-dvh select-none md:w-3/4 md:max-w-4xl md:m-auto z-10 overflow-hidden">
@@ -87,7 +31,7 @@ export const OfflineLobby: React.FC<{
             "inline-block h-full border-r-2 border-white min-w-16 p-3 hover:bg-white hover:bg-opacity-10"
           }
           size={30}
-          onClick={() => navigate(APP_ROUTES.Lobby)}
+          onClick={() => navigate(APP_ROUTES.LOBBY_SELECT)}
         />
         <h1 className="inline-block place-self-center text-white grow text-center text-4xl font-bold italic pb-2">
           Offline Lobby
@@ -105,18 +49,12 @@ export const OfflineLobby: React.FC<{
                       <button
                         key={depth}
                         className={`py-1.5 px-2.5 mx-1 rounded ${
-                          player.depth === depth
+                          lobby.depth === depth
                             ? "bg-slate-500 border-2 border-white"
                             : "bg-slate-600 border-2 border-transparent hover:bg-slate-500"
                         }`}
                         onClick={() => {
-                          updateLobby("players", [
-                            lobby.players[0],
-                            {
-                              ...player,
-                              depth,
-                            },
-                          ]);
+                          updateLobby("players", [lobby.players[0], player]);
                         }}
                       >
                         {depth}
@@ -166,8 +104,8 @@ export const OfflineLobby: React.FC<{
               },
               {
                 text: `VS ${
-                  lobby.players[1]
-                    ? lobby.players[1].type === "computer"
+                  player2
+                    ? player2.type === "computer"
                       ? "human"
                       : "computer"
                     : "computer"
@@ -188,9 +126,9 @@ export const OfflineLobby: React.FC<{
                 disabled: false,
               },
             ]}
-            options={options}
+            settings={settings}
             onChange={(key) => (e: React.ChangeEvent<HTMLInputElement>) =>
-              updateOptions(key, e.target.checked)}
+              updateSettings(key, e.target.checked)}
           />
         </div>
       </div>
@@ -198,13 +136,13 @@ export const OfflineLobby: React.FC<{
         customClass="row-start-5 m-10 font-bold text-4xl border-2 border-white italic tracking-widest hover:opacity-80 md:w-1/2 md:justify-self-center"
         text={"Start Game"}
         onClick={() => {
-          if (lobby.players[1].type === "computer") {
+          if (player2.type === "computer") {
             navigate(
-              `${APP_ROUTES.Game}?type=${LOBBY_TYPE.LOCAL}&vs=${lobby.players[1].type}&depth=${lobby.players[1].depth}`
+              `${APP_ROUTES.GAME}?type=${LOBBY_TYPE.LOCAL}&vs=${player2.type}&depth=${lobby.depth}&time=${lobby.time}`
             );
           } else {
             navigate(
-              `${APP_ROUTES.Game}?type=${LOBBY_TYPE.LOCAL}&vs=${lobby.players[1].type}`
+              `${APP_ROUTES.GAME}?type=${LOBBY_TYPE.LOCAL}&vs=${player2.type}&time=${lobby.time}`
             );
           }
         }}

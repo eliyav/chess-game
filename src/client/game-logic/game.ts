@@ -20,7 +20,7 @@ class Game {
     this.current = this.createGame();
   }
 
-  private createGame(status: GAMESTATUS = GAMESTATUS.LOBBY) {
+  private createGame(status: GAMESTATUS = GAMESTATUS.INPROGRESS) {
     return {
       grid: Board.createGrid(),
       annotations: [],

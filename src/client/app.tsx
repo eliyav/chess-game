@@ -1,100 +1,89 @@
 import "@babylonjs/loaders/glTF";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import {
-  buildDefaultOptions,
-  ControllerOptions,
-  Lobby,
-  LOBBY_TYPE,
-  TEAM,
-} from "../shared/match";
+import { Lobby } from "../shared/match";
 import { APP_ROUTES } from "../shared/routes";
+import { getSettings } from "../shared/settings";
 import LoadingScreen from "./components/loading-screen";
 import { Message, MessageModal } from "./components/modals/message-modal";
+import { handleLocation } from "./handleLocation";
 import { BaseMatch } from "./match-logic/base-match";
 import { Controller } from "./match-logic/controller";
-import { LocalMatch } from "./match-logic/local-match";
-import { OnlineMatch } from "./match-logic/online-match";
+import { createMatchContext } from "./match-logic/create-match-context";
 import { Game } from "./routes/game";
 import { Home } from "./routes/home";
 import { LobbySelect } from "./routes/lobby-select";
 import NotFound from "./routes/not-found";
-import { OfflineLobby } from "./routes/offline-lobby";
-import { OnlineLobby } from "./routes/online-lobby";
 import { type SceneManager } from "./scenes/scene-manager";
 import { websocket } from "./websocket-client";
+import { LobbyView } from "./routes/lobby-view";
 
 const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [lobby, setLobby] = useState<Lobby>();
   const [message, setMessage] = useState<Message | null>(null);
-  const [options, setOptions] = useState(buildDefaultOptions());
+  const [settings, setSettings] = useState(getSettings());
   const [loading, setLoading] = useState(false);
-  const [controllerState, setControllerState] = useState<ReturnType<
-    BaseMatch["state"]
-  > | null>(null);
-
-  const updateOptions = useCallback(
-    <KEY extends keyof ControllerOptions>(
-      key: KEY,
-      value: ControllerOptions[KEY]
-    ) => {
-      setOptions((prev) => ({
-        ...prev,
-        [key]: value,
-      }));
-    },
-    [setOptions]
-  );
+  const [matchInfo, setMatchInfo] = useState<ReturnType<BaseMatch["state"]>>();
 
   const match = useMemo(() => {
     if (!lobby) return undefined;
-    return lobby.mode === LOBBY_TYPE.LOCAL
-      ? new LocalMatch({
-          lobby,
-          player: lobby.players[0],
-          onTimeUpdate,
-          onTimeEnd,
-        })
-      : new OnlineMatch({
-          lobby,
-          player: lobby.players.find((player) => player.id === websocket.id)!,
-          onTimeUpdate,
-          onTimeEnd,
-        });
+    function onTimeUpdate() {
+      const state = controller.match?.state();
+      if (!state) return;
+      setMatchInfo(state);
+    }
+    function onTimeEnd() {
+      controller.match?.endMatch("time");
+      const player = controller.match?.getCurrentTeam();
+      controller.events.setMessage({
+        text: `${player} ran out of time!`,
+        onConfirm: () => {
+          controller.setMessage(null);
+        },
+      });
+    }
+    const player =
+      lobby.players.find((player) => player.id === websocket.id)! ||
+      lobby.players[0];
+    return createMatchContext({
+      lobby,
+      player,
+      onTimeUpdate,
+      onTimeEnd,
+    });
   }, [lobby]);
 
   const controller = useMemo(() => {
-    if (!match || !lobby) return undefined;
     return new Controller({
       sceneManager,
       match,
       events: {
         setMessage: (message: Message | null) => setMessage(message),
         navigate: (route: APP_ROUTES) => navigate(route),
-        updateState: (state) => setControllerState(state),
+        setMatchInfo: (state) => setMatchInfo(state),
       },
-      options,
+      settings,
     });
-  }, [match, sceneManager, navigate]);
+  }, [match, sceneManager, navigate, setMatchInfo, setMessage, settings]);
 
-  function onTimeUpdate() {
-    const state = match?.state();
-    if (!state) return;
-    setControllerState(state);
-  }
+  useEffect(() => {
+    handleLocation(lobby, setLobby, location, controller, navigate);
+  }, [location]);
 
-  function onTimeEnd() {
-    match?.endMatch("time");
-    const player = match?.getCurrentTeam();
-    setMessage({
-      text: `${player} ran out of time!`,
-      onConfirm: () => {
-        setMessage(null);
-      },
-    });
-  }
+  const updateSettings = useCallback(
+    <KEY extends keyof typeof settings>(
+      key: KEY,
+      value: (typeof settings)[KEY]
+    ) => {
+      setSettings((prev) => ({
+        ...prev,
+        [key]: value,
+      }));
+    },
+    [setSettings]
+  );
 
   useEffect(() => {
     sceneManager.switchScene(location.pathname as APP_ROUTES);
@@ -102,7 +91,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
 
   useEffect(() => {
     websocket.on("opponentDisconnected", () => {
-      navigate(APP_ROUTES.Home);
+      navigate(APP_ROUTES.HOME);
       setLobby(undefined);
       setMessage({
         text: "Opponent has left the match",
@@ -115,7 +104,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
     websocket.on("lobbyInfo", (lobby: Lobby) => {
       setLobby(lobby);
       if (lobby.matchStarted) {
-        navigate(`${APP_ROUTES.Game}?key=${lobby.key}&type=${lobby.mode}`);
+        navigate(`${APP_ROUTES.GAME}?key=${lobby.key}&type=${lobby.mode}`);
         setMessage({
           text: "Match has started!",
           onConfirm: () => {
@@ -163,46 +152,27 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
         />
       )}
       <Routes>
-        <Route path={APP_ROUTES.Home} element={<Home />} />
+        <Route path={APP_ROUTES.HOME} element={<Home />} />
         <Route
-          path={APP_ROUTES.Lobby}
+          path={APP_ROUTES.LOBBY_SELECT}
           element={
             <LobbySelect setMessage={setMessage} setLoading={setLoading} />
           }
         />
         <Route
-          path={APP_ROUTES.OfflineLobby}
+          path={APP_ROUTES.LOBBY}
           element={
-            <OfflineLobby
+            <LobbyView
               setLobby={setLobby}
               lobby={lobby}
-              options={options}
-              updateOptions={updateOptions}
+              settings={settings}
+              updateSettings={updateSettings}
             />
           }
         />
         <Route
-          path={APP_ROUTES.OnlineLobby}
-          element={
-            <OnlineLobby
-              lobby={lobby}
-              options={options}
-              updateOptions={updateOptions}
-              setMessage={setMessage}
-            />
-          }
-        />
-        <Route
-          path={APP_ROUTES.Game}
-          element={
-            <Game
-              lobby={lobby}
-              setLobby={setLobby}
-              controller={controller}
-              setMessage={setMessage}
-              controllerState={controllerState}
-            />
-          }
+          path={APP_ROUTES.GAME}
+          element={<Game matchInfo={matchInfo} controller={controller} />}
         />
         <Route path={"*"} element={<NotFound />} />
       </Routes>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { LOBBY_TYPE } from "../../shared/match";
+import { Lobby, LOBBY_TYPE } from "../../shared/match";
 import { SelectionButton } from "../components/buttons/selection-button";
 import { Message } from "../components/modals/message-modal";
 import { Divider } from "../components/svg/divider";
@@ -24,7 +24,7 @@ export const LobbySelect: React.FC<{
             "inline-block h-full border-r-2 border-white min-w-16 p-3 hover:bg-white hover:bg-opacity-10"
           }
           size={30}
-          onClick={() => navigate(APP_ROUTES.Home)}
+          onClick={() => navigate(APP_ROUTES.HOME)}
         />
         <h1 className="inline-block place-self-center text-white grow text-center text-4xl font-bold italic pb-2">
           Select Lobby
@@ -35,7 +35,9 @@ export const LobbySelect: React.FC<{
           customClass="m-10 p-4 font-bold text-2xl border-2 border-white italic tracking-widest hover:opacity-80"
           text={"Local"}
           onClick={() => {
-            navigate(`${APP_ROUTES.OfflineLobby}?vs=computer&depth=3&time=10`);
+            navigate(
+              `${APP_ROUTES.LOBBY}?type=local&vs=computer&depth=3&time=10`
+            );
           }}
         />
         <Divider className="w-full z-10" />
@@ -49,7 +51,10 @@ export const LobbySelect: React.FC<{
                 `${ENV_BASE_URL}${RESOURCES.CREATE_LOBBY}`
               );
               const lobbyKey = await response.text();
-              navigate(`${APP_ROUTES.OnlineLobby}?key=${lobbyKey}`);
+              console.log("lobbyKey", lobbyKey);
+              navigate(
+                `${APP_ROUTES.LOBBY}?type=${LOBBY_TYPE.ONLINE}&key=${lobbyKey}`
+              );
             } catch (e) {
               if (e instanceof Error) {
                 setMessage({
@@ -94,7 +99,9 @@ export const LobbySelect: React.FC<{
                 if (!response.ok) {
                   throw new Error("Failed to join lobby");
                 }
-                navigate(`${APP_ROUTES.OnlineLobby}?key=${lobbyKey}`);
+                navigate(
+                  `${APP_ROUTES.LOBBY}?type=${LOBBY_TYPE.ONLINE}&key=${lobbyKey}`
+                );
               } catch (e) {
                 if (e instanceof Error) {
                   setMessage({

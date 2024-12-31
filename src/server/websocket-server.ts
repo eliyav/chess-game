@@ -47,7 +47,7 @@ export function createWebsocketServer({
       const lobby = lobbies.get(lobbyKey);
       if (!lobby) {
         return socket.emit("redirect", {
-          path: APP_ROUTES.Home,
+          path: APP_ROUTES.HOME,
           message: "Lobby does not exist",
         });
       }
@@ -60,7 +60,7 @@ export function createWebsocketServer({
         );
         if (!placeHolderPlayer) {
           return socket.emit("redirect", {
-            path: APP_ROUTES.Home,
+            path: APP_ROUTES.HOME,
             message: "Lobby is full",
           });
         }
@@ -86,7 +86,7 @@ export function createWebsocketServer({
       const lobby = lobbies.get(lobbyKey);
       if (!lobby) {
         return socket.emit("redirect", {
-          path: APP_ROUTES.Home,
+          path: APP_ROUTES.HOME,
           message: "Lobby does not exist",
         });
       }
@@ -99,7 +99,7 @@ export function createWebsocketServer({
         );
         if (!placeHolderPlayer) {
           return socket.emit("redirect", {
-            path: APP_ROUTES.Home,
+            path: APP_ROUTES.HOME,
             message: "Lobby is full",
           });
         }
