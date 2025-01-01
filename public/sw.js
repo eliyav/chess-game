@@ -1,5 +1,23 @@
 const expectedCaches = [`3d-chess-v1.3.11`];
 
+const allowedExtensions = [
+  "js",
+  "css",
+  "gltf",
+  "svg",
+  "jpg",
+  "jpeg",
+  "png",
+  "gif",
+  "ico",
+  "mp3",
+];
+
+function endsWithAny(str, extensions) {
+  const regex = new RegExp(`\\.(${extensions.join("|")})$`);
+  return regex.test(str);
+}
+
 // Use the install event to pre-cache all initial resources.
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -25,6 +43,7 @@ self.addEventListener("install", (event) => {
         "/click-2VCHPPVR.mp3",
         "/crumble-BBBHSYQE.mp3",
         "/tube-ZB5725HQ.png",
+        "/clock-CWUFNU4D.svg",
       ]);
     })()
   );
@@ -57,7 +76,10 @@ self.addEventListener("fetch", (event) => {
     (async () => {
       const isGetRequest = event.request.method === "GET";
       const isRootRequest = event.request.url === self.location.origin + "/";
-      if (isGetRequest && (event.request.url.includes(".") || isRootRequest)) {
+      if (
+        isGetRequest &&
+        (endsWithAny(event.request.url, allowedExtensions) || isRootRequest)
+      ) {
         const cache = await caches.open(expectedCaches.at(-1));
         // Get the resource from the cache.
         const cachedResponse = await cache.match(event.request);
