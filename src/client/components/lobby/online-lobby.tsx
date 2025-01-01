@@ -56,7 +56,10 @@ export const OnlineLobby: React.FC<{
             "inline-block h-full border-r-2 border-white min-w-16 p-3 hover:bg-white hover:bg-opacity-10"
           }
           size={30}
-          onClick={() => navigate(APP_ROUTES.LOBBY_SELECT)}
+          onClick={() => {
+            websocket.emit("leaveLobby", { lobbyKey: lobby.key });
+            navigate(APP_ROUTES.LOBBY_SELECT);
+          }}
         />
         <div className="relative inline-block grow place-content-center">
           <h1 className="place-self-center text-white text-center text-4xl font-bold italic pb-2">
