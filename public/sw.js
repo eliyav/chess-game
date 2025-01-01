@@ -67,20 +67,20 @@ self.addEventListener("fetch", (event) => {
     (async () => {
       const cache = await caches.open(expectedCaches.at(-1));
       const cachedResponse = await cache.match(event.request);
-      const isAllowedExtension = endsWithAny(
-        event.request.url,
-        allowedExtensions
-      );
-      const isAllowedAssetExtension = endsWithAny(
-        event.request.url,
-        allowedAssetExtensions
-      );
       try {
-        const isGetRequest = event.request.method === "GET";
+        if (event.request.method !== "GET") return await fetch(event.request);
         const isRootRequest = event.request.url === self.location.origin + "/";
-        if (isGetRequest && (isAllowedExtension || isRootRequest)) {
+        const isAllowedExtension = endsWithAny(
+          event.request.url,
+          allowedExtensions
+        );
+        if (isAllowedExtension || isRootRequest) {
           //Create a modified request to check if resource has changed
           const modifiedRequest = new Request(event.request);
+          const isAllowedAssetExtension = endsWithAny(
+            event.request.url,
+            allowedAssetExtensions
+          );
           if (isAllowedAssetExtension && cachedResponse) {
             return cachedResponse;
           }
