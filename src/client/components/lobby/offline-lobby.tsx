@@ -5,9 +5,9 @@ import { APP_ROUTES } from "../../../shared/routes";
 import { POSSIBLE_DEPTHS } from "../../game-logic/bot-opponent";
 import { SelectionButton } from "../buttons/selection-button";
 import { BackButton } from "../svg/back-button";
+import { Gear } from "../svg/gear";
 import { ControllerOptionsList } from "./controller-options-list";
 import PlayerCard from "./player-card";
-import { Gear } from "../svg/gear";
 
 export const OfflineLobby: React.FC<{
   lobby: Lobby;
@@ -32,12 +32,12 @@ export const OfflineLobby: React.FC<{
           Offline Lobby
         </h1>
       </div>
-      <div className="row-start-2 row-span-1 h-42 ml-auto mr-auto w-11/12 flex flex-col flex-wrap gap-0.5 justify-center md:w-3/4">
+      <div className="row-start-2 row-span-1 ml-auto mr-auto w-11/12 flex flex-col flex-wrap gap-0.5 justify-center md:w-3/4">
         {lobby.players.map((player, i) => {
           return (
             <PlayerCard key={i} player={player} hideReady={true}>
               {player.type === "computer" ? (
-                <div className="overflow-x-scroll whitespace-nowrap mt-1 p-1 rounded bg-slate-700 text-slate-200">
+                <div className="overflow-x-scroll whitespace-nowrap mt-1 p-1 rounded bg-slate-800 text-slate-200">
                   <span className="text-sm pr-2">Depth</span>
                   {POSSIBLE_DEPTHS.map((depth, i) => (
                     <button
@@ -123,13 +123,13 @@ export const OfflineLobby: React.FC<{
         </div>
       </div>
       <button
-        className="m-auto w-fit h-fit z-10 rounded-full p-3 border-2 bg-slate-700 border-slate-200 hover:bg-white hover:bg-opacity-10"
+        className="m-auto w-fit h-fit z-10 rounded-full p-3 border-2 bg-slate-700 border-slate-200 hover:bg-white hover:bg-opacity-10 !important"
         onClick={() => navigate(APP_ROUTES.SETTINGS)}
       >
         <Gear size={30} />
       </button>
       <SelectionButton
-        customClass="row-start-5 m-10 font-bold text-4xl border-2 border-white italic tracking-widest hover:opacity-80 md:w-1/2 md:justify-self-center"
+        customClass="row-start-5 m-10 font-bold text-4xl border-2 border-white italic tracking-widest hover:opacity-80 md:w-1/2 md:justify-self-center "
         text={"Start Game"}
         onClick={() => {
           if (player2.type === "computer") {

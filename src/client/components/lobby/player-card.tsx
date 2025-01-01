@@ -1,7 +1,7 @@
 import React from "react";
 import { Player, TEAM } from "../../../shared/match";
-import { Pawn } from "../svg/pawn";
 import { Checkmark } from "../svg/checkmark";
+import { Pawn } from "../svg/pawn";
 import { XIcon } from "../svg/x-icon";
 
 const PlayerCard: React.FC<{
@@ -10,7 +10,7 @@ const PlayerCard: React.FC<{
   hideReady?: boolean;
 }> = ({ player, hideReady = false, children }) => {
   return (
-    <div className="h-full relative w-1/2 grow p-1 bg-slate-700 rounded-lg border-2 border-slate-400">
+    <div className="h-full relative w-1/2 p-1 bg-slate-700 rounded-lg border-2 border-slate-400">
       <div className="h-12 bg-slate-500 rounded p-1 text-nowrap">
         <Pawn
           className={`inline-block team-symbol-background h-full border-r-2 mr-1  ${
