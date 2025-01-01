@@ -32,6 +32,7 @@ export interface ClientToServerEvents {
   undoTurnResponse: (data: { answer: boolean; lobbyKey: string }) => void;
   abandonMatch: (data: { lobbyKey: string }) => void;
   rejoinMatch: (data: { lobbyKey: string }) => void;
+  updateLobbyTime: (data: { lobbyKey: string; time: number }) => void;
 }
 
 export interface InterServerEvents {
