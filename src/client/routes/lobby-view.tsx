@@ -50,19 +50,11 @@ export const LobbyView: React.FC<{
   if (!lobby) return <LoadingScreen />;
 
   if (lobby.mode === LOBBY_TYPE.ONLINE) {
-    return (
-      <OnlineLobby
-        lobby={lobby}
-        settings={settings}
-        updateSettings={updateSettings}
-      />
-    );
+    return <OnlineLobby lobby={lobby} />;
   } else {
     return (
       <OfflineLobby
         lobby={lobby}
-        updateSettings={updateSettings}
-        settings={settings}
         updateLobby={updateLobby}
         updateOpponentType={updateOpponentType}
       />

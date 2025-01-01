@@ -1,11 +1,6 @@
 import React, { JSX } from "react";
-import { getOptionText, Settings } from "../../../shared/settings";
 
 interface ControllerOptionsProps {
-  settings: Settings;
-  onChange: (
-    key: keyof Settings
-  ) => (e: React.ChangeEvent<HTMLInputElement>) => void;
   uniqueOptions?: {
     text: string;
     onChange: (e: React.MouseEvent) => void;
@@ -16,8 +11,6 @@ interface ControllerOptionsProps {
 }
 
 export const ControllerOptionsList: React.FC<ControllerOptionsProps> = ({
-  settings,
-  onChange,
   uniqueOptions,
 }) => {
   return (
@@ -43,29 +36,6 @@ export const ControllerOptionsList: React.FC<ControllerOptionsProps> = ({
           )
         )}
       </div>
-      {Object.entries(settings).map(([key, value], i) => (
-        <label
-          key={i}
-          className={`select-none flex relative bg-slate-200 w-full p-2 rounded-lg border-2 hover:opacity-80 ${
-            value ? "border-green-500" : "border-red-500"
-          }`}
-        >
-          <input
-            type="checkbox"
-            className="hidden"
-            checked={value}
-            onChange={onChange(key as keyof Settings)}
-          />
-          {getOptionText(key as keyof Settings)}
-          <span
-            className={`absolute right-2 font-bold ${
-              value ? "text-green-500" : "text-red-500"
-            }`}
-          >
-            {value ? "ON" : "OFF"}
-          </span>
-        </label>
-      ))}
     </div>
   );
 };

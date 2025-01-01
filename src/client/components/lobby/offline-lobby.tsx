@@ -1,24 +1,18 @@
 import React from "react";
-import { SelectionButton } from "../buttons/selection-button";
 import { useNavigate } from "react-router-dom";
-import { APP_ROUTES } from "../../../shared/routes";
-import { BackButton } from "../svg/back-button";
 import { Lobby, LOBBY_TYPE } from "../../../shared/match";
-import PlayerCard from "./player-card";
+import { APP_ROUTES } from "../../../shared/routes";
 import { POSSIBLE_DEPTHS } from "../../game-logic/bot-opponent";
+import { SelectionButton } from "../buttons/selection-button";
+import { BackButton } from "../svg/back-button";
 import { ControllerOptionsList } from "./controller-options-list";
-import { Settings } from "../../../shared/settings";
+import PlayerCard from "./player-card";
 
 export const OfflineLobby: React.FC<{
   lobby: Lobby;
-  settings: Settings;
   updateLobby: <KEY extends keyof Lobby>(key: KEY, value: Lobby[KEY]) => void;
-  updateSettings: <KEY extends keyof Settings>(
-    key: KEY,
-    value: Settings[KEY]
-  ) => void;
   updateOpponentType: () => void;
-}> = ({ lobby, settings, updateSettings, updateLobby, updateOpponentType }) => {
+}> = ({ lobby, updateLobby, updateOpponentType }) => {
   const navigate = useNavigate();
 
   const player2 = lobby.players[1];
@@ -126,9 +120,6 @@ export const OfflineLobby: React.FC<{
                 disabled: false,
               },
             ]}
-            settings={settings}
-            onChange={(key) => (e: React.ChangeEvent<HTMLInputElement>) =>
-              updateSettings(key, e.target.checked)}
           />
         </div>
       </div>

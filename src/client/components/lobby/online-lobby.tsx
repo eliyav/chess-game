@@ -16,12 +16,7 @@ import PlayerCard from "./player-card";
 
 export const OnlineLobby: React.FC<{
   lobby: Lobby | undefined;
-  settings: Settings;
-  updateSettings: <KEY extends keyof Settings>(
-    key: KEY,
-    value: Settings[KEY]
-  ) => void;
-}> = ({ lobby, settings, updateSettings }) => {
+}> = ({ lobby }) => {
   const navigate = useNavigate();
   const [clipboardMessage, setClipboardMessage] = useState("");
 
@@ -126,9 +121,6 @@ export const OnlineLobby: React.FC<{
           })}
         </div>
         <ControllerOptionsList
-          settings={settings}
-          onChange={(key) => (e: React.ChangeEvent<HTMLInputElement>) =>
-            updateSettings(key, e.target.checked)}
           uniqueOptions={[
             {
               text: "Switch Teams",
