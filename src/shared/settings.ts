@@ -14,7 +14,9 @@ export function getSettings(): Settings {
   };
 }
 
-export function getOptionText(option: keyof Settings) {
+export function getOptionText(
+  option: string extends keyof Settings ? keyof Settings : string
+) {
   switch (option) {
     case "playAnimations":
       return "Animations";

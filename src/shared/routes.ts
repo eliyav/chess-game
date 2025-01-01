@@ -3,4 +3,5 @@ export const enum APP_ROUTES {
   LOBBY_SELECT = "/lobby-select",
   LOBBY = "/lobby",
   GAME = "/game",
+  SETTINGS = "/settings",
 }

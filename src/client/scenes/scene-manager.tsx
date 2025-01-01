@@ -36,7 +36,7 @@ export type ScenesDict = {
   [Scenes.PROMOTION]?: CustomScene<{}>;
 };
 
-const sceneRouting: Record<APP_ROUTES, { [state: string]: Scenes }> = {
+const sceneRouting: Partial<Record<APP_ROUTES, { [state: string]: Scenes }>> = {
   [APP_ROUTES.GAME]: {
     ["/"]: Scenes.GAME,
     ["promote"]: Scenes.PROMOTION,

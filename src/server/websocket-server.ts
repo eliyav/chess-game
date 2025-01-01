@@ -144,6 +144,13 @@ export function createWebsocketServer({
       io.to(lobbyKey).emit("lobbyInfo", lobby);
     });
 
+    socket.on("updateLobbyTime", ({ lobbyKey, time }) => {
+      const lobby = lobbies.get(lobbyKey);
+      if (!lobby) return;
+      lobby.time = time;
+      io.to(lobbyKey).emit("lobbyInfo", lobby);
+    });
+
     //Resolve Turn
     socket.on("resolvedMove", ({ from, to, key }) => {
       socket.to(key).emit("resolvedMove", { from, to });

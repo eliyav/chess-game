@@ -1,24 +1,19 @@
 import React from "react";
-import { SelectionButton } from "../buttons/selection-button";
 import { useNavigate } from "react-router-dom";
-import { APP_ROUTES } from "../../../shared/routes";
-import { BackButton } from "../svg/back-button";
 import { Lobby, LOBBY_TYPE } from "../../../shared/match";
-import PlayerCard from "./player-card";
+import { APP_ROUTES } from "../../../shared/routes";
 import { POSSIBLE_DEPTHS } from "../../game-logic/bot-opponent";
+import { SelectionButton } from "../buttons/selection-button";
+import { BackButton } from "../svg/back-button";
+import { Gear } from "../svg/gear";
 import { ControllerOptionsList } from "./controller-options-list";
-import { Settings } from "../../../shared/settings";
+import PlayerCard from "./player-card";
 
 export const OfflineLobby: React.FC<{
   lobby: Lobby;
-  settings: Settings;
   updateLobby: <KEY extends keyof Lobby>(key: KEY, value: Lobby[KEY]) => void;
-  updateSettings: <KEY extends keyof Settings>(
-    key: KEY,
-    value: Settings[KEY]
-  ) => void;
   updateOpponentType: () => void;
-}> = ({ lobby, settings, updateSettings, updateLobby, updateOpponentType }) => {
+}> = ({ lobby, updateLobby, updateOpponentType }) => {
   const navigate = useNavigate();
 
   const player2 = lobby.players[1];
@@ -37,37 +32,35 @@ export const OfflineLobby: React.FC<{
           Offline Lobby
         </h1>
       </div>
-      <div className="h-42 ml-auto mr-auto w-11/12 row-span-1 flex flex-col flex-wrap gap-0.5 justify-center md:w-3/4">
+      <div className="row-start-2 row-span-1 ml-auto mr-auto w-11/12 flex flex-col flex-wrap gap-0.5 justify-center md:w-3/4">
         {lobby.players.map((player, i) => {
           return (
-            <React.Fragment key={i}>
-              <PlayerCard player={player} hideReady={true}>
-                {player.type === "computer" ? (
-                  <div className="overflow-x-scroll whitespace-nowrap mt-1 p-1 rounded bg-slate-700 text-slate-200">
-                    <span className="text-sm pr-2">Depth</span>
-                    {POSSIBLE_DEPTHS.map((depth) => (
-                      <button
-                        key={depth}
-                        className={`py-1.5 px-2.5 mx-1 rounded ${
-                          lobby.depth === depth
-                            ? "bg-slate-500 border-2 border-white"
-                            : "bg-slate-600 border-2 border-transparent hover:bg-slate-500"
-                        }`}
-                        onClick={() => {
-                          updateLobby("players", [lobby.players[0], player]);
-                        }}
-                      >
-                        {depth}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
-              </PlayerCard>
-            </React.Fragment>
+            <PlayerCard key={i} player={player} hideReady={true}>
+              {player.type === "computer" ? (
+                <div className="overflow-x-scroll whitespace-nowrap mt-1 p-1 rounded bg-slate-800 text-slate-200">
+                  <span className="text-sm pr-2">Depth</span>
+                  {POSSIBLE_DEPTHS.map((depth, i) => (
+                    <button
+                      key={i}
+                      className={`py-1.5 px-2.5 mx-1 rounded border-2 border-black ${
+                        lobby.depth === depth
+                          ? "bg-slate-500  border-white"
+                          : "bg-slate-600 border-transparent hover:bg-slate-500"
+                      }`}
+                      onClick={() => {
+                        updateLobby("depth", depth);
+                      }}
+                    >
+                      {depth}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </PlayerCard>
           );
         })}
       </div>
-      <div className="row-span-2 flex flex-col gap-2 p-2 align-center">
+      <div className="flex flex-col gap-2 p-2 align-center">
         <div>
           <ControllerOptionsList
             uniqueOptions={[
@@ -126,14 +119,17 @@ export const OfflineLobby: React.FC<{
                 disabled: false,
               },
             ]}
-            settings={settings}
-            onChange={(key) => (e: React.ChangeEvent<HTMLInputElement>) =>
-              updateSettings(key, e.target.checked)}
           />
         </div>
       </div>
+      <button
+        className="m-auto w-fit h-fit z-10 rounded-full p-3 border-2 bg-slate-700 border-slate-200 hover:bg-white hover:bg-opacity-10 !important"
+        onClick={() => navigate(APP_ROUTES.SETTINGS)}
+      >
+        <Gear size={30} />
+      </button>
       <SelectionButton
-        customClass="row-start-5 m-10 font-bold text-4xl border-2 border-white italic tracking-widest hover:opacity-80 md:w-1/2 md:justify-self-center"
+        customClass="row-start-5 m-10 font-bold text-4xl border-2 border-white italic tracking-widest hover:opacity-80 md:w-1/2 md:justify-self-center "
         text={"Start Game"}
         onClick={() => {
           if (player2.type === "computer") {
