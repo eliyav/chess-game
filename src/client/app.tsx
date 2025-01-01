@@ -13,10 +13,11 @@ import { createMatchContext } from "./match-logic/create-match-context";
 import { Game } from "./routes/game";
 import { Home } from "./routes/home";
 import { LobbySelect } from "./routes/lobby-select";
+import { LobbyView } from "./routes/lobby-view";
 import NotFound from "./routes/not-found";
+import { SettingsPanel } from "./routes/settings-panel";
 import { type SceneManager } from "./scenes/scene-manager";
 import { websocket } from "./websocket-client";
-import { LobbyView } from "./routes/lobby-view";
 
 const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   const navigate = useNavigate();
@@ -173,6 +174,12 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
         <Route
           path={APP_ROUTES.GAME}
           element={<Game matchInfo={matchInfo} controller={controller} />}
+        />
+        <Route
+          path={APP_ROUTES.SETTINGS}
+          element={
+            <SettingsPanel settings={settings} setSettings={setSettings} />
+          }
         />
         <Route path={"*"} element={<NotFound />} />
       </Routes>
