@@ -1,17 +1,8 @@
-const expectedCaches = [`3d-chess-v1.3.11`];
+const expectedCaches = [`3d-chess-v1.4.0`];
 
-const allowedExtensions = [
-  "js",
-  "css",
-  "gltf",
-  "svg",
-  "jpg",
-  "jpeg",
-  "png",
-  "gif",
-  "ico",
-  "mp3",
-];
+const allowedAssetExtensions = ["gltf", "svg", "png", "ico", "mp3"];
+
+const allowedExtensions = ["js", "css", "json"].concat(allowedAssetExtensions);
 
 function endsWithAny(str, extensions) {
   const regex = new RegExp(`\\.(${extensions.join("|")})$`);
@@ -74,32 +65,46 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   event.respondWith(
     (async () => {
-      const isGetRequest = event.request.method === "GET";
-      const isRootRequest = event.request.url === self.location.origin + "/";
-      if (
-        isGetRequest &&
-        (endsWithAny(event.request.url, allowedExtensions) || isRootRequest)
-      ) {
-        const cache = await caches.open(expectedCaches.at(-1));
-        // Get the resource from the cache.
-        const cachedResponse = await cache.match(event.request);
-        //Create a modified request to check if resource has changed
-        const modifiedRequest = new Request(event.request);
-        if (cachedResponse) {
-          const lastModified = cachedResponse.headers.get("Last-Modified");
-          modifiedRequest.headers.set("If-Modified-Since", lastModified);
+      const cache = await caches.open(expectedCaches.at(-1));
+      const cachedResponse = await cache.match(event.request);
+      const isAllowedExtension = endsWithAny(
+        event.request.url,
+        allowedExtensions
+      );
+      const isAllowedAssetExtension = endsWithAny(
+        event.request.url,
+        allowedAssetExtensions
+      );
+      try {
+        const isGetRequest = event.request.method === "GET";
+        const isRootRequest = event.request.url === self.location.origin + "/";
+        if (isGetRequest && (isAllowedExtension || isRootRequest)) {
+          //Create a modified request to check if resource has changed
+          const modifiedRequest = new Request(event.request);
+          if (isAllowedAssetExtension && cachedResponse) {
+            return cachedResponse;
+          }
+          if (cachedResponse) {
+            const lastModified = cachedResponse.headers.get("Last-Modified");
+            modifiedRequest.headers.set("If-Modified-Since", lastModified);
+          }
+          const fetchResponse = await fetch(modifiedRequest);
+          //If response 304, then the resource is not modified, return cached response
+          if (fetchResponse.status === 304) {
+            return cachedResponse;
+          }
+          // Cache the new response
+          cache.put(event.request, fetchResponse.clone());
+          return fetchResponse;
+        } else {
+          //If not fetching an allowed extension, then return the original request
+          return await fetch(event.request);
         }
-        const fetchResponse = await fetch(modifiedRequest);
-        //If response 304, then the resource is not modified, return cached response
-        if (fetchResponse.status === 304) {
+      } catch (e) {
+        console.error(e);
+        if (cachedResponse) {
           return cachedResponse;
         }
-        // Cache the new response
-        cache.put(event.request, fetchResponse.clone());
-        return fetchResponse;
-      } else {
-        //If not fetching an asset, then return the original request
-        return await fetch(event.request);
       }
     })()
   );
