@@ -1,7 +1,7 @@
 import React from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { getOptionText, Settings } from "../../shared/settings";
+import { useNavigate } from "react-router-dom";
 import { APP_ROUTES } from "../../shared/routes";
+import { getOptionText, Settings } from "../../shared/settings";
 import { BackButton } from "../components/svg/back-button";
 
 export const SettingsPanel: React.FC<{
