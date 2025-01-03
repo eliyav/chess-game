@@ -1,10 +1,14 @@
 import "@babylonjs/loaders/glTF";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { Lobby } from "../shared/lobby";
 import { APP_ROUTES } from "../shared/routes";
 import { getSettings } from "../shared/settings";
 import LoadingScreen from "./components/loading-screen";
 import { Message, MessageModal } from "./components/modals/message-modal";
+import NotificationTab, {
+  Notification,
+} from "./components/modals/notification-tab";
 import { handleLocation } from "./handleLocation";
 import { BaseMatch } from "./match-logic/base-match";
 import { Controller } from "./match-logic/controller";
@@ -17,13 +21,13 @@ import NotFound from "./routes/not-found";
 import { SettingsPanel } from "./routes/settings-panel";
 import { type SceneManager } from "./scenes/scene-manager";
 import { websocket } from "./websocket-client";
-import { Lobby } from "../shared/lobby";
 
 const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [lobby, setLobby] = useState<Lobby>();
   const [message, setMessage] = useState<Message | null>(null);
+  const [notification, setNotification] = useState<Notification | null>(null);
   const [settings, setSettings] = useState(getSettings());
   const [loading, setLoading] = useState(false);
   const [matchInfo, setMatchInfo] = useState<ReturnType<BaseMatch["state"]>>();
@@ -152,6 +156,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
           onReject={message.onReject}
         />
       )}
+      {notification && <NotificationTab message={notification.message} />}
       <Routes>
         <Route path={APP_ROUTES.HOME} element={<Home />} />
         <Route
