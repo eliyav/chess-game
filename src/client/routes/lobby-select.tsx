@@ -5,14 +5,14 @@ import { MATCH_TYPE } from "../../shared/match";
 import { RESOURCES } from "../../shared/resources";
 import { APP_ROUTES } from "../../shared/routes";
 import { SelectionButton } from "../components/buttons/selection-button";
-import { Message } from "../components/modals/message-modal";
 import { BackButton } from "../components/svg/back-button";
 import { Divider } from "../components/svg/divider";
+import { Alert } from "../components/modals/alert-tab";
 
 export const LobbySelect: React.FC<{
-  setMessage: React.Dispatch<React.SetStateAction<Message | null>>;
+  setAlert: React.Dispatch<React.SetStateAction<Alert | null>>;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ setMessage, setLoading }) => {
+}> = ({ setLoading, setAlert }) => {
   const navigate = useNavigate();
   const [lobbyKey, setLobbyKey] = useState("");
 
@@ -51,21 +51,14 @@ export const LobbySelect: React.FC<{
                 `${ENV_BASE_URL}${RESOURCES.CREATE_LOBBY}`
               );
               const lobbyKey = await response.text();
-              console.log("lobbyKey", lobbyKey);
               navigate(
                 `${APP_ROUTES.LOBBY}?type=${MATCH_TYPE.ONLINE}&key=${lobbyKey}`
               );
             } catch (e) {
               if (e instanceof Error) {
-                setMessage({
-                  text: e.message,
-                  onConfirm: () => setMessage(null),
-                });
+                setAlert({ message: e.message });
               } else {
-                setMessage({
-                  text: "Failed to create lobby",
-                  onConfirm: () => setMessage(null),
-                });
+                setAlert({ message: "Failed to create lobby" });
               }
             } finally {
               setLoading(false);
@@ -104,15 +97,9 @@ export const LobbySelect: React.FC<{
                 );
               } catch (e) {
                 if (e instanceof Error) {
-                  setMessage({
-                    text: e.message,
-                    onConfirm: () => setMessage(null),
-                  });
+                  setAlert({ message: e.message });
                 } else {
-                  setMessage({
-                    text: "Failed to join lobby",
-                    onConfirm: () => setMessage(null),
-                  });
+                  setAlert({ message: "Failed to join lobby" });
                 }
               } finally {
                 setLoading(false);

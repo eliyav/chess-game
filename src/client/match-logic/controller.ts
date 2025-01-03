@@ -21,12 +21,14 @@ import { websocket } from "../websocket-client";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
 import { Lobby } from "../../shared/lobby";
+import { Alert } from "../components/modals/alert-tab";
 
 export class Controller {
   sceneManager: SceneManager;
   match: LocalMatch | OnlineMatch | undefined;
   events: {
     setMessage: (message: Message | null) => void;
+    setAlert: (alert: Alert | null) => void;
     navigate: (route: APP_ROUTES) => void;
     setMatchInfo: (state: Lobby | undefined) => void;
   };
@@ -43,6 +45,7 @@ export class Controller {
     sceneManager: SceneManager;
     events: {
       setMessage: (message: Message | null) => void;
+      setAlert: (alert: Alert | null) => void;
       navigate: (route: APP_ROUTES) => void;
       setMatchInfo: (state: Lobby | undefined) => void;
     };
@@ -335,6 +338,10 @@ export class Controller {
 
   setMessage(message: Message | null) {
     this.events.setMessage(message);
+  }
+
+  setAlert(notification: Alert | null) {
+    this.events.setAlert(notification);
   }
 
   leaveMatch() {

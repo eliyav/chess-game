@@ -1,17 +1,23 @@
 import { Location } from "react-router-dom";
+import { createLobby, Lobby } from "../shared/lobby";
 import { MATCH_TYPE, PlayerType } from "../shared/match";
 import { APP_ROUTES } from "../shared/routes";
-import { Controller } from "./match-logic/controller";
 import { websocket } from "./websocket-client";
-import { createLobby, Lobby } from "../shared/lobby";
+import { Alert } from "./components/modals/alert-tab";
 
-export function handleLocation(
-  lobby: Lobby | undefined,
-  setLobby: (lobby: Lobby | undefined) => void,
-  location: Location,
-  controller: Controller,
-  navigate: (to: string) => void
-) {
+export function handleLocation({
+  lobby,
+  setLobby,
+  setAlert,
+  location,
+  navigate,
+}: {
+  lobby: Lobby | undefined;
+  setLobby: (lobby: Lobby | undefined) => void;
+  setAlert: React.Dispatch<React.SetStateAction<Alert | null>>;
+  location: Location;
+  navigate: (to: string) => void;
+}) {
   const type = new URLSearchParams(location.search).get("type");
   const vs = new URLSearchParams(location.search).get(
     "vs"
@@ -29,11 +35,8 @@ export function handleLocation(
         if (key) {
           websocket.emit("joinLobby", { lobbyKey: key });
         } else {
-          controller?.events.setMessage({
-            text: "Lobby does not exist",
-            onConfirm: () => controller.events.setMessage(null),
-          });
           navigate(APP_ROUTES.LOBBY_SELECT);
+          setAlert({ message: "Lobby does not exist" });
         }
       }
       return;
