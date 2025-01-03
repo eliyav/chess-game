@@ -13,20 +13,18 @@ const AlertTab: React.FC<{ close: () => void } & Alert> = ({
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
+    const visibleTimeout = setTimeout(() => {
+      setIsVisible(true);
+    }, 100);
+    const closeTimeout = setTimeout(() => {
       setIsVisible(false);
       setTimeout(() => close && close(), alertAnimationTime);
     }, 2000);
 
-    return () => clearTimeout(timeout);
-  }, [setIsVisible]);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setIsVisible(true);
-    }, 100);
-
-    return () => clearTimeout(timeout);
+    return () => {
+      clearTimeout(visibleTimeout);
+      clearTimeout(closeTimeout);
+    };
   }, [setIsVisible]);
 
   return (
