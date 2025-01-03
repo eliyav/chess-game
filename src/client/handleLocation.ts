@@ -1,8 +1,9 @@
 import { Location } from "react-router-dom";
-import { createLobby, Lobby, LOBBY_TYPE, PlayerType } from "../shared/match";
+import { MATCH_TYPE, PlayerType } from "../shared/match";
 import { APP_ROUTES } from "../shared/routes";
 import { Controller } from "./match-logic/controller";
 import { websocket } from "./websocket-client";
+import { createLobby, Lobby } from "../shared/lobby";
 
 export function handleLocation(
   lobby: Lobby | undefined,
@@ -22,7 +23,7 @@ export function handleLocation(
     location.pathname === APP_ROUTES.GAME ||
     location.pathname === APP_ROUTES.LOBBY
   ) {
-    if (type === LOBBY_TYPE.ONLINE) {
+    if (type === MATCH_TYPE.ONLINE) {
       if (!lobby) {
         const key = new URLSearchParams(location.search).get("key");
         if (key) {
@@ -40,7 +41,7 @@ export function handleLocation(
       if (!lobby) {
         const searchParams = new URLSearchParams(location.search);
         const lobby = createLobby({
-          type: type as LOBBY_TYPE,
+          type: type as MATCH_TYPE,
           vs,
           time,
           depth,

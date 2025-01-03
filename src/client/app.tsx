@@ -1,7 +1,6 @@
 import "@babylonjs/loaders/glTF";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import { Lobby } from "../shared/match";
 import { APP_ROUTES } from "../shared/routes";
 import { getSettings } from "../shared/settings";
 import LoadingScreen from "./components/loading-screen";
@@ -18,6 +17,7 @@ import NotFound from "./routes/not-found";
 import { SettingsPanel } from "./routes/settings-panel";
 import { type SceneManager } from "./scenes/scene-manager";
 import { websocket } from "./websocket-client";
+import { Lobby } from "../shared/lobby";
 
 const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   const navigate = useNavigate();

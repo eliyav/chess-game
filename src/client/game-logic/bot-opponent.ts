@@ -5,8 +5,6 @@ import { TEAM } from "../../shared/match";
  * https://github.com/thomasahle/sunfish/blob/master/sunfish.py
  */
 
-export const POSSIBLE_DEPTHS = [3, 4];
-
 const weights = {
   [PIECE.P]: 100,
   [PIECE.N]: 280,

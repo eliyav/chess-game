@@ -1,12 +1,13 @@
 import { Point, Turn } from "../../shared/game";
-import { Lobby, LOBBY_TYPE, Player, TEAM } from "../../shared/match";
+import { Lobby } from "../../shared/lobby";
+import { MATCH_TYPE, Player, TEAM } from "../../shared/match";
 import { GAME_WORKER_URL } from "../constants";
 import { BaseMatch, MatchLogic } from "./base-match";
 import { Controller } from "./controller";
 import { createLocalEvents, LocalEvents } from "./events";
 
 export class LocalMatch extends BaseMatch implements MatchLogic {
-  mode: LOBBY_TYPE.LOCAL;
+  mode: MATCH_TYPE.OFFLINE;
   vsComputer: { maximizingPlayer: boolean; depth: number } | undefined;
   worker: Worker | undefined;
   events: LocalEvents[] | undefined;
@@ -23,7 +24,7 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
     onTimeEnd: () => void;
   }) {
     super({ lobby, player, onTimeUpdate, onTimeEnd });
-    this.mode = LOBBY_TYPE.LOCAL;
+    this.mode = MATCH_TYPE.OFFLINE;
     const isComputer = lobby.players.find(
       (player) => player.type === "computer"
     );

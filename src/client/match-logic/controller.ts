@@ -3,8 +3,7 @@ import { PickingInfo } from "@babylonjs/core/Collisions/pickingInfo";
 import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
 import type { Nullable } from "@babylonjs/core/types";
 import { GAMESTATUS, Point, Turn } from "../../shared/game";
-import { generateKey } from "../../shared/helpers";
-import { createLobby, Lobby, LOBBY_TYPE, TEAM } from "../../shared/match";
+import { MATCH_TYPE, TEAM } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
 import { Settings } from "../../shared/settings";
 import { Message } from "../components/modals/message-modal";
@@ -21,6 +20,7 @@ import { GameScene, SceneManager, Scenes } from "../scenes/scene-manager";
 import { websocket } from "../websocket-client";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
+import { Lobby } from "../../shared/lobby";
 
 export class Controller {
   sceneManager: SceneManager;
@@ -254,7 +254,7 @@ export class Controller {
 
   resetView() {
     this.render();
-    if (this.match?.lobby.mode === LOBBY_TYPE.LOCAL) {
+    if (this.match?.lobby.mode === MATCH_TYPE.OFFLINE) {
       this.rotateCamera();
     } else {
       this.resetCamera();
@@ -340,7 +340,7 @@ export class Controller {
   leaveMatch() {
     this.events.navigate(APP_ROUTES.HOME);
     if (
-      this.match?.mode === LOBBY_TYPE.ONLINE &&
+      this.match?.mode === MATCH_TYPE.ONLINE &&
       this.match?.getGame().getState().status === GAMESTATUS.INPROGRESS
     ) {
       websocket.emit("abandonMatch", { lobbyKey: this.match?.lobby.key });
@@ -348,7 +348,7 @@ export class Controller {
   }
 
   shouldCameraRotate() {
-    if (this.match?.lobby.mode === LOBBY_TYPE.LOCAL) {
+    if (this.match?.lobby.mode === MATCH_TYPE.OFFLINE) {
       if (
         this.match?.lobby.players.find((player) => player.type === "computer")
       ) {

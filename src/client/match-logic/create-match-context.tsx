@@ -1,4 +1,5 @@
-import { Lobby, LOBBY_TYPE, Player } from "../../shared/match";
+import { Lobby } from "../../shared/lobby";
+import { MATCH_TYPE, Player } from "../../shared/match";
 import { LocalMatch } from "./local-match";
 import { OnlineMatch } from "./online-match";
 
@@ -13,7 +14,7 @@ export function createMatchContext({
   onTimeUpdate: () => void;
   onTimeEnd: () => void;
 }) {
-  return lobby.mode === LOBBY_TYPE.LOCAL
+  return lobby.mode === MATCH_TYPE.OFFLINE
     ? new LocalMatch({
         lobby,
         player,

@@ -3,10 +3,11 @@ import cors from "cors";
 import express from "express";
 import { fileURLToPath } from "node:url";
 import path from "path";
-import { createLobby, Lobby, LOBBY_TYPE } from "../shared/match";
 import { RESOURCES } from "../shared/resources";
 import { createWebsocketServer } from "./websocket-server";
 import { generateKey } from "../shared/helpers";
+import { createLobby, Lobby } from "../shared/lobby";
+import { MATCH_TYPE } from "../shared/match";
 
 const clientPath = fileURLToPath(new URL("../client", import.meta.url));
 
@@ -24,7 +25,7 @@ app.use(express.text());
 
 app.get(RESOURCES.CREATE_LOBBY, (req, res) => {
   const lobby = createLobby({
-    type: LOBBY_TYPE.ONLINE,
+    type: MATCH_TYPE.ONLINE,
     vs: "human",
     key: generateKey(),
   });

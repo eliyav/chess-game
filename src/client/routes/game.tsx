@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Lobby, TEAM } from "../../shared/match";
+import { TEAM } from "../../shared/match";
 import { Overlay } from "../components/game-overlay/overlay";
 import { ClockIcon } from "../components/svg/clock-icon";
 import {
@@ -9,6 +9,7 @@ import {
   UndoIcon,
 } from "../components/svg/game-overlay-icons";
 import { Controller } from "../match-logic/controller";
+import { Lobby } from "../../shared/lobby";
 
 export const Game: React.FC<{
   matchInfo: Lobby | undefined;
