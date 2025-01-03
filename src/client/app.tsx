@@ -1,11 +1,12 @@
 import "@babylonjs/loaders/glTF";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import { Lobby } from "../shared/match";
+import { Lobby } from "../shared/lobby";
 import { APP_ROUTES } from "../shared/routes";
 import { getSettings } from "../shared/settings";
 import LoadingScreen from "./components/loading-screen";
 import { Message, MessageModal } from "./components/modals/message-modal";
+import AlertTab, { Alert } from "./components/modals/alert-tab";
 import { handleLocation } from "./handleLocation";
 import { BaseMatch } from "./match-logic/base-match";
 import { Controller } from "./match-logic/controller";
@@ -24,6 +25,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   const location = useLocation();
   const [lobby, setLobby] = useState<Lobby>();
   const [message, setMessage] = useState<Message | null>(null);
+  const [alert, setAlert] = useState<Alert | null>(null);
   const [settings, setSettings] = useState(getSettings());
   const [loading, setLoading] = useState(false);
   const [matchInfo, setMatchInfo] = useState<ReturnType<BaseMatch["state"]>>();
@@ -61,8 +63,9 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
       sceneManager,
       match,
       events: {
-        setMessage: (message: Message | null) => setMessage(message),
-        navigate: (route: APP_ROUTES) => navigate(route),
+        setMessage: (message) => setMessage(message),
+        setAlert: (alert) => setAlert(alert),
+        navigate: (route) => navigate(route),
         setMatchInfo: (state) => setMatchInfo(state),
       },
       settings,
@@ -70,7 +73,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   }, [match, sceneManager, navigate, setMatchInfo, setMessage, settings]);
 
   useEffect(() => {
-    handleLocation(lobby, setLobby, location, controller, navigate);
+    handleLocation({ lobby, setLobby, location, navigate, setAlert });
   }, [location]);
 
   const updateSettings = useCallback(
@@ -106,11 +109,8 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
       setLobby(lobby);
       if (lobby.matchStarted) {
         navigate(`${APP_ROUTES.GAME}?key=${lobby.key}&type=${lobby.mode}`);
-        setMessage({
-          text: "Match has started!",
-          onConfirm: () => {
-            setMessage(null);
-          },
+        setAlert({
+          message: "Match has started!",
         });
       }
     });
@@ -126,11 +126,8 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
         navigate(path);
       }
       if (message) {
-        setMessage({
-          text: message,
-          onConfirm: () => {
-            setMessage(null);
-          },
+        setAlert({
+          message,
         });
       }
     });
@@ -140,7 +137,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
       websocket.off("lobbyInfo");
       websocket.off("opponentDisconnected");
     };
-  }, [websocket, navigate, setMessage, setLobby]);
+  }, [websocket, navigate, setMessage, setAlert, setLobby]);
 
   return (
     <>
@@ -152,13 +149,19 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
           onReject={message.onReject}
         />
       )}
+      {alert && (
+        <AlertTab
+          message={alert.message}
+          close={() => {
+            setAlert(null);
+          }}
+        />
+      )}
       <Routes>
         <Route path={APP_ROUTES.HOME} element={<Home />} />
         <Route
           path={APP_ROUTES.LOBBY_SELECT}
-          element={
-            <LobbySelect setMessage={setMessage} setLoading={setLoading} />
-          }
+          element={<LobbySelect setLoading={setLoading} setAlert={setAlert} />}
         />
         <Route
           path={APP_ROUTES.LOBBY}

@@ -1,13 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Lobby, LOBBY_TYPE } from "../../../shared/match";
+import { MATCH_TYPE } from "../../../shared/match";
 import { APP_ROUTES } from "../../../shared/routes";
-import { POSSIBLE_DEPTHS } from "../../game-logic/bot-opponent";
 import { SelectionButton } from "../buttons/selection-button";
 import { BackButton } from "../svg/back-button";
 import { Gear } from "../svg/gear";
 import { ControllerOptionsList } from "./controller-options-list";
 import PlayerCard from "./player-card";
+import { Lobby } from "../../../shared/lobby";
+import { POSSIBLE_DEPTHS } from "../../../shared/constants";
 
 export const OfflineLobby: React.FC<{
   lobby: Lobby;
@@ -134,11 +135,11 @@ export const OfflineLobby: React.FC<{
         onClick={() => {
           if (player2.type === "computer") {
             navigate(
-              `${APP_ROUTES.GAME}?type=${LOBBY_TYPE.LOCAL}&vs=${player2.type}&depth=${lobby.depth}&time=${lobby.time}`
+              `${APP_ROUTES.GAME}?type=${MATCH_TYPE.OFFLINE}&vs=${player2.type}&depth=${lobby.depth}&time=${lobby.time}`
             );
           } else {
             navigate(
-              `${APP_ROUTES.GAME}?type=${LOBBY_TYPE.LOCAL}&vs=${player2.type}&time=${lobby.time}`
+              `${APP_ROUTES.GAME}?type=${MATCH_TYPE.OFFLINE}&vs=${player2.type}&time=${lobby.time}`
             );
           }
         }}

@@ -1,16 +1,23 @@
 import { Location } from "react-router-dom";
-import { createLobby, Lobby, LOBBY_TYPE, PlayerType } from "../shared/match";
+import { createLobby, Lobby } from "../shared/lobby";
+import { MATCH_TYPE, PlayerType } from "../shared/match";
 import { APP_ROUTES } from "../shared/routes";
-import { Controller } from "./match-logic/controller";
 import { websocket } from "./websocket-client";
+import { Alert } from "./components/modals/alert-tab";
 
-export function handleLocation(
-  lobby: Lobby | undefined,
-  setLobby: (lobby: Lobby | undefined) => void,
-  location: Location,
-  controller: Controller,
-  navigate: (to: string) => void
-) {
+export function handleLocation({
+  lobby,
+  setLobby,
+  setAlert,
+  location,
+  navigate,
+}: {
+  lobby: Lobby | undefined;
+  setLobby: (lobby: Lobby | undefined) => void;
+  setAlert: React.Dispatch<React.SetStateAction<Alert | null>>;
+  location: Location;
+  navigate: (to: string) => void;
+}) {
   const type = new URLSearchParams(location.search).get("type");
   const vs = new URLSearchParams(location.search).get(
     "vs"
@@ -22,17 +29,14 @@ export function handleLocation(
     location.pathname === APP_ROUTES.GAME ||
     location.pathname === APP_ROUTES.LOBBY
   ) {
-    if (type === LOBBY_TYPE.ONLINE) {
+    if (type === MATCH_TYPE.ONLINE) {
       if (!lobby) {
         const key = new URLSearchParams(location.search).get("key");
         if (key) {
           websocket.emit("joinLobby", { lobbyKey: key });
         } else {
-          controller?.events.setMessage({
-            text: "Lobby does not exist",
-            onConfirm: () => controller.events.setMessage(null),
-          });
           navigate(APP_ROUTES.LOBBY_SELECT);
+          setAlert({ message: "Lobby does not exist" });
         }
       }
       return;
@@ -40,7 +44,7 @@ export function handleLocation(
       if (!lobby) {
         const searchParams = new URLSearchParams(location.search);
         const lobby = createLobby({
-          type: type as LOBBY_TYPE,
+          type: type as MATCH_TYPE,
           vs,
           time,
           depth,

@@ -1,9 +1,10 @@
 import React, { useCallback } from "react";
-import { LOBBY_TYPE, Lobby } from "../../shared/match";
+import { MATCH_TYPE } from "../../shared/match";
 import { Settings } from "../../shared/settings";
 import LoadingScreen from "../components/loading-screen";
 import { OfflineLobby } from "../components/lobby/offline-lobby";
 import { OnlineLobby } from "../components/lobby/online-lobby";
+import { Lobby } from "../../shared/lobby";
 
 export const LobbyView: React.FC<{
   lobby: Lobby | undefined;
@@ -17,7 +18,7 @@ export const LobbyView: React.FC<{
   const updateLobby = useCallback(
     <KEY extends keyof Lobby>(key: KEY, value: Lobby[KEY]) => {
       setLobby((prev) => ({
-        mode: prev?.mode ?? LOBBY_TYPE.LOCAL,
+        mode: prev?.mode ?? MATCH_TYPE.OFFLINE,
         key: prev?.key ?? "",
         players: prev?.players ?? [],
         matchStarted: prev?.matchStarted ?? false,
@@ -49,7 +50,7 @@ export const LobbyView: React.FC<{
 
   if (!lobby) return <LoadingScreen />;
 
-  if (lobby.mode === LOBBY_TYPE.ONLINE) {
+  if (lobby.mode === MATCH_TYPE.ONLINE) {
     return <OnlineLobby lobby={lobby} />;
   } else {
     return (

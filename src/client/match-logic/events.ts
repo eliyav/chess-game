@@ -50,9 +50,8 @@ export function createOnlineEvents({
         if (answer) {
           match.reset();
           controller.resetView();
-          controller.setMessage({
-            text: "Match reset successfully!",
-            onConfirm: () => controller.setMessage(null),
+          controller.setAlert({
+            message: "Match reset successfully!",
           });
         }
       },
@@ -93,9 +92,8 @@ export function createOnlineEvents({
       event: ({ answer }: { answer: boolean }) => {
         if (answer) {
           controller.undoTurn();
-          controller.setMessage({
-            text: "Last move has been undone successfully!",
-            onConfirm: () => controller.setMessage(null),
+          controller.setAlert({
+            message: "Last move has been undone successfully!",
           });
         }
       },

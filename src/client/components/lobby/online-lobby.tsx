@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ENV_BASE_URL } from "../..";
-import { Lobby, LOBBY_TYPE } from "../../../shared/match";
+import { MATCH_TYPE } from "../../../shared/match";
 import { APP_ROUTES } from "../../../shared/routes";
 import { websocket } from "../../websocket-client";
 import { SelectionButton } from "../buttons/selection-button";
@@ -13,6 +13,7 @@ import { CopyUrl } from "../svg/copy-url";
 import { Gear } from "../svg/gear";
 import { ControllerOptionsList } from "./controller-options-list";
 import PlayerCard from "./player-card";
+import { Lobby } from "../../../shared/lobby";
 
 export const OnlineLobby: React.FC<{
   lobby: Lobby | undefined;
@@ -109,7 +110,7 @@ export const OnlineLobby: React.FC<{
                     )}
                     <CopyUrl
                       onClick={() => {
-                        const url = `${ENV_BASE_URL}${APP_ROUTES.LOBBY}?type=${LOBBY_TYPE.ONLINE}&key=${lobby.key}`;
+                        const url = `${ENV_BASE_URL}${APP_ROUTES.LOBBY}?type=${MATCH_TYPE.ONLINE}&key=${lobby.key}`;
                         copyToClipboard(url, "URL");
                       }}
                       size={35}

@@ -1,5 +1,5 @@
 import { Point } from "./game";
-import { Lobby } from "./match";
+import { Lobby } from "./lobby";
 import { APP_ROUTES } from "./routes";
 
 export interface ServerToClientEvents {

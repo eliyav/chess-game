@@ -1,12 +1,13 @@
 import { Point } from "../../shared/game";
-import { Lobby, LOBBY_TYPE, Player, TEAM } from "../../shared/match";
+import { Lobby } from "../../shared/lobby";
+import { MATCH_TYPE, Player } from "../../shared/match";
 import { websocket } from "../websocket-client";
 import { BaseMatch, MatchLogic } from "./base-match";
 import { Controller } from "./controller";
 import { createOnlineEvents, OnlineEvents } from "./events";
 
 export class OnlineMatch extends BaseMatch implements MatchLogic {
-  mode: LOBBY_TYPE.ONLINE;
+  mode: MATCH_TYPE.ONLINE;
   events: OnlineEvents[] | undefined;
 
   constructor({
@@ -21,7 +22,7 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
     onTimeEnd: () => void;
   }) {
     super({ lobby, player, onTimeEnd, onTimeUpdate });
-    this.mode = LOBBY_TYPE.ONLINE;
+    this.mode = MATCH_TYPE.ONLINE;
   }
 
   move({ from, to }: { from: Point; to: Point }) {

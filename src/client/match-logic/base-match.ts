@@ -1,5 +1,6 @@
 import { GAMESTATUS, Point, Turn } from "../../shared/game";
-import { Lobby, LOBBY_TYPE, Player, TEAM } from "../../shared/match";
+import { Lobby } from "../../shared/lobby";
+import { MATCH_TYPE, Player, TEAM } from "../../shared/match";
 import Game from "../game-logic/game";
 import { Controller } from "./controller";
 import { MatchTimer } from "./match-timer";
@@ -75,7 +76,7 @@ export class BaseMatch {
       (player) => player.team === currentTeam
     );
     if (currentPlayer?.type === "computer") return false;
-    if (this.lobby.mode === LOBBY_TYPE.ONLINE) {
+    if (this.lobby.mode === MATCH_TYPE.ONLINE) {
       return currentPlayer?.team === this.player.team;
     } else {
       return true;

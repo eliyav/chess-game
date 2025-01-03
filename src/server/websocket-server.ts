@@ -1,12 +1,12 @@
 import { Server as Webserver } from "node:http";
 import { Server } from "socket.io";
-import { Lobby, LOBBY_TYPE } from "../shared/match";
 import { APP_ROUTES } from "../shared/routes";
 import {
   ClientToServerEvents,
   InterServerEvents,
   ServerToClientEvents,
 } from "../shared/websocket";
+import { Lobby } from "../shared/lobby";
 
 export function createWebsocketServer({
   server,
