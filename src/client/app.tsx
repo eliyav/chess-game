@@ -70,7 +70,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
       },
       settings,
     });
-  }, [match, sceneManager, navigate, setMatchInfo, setMessage, settings]);
+  }, [match, sceneManager, settings]);
 
   useEffect(() => {
     handleLocation({ lobby, setLobby, location, navigate, setAlert });
