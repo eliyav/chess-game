@@ -19,6 +19,7 @@ import NotFound from "./routes/not-found";
 import { SettingsPanel } from "./routes/settings-panel";
 import { type SceneManager } from "./scenes/scene-manager";
 import { websocket } from "./websocket-client";
+import { PIECE } from "../shared/game";
 
 const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
   const navigate = useNavigate();
@@ -47,6 +48,29 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
         },
       });
     }
+    function onPromotion(resolve: (value: PIECE) => void) {
+      setMessage({
+        text: "Promote to:",
+        children: (
+          <div className="flex gap-2 justify-center">
+            {Object.values(PIECE)
+              .filter((piece) => piece !== PIECE.P && piece !== PIECE.K)
+              .map((piece) => (
+                <button
+                  key={piece}
+                  onClick={() => {
+                    resolve(piece);
+                    setMessage(null);
+                  }}
+                  className={`p-2 mb-2 rounded-xl font-mono font-bold border-2 border-black min-w-20 bg-green-500 hover:bg-green-600`}
+                >
+                  {piece}
+                </button>
+              ))}
+          </div>
+        ),
+      });
+    }
     const player =
       lobby.players.find((player) => player.id === websocket.id)! ||
       lobby.players[0];
@@ -55,6 +79,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
       player,
       onTimeUpdate,
       onTimeEnd,
+      onPromotion,
     });
   }, [lobby]);
 
@@ -147,6 +172,7 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
           text={message.text}
           onConfirm={message.onConfirm}
           onReject={message.onReject}
+          children={message.children}
         />
       )}
       {alert && (
