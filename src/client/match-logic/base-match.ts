@@ -49,12 +49,12 @@ export class BaseMatch {
     this.timer?.start();
   }
 
-  move({ from, to }: { from: Point; to: Point }): {
+  async move({ from, to }: { from: Point; to: Point }): Promise<{
     turn: Turn | undefined;
     callback?: () => void;
-  } {
+  }> {
     return {
-      turn: this.getGame().move({
+      turn: await this.getGame().move({
         from: from,
         to: to,
       }),
