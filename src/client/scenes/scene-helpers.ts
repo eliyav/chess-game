@@ -20,7 +20,11 @@ export const showMoves = ({
   gameScene: GameScene;
   visibleMoves: boolean;
 }) => {
-  showSelectedPiece({ move: point, gameScene });
+  const movingPiecePosition = getPositionFromPoint({
+    point,
+    externalMesh: false,
+  });
+  highlightPiece({ type: "piece", position: movingPiecePosition, gameScene });
   if (visibleMoves) {
     for (const move of moves) {
       const { to, type } = move;
@@ -30,30 +34,30 @@ export const showMoves = ({
   }
 };
 
-const showSelectedPiece = ({
-  move,
+export function highlightPiece({
+  position,
   gameScene,
+  type,
 }: {
-  move: Point;
+  position: Point;
   gameScene: GameScene;
-}) => {
+  type: "piece" | "checkedPiece";
+}) {
+  const [z, x] = position;
   const torus = MeshBuilder.CreateTorus("torus", {
     diameter: 2.6,
     thickness: 0.2,
     tessellation: 16,
   });
   torus.isPickable = false;
-  const [z, x] = getPositionFromPoint({
-    point: move,
-    externalMesh: false,
-  });
+
   torus.setPositionWithLocalVector(new Vector3(x, Y_ABOVE_FLOOR, z));
-  const material = findMaterial("piece", gameScene.scene);
+  const material = findMaterial(type, gameScene.scene);
   if (material) {
     torus.material = material;
   }
   gameScene.data.meshesToRender.push(torus);
-};
+}
 
 const findMaterial = (name: string, scene: Scene) => {
   return scene.materials.find((mat: Material) => mat.id === name);
