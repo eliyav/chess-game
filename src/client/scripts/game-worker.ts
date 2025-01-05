@@ -12,6 +12,9 @@ function requestMove({
   const bestMove = game.getBestMove({
     depth,
     maximizingPlayer,
+    progressLogger: (progress) => {
+      self.postMessage({ type: "progress", progress });
+    },
   });
   if (!bestMove) return;
   game.move(bestMove);
