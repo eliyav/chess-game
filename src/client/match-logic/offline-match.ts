@@ -6,7 +6,7 @@ import { BaseMatch, MatchLogic } from "./base-match";
 import { Controller } from "./controller";
 import { createLocalEvents, LocalEvents } from "./events";
 
-export class LocalMatch extends BaseMatch implements MatchLogic {
+export class OfflineMatch extends BaseMatch implements MatchLogic {
   mode: MATCH_TYPE.OFFLINE;
   vsComputer: { maximizingPlayer: boolean; depth: number } | undefined;
   worker: Worker | undefined;

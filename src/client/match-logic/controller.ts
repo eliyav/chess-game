@@ -19,14 +19,14 @@ import {
 } from "../scenes/scene-helpers";
 import { GameScene, SceneManager, Scenes } from "../scenes/scene-manager";
 import { websocket } from "../websocket-client";
-import { LocalMatch } from "./local-match";
+import { OfflineMatch } from "./offline-match";
 import { OnlineMatch } from "./online-match";
 import { Lobby } from "../../shared/lobby";
 import { Alert } from "../components/modals/alert-tab";
 
 export class Controller {
   sceneManager: SceneManager;
-  match: LocalMatch | OnlineMatch | undefined;
+  match: OfflineMatch | OnlineMatch | undefined;
   events: {
     setMessage: (message: Message | null) => void;
     setAlert: (alert: Alert | null) => void;
@@ -42,7 +42,7 @@ export class Controller {
     events,
     settings,
   }: {
-    match: LocalMatch | OnlineMatch | undefined;
+    match: OfflineMatch | OnlineMatch | undefined;
     sceneManager: SceneManager;
     events: {
       setMessage: (message: Message | null) => void;
