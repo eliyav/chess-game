@@ -191,16 +191,15 @@ export class Controller {
       name,
     });
     if (isOpponentInCheck) {
-      //Get king position
       const kingPoint = this.match?.getAllGamePieces().find(({ piece }) => {
         return (
           piece?.type === PIECE.K &&
-          piece?.team !== this.match?.getCurrentTeam()
+          piece?.team === this.match?.getCurrentTeam()
         );
       })?.point;
       const kingPosition = getPositionFromPoint({
         point: kingPoint!,
-        externalMesh: true,
+        externalMesh: false,
       });
       highlightPiece({
         gameScene,
