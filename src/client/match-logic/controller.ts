@@ -120,10 +120,10 @@ export class Controller {
 
   async move({ move, emit = true }: { move: Point[]; emit?: boolean }) {
     const [from, to] = move;
-    const { turn, callback } = this.match!.move({
+    const { turn, callback } = (await this.match?.move({
       from,
       to,
-    });
+    })) || { turn: undefined, callback: () => {} };
     if (!turn) return false;
     await this.handleValidTurn({ turn });
     if (emit) {

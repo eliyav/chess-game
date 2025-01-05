@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 
 export type Message = {
   text: string;
-  onConfirm: () => void;
+  onConfirm?: () => void;
   onReject?: () => void;
   children?: ReactNode;
 };
@@ -19,14 +19,16 @@ export const MessageModal: React.FC<Message> = ({
         <p className="mb-4 text-lg font-semibold text-center bg-slate-300 p-2 rounded">
           {text}
         </p>
-        {children && <div className="mb-4">{children}</div>}
+        {children}
         <div className="flex gap-2 justify-center">
-          <button
-            className="bg-green-500 p-2 rounded-xl font-mono font-bold border-2 border-black min-w-20 hover:bg-green-600"
-            onClick={onConfirm}
-          >
-            Confirm
-          </button>
+          {onConfirm && (
+            <button
+              className="bg-green-500 p-2 rounded-xl font-mono font-bold border-2 border-black min-w-20 hover:bg-green-600"
+              onClick={onConfirm}
+            >
+              Confirm
+            </button>
+          )}
           {onReject && (
             <button
               className="bg-red-500 p-2 rounded-xl font-mono font-bold border-2 border-black min-w-20 hover:bg-red-600"

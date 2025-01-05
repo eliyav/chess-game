@@ -57,16 +57,18 @@ class Game {
     return this.current.turns.length + 1;
   }
 
-  public move({
+  public async move({
     from,
     to,
     grid = this.current.grid,
     simulate,
+    onPromotion,
   }: {
     from: Point;
     to: Point;
     grid?: Grid;
     simulate?: boolean;
+    onPromotion?: (resolve: (piece: PIECE) => void) => void;
   }) {
     if (this.current.status !== GAMESTATUS.INPROGRESS) return;
     const move = this.findMove({ grid, from, to });
@@ -76,6 +78,26 @@ class Game {
       grid,
     });
     if (!resolved) return;
+    if (resolved.promotion) {
+      if (!onPromotion) {
+        this.setPromotionPiece({
+          to,
+          team: this.getCurrentTeam(),
+          type: PIECE.Q,
+          grid,
+        });
+      } else {
+        const selection = await new Promise<PIECE>((resolve) => {
+          onPromotion?.(resolve);
+        });
+        this.setPromotionPiece({
+          to,
+          team: this.getCurrentTeam(),
+          type: selection,
+          grid,
+        });
+      }
+    }
     this.annotate(resolved);
     if (!simulate) {
       this.nextTurn();
@@ -99,14 +121,6 @@ class Game {
     }
     if (!resolvedMove) return;
 
-    if (resolvedMove.promotion) {
-      this.setPromotionPiece({
-        to,
-        team: movingPiece.team,
-        type: PIECE.Q,
-        grid,
-      });
-    }
     const isOpponentInCheck =
       this.isChecked({
         team: this.getCurrentTeamsOpponent(),

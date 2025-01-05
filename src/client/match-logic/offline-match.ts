@@ -1,4 +1,4 @@
-import { Point, Turn } from "../../shared/game";
+import { PIECE, Point, Turn } from "../../shared/game";
 import { Lobby } from "../../shared/lobby";
 import { MATCH_TYPE, Player, TEAM } from "../../shared/match";
 import { GAME_WORKER_URL } from "../constants";
@@ -11,20 +11,24 @@ export class OfflineMatch extends BaseMatch implements MatchLogic {
   vsComputer: { maximizingPlayer: boolean; depth: number } | undefined;
   worker: Worker | undefined;
   events: LocalEvents | undefined;
+  onPromotion: (resolve: (piece: PIECE) => void) => void;
 
   constructor({
     lobby,
     player,
     onTimeEnd,
     onTimeUpdate,
+    onPromotion,
   }: {
     lobby: Lobby;
     player: Player;
     onTimeUpdate: () => void;
     onTimeEnd: () => void;
+    onPromotion: (resolve: (piece: PIECE) => void) => void;
   }) {
     super({ lobby, player, onTimeUpdate, onTimeEnd });
     this.mode = MATCH_TYPE.OFFLINE;
+    this.onPromotion = onPromotion;
     const isComputer = lobby.players.find(
       (player) => player.type === "computer"
     );
@@ -36,13 +40,14 @@ export class OfflineMatch extends BaseMatch implements MatchLogic {
       : undefined;
   }
 
-  move({ from, to }: { from: Point; to: Point }): {
+  async move({ from, to }: { from: Point; to: Point }): Promise<{
     turn: Turn | undefined;
     callback: () => void;
-  } {
-    const turn = this.getGame().move({
+  }> {
+    const turn = await this.getGame().move({
       from: from,
       to: to,
+      onPromotion: this.onPromotion,
     });
     this.timer?.switchPlayer();
     return {
