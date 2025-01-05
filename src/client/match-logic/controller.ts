@@ -228,6 +228,15 @@ export class Controller {
     });
   }
 
+  setThinkingProgress(progress: number) {
+    if (this.match) {
+      this.events.setMatchInfo({
+        ...this.match.state(),
+        progress,
+      });
+    }
+  }
+
   createMatchEndPrompt(status: GAMESTATUS) {
     const text = (() => {
       const winningTeam = this.match?.getWinner();
