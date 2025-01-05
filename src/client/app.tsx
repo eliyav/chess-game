@@ -35,7 +35,16 @@ const App: React.FC<{ sceneManager: SceneManager }> = ({ sceneManager }) => {
     function onTimeUpdate() {
       const state = controller.match?.state();
       if (!state) return;
-      setMatchInfo(state);
+      setMatchInfo((prev) => {
+        if (prev) {
+          return {
+            ...prev,
+            ...state,
+          };
+        } else {
+          return state;
+        }
+      });
     }
     function onTimeEnd() {
       controller.match?.endMatch("time");
