@@ -11,6 +11,10 @@ function createMovementMaterials(scene: Scene) {
   pieceMaterial.diffuseColor = new Color3(0, 1, 0.2);
   pieceMaterial.specularColor = new Color3(0.15, 0.15, 0.15);
 
+  const checkedPieceMaterial = new StandardMaterial("checkedPiece", scene);
+  checkedPieceMaterial.diffuseColor = new Color3(1, 0, 0.2);
+  checkedPieceMaterial.specularColor = new Color3(0.15, 0.15, 0.15);
+
   const movementMaterial = new StandardMaterial("movement", scene);
   movementMaterial.diffuseColor = new Color3(1, 0.64, 0);
   movementMaterial.specularColor = new Color3(0.15, 0.15, 0.15);
@@ -47,6 +51,7 @@ function createMovementMaterials(scene: Scene) {
     castleMaterial,
     squareMaterial,
     previousTurnMaterial,
+    checkedPieceMaterial,
   };
 }
 

@@ -522,9 +522,11 @@ class Game {
   getBestMove({
     depth,
     maximizingPlayer,
+    progressLogger,
   }: {
     depth: number;
     maximizingPlayer: boolean;
+    progressLogger?: (progress: number) => void;
   }) {
     let sum = 0;
     const result = this.minimax({
@@ -534,6 +536,7 @@ class Game {
       alpha: Number.NEGATIVE_INFINITY,
       beta: Number.POSITIVE_INFINITY,
       sum,
+      progressLogger,
     });
     if (!result.bestMove) return;
     const { from, to } = result.bestMove;
@@ -547,6 +550,7 @@ class Game {
     alpha,
     beta,
     sum,
+    progressLogger,
   }: {
     grid: Grid;
     depth: number;
@@ -554,6 +558,7 @@ class Game {
     alpha: number;
     beta: number;
     sum: number;
+    progressLogger?: (progress: number) => void;
   }): {
     bestMove: Move | null;
     value: number;
@@ -575,6 +580,7 @@ class Game {
     let bestMove: Move | null = null;
     let maxValue = Number.NEGATIVE_INFINITY;
     let minValue = Number.POSITIVE_INFINITY;
+    const parts = availableMoves.length;
     for (let i = 0; i < availableMoves.length; i++) {
       const move = availableMoves[i];
       const { from, to } = move;
@@ -593,7 +599,7 @@ class Game {
         sum: newSum,
       });
       this.undoTurn();
-
+      progressLogger?.((i / parts) * 100 + 5);
       if (maximizingPlayer) {
         if (childValue > maxValue) {
           maxValue = childValue;

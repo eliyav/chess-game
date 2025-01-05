@@ -105,18 +105,20 @@ export function createLocalEvents({
   controller,
 }: {
   controller: Controller;
-}): LocalEvents[] {
-  return [
-    {
-      name: "onMove",
-      event: async (e: MessageEvent) => {
-        if (e.data.type === "move") {
-          await controller.move({
-            move: [e.data.move.from, e.data.move.to],
-            emit: false,
-          });
-        }
-      },
+}): LocalEvents {
+  return {
+    name: "onMessage",
+    event: async (e: MessageEvent) => {
+      if (e.data.type === "move") {
+        await controller.move({
+          move: [e.data.move.from, e.data.move.to],
+          emit: false,
+        });
+      } else if (e.data.type === "progress") {
+        controller.setThinkingProgress(e.data.progress);
+      } else {
+        console.error("Invalid message type");
+      }
     },
-  ];
+  };
 }

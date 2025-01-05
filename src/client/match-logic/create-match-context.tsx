@@ -1,7 +1,7 @@
 import { PIECE } from "../../shared/game";
 import { Lobby } from "../../shared/lobby";
 import { MATCH_TYPE, Player } from "../../shared/match";
-import { LocalMatch } from "./local-match";
+import { OfflineMatch } from "./offline-match";
 import { OnlineMatch } from "./online-match";
 
 export function createMatchContext({
@@ -18,7 +18,7 @@ export function createMatchContext({
   onPromotion: (resolve: (piece: PIECE) => void) => void;
 }) {
   return lobby.mode === MATCH_TYPE.OFFLINE
-    ? new LocalMatch({
+    ? new OfflineMatch({
         lobby,
         player,
         onTimeUpdate,

@@ -11,6 +11,7 @@ export interface Lobby {
   depth: number;
   timers?: { [key in TEAM]: { formatted: string; raw: number } };
   currentTeam?: TEAM;
+  progress?: number;
 }
 
 export function createLobby(preset: {

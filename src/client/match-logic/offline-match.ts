@@ -6,11 +6,11 @@ import { BaseMatch, MatchLogic } from "./base-match";
 import { Controller } from "./controller";
 import { createLocalEvents, LocalEvents } from "./events";
 
-export class LocalMatch extends BaseMatch implements MatchLogic {
+export class OfflineMatch extends BaseMatch implements MatchLogic {
   mode: MATCH_TYPE.OFFLINE;
   vsComputer: { maximizingPlayer: boolean; depth: number } | undefined;
   worker: Worker | undefined;
-  events: LocalEvents[] | undefined;
+  events: LocalEvents | undefined;
   onPromotion: (resolve: (piece: PIECE) => void) => void;
 
   constructor({
@@ -105,9 +105,7 @@ export class LocalMatch extends BaseMatch implements MatchLogic {
     this.events = events;
     if (this.vsComputer) {
       const worker = new Worker(new URL(GAME_WORKER_URL, import.meta.url));
-      for (const event of this.events) {
-        worker.onmessage = event.event;
-      }
+      worker.onmessage = events.event;
       worker.postMessage({
         type: "start",
         data: this.vsComputer,

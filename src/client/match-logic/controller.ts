@@ -2,7 +2,7 @@ import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { PickingInfo } from "@babylonjs/core/Collisions/pickingInfo";
 import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
 import type { Nullable } from "@babylonjs/core/types";
-import { GAMESTATUS, Point, Turn } from "../../shared/game";
+import { GAMESTATUS, PIECE, Point, Turn } from "../../shared/game";
 import { MATCH_TYPE, TEAM } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
 import { Settings } from "../../shared/settings";
@@ -14,18 +14,19 @@ import {
   createMovementDisc,
   getPointFromPosition,
   getPositionFromPoint,
+  highlightPiece,
   showMoves,
 } from "../scenes/scene-helpers";
 import { GameScene, SceneManager, Scenes } from "../scenes/scene-manager";
 import { websocket } from "../websocket-client";
-import { LocalMatch } from "./local-match";
+import { OfflineMatch } from "./offline-match";
 import { OnlineMatch } from "./online-match";
 import { Lobby } from "../../shared/lobby";
 import { Alert } from "../components/modals/alert-tab";
 
 export class Controller {
   sceneManager: SceneManager;
-  match: LocalMatch | OnlineMatch | undefined;
+  match: OfflineMatch | OnlineMatch | undefined;
   events: {
     setMessage: (message: Message | null) => void;
     setAlert: (alert: Alert | null) => void;
@@ -41,7 +42,7 @@ export class Controller {
     events,
     settings,
   }: {
-    match: LocalMatch | OnlineMatch | undefined;
+    match: OfflineMatch | OnlineMatch | undefined;
     sceneManager: SceneManager;
     events: {
       setMessage: (message: Message | null) => void;
@@ -175,7 +176,7 @@ export class Controller {
     });
     const lastTurn = this.match?.getGameHistory().at(-1);
     if (!lastTurn) return;
-    const { from, to } = lastTurn;
+    const { from, to, isOpponentInCheck } = lastTurn;
     //Plane in both locations
     const originDisc = createMovementDisc({
       point: from,
@@ -189,6 +190,24 @@ export class Controller {
       type: "previousTurn",
       name,
     });
+    if (isOpponentInCheck) {
+      const kingPoint = this.match?.getAllGamePieces().find(({ piece }) => {
+        return (
+          piece?.type === PIECE.K &&
+          piece?.team === this.match?.getCurrentTeam()
+        );
+      })?.point;
+      const kingPosition = getPositionFromPoint({
+        point: kingPoint!,
+        externalMesh: false,
+      });
+      highlightPiece({
+        gameScene,
+        position: kingPosition,
+        type: "checkedPiece",
+      });
+    }
+
     gameScene.scene.addMesh(originDisc);
     gameScene.scene.addMesh(targetDisc);
   }
@@ -206,6 +225,15 @@ export class Controller {
       gameScene,
       visibleMoves: this.settings.displayAvailableMoves,
     });
+  }
+
+  setThinkingProgress(progress: number) {
+    if (this.match) {
+      this.events.setMatchInfo({
+        ...this.match.state(),
+        progress,
+      });
+    }
   }
 
   createMatchEndPrompt(status: GAMESTATUS) {
