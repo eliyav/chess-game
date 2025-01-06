@@ -63,12 +63,14 @@ class Game {
     grid = this.current.grid,
     simulate,
     onPromotion,
+    onSuccess,
   }: {
     from: Point;
     to: Point;
     grid?: Grid;
     simulate?: boolean;
     onPromotion?: (resolve: (piece: PIECE) => void) => void;
+    onSuccess?: (move: Move) => void;
   }) {
     if (this.current.status !== GAMESTATUS.INPROGRESS) return;
     const move = this.findMove({ grid, from, to });
@@ -101,6 +103,7 @@ class Game {
     this.annotate(resolved);
     if (!simulate) {
       this.nextTurn();
+      onSuccess?.(move);
     }
     return resolved;
   }

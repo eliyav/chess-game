@@ -159,6 +159,7 @@ export class Controller {
     if (isGameOver) {
       const status = this.match!.getGame().getState().status;
       this.events.setMessage(this.createMatchEndPrompt(status));
+      this.match?.timer?.stop();
     } else {
       this.rotateCamera();
     }
