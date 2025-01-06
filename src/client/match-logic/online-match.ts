@@ -37,6 +37,7 @@ export class OnlineMatch extends BaseMatch implements MatchLogic {
       from: from,
       to: to,
       onPromotion: this.onPromotion,
+      onSuccess: this.timer?.switchPlayer.bind(this.timer),
     });
     return {
       turn,
