@@ -21,7 +21,7 @@
   "author": "Eliya Vahl",
   "license": "MIT",
   "dependencies": {
-    "@babylonjs/core": "^7.42.0",
+    "@babylonjs/core": "^7.46.0",
     "@babylonjs/loaders": "^7.42.0",
     "compression": "^1.7.5",
     "cors": "^2.8.5",
