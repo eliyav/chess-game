@@ -7,8 +7,7 @@ module.exports = {
       instances: 1,
       watch: false,
       autorestart: true,
-      // every 5 minutes
-      restart_delay: 300000,
+      exp_backoff_restart_delay: 100
     },
   ],
 };
