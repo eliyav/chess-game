@@ -21,8 +21,8 @@
   "author": "Eliya Vahl",
   "license": "MIT",
   "dependencies": {
-    "@babylonjs/core": "^7.42.0",
-    "@babylonjs/loaders": "^7.42.0",
+    "@babylonjs/core": "^8.0.1",
+    "@babylonjs/loaders": "^8.0.1",
     "compression": "^1.7.5",
     "cors": "^2.8.5",
     "express": "^4.21.2",
@@ -33,7 +33,7 @@
     "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
-    "@babylonjs/inspector": "^7.42.0",
+    "@babylonjs/inspector": "^8.0.1",
     "@types/compression": "^1.7.5",
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",
