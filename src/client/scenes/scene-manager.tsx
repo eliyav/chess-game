@@ -1,11 +1,9 @@
-import { type Sound, AudioEngine } from "@babylonjs/core/Audio";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import type { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Scene } from "@babylonjs/core/scene";
 import { APP_ROUTES } from "../../shared/routes";
 import { AnimationContainer } from "./animation/create-animations";
-import { handleAudioUnlock } from "./audio-engine";
 import { createGameScene } from "./game-scene";
 import { createHomeScene } from "./home-scene";
 
@@ -18,10 +16,6 @@ export type GameScene = CustomScene<{
   meshesToRender: AbstractMesh[];
   animationsContainer: AnimationContainer;
   shadowGenerator: ShadowGenerator[];
-  audio: {
-    select?: Sound;
-    crumble?: Sound;
-  };
 }>;
 
 export const enum Scenes {
@@ -54,11 +48,9 @@ const sceneRouting: Partial<Record<APP_ROUTES, { [state: string]: Scenes }>> = {
 
 export async function createSceneManager(canvas: HTMLCanvasElement) {
   const engine = new Engine(canvas, true);
-  const audioEngine = new AudioEngine(null);
-  handleAudioUnlock(audioEngine);
   const [homeScene, gameScene] = await Promise.all([
     createHomeScene(engine),
-    createGameScene(canvas, engine, audioEngine),
+    createGameScene(canvas, engine),
   ]);
   return new SceneManager({
     engine,

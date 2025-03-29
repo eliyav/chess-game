@@ -5,6 +5,7 @@ import { APP_URL } from "../config";
 import App from "./app";
 import "./index.css";
 import { createSceneManager } from "./scenes/scene-manager";
+import { createAudioManager } from "./scenes/audio-manager";
 
 export const ENV_BASE_URL =
   process.env.NODE_ENV === "production" ? APP_URL.PROD : APP_URL.DEV;
@@ -36,6 +37,7 @@ const root = ReactDOMClient.createRoot(container);
 const canvas = document.getElementById("app-canvas") as HTMLCanvasElement;
 
 const sceneManager = await createSceneManager(canvas);
+createAudioManager();
 
 root.render(
   <React.StrictMode>

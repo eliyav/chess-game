@@ -3,13 +3,16 @@ import { PickingInfo } from "@babylonjs/core/Collisions/pickingInfo";
 import { IPointerEvent } from "@babylonjs/core/Events/deviceInputEvents";
 import type { Nullable } from "@babylonjs/core/types";
 import { GAMESTATUS, PIECE, Point, Turn } from "../../shared/game";
+import { Lobby } from "../../shared/lobby";
 import { MATCH_TYPE, TEAM } from "../../shared/match";
 import { APP_ROUTES } from "../../shared/routes";
 import { Settings } from "../../shared/settings";
+import { Alert } from "../components/modals/alert-tab";
 import { Message } from "../components/modals/message-modal";
 import { doPointsMatch } from "../game-logic/moves";
 import { rotateCamera } from "../scenes/animation/camera";
 import calcTurnAnimation from "../scenes/animation/turn-animation";
+import { audioManager } from "../scenes/audio-manager";
 import {
   createMovementDisc,
   getPointFromPosition,
@@ -21,8 +24,6 @@ import { GameScene, SceneManager, Scenes } from "../scenes/scene-manager";
 import { websocket } from "../websocket-client";
 import { OfflineMatch } from "./offline-match";
 import { OnlineMatch } from "./online-match";
-import { Lobby } from "../../shared/lobby";
-import { Alert } from "../components/modals/alert-tab";
 
 export class Controller {
   sceneManager: SceneManager;
@@ -138,7 +139,7 @@ export class Controller {
     if (this.settings.playGameSounds) {
       const moveType = turn.type;
       if (moveType === "capture" || moveType === "enPassant") {
-        gameScene.data.audio.crumble?.play();
+        audioManager.crumbleAudio.play();
       }
     }
     this.clearMeshes({ name: "plane" });
@@ -216,7 +217,7 @@ export class Controller {
   displayMoves(point: Point) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (this.settings.playGameSounds) {
-      gameScene.data.audio.select?.play();
+      audioManager.selectAudio.play();
     }
     const moves = this.match!.getMoves(point);
     this.render();
