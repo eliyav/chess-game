@@ -1,5 +1,6 @@
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Engine } from "@babylonjs/core/Engines/engine";
+import type { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { ImportMeshAsync } from "@babylonjs/core/Loading/sceneLoader";
 import { Material } from "@babylonjs/core/Materials/material";
@@ -21,7 +22,7 @@ import { createMeshMaterials } from "./materials";
 import { CustomScene } from "./scene-manager";
 
 export const createHomeScene = async (
-  engine: Engine
+  engine: Engine | WebGPUEngine
 ): Promise<CustomScene<{}>> => {
   const scene = new Scene(engine);
   const camera = new ArcRotateCamera(

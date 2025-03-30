@@ -1,4 +1,5 @@
 import { Engine } from "@babylonjs/core/Engines/engine";
+import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import type { ShadowGenerator } from "@babylonjs/core/Lights/Shadows/shadowGenerator";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Scene } from "@babylonjs/core/scene";
@@ -47,7 +48,15 @@ const sceneRouting: Partial<Record<APP_ROUTES, { [state: string]: Scenes }>> = {
 };
 
 export async function createSceneManager(canvas: HTMLCanvasElement) {
-  const engine = new Engine(canvas, true);
+  const engine = (await WebGPUEngine.IsSupportedAsync)
+    ? new WebGPUEngine(canvas, {
+        antialias: true,
+      })
+    : new Engine(canvas, true);
+  if (engine instanceof WebGPUEngine) {
+    await engine.initAsync();
+  }
+
   const [homeScene, gameScene] = await Promise.all([
     createHomeScene(engine),
     createGameScene(canvas, engine),
@@ -60,7 +69,7 @@ export async function createSceneManager(canvas: HTMLCanvasElement) {
 }
 
 export class SceneManager {
-  private engine: Engine;
+  private engine: Engine | WebGPUEngine;
   private scenes: ScenesDict;
   private activeSceneId: Scenes;
 
@@ -69,7 +78,7 @@ export class SceneManager {
     gameScene,
     engine,
   }: {
-    engine: Engine;
+    engine: Engine | WebGPUEngine;
     homeScene: ScenesDict[Scenes.HOME];
     gameScene: ScenesDict[Scenes.GAME];
   }) {

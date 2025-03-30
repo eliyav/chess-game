@@ -1,6 +1,7 @@
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import "@babylonjs/core/Culling/ray";
 import { Engine } from "@babylonjs/core/Engines/engine";
+import type { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { ShadowGenerator } from "@babylonjs/core/Lights/Shadows";
@@ -14,7 +15,7 @@ import { GameScene } from "./scene-manager";
 
 export const createGameScene = async (
   canvas: HTMLCanvasElement,
-  engine: Engine
+  engine: Engine | WebGPUEngine
 ): Promise<GameScene> => {
   const scene = new Scene(engine);
   const camera = new ArcRotateCamera(
