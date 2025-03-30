@@ -12,6 +12,7 @@
     "build": "node esbuild.config.js",
     "build:prod": "node esbuild.config.js -- -p",
     "build:watch": "node esbuild.config.js -- -w -spb",
+    "build:analyze": "node esbuild.config.js -- -a",
     "nodemon:server": "nodemon dist/server/index.js"
   },
   "browserslist": [

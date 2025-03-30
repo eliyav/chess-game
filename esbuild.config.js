@@ -3,6 +3,8 @@ import { tailwindPlugin } from "esbuild-plugin-tailwindcss";
 import fs from "node:fs/promises";
 
 const isWatch = process.argv.includes("--watch") || process.argv.includes("-w");
+const isAnalyze =
+  process.argv.includes("--analyze") || process.argv.includes("-a");
 const isSkipPrebuild =
   process.argv.includes("--skipPrebuild") || process.argv.includes("-spb");
 const isProductionEnv =
@@ -51,6 +53,7 @@ const browserEsmBundle = {
   define: {
     "process.env.NODE_ENV": isProductionEnv ? '"production"' : '"development"',
   },
+  metafile: isAnalyze ? true : false,
   plugins: [
     tailwindPlugin({
       config: "./tailwind.config.js",
@@ -92,5 +95,14 @@ if (isWatch) {
     servedir: "dist/client",
   });
 } else {
-  await Promise.all(bundles.map((bundle) => build(bundle)));
+  await Promise.all(
+    bundles.map(async (bundle, i) => {
+      const result = await build(bundle);
+      // Create a metafile if metafile is enabled
+      if (isAnalyze && result.metafile) {
+        fs.writeFile(`meta${i}.json`, JSON.stringify(result.metafile));
+      }
+      return result;
+    })
+  );
 }
