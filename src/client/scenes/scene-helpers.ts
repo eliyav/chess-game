@@ -1,6 +1,7 @@
 import { Material } from "@babylonjs/core/Materials/material";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { CreateDisc } from "@babylonjs/core/Meshes/Builders/discBuilder";
+import { CreateTorus } from "@babylonjs/core/Meshes/Builders/torusBuilder";
 import { Scene } from "@babylonjs/core/scene";
 import { Move, Point } from "../../shared/game";
 import { pointIndexMap, pointPositionMap } from "../data/point-map-data";
@@ -44,7 +45,7 @@ export function highlightPiece({
   type: "piece" | "checkedPiece";
 }) {
   const [z, x] = position;
-  const torus = MeshBuilder.CreateTorus("torus", {
+  const torus = CreateTorus("torus", {
     diameter: 2.6,
     thickness: 0.2,
     tessellation: 16,
@@ -110,7 +111,7 @@ export const createMovementDisc = ({
     point,
     externalMesh: false,
   });
-  const disc = MeshBuilder.CreateDisc(name || "disc", {
+  const disc = CreateDisc(name || "disc", {
     radius: 1.1,
   });
   disc.isPickable = false;

@@ -1,10 +1,7 @@
-import {
-  ISceneLoaderAsyncResult,
-  SceneLoader,
-} from "@babylonjs/core/Loading/sceneLoader";
+import { ImportMeshAsync } from "@babylonjs/core/Loading/sceneLoader";
 import { Material } from "@babylonjs/core/Materials/material";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
-import { Color3 } from "@babylonjs/core/Maths/math";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { Scene } from "@babylonjs/core/scene";
@@ -17,7 +14,7 @@ import queen from "../../../assets/pieces/queenv3.gltf";
 import rook from "../../../assets/pieces/rookv3.gltf";
 import { createMeshMaterials, createMovementMaterials } from "./materials";
 import chessData from "../game-logic/chess-data-import";
-import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { CreatePlane } from "@babylonjs/core/Meshes/Builders/planeBuilder";
 import { getPositionFromPoint } from "./scene-helpers";
 
 export const loadGameAssets = async ({
@@ -31,11 +28,10 @@ export const loadGameAssets = async ({
 }) => {
   const meshesToLoad = [king, queen, knight, bishop, rook, pawn];
 
-  const loadedBoardMesh: ISceneLoaderAsyncResult =
-    await SceneLoader.ImportMeshAsync("", board, "");
+  const loadedBoardMesh = await ImportMeshAsync(board, scene);
 
-  const loadedPieceMeshes: ISceneLoaderAsyncResult[] = await Promise.all(
-    meshesToLoad.map((mesh) => SceneLoader.ImportMeshAsync("", mesh, ""))
+  const loadedPieceMeshes = await Promise.all(
+    meshesToLoad.map((mesh) => ImportMeshAsync(mesh, scene))
   );
 
   loadedBoardMesh.meshes.forEach((mesh, idx) => {
@@ -67,7 +63,7 @@ export const loadGameAssets = async ({
 
   //Create invisible mesh for each square on the board for raypicking
   chessData.boardPoints.forEach((point, i) => {
-    const plane = MeshBuilder.CreatePlane(`plane-${i}`, {
+    const plane = CreatePlane(`plane-${i}`, {
       size: 2.8,
     });
     const [z, x] = getPositionFromPoint({
@@ -95,7 +91,7 @@ function configureChessPieces({
   materials,
 }: {
   finalArray: ChessPieceMesh[];
-  meshes: ISceneLoaderAsyncResult[];
+  meshes: Awaited<ReturnType<typeof ImportMeshAsync>>[];
   materials: Material[];
 }) {
   meshes.forEach((mesh) => {

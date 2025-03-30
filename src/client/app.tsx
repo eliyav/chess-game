@@ -1,4 +1,4 @@
-import "@babylonjs/loaders/glTF";
+import "@babylonjs/loaders/glTF/2.0/glTFLoader";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Lobby } from "../shared/lobby";

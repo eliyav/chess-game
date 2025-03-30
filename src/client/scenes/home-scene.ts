@@ -1,10 +1,7 @@
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import {
-  ISceneLoaderAsyncResult,
-  SceneLoader,
-} from "@babylonjs/core/Loading/sceneLoader";
+import { ImportMeshAsync } from "@babylonjs/core/Loading/sceneLoader";
 import { Material } from "@babylonjs/core/Materials/material";
 import { Space } from "@babylonjs/core/Maths/math.axis";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -43,15 +40,10 @@ export const createHomeScene = async (
 
   const materials = createMeshMaterials(scene);
 
-  const importedBoardMesh = await SceneLoader.ImportMeshAsync(
-    "",
-    board,
-    "",
-    scene
-  );
+  const importedBoardMesh = await ImportMeshAsync(board, scene);
   const importedPiecesMeshes = await Promise.all(
     [king, queen, knight, bishop, rook, pawn].map((mesh) =>
-      SceneLoader.ImportMeshAsync("", mesh, "", scene)
+      ImportMeshAsync(mesh, scene)
     )
   );
 
@@ -99,7 +91,7 @@ function createDisplayPieces({
   materials,
 }: {
   finalArray: DisplayMesh[];
-  meshes: ISceneLoaderAsyncResult[];
+  meshes: Awaited<ReturnType<typeof ImportMeshAsync>>[];
   materials: Material[];
 }) {
   meshes.forEach((mesh) => {
@@ -122,7 +114,7 @@ function createDisplayPieces({
 }
 
 function createDisplayBoard(
-  board: ISceneLoaderAsyncResult
+  board: Awaited<ReturnType<typeof ImportMeshAsync>>
 ): [AbstractMesh, Nullable<AbstractMesh>] {
   const boardMesh = board.meshes[0];
   const boardClone = boardMesh.clone("Board", null);
