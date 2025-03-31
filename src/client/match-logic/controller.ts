@@ -139,7 +139,7 @@ export class Controller {
     if (this.settings.playGameSounds) {
       const moveType = turn.type;
       if (moveType === "capture" || moveType === "enPassant") {
-        audioManager.crumbleAudio.play();
+        audioManager?.play("crumble");
       }
     }
     this.clearMeshes({ name: "plane" });
@@ -217,7 +217,7 @@ export class Controller {
   displayMoves(point: Point) {
     const gameScene = this.sceneManager.getScene(Scenes.GAME);
     if (this.settings.playGameSounds) {
-      audioManager.selectAudio.play();
+      audioManager?.play("select");
     }
     const moves = this.match!.getMoves(point);
     this.render();
