@@ -24,7 +24,7 @@ export const OfflineLobby: React.FC<{
       <div className="flex grid-rows-1 justify-center align-center glass dark-pane m-4">
         <BackButton
           className={
-            "inline-block h-full border-r-2 border-white min-w-16 p-3 hover:bg-white hover:bg-opacity-10"
+            "inline-block h-full border-r-2 border-white min-w-16 p-3 hover:bg-[var(--hover-bg)]"
           }
           size={30}
           onClick={() => navigate(APP_ROUTES.LOBBY_SELECT)}
@@ -124,7 +124,7 @@ export const OfflineLobby: React.FC<{
         </div>
       </div>
       <button
-        className="m-auto w-fit h-fit z-10 rounded-full p-3 border-2 bg-slate-700 border-slate-200 hover:bg-white hover:bg-opacity-10 !important"
+        className="m-auto w-fit h-fit z-10 rounded-full p-3 border-2 bg-slate-700 border-slate-200 hover:bg-[var(--hover-bg)]"
         onClick={() => navigate(APP_ROUTES.SETTINGS)}
       >
         <Gear size={30} />

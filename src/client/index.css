@@ -1,10 +1,9 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 :root {
   --primary-dark-opaque: rgba(0, 0, 0, 0.6);
   --primary-light-opaque: rgba(255, 255, 255, 0.7);
+  --hover-bg: rgba(255, 255, 255, 0.1);
 }
 
 .glass {
