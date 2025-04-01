@@ -32,7 +32,7 @@ export const SettingsPanel: React.FC<{
       <div className="flex grid-rows-1 justify-center align-center glass dark-pane m-4">
         <BackButton
           className={
-            "inline-block h-full border-r-2 border-white min-w-16 p-3 hover:bg-white hover:bg-opacity-10"
+            "inline-block h-full border-r-2 border-white min-w-16 p-3 hover:bg-[var(--hover-bg)]"
           }
           size={30}
           onClick={() => closeWindow()}

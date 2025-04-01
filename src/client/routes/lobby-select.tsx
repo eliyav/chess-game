@@ -21,7 +21,7 @@ export const LobbySelect: React.FC<{
       <div className="flex grid-rows-1 justify-center align-center glass dark-pane m-4">
         <BackButton
           className={
-            "inline-block h-full border-r-2 border-white min-w-16 p-3 hover:bg-white hover:bg-opacity-10"
+            "inline-block h-full border-r-2 border-white min-w-16 p-3 hover:bg-[var(--hover-bg)]"
           }
           size={30}
           onClick={() => navigate(APP_ROUTES.HOME)}
@@ -74,7 +74,7 @@ export const LobbySelect: React.FC<{
             onChange={(e) => setLobbyKey(e.target.value.toUpperCase())}
             autoComplete="off"
             value={lobbyKey}
-            className="relative w-full p-2 rounded-xl mb-4 text-center border-2 h-16 border-gray-700 shadow-sm shadow-white placeholder-opacity-50 focus:outline-none focus:shadow-md focus:shadow-white"
+            className="relative w-full p-2 rounded-xl mb-4 bg-white text-center border-2 h-16 border-gray-700 shadow-sm shadow-white placeholder-opacity-50 focus:outline-none focus:shadow-md focus:shadow-white"
           ></input>
           <SelectionButton
             customClass={
