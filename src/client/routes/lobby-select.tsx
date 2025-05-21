@@ -90,7 +90,7 @@ export const LobbySelect: React.FC<{
                   {}
                 );
                 if (!response.ok) {
-                  throw new Error("Failed to join lobby");
+                  throw new Error(await response.text());
                 }
                 navigate(
                   `${APP_ROUTES.LOBBY}?type=${MATCH_TYPE.ONLINE}&key=${lobbyKey}`
@@ -98,8 +98,6 @@ export const LobbySelect: React.FC<{
               } catch (e) {
                 if (e instanceof Error) {
                   setAlert({ message: e.message });
-                } else {
-                  setAlert({ message: "Failed to join lobby" });
                 }
               } finally {
                 setLoading(false);

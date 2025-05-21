@@ -35,6 +35,7 @@ app.get(RESOURCES.CREATE_LOBBY, (req, res) => {
 
 app.get(RESOURCES.JOIN_LOBBY, (req, res) => {
   const lobbyKey = req.query.key as string;
+
   if (!lobbyKey) {
     res.status(400).send("Lobby key is required");
     return;
@@ -44,7 +45,8 @@ app.get(RESOURCES.JOIN_LOBBY, (req, res) => {
     res.status(400).send("Lobby does not exist");
     return;
   }
-  if (lobby.players.length === 2) {
+  const players = lobby.players.filter((player) => player.id);
+  if (players.length === 2) {
     res.status(400).send("Lobby is full");
     return;
   }
