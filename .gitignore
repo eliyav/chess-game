@@ -137,3 +137,6 @@ dist
 
 #Build for tests
 build
+
+# Sqlite database files
+*.sqlite
