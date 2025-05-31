@@ -13,7 +13,8 @@
     "build:prod": "node esbuild.config.js -- -p",
     "build:watch": "node esbuild.config.js -- -w -spb",
     "build:analyze": "node esbuild.config.js -- -a",
-    "nodemon:server": "nodemon dist/server/index.js"
+    "nodemon:server": "nodemon dist/server/index.js",
+    "kysely:migrate:latest": "kysely migrate:latest"
   },
   "browserslist": [
     "last 1 Chrome version",
@@ -24,20 +25,22 @@
   "dependencies": {
     "@babylonjs/core": "^8.0.1",
     "@babylonjs/loaders": "^8.0.1",
+    "better-sqlite3": "^11.10.0",
     "compression": "^1.7.5",
     "cors": "^2.8.5",
     "express": "^4.21.2",
+    "kysely": "^0.28.2",
+    "kysely-ctl": "^0.13.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.1",
     "socket.io": "^4.8.1",
-    "socket.io-client": "^4.8.1",
-    "sqlite3": "^5.1.7",
-    "typeorm": "^0.3.24"
+    "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
     "@babylonjs/inspector": "^8.0.1",
     "@tailwindcss/postcss": "^4.1.0",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/compression": "^1.7.5",
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",
