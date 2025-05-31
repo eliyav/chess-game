@@ -8,10 +8,7 @@ import { createWebsocketServer } from "./websocket-server";
 import { generateKey } from "../shared/helpers";
 import { createLobby, Lobby } from "../shared/lobby";
 import { MATCH_TYPE } from "../shared/match";
-import { initDB } from "./database/data-source";
 import usersRouter from "./routers/users-router";
-
-export const DB = initDB();
 
 const clientPath = fileURLToPath(new URL("../client", import.meta.url));
 
