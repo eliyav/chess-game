@@ -1,15 +1,17 @@
 import express from "express";
-import { User } from "../database/entity/user";
-import { UserRepository } from "../database/repositories/user-repository";
-import type { SqliteError } from "../database/database-query-types";
-import { QueryFailedError } from "typeorm";
+import {
+  createUser,
+  deleteUser,
+  getAllUsers,
+  updateUser,
+} from "../database/repositories/user-repository";
 
 const usersRouter = express.Router();
 
 // Get all users
 usersRouter.get("/", async (req, res) => {
   try {
-    const users = await UserRepository.getUsers();
+    const users = await getAllUsers();
     res.json(users);
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -25,29 +27,24 @@ usersRouter.post("/", async (req, res) => {
     return res.status(400).send("Username, email, and password are required");
   }
 
-  const newUser = new User();
-  newUser.username = username;
-  newUser.email = email;
-  newUser.password = password;
-
   try {
-    const result = await UserRepository.insertUser(newUser);
+    const result = await createUser({
+      username,
+      email,
+      password,
+    });
     console.log("User created:", result);
-    if (result.identifiers.length === 0) {
-      return res.status(400).send("User could not be created");
-    }
     res.status(201).json({
       message: "User created successfully",
-      userId: result.identifiers[0].id,
+      userId: result.id,
     });
   } catch (error) {
-    if (error instanceof QueryFailedError) {
-      const sqliteError = error as SqliteError;
-      if (sqliteError.driverError.code === "SQLITE_CONSTRAINT") {
-        if (sqliteError.driverError.message.includes("username")) {
+    if (error instanceof Error) {
+      if (error.name === "SqliteError") {
+        if (error.message.includes("user.username")) {
           return res.status(400).send("Username already exists");
         }
-        if (sqliteError.driverError.message.includes("email")) {
+        if (error.message.includes("user.email")) {
           return res.status(400).send("Email already exists");
         }
         return res.status(400).send("Username or email already exists");
@@ -67,19 +64,11 @@ usersRouter.put("/:id", async (req, res) => {
   }
 
   try {
-    const user = await UserRepository.getUserById(userId);
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-
-    user.username = username;
-    user.email = email;
-    user.password = password;
-
-    const result = await UserRepository.updateUser(user);
-    if (result.affected === 0) {
-      return res.status(400).send("User could not be updated");
-    }
+    const user = await updateUser(userId, {
+      username,
+      email,
+      password,
+    });
     res.json({
       message: "User updated successfully",
       userId: user.id,
@@ -93,17 +82,8 @@ usersRouter.put("/:id", async (req, res) => {
 //Delete a user
 usersRouter.delete("/:id", async (req, res) => {
   const userId = parseInt(req.params.id, 10);
-
   try {
-    const user = await UserRepository.getUserById(userId);
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-
-    const deleteResult = await UserRepository.deleteUser(userId);
-    if (deleteResult.affected === 0) {
-      return res.status(400).send("User could not be deleted");
-    }
+    const user = await deleteUser(userId);
     res.status(200).send({ message: "User deleted successfully" });
   } catch (error) {
     console.error("Error deleting user:", error);
