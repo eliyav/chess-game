@@ -8,7 +8,7 @@
     "clean": "node -e \"fs.rmSync('dist', {recursive: true, force: true})\"",
     "start": "npm run build && concurrently --names esbuild,nodemon -c auto --kill-others npm:build:watch npm:nodemon:server",
     "typecheck": "tsc --noEmit",
-    "test": "glob -c \"node --import tsx --test\" \"src/tests/**/*.test.ts\"",
+    "test": "glob -c \"node --inspect --import tsx --test\" \"src/tests/**/*.test.ts\"",
     "build": "node esbuild.config.js",
     "build:prod": "node esbuild.config.js -- -p",
     "build:watch": "node esbuild.config.js -- -w -spb",
