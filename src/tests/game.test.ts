@@ -4,6 +4,7 @@ import Game from "../client/game-logic/game";
 import { GAMESTATUS, PIECE } from "../shared/game";
 import { TEAM } from "../shared/match";
 import { doPointsMatch } from "../client/game-logic/moves";
+import { Board } from "../client/game-logic/board";
 
 describe("Game Class", () => {
   let game: Game;
@@ -103,5 +104,56 @@ describe("Game Class", () => {
     const kingMoves = game.getMoves({ point: king!.point });
     assert.ok(kingMoves.some((move) => move.type === "castle"));
     assert.ok(kingMoves.some((move) => doPointsMatch(move.to, [0, 0])));
+  });
+
+  it("should not have queen side castling", () => {
+    game.current.grid = Board.createGrid(8, [
+      {
+        type: PIECE.K,
+        teams: [
+          {
+            name: TEAM.WHITE,
+            startingPoints: [[4, 0]],
+          },
+          {
+            name: TEAM.BLACK,
+            startingPoints: [[3, 7]],
+          },
+        ],
+      },
+      {
+        type: PIECE.R,
+        teams: [
+          {
+            name: TEAM.WHITE,
+            startingPoints: [[0, 0]],
+          },
+          {
+            name: TEAM.BLACK,
+            startingPoints: [],
+          },
+        ],
+      },
+      {
+        type: PIECE.B,
+        teams: [
+          {
+            name: TEAM.WHITE,
+            startingPoints: [],
+          },
+          {
+            name: TEAM.BLACK,
+            startingPoints: [[2, 1]],
+          },
+        ],
+      },
+    ]);
+    const castling = game.checkForCastling({
+      kingPoint: [4, 0],
+      team: TEAM.WHITE,
+      grid: game.current.grid,
+      turns: game.getState().turns,
+    });
+    assert(castling.length === 0);
   });
 });
