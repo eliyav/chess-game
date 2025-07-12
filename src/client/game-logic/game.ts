@@ -739,7 +739,7 @@ class Game {
       const square = squaresToCheckEnemyThreat[i];
       for (let k = 0; k < opponentsAvailableMoves.length; k++) {
         const availableMove = opponentsAvailableMoves[k];
-        const doesMoveMatchSquare = doPointsMatch(availableMove.from, square);
+        const doesMoveMatchSquare = doPointsMatch(availableMove.to, square);
         doesMoveMatchSquare
           ? squaresUnderEnemyThreat.push(doesMoveMatchSquare)
           : null;

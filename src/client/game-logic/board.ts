@@ -35,11 +35,14 @@ export class Board {
     });
   }
 
-  static createGrid(boardSize = chessData.boardSize): Grid {
+  static createGrid(
+    boardSize = chessData.boardSize,
+    initialPositions?: typeof chessData.initialPositions
+  ): Grid {
     const grid = Array.from({ length: boardSize }, () =>
       Array.from({ length: boardSize }, () => undefined)
     );
-    this.setPieces({ grid });
+    this.setPieces({ grid, initialPositions });
     return grid;
   }
 
