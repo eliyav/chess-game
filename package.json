@@ -25,7 +25,7 @@
   "dependencies": {
     "@babylonjs/core": "^8.10.0",
     "@babylonjs/loaders": "^8.10.0",
-    "better-sqlite3": "^11.10.0",
+    "better-sqlite3": "^12.4.1",
     "compression": "^1.8.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
