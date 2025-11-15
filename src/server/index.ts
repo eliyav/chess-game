@@ -57,7 +57,7 @@ app.get(RESOURCES.JOIN_LOBBY, (req, res) => {
   res.send(lobbyKey);
 });
 
-app.get("*", function (req, res) {
+app.get("/{*splat}", function (req, res) {
   res.sendFile(path.join(clientPath, "index.html"));
 });
 
